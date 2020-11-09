@@ -287,36 +287,7 @@
             }
 
             if (content != null && content != '') {
-                var signedValue;
-                var cc;
-                //test promise
-                signHashPromise(content, selectedValue, (tipoFirma == "cosign"), "Windows-MY", "", function (sv, connection) {
-                    signedValue = sv;
-                    cc = connection;
-                }
-                ).then(function () {
-                    cc.close();
-                    if (signedValue == null || signedValue == "KO") {
-                        docStatus = false;
-                        docStatusDescription = "Errore nella firma digitale del documento.";
-                    }
-                    else {
-                        var status = 100;
-                        var urlPost = "../SmartClient/SaveSignedHashFile.aspx?isPades=" + pades + "&idDocumento=" + idDocumento;
-                        var data = { 'signedDoc': signedValue };
-                        var statusURL = ajaxCall(urlPost, data);
-                        status = statusURL.status;
-                        content = statusURL.content;
-                        if (status != 200) {
-                            docStatus = false;
-                            docStatusDescription = "Errore durante l\'invio del documento firmato.\n";
-                        }
-                    }
-                    sendStatus(docStatus, docStatusDescription, idDocumento, callback);
-                    });
-
-                /*
-                signHashPromise(content, selectedValue, (tipoFirma == "cosign"), "Windows-MY", "", function (signedValue, connection) {
+                signHash(content, selectedValue, (tipoFirma == "cosign"), "Windows-MY", "", function (signedValue, connection) {
                     connection.close();
                     if (signedValue == null || signedValue == "KO") {
                         docStatus = false;
@@ -336,7 +307,6 @@
                     }
                     sendStatus(docStatus, docStatusDescription, idDocumento, callback);
                 });
-                */
             }
             else {
                 alert("Impossibile contattare il ws...");
@@ -433,7 +403,7 @@
                 }
             }
         }
-
+         
         var convertFile = function (convCentr, fileFormat, selectedValue, tempfilePath, tipoFirma, idDocumento, pades, sighHash, callback) {
             var docStatus = true;
             var docStatusDescription = "";
@@ -623,38 +593,6 @@
                 convCentr = document.getElementById("chkConverti").checked;
                         <%} %>
 
-            (async function loop() {
-                for (k = 0; k < docs.length; k++) {
-                    await new Promise((resolve) => {
-                        documento = JSON.parse(docs[k]);
-                        idDocumento = documento.idDocumento;
-                        isSigned = documento.isSigned;
-                        fileExtension = documento.fileExtension;
-                        //Se contiene P vuol dire che arriva da LF es è cades
-                        if (idDocumento.indexOf("P") > -1) {
-                            idDocumento = idDocumento.replace("P", "");
-                   <%-- this.SignHash('<%=this.TipoFirma%>', idDocumento, true);--%>
-                            SignPromise(tipoFirma, idDocumento, callback, true, true, isSigned, fileExtension, convCentr).then(function () { resolve(); });
-                        } else if (idDocumento.indexOf("C") > -1) {
-                            idDocumento = idDocumento.replace("C", "");
-                    <%--this.SignHash('<%=this.TipoFirma%>', idDocumento, false);--%>
-                            SignPromise(tipoFirma, idDocumento, callback, true, false, isSigned, fileExtension, convCentr).then(function () { resolve(); });
-                        }
-                        else {
-                            if (padesSign) {
-                                SignPromise(tipoFirma, idDocumento, callback, true, true, isSigned, fileExtension, convCentr).then(function () { resolve(); });
-                            } else {
-                                SignPromise(tipoFirma, idDocumento, callback, true, false, isSigned, fileExtension, convCentr).then(function () { resolve(); });
-                            }
-                        }
-                        // setTimeout(resolve, Math.random() * 1000)
-                    });
-                   //console.log(k);
-                }
-            })();
-
-
-          <%-- 
             for (k = 0; k < docs.length; k++) {
                 documento = JSON.parse(docs[k]);
                 idDocumento = documento.idDocumento;
@@ -662,13 +600,13 @@
                 fileExtension = documento.fileExtension;
                 //Se contiene P vuol dire che arriva da LF es è cades
                 if (idDocumento.indexOf("P") > -1) {
-                    idDocumento = idDocumento.replace("P", ""); --%>
+                    idDocumento = idDocumento.replace("P", "");
                    <%-- this.SignHash('<%=this.TipoFirma%>', idDocumento, true);--%>
-                   <%--Sign(tipoFirma, idDocumento, callback, true, true, isSigned, fileExtension, convCentr);
+                    Sign(tipoFirma, idDocumento, callback, true, true, isSigned, fileExtension, convCentr);
                 } else if (idDocumento.indexOf("C") > -1) {
-                    idDocumento = idDocumento.replace("C", ""); --%>
+                    idDocumento = idDocumento.replace("C", "");
                     <%--this.SignHash('<%=this.TipoFirma%>', idDocumento, false);--%>
-                   <%-- Sign(tipoFirma, idDocumento, callback, true, false, isSigned, fileExtension, convCentr);
+                    Sign(tipoFirma, idDocumento, callback, true, false, isSigned, fileExtension, convCentr);
                 }
                 else {
 
@@ -678,303 +616,9 @@
                         Sign(tipoFirma, idDocumento, callback, true, false, isSigned, fileExtension, convCentr);
                     }
                 }
-        }--%>
+        }
     }
 
-    // test promise
-        var _signHashPromise = function (selectedValue, content, recoveryPath, tipoFirma, pades, idDocumento, callback) {
-           //console.log(">>>> INIT - _signHashPromise");
-            var status;
-            var urlPost;
-            var statusURL;
-            var docStatus = true;
-            var docStatusDescription = "";
-            var _promise = new Promise(function (resolve, reject) {
-               //console.log(">>>> START - _signHashPromise");
-                try {
-                status = 0;
-                content = '';
-                urlPost = recoveryPath + '?isHash=true&idDocumento=' + idDocumento;
-                statusURL = ajaxCall(urlPost);
-                status = statusURL.status;
-                content = statusURL.content;
-            }
-            catch (e) {
-                alert(e.message.toString());
-                retValue = false;
-            }
-            if (content != null && content != '') {
-
-                var signedValue;
-                var cc;
-                //test promise
-                signHashPromise(content, selectedValue, (tipoFirma == "cosign"), "Windows-MY", "", function (sv, connection) {
-                    signedValue = sv;
-                    cc = connection;
-                }
-                ).then(function () {
-                    cc.close();
-                    if (signedValue == null || signedValue == "KO") {
-                        docStatus = false;
-                        docStatusDescription = "Errore nella firma digitale del documento.";
-                    }
-                    else {
-                        var status = 100;
-                        var urlPost = "../SmartClient/SaveSignedHashFile.aspx?isPades=" + pades + "&idDocumento=" + idDocumento;
-                        var data = { 'signedDoc': signedValue };
-                        var statusURL = ajaxCall(urlPost, data);
-                        status = statusURL.status;
-                        content = statusURL.content;
-                        if (status != 200) {
-                            docStatus = false;
-                            docStatusDescription = "Errore durante l\'invio del documento firmato.\n";
-                        }
-                    }
-                    sendStatus(docStatus, docStatusDescription, idDocumento, callback);
-                   //console.log("### >>>>  _signHashPromise");
-                    resolve();
-                });
-
-            }
-            else {
-                alert("Impossibile contattare il ws...");
-                callback(false);
-                reject();
-                }
-               //console.log(">>>> END - _signHashPromise");
-            });
-           //console.log(">>>> RETURN - _signHashPromise");
-            return _promise;
-        }
-//////////////////////
-
-
-// test Promise
-        var _signPromise = function (selectedValue, tempfilePath, content, tipoFirma, idDocumento, pades, callback, sighHash, signedAsPdf) {
-           //console.log(">>>> INIT - _signPromise");
-            var status;
-            var urlPost;
-            var statusURL;
-            var docStatus = true;
-            var docStatusDescription = "";
-            var recoveryPath = '../SmartClient/SignedRecordViewer.aspx';
-            var _promise = new Promise(function (resolve, reject) {
-               //console.log(">>>> START - _signPromise");
-                if (sighHash) {
-                    _signHashPromise(selectedValue, content, recoveryPath, tipoFirma, pades, idDocumento, callback).then(function () {
-                       //console.log("### >>>>  _signPromise");
-                        resolve();
-                    });
-                } else {
-                    if (content && content !== '') {
-                        _signDocument(selectedValue, tempfilePath, tipoFirma, idDocumento, signedAsPdf, callback);
-                    } else {
-                        try {
-                            status = 0;
-                            content = '';
-                            urlPost = recoveryPath + '?type=applet&idDocumento=' + idDocumento;
-                            statusURL = ajaxCall(urlPost);
-                            status = statusURL.status;
-                            content = statusURL.content;
-                        }
-                        catch (e) {
-                            alert(e.message.toString());
-                            retValue = false;
-                        }
-                        saveFile(tempfilePath, content, function (retVal, connection) {
-                            connection.close();
-                            //alert("SaveFileNoApplet 1 retVal" + retVal);
-                            if (retVal == "true") {
-                                status = 200;
-                            }
-                            else {
-                                status = 100;
-                            }
-
-                            _signDocument(selectedValue, tempfilePath, tipoFirma, idDocumento, signedAsPdf, callback);
-                        });
-                    }
-                   //console.log("### >>>>  _signPromise in else sign");
-                    resolve();
-                }
-               //console.log(">>>> END - _signPromise");
-            });
-           //console.log(">>>> RETURN - _signPromise");
-            return _promise;
-        }
-
-///////////////////
-
-
-// test promise
-        function SignPromise(tipoFirma, idDocumento, callback, sighHash, pades, signed, fileExtension, convCentr) {
-           //console.log(">>>>  INIT - SignPromise");
-            var docStatus = true;
-            var docStatusDescription = "";
-            var urlPost;
-            var temp = document.getElementById("lstListaCertificati");
-            var indexCert = temp.selectedIndex;
-            var statusURL = null;
-            var content = null;
-            var status = null;
-            var fileFormat = '';
-            var errorText = null;
-            var tempfilePath = null;
-            if (fileExtension) {
-                fileFormat = fileExtension.toUpperCase();
-            }
-            var _promise = new Promise(function (resolve, reject) {
-               //console.log(">>>>  START - SignPromise");
-                if (pades || (signed && (signed === "0"))) {
-                    tipoFirma = 'sign';
-                }
-                if (isNaN(indexCert) || indexCert == -1) {
-                    docStatus = false;
-                    docStatusDescription = "Nessun certificato selezionato";
-                    sendStatus(docStatus, docStatusDescription, idDocumento, callback);
-                }
-                else {
-                    getSpecialFolder(function (path, connection) {
-                        connection.close();
-                        var selectedValue = temp.options[indexCert].value;
-                        if (idDocumento != null && idDocumento != "") {
-                            tempfilePath = path + 'tempsign_' + getUniqueId() + fileFormat;
-                            urlPost = "../SmartClient/FirmaMultiplaChangeSessionContext.aspx?fromDoc=1&idDocumento=" + idDocumento + "&tipoFirma=" + tipoFirma + "&pades=" + pades;
-                            statusURL = ajaxCall(urlPost);
-                            status = statusURL.status;
-                            content = statusURL.content;
-                            errorText = statusURL.errorText;
-                            if (status != 200) {
-                                sendStatus(status, errorText, idDocumento, callback);
-                                resolve();
-                                return;
-                            }
-                        }
-                        if (docStatus) {
-                            var signedAsPdf = false;
-                            var toConvert = false;
-                            var convLoc = false; // ConvertLocally();
-
-                            // Conversione del file da firmare in pdf
-                            // Se il sistema è configurato per convertire il documento in pdf prima
-                            // della firma...
-                            if (convCentr || convLoc) {
-                                tempfilePath = path + 'tempsign_' + getUniqueId() + '.pdf';
-                                convertFilePromise(convCentr, fileFormat, selectedValue, tempfilePath, tipoFirma, idDocumento, pades, sighHash, callback).then(function () {
-                                   //console.log("### >>>>  SignPromise Resolve");
-                                    resolve();
-                                });
-                            }
-                            else {
-                                _signPromise(selectedValue, tempfilePath, content, tipoFirma, idDocumento, pades, callback, sighHash, false).then(function () {
-                                   //console.log("### >>>>  SignPromise Resolve");
-                                    resolve();
-                                });
-                            }
-                        } else {
-                            sendStatus(docStatus, docStatusDescription, idDocumento, callback);
-                            resolve();
-                        }
-                    });
-                }
-               //console.log(">>>>  END - SignPromise");
-            })
-           //console.log(">>>>  RETURN - SignPromise");
-            return _promise;
-            // Invio informazioni sullo stato della firma  
-        }
-
-
-        var convertFilePromise = function (convCentr, fileFormat, selectedValue, tempfilePath, tipoFirma, idDocumento, pades, sighHash, callback) {
-           //console.log(">>>>  INIT - convertFilePromise");
-            var docStatus = true;
-            var docStatusDescription = "";
-            var urlPost;
-            // ...se l'utente vuole convertire il documento si procede con la conversione
-            // prefirma
-            var statusURL = null;
-            var content = null;
-            var status = null;
-            var signedAsPdf = false;
-            var _promise = new Promise(function (resolve, reject) {
-                if (fileFormat.indexOf("P7M") == -1 && fileFormat.indexOf("PDF") == -1) {
-                    // Se è richiesta conversione pdf prefirma...
-                    // ...se è richiesta la conversione centrale...
-                    if (convCentr) {
-                       //console.log(">>>> - convertFilePromise conversione");
-                        // ...si procede con la  conversione sincrona
-                        toConvert = true;
-                        //ABBATANGELI GIANLUIGI
-                        // ERRORE !!! - E' NECESSARIO AVERE IN RISPOSTA HASH DEL FILE E NON TUTTO IL FILE !!!
-                        // MODIFICARE  ConvPDFSincrona.aspx.cs CON IN PIU' PARAMETRO ISHASH CHE RESTITUISCE IL SOLO HASH DEL FILE CONVERTITO IN PDF !!!
-                        urlPost = '../DigitalSignature/ConvPDFSincrona.aspx?applet=true';
-                        // FINE ERRORE !!!
-                        var paramPost = '';
-                        $.ajax({
-                            type: 'POST',
-                            url: urlPost,
-                            data: {},
-                            success: function (content, textStatus, jqXHR) {
-                                status = jqXHR.status;
-                                //var content = response.responseText;
-                                if (status != 200) {
-                                    signedAsPdf = false;
-                                    content = null;
-                                }
-                                else {
-                                    signedAsPdf = (content != null);
-                                }
-
-                                if ((!signedAsPdf) && toConvert) {
-                                    docStatusDescription = "Non è stato possibile convertire il file in formato PDF.\n" +
-                                                                                "Operazione annullata, il file non verrà firmato.";
-                                    docStatus = false;
-                                    sendStatus(docStatus, docStatusDescription, idDocumento, callback);
-                                } else {
-                                    saveFile(tempfilePath, content, function (retVal, connection) {
-                                        //alert("SaveFileNoApplet 1 retVal" + retVal);
-                                        connection.close();
-                                        if (retVal == "true") {
-                                            status = 200;
-                                        }
-                                        else {
-                                            status = 100;
-                                        }
-
-                                        _sign(selectedValue, tempfilePath, content, tipoFirma, idDocumento, pades, callback, false, signedAsPdf);
-                                        resolve();
-                                    });
-                                }
-                            },
-                            error: function () {
-                                docStatusDescription = "Non è stato possibile convertire il file in formato PDF.\n" +
-                                                                            "Operazione annullata, il file non verrà firmato.";
-                                docStatus = false;
-                                sendStatus(docStatus, docStatusDescription, idDocumento, callback);
-                                resolve();
-                            },
-                            async: true
-                        });
-
-                    }
-                    else {
-                        // ...conversione locale eliminata
-                        //content = ConvertPdfStream(http.responseBody, fileFormat, false);
-                    }
-                }
-                else {
-                    //alert('Il file di tipo ' + fileFormat + ' non sarà convertito.');
-                   //console.log(">>>> - convertFilePromise no conversione");
-                    //_sign(selectedValue, tempfilePath, content, tipoFirma, idDocumento, pades, callback, sighHash);
-                    _signPromise(selectedValue, tempfilePath, content, tipoFirma, idDocumento, pades, callback, sighHash, false).then(function () {
-                       //console.log("### >>>>  convertFilePromise Resolve");
-                        resolve();
-                    });
-                }
-            });
-           //console.log(">>>> RETURN - convertFilePromise");
-            return _promise;
-        }
 
 
     function CadesChkChange() {

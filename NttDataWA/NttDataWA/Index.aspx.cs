@@ -854,7 +854,6 @@ namespace NttDataWA
         {
             //Lnr 23/05/2013 - 07/06/2013 disabilito tasto smista se non ho trasm operative di tipo D
             HttpContext.Current.Session["SMISTA_DOC_MANAGER"] = null;
-            HttpContext.Current.Session.Remove("ClosePopupSmistamento");
             List<Notification> l = (from d in NotificationManager.ListNotifyFiltered where d.TYPE_NOTIFICATION == NotificationManager.NotificationType.OPERATIONAL select d).ToList<Notification>();
             if (l != null && l.Count > 0)
             {

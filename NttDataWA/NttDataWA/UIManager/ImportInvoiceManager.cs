@@ -66,7 +66,6 @@ namespace NttDataWA.UIManager
                 else
                 {
                     XmlDocument XmlDoc = new XmlDocument();
-                    
                     XmlDoc.LoadXml(invoice);
                     SetSessionValue("invoiceXML", XmlDoc);
 
@@ -80,10 +79,10 @@ namespace NttDataWA.UIManager
                     {
                         return "NO_IPA";
                     }
-
+                    
                     // Produco il file XML da utilizzare per l'anteprima
                     // contiene il riferimento al foglio di stile XSL
-
+                    
 
                     //XmlDocument previewInvoice = new XmlDocument();
                     //string decl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -93,7 +92,7 @@ namespace NttDataWA.UIManager
 
                     //previewInvoice.Save("C:\\Users\\utente\\temp\\test_invoice.xml");
 
-
+                    
 
                     //Byte[] bytes = Encoding.UTF8.GetBytes(previewInvoice.OuterXml);
                     //DocsPaWR.FileDocumento fileDoc = new DocsPaWR.FileDocumento();
@@ -102,30 +101,7 @@ namespace NttDataWA.UIManager
                     //fileDoc.contentType = "text/xml";
                     //fileDoc.content = bytes;
                     //fileDoc.length = bytes.Length;
-
-                    // nascondere i campi vuoti nella preview
-
-
-                    // Nascondo i campi vuoti in un file copia, conservo l'originale
-                    // cosi non altero la struttura del xml
-
-                    //rimuovo i nodi vuoti (meglio nasconderli)
-                    //XmlDocument XmlDocPreview = new XmlDocument();
-                    //XmlDocPreview.LoadXml(invoice);
-                    //XmlNodeList emptyElements = XmlDocPreview.SelectNodes(@"//*[not(node())]");
-                    //do
-                    //{
-                    //    foreach (XmlNode nodeTemp in emptyElements)
-                    //        nodeTemp.ParentNode.RemoveChild(nodeTemp);
-                    //    emptyElements = XmlDocPreview.SelectNodes(@"//*[not(node())]");
-                    //} while (emptyElements.Count > 0);
-
-                    // fine rimozione nodi vuoti
-
-
-                    //DocsPaWR.FileDocumento fileDoc = getInvoicePreview(invoice);
-                    DocsPaWR.FileDocumento fileDoc = getInvoicePreview(XmlDoc.OuterXml);
-                    //.FileDocumento fileDoc = getInvoicePreview(XmlDocPreview.OuterXml);
+                    DocsPaWR.FileDocumento fileDoc = getInvoicePreview(invoice);
                     SetSessionValue("invoicePreview", fileDoc);
 
                     return string.Empty;
@@ -184,7 +160,7 @@ namespace NttDataWA.UIManager
 
 
         }
-    
+
         public static bool uploadFattura()
         {
 
@@ -210,243 +186,262 @@ namespace NttDataWA.UIManager
 
         }
 
-        public static bool updateParams(string rifAmm, string strIdDoc, string codGic, string posFin, string strDesc, string strQuant, string strPrezUni, string strPrezTot, string strAliquot, string optional1, string optional2, string optional3, string optional4, string optional5, string optional6, string optional7, string optional8, string optional9, string optional10)
+        public static bool updateParams(string rifAmm, string strIdDoc, string codGic, string posFin, string strDesc, string strQuant, string strPrezUni, string strPrezTot, string strAliquot, string optional1, string optional2, string optional3, string optional4, string optional5, string optional6)
         {
-            XmlDocument fatturaXML = (XmlDocument)GetSessionValue("invoiceXML");
-            if (fatturaXML == null)
-                return false;
-            
-            NttDatalLibrary.FatturaElettronicaType fattura = FatturaPARepository.GenerateFatturaFromXML(fatturaXML);
-            if (fattura == null)
-                return false;
+            bool result = true;
+
             try
             {
-                // Controlla nella rappresentazione tabellare dei nodi quali sono quelli obbligatori (già creati) e quali non (da creare nel caso non esistano)
-                // Aggiorna Campi oggetto.
-
-                #region Header 
-                // 1.2.6
-                if (!string.IsNullOrWhiteSpace(rifAmm))
+                // aggiorno XML fattura
+                XmlDocument invoice = (XmlDocument)GetSessionValue("invoiceXML");
+                string invoiceText = string.Empty;
+                if (invoice != null)
                 {
-                    fattura.FatturaElettronicaHeader.CedentePrestatore.RiferimentoAmministrazione = rifAmm.Trim();
-                }
-                #endregion
+                    XmlNamespaceManager xmlnsMan = new XmlNamespaceManager(invoice.NameTable);
+                    //xmlnsMan.AddNamespace("p", "http://www.fatturapa.gov.it/sdi/fatturapa/v1.0");
+                    //xmlnsMan.AddNamespace("p", "http://www.fatturapa.gov.it/sdi/fatturapa/v1.1");
+                    xmlnsMan.AddNamespace("p", InvoiceNamespace);
 
-                #region Body
-                var body = fattura.FatturaElettronicaBody.FirstOrDefault();
-                if (body != null)
-                {
-                    NttDatalLibrary.DatiDocumentiCorrelatiType _datiContratto = null;
-                    NttDatalLibrary.DatiDocumentiCorrelatiType _datiOrdineAcquisto = null;
-                    NttDatalLibrary.DettaglioLineeType _dettaglioLinea = null;
-                    if (body.DatiGenerali.DatiOrdineAcquisto != null)
-                        _datiOrdineAcquisto = body.DatiGenerali.DatiOrdineAcquisto.FirstOrDefault();
-                    _dettaglioLinea = body.DatiBeniServizi.DettaglioLinee.FirstOrDefault();
-
-                    //2.1.2.4  
-                    if (!string.IsNullOrEmpty(optional1))
+                    if (!string.IsNullOrEmpty(rifAmm))
                     {
-                        //   [2.1.2.2] idDocumento è un requisito
-
-                        if (_datiOrdineAcquisto != null)
-                            _datiOrdineAcquisto.NumItem = optional1.Trim();
+                        XmlNode node = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaHeader/CedentePrestatore/RiferimentoAmministrazione", xmlnsMan);
+                        node.InnerText = rifAmm;
                     }
-                    //2.1.2.5
-                    if (!string.IsNullOrEmpty(optional2))
+                    if (!string.IsNullOrEmpty(strIdDoc))
                     {
-                        if (_datiOrdineAcquisto != null)
-                            _datiOrdineAcquisto.CodiceCommessaConvenzione = optional2.Trim();
+                        XmlNode node1 = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiContratto/IdDocumento", xmlnsMan);
+                        node1.InnerText = strIdDoc;
+                    }
+                    if (!string.IsNullOrEmpty(codGic))
+                    {
+                        XmlNode node2 = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCIG", xmlnsMan);
+                        node2.InnerText = codGic;
                     }
 
-                    // 2.1.3.2
-                    if (!string.IsNullOrWhiteSpace(strIdDoc))
+                                        
+                    if ((!string.IsNullOrEmpty(optional1)) || (!string.IsNullOrEmpty(optional2)))
                     {
-                        if (body.DatiGenerali.DatiContratto == null)
-                            body.DatiGenerali.DatiContratto = new NttDatalLibrary.DatiDocumentiCorrelatiType[] { new NttDatalLibrary.DatiDocumentiCorrelatiType() };
-                        _datiContratto = body.DatiGenerali.DatiContratto.FirstOrDefault();  // supposto che sia già stato creato in precedenza nel backend
-                        _datiContratto.IdDocumento = strIdDoc.Trim();
+                        XmlNode DatiOrdineAcquisto = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto", xmlnsMan);
+
+                        //2.1.2.4  
+                        if (!string.IsNullOrEmpty(optional1))
+                        {
+                            XmlNode beforeNode = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/IdDocumento", xmlnsMan);
+
+                            XmlElement nodoOptional1 = invoice.CreateElement("NumItem");
+                            nodoOptional1.InnerText = optional1;
+                            DatiOrdineAcquisto.InsertAfter(nodoOptional1,beforeNode);
+                            //DatiOrdineAcquisto.AppendChild(nodoOptional1);
+                        }
+
+                        //2.1.2.5
+                        if (!string.IsNullOrEmpty(optional2))
+                        {
+                            XmlNode afterNode = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCUP", xmlnsMan);
+                            XmlNode nodeOpt2 = invoice.CreateElement("CodiceCommessaConvenzione");
+                            nodeOpt2.InnerText = optional2;
+                            DatiOrdineAcquisto.InsertBefore(nodeOpt2,afterNode);
+                            //DatiOrdineAcquisto.AppendChild(nodeOpt2);
+                        }
+                    }
+                    
+                    if (!string.IsNullOrEmpty(optional3) || !string.IsNullOrEmpty(optional4))
+                    {
+                        XmlNode node_DettaglioLinee = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee", xmlnsMan);
+                        //2.2.1.7
+                        if (!string.IsNullOrEmpty(optional3))
+                        {
+                            XmlNode beforeNode = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/UnitaMisura", xmlnsMan);
+                            XmlElement nodoOptional3 = invoice.CreateElement("DataInizioPeriodo");
+                            nodoOptional3.InnerText = optional3;
+                            node_DettaglioLinee.InsertAfter(nodoOptional3,beforeNode);
+                            //node_DettaglioLinee.AppendChild(nodoOptional3);
+                        }
+                        //2.2.1.8 
+                        if (!string.IsNullOrEmpty(optional4))
+                        {
+                            XmlNode afterNode = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoUnitario", xmlnsMan);
+                            XmlElement nodoOptional4 = invoice.CreateElement("DataFinePeriodo");
+                            nodoOptional4.InnerText = optional4;
+                            node_DettaglioLinee.InsertBefore(nodoOptional4, afterNode);
+                            //node_DettaglioLinee.AppendChild(nodoOptional4);
+                        }
                     }
                     //2.1.3.5
                     if (!string.IsNullOrEmpty(optional5))
                     {
-                        if (_datiContratto != null)
-                            _datiContratto.CodiceCommessaConvenzione = optional5.Trim();
-                    }
-                    // 2.1.3.7
-                    if (!string.IsNullOrEmpty(codGic))
-                    {
-                        if (_datiContratto != null)
-                            _datiContratto.CodiceCIG = codGic.Trim();
+                        XmlNode beforeNode = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiContratto/IdDocumento", xmlnsMan);
+                        XmlNode DatiContratto = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiContratto", xmlnsMan);
+                        XmlNode nodeOpt5 = invoice.CreateElement("CodiceCommessaConvenzione");
+                        nodeOpt5.InnerText = optional5;
+                        DatiContratto.InsertAfter(nodeOpt5, beforeNode);
+                        //DatiContratto.AppendChild(nodeOpt5);
                     }
 
-                    // [2.1.4.2]
-                    if (!string.IsNullOrEmpty(optional10))
-                    {
-                        if (body.DatiGenerali.DatiConvenzione == null)
-                            body.DatiGenerali.DatiConvenzione = new NttDatalLibrary.DatiDocumentiCorrelatiType[] { new NttDatalLibrary.DatiDocumentiCorrelatiType() };
-                        var _datiConvenzione = body.DatiGenerali.DatiConvenzione.FirstOrDefault();
-                        _datiConvenzione.IdDocumento = optional10;
+                    if (!string.IsNullOrEmpty(posFin)){
+                        XmlNode node_DataFattura = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Data", xmlnsMan);
+                        string dataFAttura = node_DataFattura.InnerText;
+                        string annoFattura = dataFAttura.Substring(0,4);
+
+                        XmlNode node_DettaglioLinee = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee", xmlnsMan);
+                        XmlElement altriDatiGestionali = invoice.CreateElement("AltriDatiGestionali");
+                        XmlElement tipoDato = invoice.CreateElement("TipoDato");
+                        tipoDato.InnerText = "POS_FIN";
+                        altriDatiGestionali.AppendChild(tipoDato);
+
+                        XmlElement riferimentoTesto = invoice.CreateElement("RiferimentoTesto");
+                        riferimentoTesto.InnerText = posFin;
+                        altriDatiGestionali.AppendChild(riferimentoTesto);
+
+                        XmlElement riferimentoNumero = invoice.CreateElement("RiferimentoNumero");
+                        riferimentoNumero.InnerText = "0.00";
+                        altriDatiGestionali.AppendChild(riferimentoNumero);
+
+                        XmlElement riferimentoData = invoice.CreateElement("RiferimentoData");
+                        riferimentoData.InnerText = dataFAttura;
+                        altriDatiGestionali.AppendChild(riferimentoData);
+
+                        node_DettaglioLinee.AppendChild(altriDatiGestionali);
+
+                        XmlElement altriDatiGestionali2 = invoice.CreateElement("AltriDatiGestionali");
+                        XmlElement tipoDato2 = invoice.CreateElement("TipoDato");
+                        tipoDato2.InnerText = "ANNO_FIN";
+                        altriDatiGestionali2.AppendChild(tipoDato2);
+
+                        XmlElement riferimentoTesto2 = invoice.CreateElement("RiferimentoTesto");
+                        riferimentoTesto2.InnerText = annoFattura;
+                        altriDatiGestionali2.AppendChild(riferimentoTesto2);
+
+                        XmlElement riferimentoNumero2 = invoice.CreateElement("RiferimentoNumero");
+                        riferimentoNumero2.InnerText = "0.00";
+                        altriDatiGestionali2.AppendChild(riferimentoNumero2);
+
+                        XmlElement riferimentoData2 = invoice.CreateElement("RiferimentoData");
+                        riferimentoData2.InnerText = dataFAttura;
+                        altriDatiGestionali2.AppendChild(riferimentoData2);
+
+                        node_DettaglioLinee.AppendChild(altriDatiGestionali2);
                     }
-
-                    // [2.1.5.1]
-                    if (!string.IsNullOrEmpty(optional8))
-                    {
-                        if (body.DatiGenerali.DatiRicezione == null)
-                            body.DatiGenerali.DatiRicezione = new NttDatalLibrary.DatiDocumentiCorrelatiType[] { new NttDatalLibrary.DatiDocumentiCorrelatiType() };
-                        var _datiRicezione = body.DatiGenerali.DatiRicezione.FirstOrDefault();
-                        //2.1.5.1
-                        if (!string.IsNullOrEmpty(optional7))
-                            //_datiRicezione.RiferimentoNumeroLinea = new string[] { optional7.Trim() };
-                            _datiRicezione.RiferimentoNumeroLinea = optional7.Trim();
-                        //2.1.5.2
-                        _datiRicezione.IdDocumento = optional8.Trim();
-                        //2.1.5.4
-                        if (!string.IsNullOrEmpty(optional9))
-                            _datiRicezione.NumItem = optional9.Trim();
-                    }
-
-
-                    
-                    //2.2.1.7
-                    //if (!string.IsNullOrEmpty(optional3) && _dettaglioLinea != null)
-                    //{
-                    //    DateTime _dataInizio;
-                    //    DateTime.TryParse(optional3, out _dataInizio);
-                    //    _dettaglioLinea.DataInizioPeriodo = _dataInizio;
-                    //}
-                    //2.2.1.8 
-                    //if (!string.IsNullOrEmpty(optional4) && _dettaglioLinea != null)
-                    //{
-                    //    DateTime _dataFine;
-                    //    DateTime.TryParse(optional4, out _dataFine);
-                    //    _dettaglioLinea.DataInizioPeriodo = _dataFine;
-                    //}
-
 
                     //2.2.1.15
-                    if (!string.IsNullOrEmpty(optional6) && _dettaglioLinea != null)
+                    if (!string.IsNullOrEmpty(optional6))
                     {
-                        _dettaglioLinea.RiferimentoAmministrazione = optional6.Trim();
+                        XmlNode beforeNode = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AliquotaIVA", xmlnsMan);
+                        XmlNode nodeOpt6 = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee", xmlnsMan);
+
+                        XmlElement nodoOptional6 = invoice.CreateElement("RiferimentoAmministrazione");
+                        nodoOptional6.InnerText = optional6;
+                        nodeOpt6.InsertAfter(nodoOptional6, beforeNode);
+                        //nodeOpt6.AppendChild(nodoOptional6);
                     }
 
-                    // [2.2.1.16.2]
-                    if (!string.IsNullOrEmpty(posFin) && _dettaglioLinea != null)
+                    if (!string.IsNullOrEmpty(strDesc) && !string.IsNullOrEmpty(strQuant) &&
+                        !string.IsNullOrEmpty(strPrezUni) && !string.IsNullOrEmpty(strPrezTot) &&
+                        !string.IsNullOrEmpty(strAliquot))
                     {
-                        NttDatalLibrary.AltriDatiGestionaliType _altriDati;
-                        if (_dettaglioLinea.AltriDatiGestionali != null)
-                            _altriDati = _dettaglioLinea.AltriDatiGestionali.FirstOrDefault();
-                        else
+                        try
                         {
-                            _dettaglioLinea.AltriDatiGestionali = new NttDatalLibrary.AltriDatiGestionaliType[] { new NttDatalLibrary.AltriDatiGestionaliType() };
-                            _altriDati = _dettaglioLinea.AltriDatiGestionali.FirstOrDefault();
+                            strPrezUni = strPrezUni.Replace("-", ""); strPrezTot = strPrezTot.Replace("-", "");
+                            strPrezUni = strPrezUni.Replace("+", ""); strPrezTot = strPrezUni.Replace("+", "");
+
+                            XmlNodeList listLinee = invoice.SelectNodes("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee", xmlnsMan);
+                            string numLinea = (listLinee.Count + 1).ToString();
+                            XmlNode ultimoDettaglio = listLinee.Item(listLinee.Count - 1);
+
+                            float pTotale;
+                            float unitarioPrec;
+                            float totalePrec;
+                            string totale1;
+                            string totale2;
+
+                            //System.Globalization.NumberStyles style = System.Globalization.NumberStyles.AllowDecimalPoint;
+                            //System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.CreateSpecificCulture("fr-FR");
+
+                            float.TryParse(strPrezTot, out pTotale);
+
+                            XmlNode nodoUnitarioPrec = ultimoDettaglio.SelectSingleNode("PrezzoUnitario", xmlnsMan);
+
+                            float.TryParse(nodoUnitarioPrec.InnerText.Replace(".",","), out unitarioPrec);
+                            totale1 = (unitarioPrec + pTotale).ToString().Replace(",",".");
+                            if (!totale1.Contains('.'))
+                                totale1 = totale1 + ".00";
+                            nodoUnitarioPrec.InnerText = totale1;
+
+                            XmlNode nodoTotalePrec = ultimoDettaglio.SelectSingleNode("PrezzoTotale", xmlnsMan);
+                            float.TryParse(nodoTotalePrec.InnerText.Replace(".", ","), out totalePrec);
+                            totale2 = (totalePrec + pTotale).ToString();
+                            if (!totale2.Contains('.'))
+                                totale2 = totale2 + ".00";
+                            nodoTotalePrec.InnerText = totale2;
+
+                            //XmlNode nodoTotaleImponibile = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/ImponibileImporto", xmlnsMan);
+                            //float.TryParse(nodoTotaleImponibile.InnerText.Replace(".", ","), out totaleImponibile);
+                            //nodoTotaleImponibile.InnerText = (totaleImponibile + pTotale).ToString();
+
+                            //XmlNode nodoTotaleGenerale = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ImportoPagamento", xmlnsMan);
+                            //float.TryParse(nodoTotaleGenerale.InnerText.Replace(".", ","), out totaleGenerale);
+                            //nodoTotaleGenerale.InnerText = (totaleGenerale + pTotale).ToString();
+
+                            XmlElement dettaglioLinee = invoice.CreateElement("DettaglioLinee");
+
+                            XmlElement numeroLinea = invoice.CreateElement("NumeroLinea");
+                            numeroLinea.InnerText = numLinea;
+                            XmlElement descrizione = invoice.CreateElement("Descrizione");
+                            descrizione.InnerText = strDesc;
+                            XmlElement quantita = invoice.CreateElement("Quantita");
+                            quantita.InnerText = strQuant.Replace(",", ".") + ".00";
+                            XmlElement prezzoUnitario = invoice.CreateElement("PrezzoUnitario");
+                            prezzoUnitario.InnerText = "-" + (strPrezUni.Replace(",", "."));
+                            XmlElement prezzoTotale = invoice.CreateElement("PrezzoTotale");
+                            prezzoTotale.InnerText = "-" + (strPrezTot.Replace(",", "."));
+                            XmlElement aliquotaIVA = invoice.CreateElement("AliquotaIVA");
+                            aliquotaIVA.InnerText = strAliquot.Replace(",", ".") + ".00";
+
+                            dettaglioLinee.AppendChild(numeroLinea);
+                            dettaglioLinee.AppendChild(descrizione);
+                            dettaglioLinee.AppendChild(quantita);
+                            dettaglioLinee.AppendChild(prezzoUnitario);
+                            dettaglioLinee.AppendChild(prezzoTotale);
+                            dettaglioLinee.AppendChild(aliquotaIVA);
+
+                            XmlNode datiBeniServizi = invoice.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi", xmlnsMan);
+                            datiBeniServizi.InsertAfter(dettaglioLinee, ultimoDettaglio);
                         }
-                        DateTime _dataFattura = body.DatiGenerali.DatiGeneraliDocumento.Data;
-                        // [2.2.1.16.1]
-                        _altriDati.TipoDato = "POS_FIN";
-                        // [2.2.1.16.2]
-                        _altriDati.RiferimentoTesto = posFin.Trim();
-                        // [2.2.1.16.3]
-                        _altriDati.RiferimentoNumero = "0.00";
-                        _altriDati.RiferimentoNumeroSpecified = true;
-                        // [2.2.1.16.4]
-                        _altriDati.RiferimentoData = _dataFattura;
-                        _altriDati.RiferimentoDataSpecified = true;
-
-                        // altri dati gestionali 2
-
-                        var _altriDati2 = new NttDatalLibrary.AltriDatiGestionaliType();
-                        _dettaglioLinea.AltriDatiGestionali = new NttDatalLibrary.AltriDatiGestionaliType[] { _altriDati, _altriDati2 };
-
-                        _altriDati2.TipoDato = "ANNO_FIN";
-                        _altriDati2.RiferimentoTesto = _dataFattura.Year.ToString();
-                        _altriDati2.RiferimentoNumero = "0.00";
-                        _altriDati2.RiferimentoNumeroSpecified = true;
-                        _altriDati2.RiferimentoData = _dataFattura;
-                        _altriDati2.RiferimentoDataSpecified = true;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(strDesc) &&
-                        !string.IsNullOrWhiteSpace(strQuant) &&
-                        !string.IsNullOrWhiteSpace(strPrezUni) &&
-                        !string.IsNullOrWhiteSpace(strPrezTot) &&
-                        !string.IsNullOrWhiteSpace(strAliquot))
-                    {
-                        strPrezUni = strPrezUni.Replace("-", "").Replace("+", "");
-                        strPrezTot = strPrezTot.Replace("-", "").Replace("+", "");
-
-                        if (!strQuant.Contains('.') && !strQuant.Contains(','))
-                            strQuant = strQuant + ".00";
-                        if (!strAliquot.Contains('.') && !strAliquot.Contains(','))
-                            strAliquot = strAliquot + ".00";
-
-                        Decimal _prezzoUnitario = 0;
-                        bool _conversionePrezzoUnitario = Decimal.TryParse(strPrezUni, out _prezzoUnitario);
-                        Decimal _prezzoTotale = 0;
-                        bool _conversionePrezzoTotale = Decimal.TryParse(strPrezTot, out _prezzoTotale);
-
-                        List<NttDatalLibrary.DettaglioLineeType> _listaLinee = body.DatiBeniServizi.DettaglioLinee.ToList();
-                        NttDatalLibrary.DettaglioLineeType _lineaLast = _listaLinee.Last();
-                        
-
-                        //2.2.1.8 
-                        //if (_dettaglioLinea != null)
-                        //{
-                        //    _dettaglioLinea.PrezzoUnitario += _prezzoTotale;  // ? 
-                        //    _dettaglioLinea.PrezzoTotale += _prezzoTotale;
-                        //}
-                        if(_lineaLast != null)
+                        catch
                         {
-                            _lineaLast.PrezzoUnitario += _prezzoUnitario;
-                            _lineaLast.PrezzoTotale += _prezzoTotale;
+                            result = false;
                         }
-
-                        // nuova linea 
-                        NttDatalLibrary.DettaglioLineeType _dettaglioLinea2 = new NttDatalLibrary.DettaglioLineeType();
-                        //_dettaglioLinea2.NumeroLinea = "2";
-                        _dettaglioLinea2.NumeroLinea = (_listaLinee.Count + 1).ToString();
-                        _dettaglioLinea2.Descrizione = strDesc.Trim();
-                        Decimal _quantitaLinea2;
-                        //_dettaglioLinea2.QuantitaSpecified = Decimal.TryParse(strQuant.Replace(",", "."), out _quantitaLinea2);
-                        _dettaglioLinea2.QuantitaSpecified = Decimal.TryParse(strQuant.Replace(".", ","), out _quantitaLinea2);
-                        _dettaglioLinea2.Quantita = _quantitaLinea2;
-                        _dettaglioLinea2.PrezzoUnitario = _prezzoUnitario > 0 ? -1 * _prezzoUnitario : _prezzoUnitario;
-                        _dettaglioLinea2.PrezzoTotale = _prezzoTotale > 0 ? -1 * _prezzoTotale : _prezzoTotale;
-                        Decimal _aliquotaLinea2 = 0;
-                        //Decimal.TryParse(strAliquot.Replace(",", "."), out _aliquotaLinea2);
-                        Decimal.TryParse(strAliquot.Replace(".", ","), out _aliquotaLinea2);
-                        _dettaglioLinea2.AliquotaIVA = _aliquotaLinea2;
-
-                        _listaLinee.Add(_dettaglioLinea2);
-                        body.DatiBeniServizi.DettaglioLinee = _listaLinee.ToArray();
-
-                        //body.DatiBeniServizi.DettaglioLinee = new NttDatalLibrary.DettaglioLineeType[] { _dettaglioLinea, _dettaglioLinea2 };
                     }
 
-
+                    if (result)
+                    {
+                        SetSessionValue("invoiceXML", invoice);
+                        invoiceText = invoice.OuterXml;
+                    }
                 }
-                #endregion
+                else
+                {
+                    result = false;
+                }
 
-                #region Creazione XML
-                
-                XmlDocument xmlDoc = FatturaPARepository.GenerateXMLFromFattura(fattura); new XmlDocument();
-                if (xmlDoc == null)
-                    return false;
+                // aggiorno preview
+                if (!string.IsNullOrEmpty(invoiceText))
+                {
+                    DocsPaWR.FileDocumento preview = getInvoicePreview(invoiceText);
+                    SetSessionValue("invoicePreview", preview);
+                }
+                else
+                {
+                    result = false;
+                }
 
-                #endregion
-
-                SetSessionValue("invoiceXML", xmlDoc);
-
-                DocsPaWR.FileDocumento preview = getInvoicePreview(xmlDoc.InnerXml);
-                //DocsPaWR.FileDocumento preview = getInvoicePreview(XmlDocPreview.OuterXml);
-                SetSessionValue("invoicePreview", preview);
+                return result;       
             }
             catch (Exception ex)
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return false;
             }
-            
-            return true;
 
         }
 
@@ -457,8 +452,7 @@ namespace NttDataWA.UIManager
                 string urlXSL = System.Configuration.ConfigurationManager.AppSettings["FATTURAPA_XSL_URL"];
 
                 XmlDocument previewInvoice = new XmlDocument();
-                //string decl = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"; 
-                string decl = "<?xml version=\"1.0\" encoding=\"utf-16\"?>";
+                string decl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
                 string pi = "<?xml-stylesheet type=\"text/xsl\" href=\"" + urlXSL + "\"?>";
                 string previewXml = invoice.Replace(decl, decl + "\n" + pi);
                 previewInvoice.LoadXml(previewXml);
@@ -478,20 +472,6 @@ namespace NttDataWA.UIManager
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return null;
             }
-        }
-
-        public static DocsPaWR.FileDocumento getInvoicePreviewPdf(byte[] content)
-        {
-            try
-            {
-                return ws.FatturazioneGetPreviewPdf(content);
-            }
-            catch(Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return null;
-            }
-            
         }
 
         #region Session functions

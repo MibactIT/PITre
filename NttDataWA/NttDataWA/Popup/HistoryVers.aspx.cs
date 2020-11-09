@@ -222,19 +222,6 @@ namespace NttDataWA.Popup
                 case "E":
                     label = Utils.Languages.GetLabelFromCode("optConsErr", language);
                     break;
-                case "F":
-                    label = Utils.Languages.GetLabelFromCode("optConsFld", language);
-                    break;
-                case "T":
-                    label = Utils.Languages.GetLabelFromCode("optConsTim", language);
-                    break;
-                case "B":
-                    label = Utils.Languages.GetLabelFromCode("optConsBfw", language);
-                    break;
-                case "K":
-                    label = Utils.Languages.GetLabelFromCode("optConsBfe", language);
-                    break;
-
             }
 
             this.HistoryVersLblStatus.Text = label;

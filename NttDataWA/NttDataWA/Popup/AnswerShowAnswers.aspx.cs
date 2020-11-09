@@ -422,11 +422,6 @@ namespace NttDataWA.Popup
                 this.ListaFiltri[0] = new DocsPaWR.FiltroRicerca[1];
                 fVList = new DocsPaWR.FiltroRicerca[0];
 
-                fV1 = new DocsPaWR.FiltroRicerca();
-                fV1.argomento = DocsPaWR.FiltriDocumento.DOCUMENTI_IN_RISPOSTA.ToString();
-                fV1.valore = "true";
-                fVList = utils.addToArrayFiltroRicerca(fVList, fV1);
-
                 //Filtro per protocolli in PARTENZA
                 fV1 = new DocsPaWR.FiltroRicerca();
                 fV1.argomento = DocsPaWR.FiltriDocumento.TIPO.ToString();

@@ -53,7 +53,7 @@ require(['src/html5Upload', 'domReady', 'knockout-models'], function (html5Uploa
                                     try {
                                         response = JSON.parse(response);
                                     } catch (ex) {
-                                       //console.log(ex);
+                                        console.log(ex);
                                         response = {Success: false, Error:'Generic Error'};
                                     }
 
@@ -61,7 +61,7 @@ require(['src/html5Upload', 'domReady', 'knockout-models'], function (html5Uploa
                                 if (response.Success)
                                     fileModel.uploadSuccessful(true);
                                 else {
-                                   //console.log(response.Error);
+                                    console.log(response.Error);
                                     fileModel.uploadSuccessful(false);
                                 }
 

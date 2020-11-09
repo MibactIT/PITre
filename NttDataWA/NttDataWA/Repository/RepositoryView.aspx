@@ -76,13 +76,12 @@
                     </asp:TemplateField>
                     <asp:TemplateField Visible="true">
                         <ItemTemplate>
-                            <asp:LinkButton runat="server" ID="lblNomeFile" CssClass="clickable" Width="190pt"></asp:LinkButton>
+                            <asp:Label ID="lblNomeFile" runat="server" Width="190pt" />
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField Visible="true">
                         <ItemTemplate>
                             <asp:Label ID="lblDescrizione" runat="server" Width="150pt" />
-                            <asp:LinkButton runat="server" ID="lkbDescrizione" CommandName="Description" CssClass="clickable"></asp:LinkButton>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField Visible="true">
@@ -99,11 +98,6 @@
                         <ItemTemplate>
                             <asp:Label ID="lblPercentage" runat="server" Text='' />
                             <asp:Image ID="imgPercentage" runat="server" ImageUrl='' />
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField Visible="true">
-                        <ItemTemplate>
-                            <cc1:CustomImageButton ID="imgDeleteFile" runat="server" CommandName="DeleteFile" ></cc1:CustomImageButton>
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>

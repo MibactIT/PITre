@@ -16,7 +16,7 @@
         <%} %>
         <title>Stampa in corso</title>
         <script src="../Scripts/jquery-1.8.1.min.js" type="text/javascript"></script>
-        <script src="../Scripts/DYMO.Label.Framework.latest.js?v3" type="text/javascript"></script>
+        <script src="../Scripts/DYMO.Label.Framework.latest.js" type="text/javascript"></script>
         <script src="../Scripts/webclientconnector.js" type="text/javascript"></script>
 		<script type="text/javascript">
 		    var appletS = undefined;

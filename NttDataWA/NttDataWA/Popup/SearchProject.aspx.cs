@@ -771,6 +771,8 @@ namespace NttDataWA.Popup
                     ProjectManager.setHashFascicoli(this, null);
                     ProjectManager.setHashFascicoliSelezionati(this, null);
                     this.CloseMask(true);
+
+                    #region commentato
                     //}
                     //else
                     //{
@@ -897,6 +899,7 @@ namespace NttDataWA.Popup
                     //ProjectManager.setHashFascicoliSelezionati(this, null);
                     //this.CloseMask(true);
                     //}
+                    #endregion
                 }
                 else
                 {
@@ -1006,6 +1009,14 @@ namespace NttDataWA.Popup
                                         selectedFolder = ProjectManager.getFolder(this, prj);
 
                                     bool inserted = false;
+
+                                    //Controllo se il folder è effettivamente quello selezionato/
+                                    Folder fold = ProjectManager.getFolderInSession();
+                                    if(selectedFolder.systemID != fold.systemID)
+                                    {
+                                        control = false;
+                                    }
+
 
                                     if (selectedFolder != null && control)
                                     {
@@ -1320,10 +1331,6 @@ namespace NttDataWA.Popup
                     if (this.CallerSearchProject != null && this.CallerSearchProject == "searchInstance")
                     {
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "closeMask", "if (parent.fra_main) {parent.fra_main.closeAjaxModal('SearchDocumentsInProject', '" + returnValue + "');} else {parent.closeAjaxModal('SearchDocumentsInProject', '" + returnValue + "');};", true);
-                    }
-                    else if (this.CallerSearchProject != null && this.CallerSearchProject == "custom")
-                    {
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "closeMask", "if (parent.fra_main) {parent.fra_main.closeAjaxModal('SearchProjectCustom', '" + returnValue + "');} else {parent.closeAjaxModal('SearchProjectCustom', '" + returnValue + "');};", true);
                     }
                     else
                     {
@@ -3786,6 +3793,8 @@ namespace NttDataWA.Popup
                     Folder fold = ProjectManager.getFolder(folderId, UserManager.GetInfoUser());
                     int numDoc = ProjectManager.getCountDocumentiInFolder(fold);
 
+                    ProjectManager.setFolderInSession(fold);
+
                     //this.docsInFolderCount.Text = numDoc.ToString();
                     upPnlStruttura.Update();
                     ProjectManager.setHashFascicoliSelezionati(this, HT_fascicoliSelezionati);
@@ -3801,6 +3810,8 @@ namespace NttDataWA.Popup
                     //InfoFascicolo fasc = ProjectManager.getInfoFascicoloDaFascicolo(fascicolo);  
                     Folder fold = ProjectManager.getFolder(folderId, UserManager.GetInfoUser());
                     int numDoc = ProjectManager.getCountDocumentiInFolder(fold);
+
+                    ProjectManager.setFolderInSession(fold);
 
                     //this.docsInFolderCount.Text = numDoc.ToString();
                     upPnlStruttura.Update();
@@ -4038,7 +4049,7 @@ namespace NttDataWA.Popup
                         if (corrInSess != null)
                         {
                             txtCodiceProprietario.Text = corrInSess.CodiceRubrica;
-                            TxtCode_OnTextChanged(txtCodiceProprietario, new EventArgs());
+                            TxtCode_OnTextChanged(new object(), new EventArgs());
                         }
                     }
                     //Laura 12 Aprile
@@ -4094,6 +4105,10 @@ namespace NttDataWA.Popup
             HttpContext.Current.Session["AddressBook.Cc"] = null;
         }
 
+        //protected void DdlTitolario_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    UIManager.ClassificationSchemeManager.SetTitolarioInSession(UIManager.ClassificationSchemeManager.getTitolario(ddlTitolario.SelectedValue));
+        //}
 
         protected void btnclassificationschema_Click(object sender, ImageClickEventArgs e)
         {

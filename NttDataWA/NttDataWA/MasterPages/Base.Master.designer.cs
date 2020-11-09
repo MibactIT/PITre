@@ -19,7 +19,7 @@ namespace NttDataWA.MasterPages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Html;
+        protected global::System.Web.UI.HtmlControls.HtmlElement Html;
         
         /// <summary>
         /// Head1 control.
@@ -29,6 +29,15 @@ namespace NttDataWA.MasterPages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlHead Head1;
+        
+        /// <summary>
+        /// CssLayout control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlLink CssLayout;
         
         /// <summary>
         /// head control.
@@ -92,15 +101,6 @@ namespace NttDataWA.MasterPages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 Guide;
-        
-        /// <summary>
-        /// ClientBigfile control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 ClientBigfile;
         
         /// <summary>
         /// headerLogo control.
@@ -706,6 +706,33 @@ namespace NttDataWA.MasterPages {
         protected global::System.Web.UI.WebControls.Label BaseMasterLblSearchScarti;
         
         /// <summary>
+        /// LiMenuSearchlArchivioESPI control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl LiMenuSearchlArchivioESPI;
+        
+        /// <summary>
+        /// LinkMenuSearchArchivioESPI control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor LinkMenuSearchArchivioESPI;
+        
+        /// <summary>
+        /// BaseMasterLblArchivioESPI control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label BaseMasterLblArchivioESPI;
+        
+        /// <summary>
         /// LiMenuManagement control.
         /// </summary>
         /// <remarks>
@@ -1109,42 +1136,6 @@ namespace NttDataWA.MasterPages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label BaseMasterLblProceedings;
-        
-        /// <summary>
-        /// LiMenuReportAccessi control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl LiMenuReportAccessi;
-        
-        /// <summary>
-        /// BaseMasterLblReportAccessi control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label BaseMasterLblReportAccessi;
-        
-        /// <summary>
-        /// LiMenuClientBigfile control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl LiMenuClientBigfile;
-        
-        /// <summary>
-        /// BaseMasterLblClientBigfile control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label BaseMasterLblClientBigfile;
         
         /// <summary>
         /// LiMenuOptions control.

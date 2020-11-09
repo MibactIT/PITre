@@ -145,12 +145,13 @@ function CercaSentinella() {
             };
             conneconnessioneSentinellaction.onclose = function (event) {
                 if (conneconnessioneSentinellaction.CLOSED === conneconnessioneSentinellaction.readyState) {
+                    console.log('CLOSE sentinella ');
                 }
                 console.log('CLOSE sentinella ');
             };
             conneconnessioneSentinellaction.onerror = function OnSocketError(ev) {
                 onError(ev, conneconnessioneSentinellaction);
-            }
+            };
             conneconnessioneSentinellaction.onmessage = function (event) {
                 try {
                     conneconnessioneSentinellaction.close();
@@ -173,7 +174,7 @@ function CercaSentinella() {
 
 
 function InterrogaSentinella() {
-    if (PORTA_SENTINELLA == 0) //sentinella non creata o numero utenti massimo raggiunto
+    if (PORTA_SENTINELLA === 0) //sentinella non creata o numero utenti massimo raggiunto
         return;
 }
 
@@ -181,7 +182,6 @@ function InterrogaSentinella() {
 //File system applet method
 
 function testChiamataFSO(onSuccess, onError) {
-    alert("start");
     onSuccess = onSuccess || null;
     onError = onError || null;
     try{
@@ -488,7 +488,6 @@ function signData(contentEnc, serialNumber, applyCosign, storeLocation, storeNam
 }
 
 function signHash(hashEnc, varcertSerial, applyCosign, storeLocation, storeName, onSuccess, onError) {
-    console.log('SIGN_HASH');
     onSuccess = onSuccess || null;
     onError = onError || null;
     var message = JSON.stringify({ GUID: guid(), CLASS: TIPO_APPLET.SIGNER, METHOD: SIGNER_METHOD.SIGN_HASH, PARAMETERS: [hashEnc, varcertSerial, applyCosign, storeLocation, storeName] });
@@ -534,20 +533,17 @@ function invokeMethod(message, onSuccess, onError, connection) {
             if (connection.CLOSED === connection.readyState) {
                 //reallowOp();
             }
-            console.log('CHIUDO DOPO EVENTO' + event);
             console.log('CLOSE - init connectionCount: ' + connectionCount);
         };
         connection.onerror = function OnSocketError(ev) {
             onError(ev, connection);
-        };
+        }
         connection.onmessage = function(event) { 
             try {
                 connection.close();
                 var msg = JSON.parse(event.data);
                 switch (msg.STATUS) {
-                    case 'SUCCESS':
-                        console.log('ricevuta risposta');
-                        onSuccess(msg.MESSAGE, connection);
+                    case 'SUCCESS': onSuccess(msg.MESSAGE, connection);
                         break;
                     case 'ERROR': throw msg.MESSAGE;
                 }
@@ -572,17 +568,17 @@ function connectionManager(message, onSuccess, onError) {
     if (connectionCount > maxConnections) {
         setTimeout(
             function () {
-                connectionManager(message, onSuccess, onError);
+                connectionManager(message, onSuccess, onError)
             },
         100);
     } else {
         connectionCount++;
         connection = new WebSocket(url);
         if (!onSuccess) {
-            onSuccess = function (msg, connection) { console.log('CHIUDO DA OnSuccess'); connection.close(); };
+            onSuccess = function (msg, connection) { connection.close(); };
         }
         if (!onError) {
-            onError = function (msg, connection) { console.log('CHIUDO DA OnError'); connection.close(); };
+            onError = function (msg, connection) { connection.close(); };
         }
         invokeMethod(message, onSuccess, onError, connection);
     }
@@ -686,6 +682,7 @@ function invokeMethodPromise(message, onSuccess, onError, connection) {
                 }
             };
         } catch (e) {
+            console.log(e);
         }
         console.log(">>>> END - invokeMethodPromise");
     });

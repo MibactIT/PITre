@@ -95,6 +95,20 @@
     runat="server">
     <div class="content">
         <div class="container">
+            <asp:Panel ID="PnlTypology" runat="server" Visible="false">
+                <div class="row">
+                    <div class="colHalf">
+                        <span class="weight">
+                            <asp:Literal runat="server" ID="CreateNewDocumentTypology"></asp:Literal>
+                        </span>
+                    </div>
+                    <div class="colHalf2">
+                        <asp:DropDownList runat="server" ID="ddlTypology" CssClass="chzn-select-deselect" Width="100%" AutoPostBack="true" OnSelectedIndexChanged="ddlTypology_SelectedIndexChanged">
+
+                        </asp:DropDownList>
+                    </div>
+                </div>
+            </asp:Panel>
             <asp:Panel runat="server" ID="PnlObject">
                 <div class="row">
                     <div class="col">

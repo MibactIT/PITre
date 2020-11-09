@@ -942,23 +942,17 @@ namespace NttDataWA.Utils
             string enteCertCN = string.Empty;
             string enteCertO = string.Empty;
             string enteCertC = string.Empty;
-            try
-            {
-                if (string.IsNullOrEmpty(issuerName)) return string.Empty; //no issuesName
-                string[] issuerNamePars = issuerName.Split(',');
-                // recupera CN
-                if (issuerName.Contains("CN="))
-                    enteCertCN = issuerNamePars.Where(a => a.Contains("CN=")).SingleOrDefault().Split('=')[1];
-                // recupera O
-                if (issuerName.Contains("O="))
-                    enteCertO = string.Format("{0}{1}", (string.IsNullOrEmpty(enteCertCN) ? string.Empty : ", "), issuerNamePars.Where(a => a.Contains("O=")).SingleOrDefault().Split('=')[1]);
-                if (issuerName.Contains("C="))
-                    enteCertC = string.Format(", {0}", issuerNamePars.Where(a => a.Contains("C=")).SingleOrDefault().Split('=')[1]);
-            }
-            catch (Exception e)
-            {
+            if (string.IsNullOrEmpty(issuerName)) return string.Empty; //no issuesName
+            string[] issuerNamePars = issuerName.Split(',');
+            // recupera CN
+            if (issuerName.Contains("CN="))
+                enteCertCN = issuerNamePars.Where(a => a.Contains("CN=")).SingleOrDefault().Split('=')[1];
+            // recupera O
+            if (issuerName.Contains("O="))
+                enteCertO = string.Format("{0}{1}", (string.IsNullOrEmpty(enteCertCN) ? string.Empty : ", "), issuerNamePars.Where(a => a.Contains("O=")).SingleOrDefault().Split('=')[1]);
+            if (issuerName.Contains("C="))
+                enteCertC = string.Format(", {0}", issuerNamePars.Where(a => a.Contains("C=")).SingleOrDefault().Split('=')[1]);
 
-            }
             return string.Format("{0}{1}{2}", enteCertCN, enteCertO, enteCertC);
         }
 

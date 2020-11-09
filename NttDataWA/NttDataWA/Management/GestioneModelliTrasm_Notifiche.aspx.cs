@@ -357,7 +357,6 @@ namespace NttDataWA.Management
         /// <param name="e"></param>
         protected void btn_annulla_Click(object sender, EventArgs e)
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
             ScriptManager.RegisterClientScriptBlock(this.UpdatePanelButtons, this.UpdatePanelButtons.GetType(), "closeAJM", "parent.closeAjaxModal('GestioneNotifiche','');", true);
             //this.chiudePopup("NONE");
         }
@@ -369,7 +368,6 @@ namespace NttDataWA.Management
         /// <param name="e"></param>
         protected void btn_ok_Click(object sender, EventArgs e)
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
             switch (this.hd_mode.Value)
             {
                 case "INSERT":
@@ -402,13 +400,11 @@ namespace NttDataWA.Management
                                 {
                                     foreach (NttDataWA.DocsPaWR.UtentiConNotificaTrasm utNot in mittDest.UTENTI_NOTIFICA)
                                     {
-                                        statoChk = this.utenteSelezionato(utNot.ID_PEOPLE, Convert.ToString(mittDest.ID_CORR_GLOBALI));
-                                        utNot.FLAG_NOTIFICA = statoChk;
-                                        //if (utNot.FLAG_NOTIFICA != "1")
-                                        //{
-                                        //    statoChk = this.utenteSelezionato(utNot.ID_PEOPLE, Convert.ToString(mittDest.ID_CORR_GLOBALI));
-                                        //    utNot.FLAG_NOTIFICA = statoChk;
-                                        //}
+                                        if (utNot.FLAG_NOTIFICA != "1")
+                                        {
+                                            statoChk = this.utenteSelezionato(utNot.ID_PEOPLE, Convert.ToString(mittDest.ID_CORR_GLOBALI));
+                                            utNot.FLAG_NOTIFICA = statoChk;
+                                        }
                                     }
                                 }
                             }

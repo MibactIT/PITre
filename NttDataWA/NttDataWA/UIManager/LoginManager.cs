@@ -219,6 +219,36 @@ namespace NttDataWA.UIManager
         }
 
         /// <summary>
+        /// Forced User Login
+        /// </summary>
+        /// <param name="login">UserLogin</param>
+        /// <param name="loginResult">LoginResult</param>
+        /// <returns>Utente</returns>
+        public static Utente ForcedLoginLDAP(Page page, string ldapUser, string codAmm, out DocsPaWR.LoginResult loginResult)
+        {
+            Utente user = null;
+            loginResult = DocsPaWR.LoginResult.OK;
+            string ipaddress;
+
+            try
+            {
+                loginResult = docsPaWS.LoginLDAP(ldapUser, codAmm, page.Session.SessionID, out user, out ipaddress);
+            }
+            catch (Exception exception)
+            {
+                //logger.Debug("Login Error", exception);
+                loginResult = DocsPaWR.LoginResult.APPLICATION_ERROR;
+                user = null;
+            }
+            //catch (System.Exception ex)
+            //{
+            //    UIManager.AdministrationManager.DiagnosticError(ex);
+            //    return null;
+            //}
+            return user;
+        }
+
+        /// <summary>
         /// User Login
         /// </summary>
         /// <param name="page">Page</param>

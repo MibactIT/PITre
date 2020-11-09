@@ -2213,9 +2213,6 @@ namespace NttDataWA.Popup
                                 returnMsg += "WarningDocumentNoClassificatedSelect";
                                 retMes2 = fasc.descrizione;
                                 break;
-                            case 3:
-                                returnMsg += "WarningBloccoModificheDocumentoInLf";
-                                break;
                         }
 
                     }

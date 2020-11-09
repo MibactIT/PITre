@@ -58,7 +58,7 @@ namespace NttDataWA.Management
             }
 
 
-            
+
         }
 
         private void InitializePage()
@@ -67,7 +67,7 @@ namespace NttDataWA.Management
 
             this.LitProceedings.Text = Utils.Languages.GetLabelFromCode("ProceedingsTitle", language);
             this.lblReport.Text = Utils.Languages.GetLabelFromCode("ProceedingsReportType", language);
-            
+
             this.ProceedingsBtnPrint.Text = Utils.Languages.GetLabelFromCode("ProceedingsBtnPrint", language);
             this.lblProceedingType.Text = Utils.Languages.GetLabelFromCode("ProceedingsLblType", language);
             this.lblProceedingsYear.Text = Utils.Languages.GetLabelFromCode("ProceedingsLblYear", language);

@@ -23,7 +23,7 @@ define(function () {
         self.onFileAdded = options.onFileAdded || noop;
         self.uploadUrl = options.uploadUrl;
         self.onFileAddedProxy = function (upload) {
-           //console.log('Event: onFileAdded, file: ' + upload.fileName);
+            console.log('Event: onFileAdded, file: ' + upload.fileName);
             self.onFileAdded(upload);
         };
 
@@ -43,15 +43,15 @@ define(function () {
         self.events = {
             onProgress: function (fileSize, uploadedBytes) {
                 var progress = uploadedBytes / fileSize * 100;
-               //console.log('Event: upload onProgress, progress = ' + progress + ', fileSize = ' + fileSize + ', uploadedBytes = ' + uploadedBytes);
+                console.log('Event: upload onProgress, progress = ' + progress + ', fileSize = ' + fileSize + ', uploadedBytes = ' + uploadedBytes);
                 (self.eventHandlers.onProgress || noop)(progress, fileSize, uploadedBytes);
             },
             onStart: function () {
-               //console.log('Event: upload onStart');
+                console.log('Event: upload onStart');
                 (self.eventHandlers.onStart || noop)();
             },
             onCompleted: function (data) {
-               //console.log('Event: upload onCompleted, data = ' + data);
+                console.log('Event: upload onCompleted, data = ' + data);
                 file = null;
                 (self.eventHandlers.onCompleted || noop)(data);
             }
@@ -67,7 +67,7 @@ define(function () {
     UploadManager.prototype = {
 
         initialize: function () {
-           //console.log('Initializing upload manager');
+            console.log('Initializing upload manager');
             var manager = this,
                 dropContainer = manager.dropContainer,
                 inputField = manager.inputField,
@@ -113,7 +113,7 @@ define(function () {
         },
 
         processFiles: function (files) {
-           //console.log('Processing files: ' + files.length);
+            console.log('Processing files: ' + files.length);
             var manager = this,
                 len = files.length,
                 file,
@@ -138,7 +138,7 @@ define(function () {
 
             // Queue upload if maximum simultaneous uploads reached:
             if (manager.activeUploads === manager.maxSimultaneousUploads) {
-               //console.log('Queue upload: ' + upload.fileName);
+                console.log('Queue upload: ' + upload.fileName);
                 manager.uploadsQueue.push(upload);
                 return;
             }
@@ -156,9 +156,9 @@ define(function () {
                 data = manager.data,
                 key = manager.key || 'file';
 
-           //console.log('Beging upload: ' + upload.fileName);
+            console.log('Beging upload: ' + upload.fileName);
             if (manager.firstUpload) {
-               //console.log('First file uploaded: ' + upload.fileName);
+                console.log('First file uploaded: ' + upload.fileName);
                 if (!data) {
                     data = { First: true }
                 } else {
@@ -180,7 +180,7 @@ define(function () {
             // Triggered when upload starts:
             xhr.upload.onloadstart = function () {
                 // File size is not reported during start!
-               //console.log('Upload started: ' + fileName);
+                console.log('Upload started: ' + fileName);
                 upload.events.onStart();
             };
 
@@ -196,7 +196,7 @@ define(function () {
 
             // Triggered when upload is completed:
             xhr.onload = function (event) {
-               //console.log('Upload completed: ' + fileName);
+                console.log('Upload completed: ' + fileName);
 
                 // Reduce number of active uploads:
                 manager.activeUploads -= 1;
@@ -211,14 +211,14 @@ define(function () {
 
             // Triggered when upload fails:
             xhr.onerror = function () {
-               //console.log('Upload failed: ', upload.fileName);
+                console.log('Upload failed: ', upload.fileName);
             };
 
             // Append additional data if provided:
             if (data) {
                 for (prop in data) {
                     if (data.hasOwnProperty(prop)) {
-                       //console.log('Adding data: ' + prop + ' = ' + data[prop]);
+                        console.log('Adding data: ' + prop + ' = ' + data[prop]);
                         formData.append(prop, data[prop]);
                     }
                 }
@@ -261,35 +261,21 @@ define(function () {
     };
 
     module.onEnabled = function (url, callback) {
-
+        
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.onload = function () {
-            try {
-                if (xhr.status === 200) {
-                    callback();
-                } else {
-                   //console.log(xhr.statusText);
-                }
-            } catch (error) {
-               //console.log(error);
+            if (xhr.status == 200) {
+                callback();
+            } else {
+                console.log(xhr.statusText);
             }
         };
         xhr.onerror = function () {
-            try {
-               //console.log(xhr.statusText);
-            } catch (error) {
-               //console.log(error);
-            }
+            console.log(xhr.statusText);
         };
-
-        try {
-            xhr.send();
-        } catch (error) {
-           //console.log(error);
-        }
-
-    };
+        xhr.send();
+    }
 
     return module;
 });

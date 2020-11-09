@@ -93,19 +93,6 @@ namespace NttDataWA.UserControls
             }
         }
 
-        public virtual void DisableStatoSpedizione()
-        {
-            foreach (GridViewRow item in this.DataGrid.Rows)
-            {
-                CheckBox chkIncludiInSpedizione = this.GetCheckBoxIncludiInSpedizione(item);
-                if (chkIncludiInSpedizione.Visible)
-                {
-                    chkIncludiInSpedizione.Checked = false;
-                    chkIncludiInSpedizione.Enabled = false;
-                }
-            }
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -549,10 +536,10 @@ namespace NttDataWA.UserControls
                     {
 
                         descrizione = string.Format("{0}{1} ({2}){3}",
-                                            descrizione,
-                                            corr.codiceRubrica,
-                                            corr.descrizione,
-                                            cc);
+                                        descrizione,
+                                        corr.codiceRubrica,
+                                        corr.descrizione,
+                                        cc);
                     }
                 }
 

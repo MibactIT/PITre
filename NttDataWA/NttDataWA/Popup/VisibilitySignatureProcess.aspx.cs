@@ -38,21 +38,6 @@ namespace NttDataWA.Popup
             }
         }
 
-        private List<ProcessoFirma> ListaProcessiDiFirma
-        {
-            get
-            {
-                if (HttpContext.Current.Session["ListaProcessiDiFirma"] != null)
-                    return (List<ProcessoFirma>)HttpContext.Current.Session["ListaProcessiDiFirma"];
-                else
-                    return null;
-            }
-            set
-            {
-                HttpContext.Current.Session["ListaProcessiDiFirma"] = value;
-            }
-        }
-
         public RubricaCallType CallType
         {
             get
@@ -83,20 +68,6 @@ namespace NttDataWA.Popup
             }
         }
 
-        private List<FiltroProcessoFirma> FiltroRicerca
-        {
-            get
-            {
-                return HttpContext.Current.Session["FiltroRicercaVisibilitySignatureProcess"] as List<FiltroProcessoFirma>;
-            }
-            set
-            {
-                HttpContext.Current.Session["FiltroRicercaVisibilitySignatureProcess"] = value;
-            }
-        }
-
-        private const string CLOSE_POPUP_ADD_FILTER_VISIBILITY = "closeAddFilterVisibility";
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!this.IsPostBack)
@@ -106,10 +77,8 @@ namespace NttDataWA.Popup
             }
             else
             {
-                BuildTableProcessRole();
-                ReadRetValueFromPopup();
+                RefreshScript();
             }
-            RefreshScript();
         }
 
         private void InitializeLanguage()
@@ -118,147 +87,20 @@ namespace NttDataWA.Popup
             this.BtnClose.Text = Utils.Languages.GetLabelFromCode("VisibilitySignatureProcessBtnClose", language);
             //this.BtnConfirm.Text = Utils.Languages.GetLabelFromCode("VisibilitySignatureProcessBtnConfirm", language);
             this.LitVisibilitySignatureProcessCorr.Text = Utils.Languages.GetLabelFromCode("LitVisibilitySignatureProcessCorr", language);
-            this.IndexImgAddFilter.ToolTip = Utils.Languages.GetLabelFromCode("IndexImgAddFilterTooltip", language);
-            this.IndexImgRemoveFilter.ToolTip = Utils.Languages.GetLabelFromCode("IndexImgRemoveFilterTooltip", language);
-            this.AddFilterVisibilitySignatureProcess.Title = Utils.Languages.GetLabelFromCode("VisibilitySignatureAddFilterTitle", language);
-            this.LtlTipoVisibilita.Text = Utils.Languages.GetLabelFromCode("VisibilitySignatureLtlTipoVisibilita", language);
-            this.rb_monitoratore.Text = Utils.Languages.GetLabelFromCode("VisibilitySignatureMonitoratore", language);
-            this.rb_proponente.Text = Utils.Languages.GetLabelFromCode("VisibilitySignatureProponente", language);
-            this.BtnAssegnaVisibilita.Text = Utils.Languages.GetLabelFromCode("VisibilitySignatureBtnAssegnaVisibilita", language);
-            this.LtlAssegnaVisibilita.Text = Utils.Languages.GetLabelFromCode("VisibilitySignatureLtlAssegnaVisibilita", language);
-            this.BtnEsportaVisibilita.Text = Utils.Languages.GetLabelFromCode("VisibilitySignatureBtnEsportaVisibilita", language);
-            this.ExportDati.Title = Utils.Languages.GetLabelFromCode("VisibilitySignatureEsportaVisibilita", language);
         }
 
         private void InitializaPage()
         {
-            this.FiltroRicerca = null;
-            // LoadListaCorr();
-            BuildTableProcessRole();
+            LoadListCorr();
             SetAjaxAddressBook();
-            //GridViewResult_Bind();
-        }
-
-        private void BuildTableProcessRole()
-        {
-            this.plcGridProcessRole.Controls.Clear();
-            List<VisibilitaProcessoRuolo> visibilita = new List<VisibilitaProcessoRuolo>();
-            if (this.ProcessoDiFirmaSelected != null && !string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
-            {
-                visibilita = LoadListaCorr(this.ProcessoDiFirmaSelected.idProcesso);
-                Table table = CreateTable(ProcessoDiFirmaSelected, visibilita);
-                this.plcGridProcessRole.Controls.Add(table);
-            }
-            else
-            {
-                foreach (ProcessoFirma processo in this.ListaProcessiDiFirma)
-                {
-                    if (processo.passi != null && processo.passi.Count() > 0)
-                    {
-                        visibilita = LoadListaCorr(processo.idProcesso);
-                        Table table = CreateTable(processo, visibilita);
-                        this.plcGridProcessRole.Controls.Add(table);
-                    }
-                }
-            }
-            this.UpPnlGridProcessRole.Update();
-        }
-
-        private Table CreateTable(ProcessoFirma processo, List<VisibilitaProcessoRuolo> visibilita)
-        {
-            Table tbl = new Table();
-            tbl.ID = "table_" + processo.idProcesso;
-            tbl.CssClass = "tbl_rounded_custom";
-
-            // header
-            TableRow rowProcesso = new TableRow();
-
-            TableCell cell1 = new TableCell();
-            cell1.ColumnSpan = 3;
-            cell1.ID = "cellProcess_" + processo.idProcesso;
-            cell1.CssClass = "th first";
-            cell1.Text = processo.nome;
-            rowProcesso.Controls.Add(cell1);
-            rowProcesso.ID = "rowProcesso_" + processo.idProcesso;
-
-            tbl.Controls.Add(rowProcesso);
-
-            TableRow rowRuoli;
-            foreach (VisibilitaProcessoRuolo vis in visibilita)
-            {
-                rowRuoli = new TableRow();
-
-                TableCell cellRoleDescription = new TableCell();
-                cellRoleDescription.ID = "roleDescription_" + processo.idProcesso + "_" + vis.ruolo.systemId;
-                cellRoleDescription.CssClass = "role";
-                cellRoleDescription.Text = vis.ruolo.descrizione + " (" + vis.ruolo.codiceRubrica + ")";
-                rowRuoli.Cells.Add(cellRoleDescription);
-
-                TableCell cellTipoVis = new TableCell();
-                cellTipoVis.ID = "tipoVisibilita_" + processo.idProcesso + "_" + vis.ruolo.idGruppo;
-                cellTipoVis.CssClass = "center";
-
-                DropDownList ddlTipoVis = new DropDownList();
-                ddlTipoVis.EnableViewState = false;
-                ddlTipoVis.ID = "ddlTipoVis_" + processo.idProcesso + "_" + vis.ruolo.idGruppo;
-                ddlTipoVis.CssClass = "chzn-select-deselect";
-                ddlTipoVis.AutoPostBack = true;
-                ddlTipoVis.Width = 150;
-                ddlTipoVis.Attributes.Add("onchange", "disallowOp('ContentPlaceHolderContent');");
-                ddlTipoVis.SelectedIndexChanged += new EventHandler(ddlTipoVis_SelectedIndexChanged);
-                ddlTipoVis.Items.Add(new ListItem(Utils.Languages.GetLabelFromCode("VisibilitySignatureProponente", UserManager.GetUserLanguage()), TipoVisibilita.PROPONENTE.ToString()));
-                ddlTipoVis.Items.Add(new ListItem(Utils.Languages.GetLabelFromCode("VisibilitySignatureMonitoratore", UserManager.GetUserLanguage()), TipoVisibilita.MONITORATORE.ToString()));
-
-                ddlTipoVis.SelectedValue = vis.tipoVisibilita.ToString();
-
-                cellTipoVis.Controls.Add(ddlTipoVis);
-
-                rowRuoli.Cells.Add(cellTipoVis);
-
-                TableCell cellAction = new TableCell();
-                cellAction.ID = "rimuovi_" + processo.idProcesso + "_" + vis.ruolo.idGruppo;
-                cellAction.CssClass = "center";
-
-                CustomImageButton btnDelete = new CustomImageButton();
-                btnDelete.ID = "btnDelete_" + processo.idProcesso + "_" + vis.ruolo.idGruppo;
-                btnDelete.ImageUrl = "../Images/Icons/delete.png";
-                btnDelete.OnMouseOutImage = "../Images/Icons/delete.png";
-                btnDelete.OnMouseOverImage = "../Images/Icons/delete_hover.png";
-                btnDelete.ImageUrlDisabled = "../Images/Icons/delete.png";
-                btnDelete.CssClass = "clickable";
-                btnDelete.Click += BtnRimuoviVisibilita_Click;
-                btnDelete.Attributes.Add("onClick", "disallowOp('ContentPlaceHolderContent');");
-                cellAction.Controls.Add(btnDelete);
-
-                rowRuoli.Cells.Add(cellAction);
-
-                tbl.Controls.Add(rowRuoli);
-            }
-
-            return tbl;
+            GridViewResult_Bind();
         }
 
         private void RefreshScript()
         {
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshSelect", "refreshSelect();", true);
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshTipsy", "tooltipTipsy();", true);
         }
 
-        private void ReadRetValueFromPopup()
-        {
-            if (this.Request.Form["__EVENTARGUMENT"] != null && (this.Request.Form["__EVENTARGUMENT"].Equals(CLOSE_POPUP_ADD_FILTER_VISIBILITY)))
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
-                if (!string.IsNullOrEmpty(this.AddFilterVisibilitySignatureProcess.ReturnValue))
-                {
-                    this.IndexImgRemoveFilter.Enabled = true;
-                    //this.LoadListCorr();
-                    //GridViewResult_Bind();
-                    BuildTableProcessRole();
-                    this.UpPnlFilter.Update();
-                }
-            }
-        }
         protected void BtnConfirm_Click(object sender, EventArgs e)
         {
 
@@ -282,55 +124,49 @@ namespace NttDataWA.Popup
         {
             try
             {
-                Ruolo ruolo = new Ruolo();
-                ruolo.idGruppo = this.idCorr.Value;
-                ruolo.codiceRubrica = this.TxtCodeCorr.Text;
-                ruolo.descrizione = this.TxtDescriptionCorr.Text;
-                TipoVisibilita tipoVis = (TipoVisibilita)Enum.Parse(typeof(TipoVisibilita), RblTipoVisibilita.SelectedValue);
+                Corrispondente corr = new Corrispondente();
+                corr.systemId = this.idCorr.Value;
+                corr.codiceRubrica = this.TxtCodeCorr.Text;
+                corr.descrizione = this.TxtDescriptionCorr.Text;
 
-                List<VisibilitaProcessoRuolo> visibilita = new List<VisibilitaProcessoRuolo>();
-                if (this.ProcessoDiFirmaSelected != null && !string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
+                //AGGIUNGO SUL DB
+                //Verifico che il corrispondente selezionato non sia già presente nella lista
+                Corrispondente cor = (from c in this.ListaVisibilitaProcesso where c.systemId.Equals(corr.systemId) select c).FirstOrDefault();
+                if (cor == null)
                 {
-                    visibilita.Add(new VisibilitaProcessoRuolo()
+                    if (UIManager.SignatureProcessesManager.InsertVisibilitaProcesso(new List<Corrispondente>() { corr }, this.ProcessoDiFirmaSelected.idProcesso))
                     {
-                        idProcesso = this.ProcessoDiFirmaSelected.idProcesso,
-                        ruolo = ruolo,
-                        tipoVisibilita = tipoVis
-                    });
-                }
-                else
-                {
-                    foreach (ProcessoFirma processo in this.ListaProcessiDiFirma)
-                    {
-                        if (processo.passi != null && processo.passi.Count() > 0)
+                        //AGGIORNO LA LISTA IN SESSIONE ED AGGIORNO LA GRIGLIA
+                        this.TxtCodeCorr.Text = string.Empty;
+                        this.TxtDescriptionCorr.Text = string.Empty;
+                        this.BtnAddRole.Enabled = false;
+                        this.UpdPnlCorr.Update();
+
+                        if (ListaVisibilitaProcesso == null)
                         {
-                            visibilita.Add(new VisibilitaProcessoRuolo()
-                            {
-                                idProcesso = this.ProcessoDiFirmaSelected.idProcesso,
-                                ruolo = ruolo,
-                                tipoVisibilita = tipoVis
-                            });
+                            ListaVisibilitaProcesso = new List<Corrispondente>();
                         }
+
+                        this.ListaVisibilitaProcesso.Add(corr);
+                        this.ListaVisibilitaProcesso = (from p in ListaVisibilitaProcesso orderby p.descrizione ascending select p).ToList<Corrispondente>();
+                        GridViewResult_Bind();
+                    }
+                    else
+                    {
+                        string msg = "ErrorVisibilitySignatureProcessCorrispondent";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
+                        return;
                     }
                 }
-                //AGGIUNGO SUL DB
-                if (UIManager.SignatureProcessesManager.InsertVisibilitaProcesso(visibilita))
-                {
-                    //AGGIORNO LA LISTA IN SESSIONE ED AGGIORNO LA GRIGLIA
-                    this.TxtCodeCorr.Text = string.Empty;
-                    this.TxtDescriptionCorr.Text = string.Empty;
-                    this.BtnAssegnaVisibilita.Enabled = false;
-                    this.UpdPnlCorr.Update();
-                    this.UpPnlButtons.Update();
-                }
                 else
                 {
-                    string msg = "ErrorVisibilitySignatureProcessCorrispondent";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
+                    this.TxtCodeCorr.Text = string.Empty;
+                    this.TxtDescriptionCorr.Text = string.Empty;
+                    this.BtnAddRole.Enabled = false;
+                    this.UpdPnlCorr.Update();
                 }
-                BuildTableProcessRole();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 string msg = "ErrorVisibilitySignatureProcessCorrispondent";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
@@ -367,135 +203,34 @@ namespace NttDataWA.Popup
                 List<NttDataWA.Popup.AddressBook.CorrespondentDetail> atList = (List<NttDataWA.Popup.AddressBook.CorrespondentDetail>)HttpContext.Current.Session["AddressBook.At"];
                 if (atList != null && atList.Count > 0)
                 {
-                    List<VisibilitaProcessoRuolo> visibilita = new List<VisibilitaProcessoRuolo>();
-                    Ruolo ruolo;
+                    List<Corrispondente> listaCorr = new List<Corrispondente>();
                     foreach (NttDataWA.Popup.AddressBook.CorrespondentDetail corr in atList)
                     {
-                        ruolo = new Ruolo();
-                        ruolo = RoleManager.getRuoloById(corr.SystemID);
-                        TipoVisibilita tipoVis = (TipoVisibilita)Enum.Parse(typeof(TipoVisibilita), RblTipoVisibilita.SelectedValue);
-
-                        if (this.ProcessoDiFirmaSelected != null && !string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
+                        if ((from c in this.ListaVisibilitaProcesso where c.systemId.Equals(corr.SystemID) select c).FirstOrDefault() == null)
                         {
-                            visibilita.Add(new VisibilitaProcessoRuolo()
-                            {
-                                idProcesso = this.ProcessoDiFirmaSelected.idProcesso,
-                                ruolo = ruolo,
-                                tipoVisibilita = tipoVis
-                            });
-                        }
-                        else
-                        {
-                            foreach (ProcessoFirma processo in this.ListaProcessiDiFirma)
-                            {
-                                if (processo.passi != null && processo.passi.Count() > 0)
-                                {
-                                    visibilita.Add(new VisibilitaProcessoRuolo()
-                                    {
-                                        idProcesso = processo.idProcesso,
-                                        ruolo = ruolo,
-                                        tipoVisibilita = tipoVis
-                                    });
-                                }
-                            }
+                            listaCorr.Add(new Corrispondente() { systemId = corr.SystemID, descrizione = corr.Descrizione, codiceRubrica = corr.CodiceRubrica });
                         }
                     }
-                    if (UIManager.SignatureProcessesManager.InsertVisibilitaProcesso(visibilita))
+                    if (UIManager.SignatureProcessesManager.InsertVisibilitaProcesso(listaCorr, this.ProcessoDiFirmaSelected.idProcesso))
                     {
+                        if (ListaVisibilitaProcesso == null)
+                        {
+                            ListaVisibilitaProcesso = new List<Corrispondente>();
+                        }
 
+                        this.ListaVisibilitaProcesso.AddRange(listaCorr);
+                        this.ListaVisibilitaProcesso = (from p in ListaVisibilitaProcesso orderby p.descrizione ascending select p).ToList<Corrispondente>();
+                        GridViewResult_Bind();
                     }
-                    BuildTableProcessRole();
                 }
                 HttpContext.Current.Session["AddressBook.At"] = null;
                 HttpContext.Current.Session["AddressBook.Cc"] = null;
-
             }
             catch (System.Exception ex)
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return;
             }
-        }
-
-        protected void IndexImgAddFilter_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxModalPopupAddFilterVisibilitySignatureProcess", "parent.ajaxModalPopupAddFilterVisibilitySignatureProcess();", true);
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-
-        protected void IndexImgRemoveFilter_Click(object sender, EventArgs e)
-        {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
-            this.IndexImgRemoveFilter.Enabled = false;
-            this.FiltroRicerca = null;
-            //LoadListCorr();
-            //GridViewResult_Bind();
-            BuildTableProcessRole();
-            this.UpPnlFilter.Update();
-        }
-
-        protected void ddlTipoVis_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
-            try
-            {
-                DropDownList ddlTipoVis = (DropDownList)this.plcGridProcessRole.FindControl((((DropDownList)sender).ID));
-                string idTipoVis = (((DropDownList)sender).ID);
-                string idProcesso = idTipoVis.Split('_')[1];
-                string idGruppo = idTipoVis.Split('_')[2];
-
-                TipoVisibilita tipoVisibilita = (TipoVisibilita)Enum.Parse(typeof(TipoVisibilita), ddlTipoVis.SelectedValue);
-
-                if (!UIManager.SignatureProcessesManager.UpdateTipoVisibilitaProcesso(idProcesso, idGruppo, tipoVisibilita))
-                {
-                    string msg = "ErrorVisibilitySignatureProcessDeleteCorr";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                }
-                else
-                {
-                    this.BuildTableProcessRole();
-                }
-            }
-            catch (Exception ex)
-            {
-                string msg = "ErrorVisibilitySignatureProcessDeleteCorr";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                return;
-            }
-        }
-
-        protected void BtnRimuoviVisibilita_Click(object sender, EventArgs e)
-        {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
-            try
-            {
-                string idBtnRimuoviBisibilita = (((CustomImageButton)sender).ID);
-                string idProcesso = idBtnRimuoviBisibilita.Split('_')[1];
-                string idGruppo = idBtnRimuoviBisibilita.Split('_')[2];
-
-                if (!UIManager.SignatureProcessesManager.RimuoviVisibilitaProcesso(idProcesso, idGruppo))
-                {
-                    string msg = "ErrorVisibilitySignatureProcessDeleteCorr";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                }
-                else
-                {
-                    this.BuildTableProcessRole();
-                }
-            }
-            catch (Exception ex)
-            {
-                string msg = "ErrorVisibilitySignatureProcessDeleteCorr";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                return;
-            }
-
         }
 
         private void GridViewResult_Bind()
@@ -513,7 +248,7 @@ namespace NttDataWA.Popup
         {
         }
 
-
+        
 
         protected void GridViewResult_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
@@ -550,10 +285,10 @@ namespace NttDataWA.Popup
                     panel.CssClass = "recordNavigator";
 
                     int startFrom = 1;
-                    if (int.Parse(this.grid_pageindex.Value) > 6) startFrom = int.Parse(this.grid_pageindex.Value) - 5;
+                    if (int.Parse(this.grid_pageindex.Value) > 6) startFrom = int.Parse(this.grid_pageindex.Value) -5;
 
                     int endTo = 10;
-                    if (int.Parse(this.grid_pageindex.Value) > 6) endTo = int.Parse(this.grid_pageindex.Value) + 5;
+                    if (int.Parse(this.grid_pageindex.Value) > 6) endTo = int.Parse(this.grid_pageindex.Value) +5;
                     if (endTo > countPage) endTo = countPage;
 
                     if (startFrom > 1)
@@ -607,67 +342,6 @@ namespace NttDataWA.Popup
 
         }
 
-        protected void BtnAssegnaVisibilita_Click(object sender, EventArgs e)
-        {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
-            try
-            {
-                Ruolo ruolo = new Ruolo();
-                ruolo.idGruppo = this.idCorr.Value;
-                ruolo.codiceRubrica = this.TxtCodeCorr.Text;
-                ruolo.descrizione = this.TxtDescriptionCorr.Text;
-                TipoVisibilita tipoVis = (TipoVisibilita)Enum.Parse(typeof(TipoVisibilita), RblTipoVisibilita.SelectedValue);
-
-                List<VisibilitaProcessoRuolo> visibilita = new List<VisibilitaProcessoRuolo>();
-                if (this.ProcessoDiFirmaSelected != null && !string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
-                {
-                    visibilita.Add(new VisibilitaProcessoRuolo()
-                    {
-                        idProcesso = this.ProcessoDiFirmaSelected.idProcesso,
-                        ruolo = ruolo,
-                        tipoVisibilita = tipoVis
-                    });
-                }
-                else
-                {
-                    foreach (ProcessoFirma processo in this.ListaProcessiDiFirma)
-                    {
-                        if (processo.passi != null && processo.passi.Count() > 0)
-                        {
-                            visibilita.Add(new VisibilitaProcessoRuolo()
-                            {
-                                idProcesso = processo.idProcesso,
-                                ruolo = ruolo,
-                                tipoVisibilita = tipoVis
-                            });
-                        }
-                    }
-                }
-                //AGGIUNGO SUL DB
-                if (UIManager.SignatureProcessesManager.InsertVisibilitaProcesso(visibilita))
-                {
-                    //AGGIORNO LA LISTA IN SESSIONE ED AGGIORNO LA GRIGLIA
-                    this.TxtCodeCorr.Text = string.Empty;
-                    this.TxtDescriptionCorr.Text = string.Empty;
-                    this.BtnAssegnaVisibilita.Enabled = false;
-                    this.UpdPnlCorr.Update();
-                    this.UpPnlButtons.Update();
-                }
-                else
-                {
-                    string msg = "ErrorVisibilitySignatureProcessCorrispondent";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                }
-                BuildTableProcessRole();
-            }
-            catch (Exception ex)
-            {
-                string msg = "ErrorVisibilitySignatureProcessDeleteCorr";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                return;
-            }
-        }
-
         protected void ImgDeleteVisibility_Click(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
@@ -690,7 +364,7 @@ namespace NttDataWA.Popup
                     return;
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 string msg = "ErrorVisibilitySignatureProcessDeleteCorr";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
@@ -703,29 +377,34 @@ namespace NttDataWA.Popup
             ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
             try
             {
-                string codice = TxtCodeCorr.Text;
-                this.TxtCodeCorr.Text = string.Empty;
-                this.TxtDescriptionCorr.Text = string.Empty;
-                if (!string.IsNullOrEmpty(codice))
+                if (!string.IsNullOrEmpty(this.TxtCodeCorr.Text))
                 {
                     RubricaCallType calltype = RubricaCallType.CALLTYPE_PROTO_INT_MITT;
                     ElementoRubrica[] listaCorr = null;
                     Corrispondente corr = null;
                     UIManager.RegistryManager.SetRegistryInSession(RoleManager.GetRoleInSession().registri[0]);
-                    listaCorr = UIManager.AddressBookManager.getElementiRubricaMultipli(codice, calltype, true);
+                    listaCorr = UIManager.AddressBookManager.getElementiRubricaMultipli(TxtCodeCorr.Text, calltype, true);
                     if (listaCorr != null && (listaCorr.Count() == 1))
                     {
                         if (listaCorr.Count() == 1)
                         {
-                            corr = UIManager.AddressBookManager.getCorrispondenteRubrica(codice, calltype);
+                            corr = UIManager.AddressBookManager.getCorrispondenteRubrica(this.TxtCodeCorr.Text, calltype);
                         }
                         if (corr == null)
                         {
+                            this.TxtCodeCorr.Text = string.Empty;
+                            this.TxtDescriptionCorr.Text = string.Empty;
+                            //this.idRuolo.Value = string.Empty;
+                            this.UpdPnlCorr.Update();
                             string msg = "ErrorTransmissionCorrespondentNotFound";
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
                         }
                         if (!corr.tipoCorrispondente.Equals("R"))
                         {
+                            this.TxtCodeCorr.Text = string.Empty;
+                            this.TxtDescriptionCorr.Text = string.Empty;
+                            //this.idRuolo.Value = string.Empty;
+                            this.UpdPnlCorr.Update();
                             string msg = "WarningCorrespondentAsRole";
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) { parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else { parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
                         }
@@ -733,18 +412,37 @@ namespace NttDataWA.Popup
                         {
                             this.TxtCodeCorr.Text = corr.codiceRubrica;
                             this.TxtDescriptionCorr.Text = corr.descrizione;
-                            this.idCorr.Value = ((DocsPaWR.Ruolo)corr).idGruppo;
-                            this.BtnAssegnaVisibilita.Enabled = true;
-                            this.UpPnlButtons.Update();
+                            this.idCorr.Value = corr.systemId;
+                            this.BtnAddRole.Enabled = true;
+                            //this.PassoDiFirmaSelected.ruoloCoinvolto = ruolo;
+                            this.UpdPnlCorr.Update();
                         }
                     }
                     else
                     {
+                        this.TxtCodeCorr.Text = string.Empty;
+                        this.TxtDescriptionCorr.Text = string.Empty;
+                        //this.idRuolo.Value = string.Empty;
+                        this.UpdPnlCorr.Update();
                         string msg = "ErrorTransmissionCorrespondentNotFound";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
                     }
+                    //else
+                    //{
+                    //    corr = null;
+                    //    this.FoundCorr = listaCorr;
+                    //    this.TypeChooseCorrespondent = "Sender";
+                    //    this.TypeRecord = "A";
+                    //    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "chooseCorrespondent", "ajaxModalPopupChooseCorrespondent();", true);
+                    //}
                 }
-                this.UpdPnlCorr.Update();
+                else
+                {
+                    this.TxtCodeCorr.Text = string.Empty;
+                    this.TxtDescriptionCorr.Text = string.Empty;
+                    //this.idRuolo.Value = string.Empty;
+                    this.UpdPnlCorr.Update();
+                }
             }
             catch (Exception ex)
             {
@@ -754,9 +452,9 @@ namespace NttDataWA.Popup
             }
         }
 
-        private List<VisibilitaProcessoRuolo> LoadListaCorr(string idProcesso)
+        private void LoadListCorr()
         {
-            return UIManager.SignatureProcessesManager.GetVisibilitaProcesso(idProcesso, FiltroRicerca);
+            this.ListaVisibilitaProcesso = UIManager.SignatureProcessesManager.GetVisibilitaProcesso(this.ProcessoDiFirmaSelected.idProcesso);
         }
 
         protected string GetDescriptionCorr(Corrispondente corr)

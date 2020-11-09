@@ -199,8 +199,6 @@ namespace NttDataWA.Popup
             {
                 bool toSend = true;
                 fileReq = DocumentManager.AddVersion(fileReq, toSend);
-                //ABBATANGELI - evita errore addVersion subito dopo upload da repository
-                Session["fileDoc"] = null;
                 return fileReq.version;
             }
             catch (NttDataWAException ex) 

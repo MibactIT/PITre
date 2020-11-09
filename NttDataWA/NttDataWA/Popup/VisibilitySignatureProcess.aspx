@@ -9,7 +9,8 @@
     <script src="../Scripts/chosen.jquery.min.js" type="text/javascript"></script>
     <link href="../Css/chosen.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
-        .tbl_rounded_custom th, .tbl_rounded_custom td.th {
+        .tbl_rounded_custom th, .tbl_rounded_custom td.th
+        {
             background: url(../Images/Common/table_header_bg.png) repeat-x top left;
             color: #fff;
             font-weight: bold;
@@ -17,63 +18,15 @@
             padding: 5px;
             vertical-align: top;
             text-align: left;
-            border: 0;
         }
-
-        .tbl_rounded_custom td.role {
-            width: 70%;
-            padding-left: 5px;
-        }
-
-        .tbl_rounded_custom tr.header td, .tbl_rounded_custom tr.header2 td {
+        
+        .tbl_rounded_custom tr.header td, .tbl_rounded_custom tr.header2 td
+        {
             background-color: #e1e9f0;
         }
-
-        .tbl_rounded_custom {
-            margin: 0px;
-            border-spacing: 0;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-
-        .contentProcess {
-            margin-top: 20px;
-        }
-                .col-marginSx5 {
-            float: left;
-            width: 100px;
-            margin: 0px 3px 0px 3px;
-        }
-
-            .col-marginSx5 p {
-                margin: 0px;
-                padding: 0px;
-            }
-        #containerStandardTopCx p
-        {
-            margin: 0px;
-            padding: 0px;
-            text-align: left;
-            font-weight:bold;
-            color:#044c7f;
-            font-size:15px;
-            margin-bottom:15px;
-            border-bottom:1px solid #cccccc;
-        }
-
-        #containerStandardTopCx
-        {
-            float: left;
-            height: 27px;
-            width: 100%;
-            text-align:left;
-            background: url(../../Images/Standard/bg_top_standard_cx.png);
-        }
-
     </style>
     <script type="text/javascript">
-
+        
         function closeAddressBookPopup() {
             $('#btnAddressBookPostback').click();
         }
@@ -159,67 +112,23 @@
     </script>
 </asp:Content>
 <asp:Content ID="ContentPlaceHolderContent" ContentPlaceHolderID="ContentPlaceHolderContent"
-    runat="server">
-    <uc:ajaxpopup2 Id="AddFilterVisibilitySignatureProcess" runat="server" Url="../Popup/AddFilterVisibilitySignatureProcess.aspx"
-        PermitClose="false" Width="500" Height="300" PermitScroll="false" CloseFunction="function (event, ui){__doPostBack('UpPnlButtons', 'closeAddFilterVisibility');}" />
-    <uc:ajaxpopup2 Id="ExportDati" runat="server" Url="../ExportDati/exportDatiSelection.aspx?export=exportVisibilita"
-        Width="650" Height="500" PermitClose="true" PermitScroll="true" CloseFunction="function (event, ui) {__doPostBack('UpPnlButtons', ''); }" />
-    <div id="container" style="padding: 20px">
-         <div id="contentFilter">
-                            <fieldset class="filterAddressbook">
-        <asp:Panel ID="PnlAggiungiVisibilita" runat="server">
-             <div id="containerStandardTopCx">
-                    <p>
-                        <asp:Literal ID="LtlAssegnaVisibilita" runat="server"></asp:Literal>
-                    </p>
-                </div>
-
-            <div class="row">
-                 <%-- TIPO VISIBILITA --%>
-                <div class="col-marginSx5">
-                    <p>
-                        <span class="weight">
-                            <asp:Literal runat="server" ID="LtlTipoVisibilita"></asp:Literal>
-                        </span>
-                    </p>
-                </div>
-                <div class="col4">
-                    <asp:RadioButtonList ID="RblTipoVisibilita" runat="server" RepeatDirection="Vertical">
-                        <asp:ListItem Id="rb_proponente" Selected="True" Value="PROPONENTE" runat="server"></asp:ListItem>
-                        <asp:ListItem Id="rb_monitoratore" Value="MONITORATORE" runat="server"></asp:ListItem>
-                    </asp:RadioButtonList>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <p>
-                        <span class="weight">
-                            <asp:Literal ID="LitVisibilitySignatureProcessCorr" runat="server" /></span>
-                    </p>
-                </div>
-                <div class="col-right-no-margin">
-                    <asp:UpdatePanel ID="UpdPnlAction" UpdateMode="Conditional" runat="server" ClientIDMode="Static">
-                        <ContentTemplate>
-                            <cc1:CustomImageButton runat="server" ID="BtnAddressBook" ImageUrl="../Images/Icons/address_book.png"
-                                OnMouseOutImage="../Images/Icons/address_book.png" OnMouseOverImage="../Images/Icons/address_book_hover.png"
-                                CssClass="clickableLeft" ImageUrlDisabled="../Images/Icons/address_book_disabled.png"
-                                OnClick="BtnAddressBook_Click" />
-                        </ContentTemplate>
-                    </asp:UpdatePanel>
-                </div>
-            </div>
-            <asp:UpdatePanel ID="UpdPnlCorr" UpdateMode="Conditional" runat="server">
-                <ContentTemplate>
-                    <div class="row">
-                        <asp:HiddenField ID="idRuoloTitolare" runat="server" />
-                        <div class="colHalf">
-                            <cc1:CustomTextArea ID="TxtCodeCorr" runat="server" CssClass="txt_addressBookLeft"
-                                AutoPostBack="true" CssClassReadOnly="txt_addressBookLeft_disabled" AutoComplete="off"
-                                OnTextChanged="TxtCode_OnTextChanged" onchange="disallowOp('ContentPlaceHolderContent');">
-                            </cc1:CustomTextArea>
-                        </div>
-                        <div class="colHalf2">
-                            <div class="colHalf3">
+    ClientIDMode="static" runat="server">
+<div id="container" style="padding: 20px">
+    <asp:UpdatePanel ID="UpdPnlContainer" UpdateMode="Conditional" runat="server" ClientIDMode="Static">
+        <ContentTemplate>
+                <asp:UpdatePanel ID="UpdPnlCorr" UpdateMode="Conditional" runat="server" ClientIDMode="Static">
+                    <ContentTemplate>
+                        <div class="row" style="width: 100%">
+                            <div class="colHalf" style="width: 35%">
+                                <strong>
+                                    <asp:Literal ID="LitVisibilitySignatureProcessCorr" runat="server" /></strong>
+                                <cc1:CustomTextArea ID="TxtCodeCorr" runat="server" CssClass="txt_addressBookLeft"
+                                    autocomplete="off" AutoPostBack="true"
+                                    Width="40%" Style="margin-left: 10px" OnTextChanged="TxtCode_OnTextChanged" CssClassReadOnly="txt_addressBookLeft_disabled"
+                                    AutoCompleteType="Disabled" onchange="disallowOp('ContentPlaceHolderContent');">
+                                </cc1:CustomTextArea>
+                            </div>
+                            <div class="colHalf" style="width: 55%;">
                                 <asp:HiddenField ID="idCorr" runat="server" />
                                 <cc1:CustomTextArea ID="TxtDescriptionCorr" runat="server" CssClass="txt_addressBookRight"
                                     CssClassReadOnly="txt_addressBookRight_disabled" autocomplete="off" AutoCompleteType="Disabled"></cc1:CustomTextArea>
@@ -233,83 +142,75 @@
                                 </uc1:AutoCompleteExtender>
                                 <asp:Button ID="btnRecipient" runat="server" Text="vai" Style="display: none;" />
                             </div>
+                            <div class="col-right-no-margin2">
+                                <cc1:CustomImageButton runat="server" ID="BtnAddressBook" ImageUrl="../Images/Icons/address_book.png"
+                                    OnMouseOutImage="../Images/Icons/address_book.png" OnMouseOverImage="../Images/Icons/address_book_hover.png"
+                                    CssClass="clickableLeft" ImageUrlDisabled="../Images/Icons/address_book_disabled.png"
+                                    OnClick="BtnAddressBook_Click" />
+                                <cc1:CustomImageButton ID="BtnAddRole" runat="server" CssClass="clickableLeft" Visible="true"
+                                    ImageUrl="../Images/Icons/add_version.png" OnMouseOutImage="../Images/Icons/add_version.png"
+                                    OnClick="BtnAddRole_Click" OnMouseOverImage="../Images/Icons/add_version_hover.png" Enabled="false"
+                                    ImageUrlDisabled="../Images/Icons/add_version_disabled.png" ToolTip='<%$ localizeByText:VisibilitySignaturedAddVisibilityTooltip%>' />
+                            </div>
                         </div>
-                    </div>
-                </ContentTemplate>
-            </asp:UpdatePanel>
-        </asp:Panel>
-                                </fieldset>
-             </div>
-        <asp:UpdatePanel runat="server" ID="UpnlGrid" ClientIDMode="Static" UpdateMode="Conditional" Visible="false">
-            <ContentTemplate>
-                <div class="row" style="padding-top: 15px">
-                    <asp:GridView ID="GridViewResult" runat="server" AllowSorting="false" AllowPaging="true"
-                        AutoGenerateColumns="false" CssClass="tbl_rounded_custom round_onlyextreme" PageSize="15"
-                        HorizontalAlign="Center" ShowHeader="true" ShowHeaderWhenEmpty="true"
-                        Width="100%" OnPreRender="GridViewResult_PreRender" OnRowCreated="GridViewResult_RowDataBound"
-                        OnPageIndexChanging="GridViewResult_PageIndexChanging">
-                        <RowStyle CssClass="NormalRow" />
-                        <AlternatingRowStyle CssClass="AltRow" />
-                        <PagerStyle CssClass="recordNavigator2" />
-                        <Columns>
-                            <asp:TemplateField Visible="false">
-                                <ItemTemplate>
-                                    <asp:Label runat="server" ID="systemIdCorr" Text='<%# Bind("systemId") %>' />
-                                </ItemTemplate>
-                            </asp:TemplateField>
-                            <asp:TemplateField HeaderText='<%$ localizeByText:VisibilitySignatureProcessRole%>'
-                                HeaderStyle-Width="85%">
-                                <ItemTemplate>
-                                    <asp:Label runat="server" ID="lblDescriptionRole" Text='<%#this.GetDescriptionCorr((NttDataWA.DocsPaWR.Corrispondente) Container.DataItem) %>' />
-                                </ItemTemplate>
-                            </asp:TemplateField>
-                            <asp:TemplateField HeaderStyle-Width="10px" ItemStyle-Width="10px" ItemStyle-CssClass="grdList_del"
-                                ItemStyle-HorizontalAlign="Center" HeaderText='<%$ localizeByText:VisibilitySignatureProcessRemove%>'>
-                                <ItemTemplate>
-                                    <cc1:CustomImageButton ID="ImgDeleteVisibility" runat="server" ImageAlign="Middle"
-                                        ImageUrl="../Images/Icons/delete.png" OnMouseOverImage="../Images/Icons/delete_hover.png" ToolTip='<%$ localizeByText:VisibilitySignaturedDeleteVisibilityTooltip%>'
-                                        OnMouseOutImage="../Images/Icons/delete.png" CssClass="clickableLeft" OnClick="ImgDeleteVisibility_Click" OnClientClick="disallowOp('ContentPlaceHolderContent');" />
-                                </ItemTemplate>
-                                <ItemStyle />
-                            </asp:TemplateField>
-                        </Columns>
-                    </asp:GridView>
-                    <asp:PlaceHolder ID="plcNavigator" runat="server" />
-                    <asp:HiddenField ID="grid_pageindex" runat="server" ClientIDMode="Static" />
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+                <asp:UpdatePanel runat="server" ID="UpnlGrid" ClientIDMode="Static" UpdateMode="Conditional">
+                    <ContentTemplate>
+                        <div class="row" style="padding-top: 15px">
+                            <asp:GridView ID="GridViewResult" runat="server" AllowSorting="false" AllowPaging="true"
+                                    AutoGenerateColumns="false" CssClass="tbl_rounded_custom round_onlyextreme" PageSize="15"
+                                    HorizontalAlign="Center"  ShowHeader="true" ShowHeaderWhenEmpty="true"
+                                    Width="100%" OnPreRender="GridViewResult_PreRender" OnRowCreated="GridViewResult_RowDataBound"
+                                     OnPageIndexChanging="GridViewResult_PageIndexChanging"
+                                    >
+                                    <RowStyle CssClass="NormalRow" />
+                                    <AlternatingRowStyle CssClass="AltRow" />
+                                    <PagerStyle CssClass="recordNavigator2" />
+                                <Columns>
+                                    <asp:TemplateField Visible="false">
+                                        <ItemTemplate>
+                                            <asp:Label runat="server" ID="systemIdCorr" Text='<%# Bind("systemId") %>' />
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText='<%$ localizeByText:VisibilitySignatureProcessRole%>'
+                                        HeaderStyle-Width="85%">
+                                        <ItemTemplate>
+                                            <asp:Label runat="server" ID="lblDescriptionRole" Text='<%#this.GetDescriptionCorr((NttDataWA.DocsPaWR.Corrispondente) Container.DataItem) %>'  />
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderStyle-Width="10px" ItemStyle-Width="10px" ItemStyle-CssClass="grdList_del"
+                                        ItemStyle-HorizontalAlign="Center" HeaderText='<%$ localizeByText:VisibilitySignatureProcessRemove%>'>
+                                        <ItemTemplate>
+                                            <cc1:CustomImageButton ID="ImgDeleteVisibility" runat="server" ImageAlign="Middle"
+                                                ImageUrl="../Images/Icons/delete.png" OnMouseOverImage="../Images/Icons/delete_hover.png" ToolTip='<%$ localizeByText:VisibilitySignaturedDeleteVisibilityTooltip%>'
+                                                OnMouseOutImage="../Images/Icons/delete.png" CssClass="clickableLeft" OnClick="ImgDeleteVisibility_Click"  OnClientClick="disallowOp('ContentPlaceHolderContent');" />
+                                        </ItemTemplate>
+                                        <ItemStyle />
+                                    </asp:TemplateField>
+                                </Columns>
+                            </asp:GridView>
+                            <asp:PlaceHolder ID="plcNavigator" runat="server" />
+                            <asp:HiddenField ID="grid_pageindex" runat="server" ClientIDMode="Static" />
+                        </div>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+        </ContentTemplate>
+    </asp:UpdatePanel>
                 </div>
-            </ContentTemplate>
-        </asp:UpdatePanel>
-        <div class="contentProcess">
-            <asp:UpdatePanel ID="UpPnlFilter" runat="server" ClientIDMode="Static" UpdateMode="Conditional">
-                <ContentTemplate>
-                    <cc1:CustomImageButton runat="server" ID="IndexImgAddFilter" ImageUrl="../Images/Icons/home_add_filters.png"
-                        OnMouseOutImage="../Images/Icons/home_add_filters.png" OnMouseOverImage="../Images/Icons/home_add_filters_hover.png"
-                        CssClass="clickableRight" OnClientClick="disallowOp('ContentPlaceHolderContent'); return ajaxModalPopupAddFilterVisibilitySignatureProcess();"
-                        ImageUrlDisabled="../Images/Icons/home_add_filters_disabled.png" OnClick="IndexImgAddFilter_Click" />
-                    <cc1:CustomImageButton runat="server" ID="IndexImgRemoveFilter" ImageUrl="../Images/Icons/home_delete_filters.png"
-                        OnMouseOutImage="../Images/Icons/home_delete_filters.png" OnMouseOverImage="../Images/Icons/home_delete_filters_hover.png"
-                        CssClass="clickableRight" ImageUrlDisabled="../Images/Icons/home_delete_filters_disabled.png" OnClick="IndexImgRemoveFilter_Click"
-                        Enabled="false" OnClientClick="disallowOp('ContentPlaceHolderContent');" />
-                </ContentTemplate>
-            </asp:UpdatePanel>
-        </div>
-        <asp:UpdatePanel ID="UpPnlGridProcessRole" runat="server" ClientIDMode="Static" UpdateMode="Conditional">
-            <ContentTemplate>
-                <asp:PlaceHolder ID="plcGridProcessRole" runat="server" />
-            </ContentTemplate>
-        </asp:UpdatePanel>
-    </div>
 </asp:Content>
 <asp:Content ID="ContentButtons" ContentPlaceHolderID="ContentPlaceOldersButtons"
     runat="server">
     <asp:UpdatePanel ID="UpPnlButtons" runat="server" UpdateMode="Conditional" ClientIDMode="Static">
         <ContentTemplate>
-            <cc1:CustomButton ID="BtnAssegnaVisibilita" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable" OnClientClick="disallowOp('ContentPlaceHolderContent')" 
-                OnMouseOver="btnHover" ClientIDMode="Static" OnClick="BtnAssegnaVisibilita_Click" Enabled="false" />
-            <cc1:CustomButton ID="BtnEsportaVisibilita" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover"  OnClientClick="return ajaxModalPopupExportDati();" />            
+            <%--            <cc1:CustomButton ID="BtnConfirm" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
+                OnMouseOver="btnHover" ClientIDMode="Static" OnClick="BtnConfirm_Click" />--%>
             <cc1:CustomButton ID="BtnClose" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
                 OnMouseOver="btnHover" ClientIDMode="Static" OnClick="BtnClose_Click" />
+            <%--<asp:Button ID="btnObjectPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
+                OnClick="btnObjectPostback_Click" />
+            <asp:Button ID="btnAddressBookPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
+                OnClick="btnAddressBookPostback_Click" OnClientClick="disallowOp('ContentPlaceHolderContent')" />--%>
             <asp:Button ID="btnAddressBookPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
                 OnClick="btnAddressBookPostback_Click" OnClientClick="disallowOp('ContentPlaceHolderContent')" />
         </ContentTemplate>

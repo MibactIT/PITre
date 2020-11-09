@@ -352,10 +352,10 @@
         </asp:UpdatePanel>
         <asp:UpdatePanel runat="server" ID="UpPnlGridView" UpdateMode="Conditional">
             <ContentTemplate>
-                <asp:GridView ID="gridViewResult" runat="server" Width="100%" AllowPaging="false"
+                <asp:GridView ID="gridViewResult" runat="server" Width="100%" AllowPaging="true"
                     PageSize="10" AutoGenerateColumns="false" CssClass="tbl" HorizontalAlign="Center"
                     ShowHeader="true" ShowHeaderWhenEmpty="true" OnRowDataBound="gridViewResult_RowDataBound"
-                    OnPreRender="gridViewResult_PreRender">
+                    OnPreRender="gridViewResult_PreRender" OnPageIndexChanging="gridViewResult_PageIndexChanging">
                     <RowStyle CssClass="NormalRow" />
                     <AlternatingRowStyle CssClass="AltRow" />
                     <PagerStyle CssClass="recordNavigator2" />
@@ -403,12 +403,6 @@
                         </asp:TemplateField>
                     </Columns>
                 </asp:GridView>
-                <asp:PlaceHolder ID="plcNavigator" runat="server" />
-                <asp:UpdatePanel ID="upPnlGridIndexes" runat="server" ClientIDMode="Static" UpdateMode="Conditional">
-                    <ContentTemplate>
-                        <asp:HiddenField ID="grid_pageindex" runat="server" ClientIDMode="Static" />
-                    </ContentTemplate>
-                </asp:UpdatePanel>
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>

@@ -85,51 +85,6 @@ namespace NttDataWA.UserControls {
         protected global::System.Web.UI.WebControls.Literal LitDocumentConversionPDF;
         
         /// <summary>
-        /// UpdatePanelPreview control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanelPreview;
-        
-        /// <summary>
-        /// PlaceHolderPreview control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder PlaceHolderPreview;
-        
-        /// <summary>
-        /// imgPrevPreview control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton imgPrevPreview;
-        
-        /// <summary>
-        /// ViewDocumentPreview control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ViewDocumentPreview;
-        
-        /// <summary>
-        /// imgNextPreview control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton imgNextPreview;
-        
-        /// <summary>
         /// UpPnlContentDxSx control.
         /// </summary>
         /// <remarks>
@@ -226,7 +181,7 @@ namespace NttDataWA.UserControls {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl frame;
+        protected global::System.Web.UI.HtmlControls.HtmlIframe frame;
         
         /// <summary>
         /// PlcVersions control.

@@ -10,11 +10,16 @@ using System.Text.RegularExpressions;
 using NttDatalLibrary;
 using System.Collections;
 using NttDataWA.Utils;
+using log4net;
 
 namespace NttDataWA.Popup
 {
 	public partial class Signature : System.Web.UI.Page
     {
+        private ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static DocsPaWR.DocsPaWebService _docsPaWS = ProxyManager.GetWS();
+
+
         #region Properties
 
         /// <summary>
@@ -286,23 +291,10 @@ namespace NttDataWA.Popup
             }
         }
 
-        private bool ChangeSignature
-        {
-            get
-            {
-                if (HttpContext.Current.Session["ChangeSignature"] != null)
-                    return (bool)HttpContext.Current.Session["ChangeSignature"];
-                else return false;
-            }
-            set
-            {
-                HttpContext.Current.Session["ChangeSignature"] = value;
-            }
-        }
         #endregion
 
 
-        private string firma = "";
+		private string firma = "";
         private string positionSignature;
         private string characterSignature;
         private string colorSignature;
@@ -316,6 +308,7 @@ namespace NttDataWA.Popup
         private const string TSD = "tsd";
         private const string M7M = "m7m";
 
+        private DettaglioSegnatura _dettaglioSegnatura;
         #region Const
 
         private const string NoSignature = "noSignatureStamp";
@@ -324,7 +317,11 @@ namespace NttDataWA.Popup
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            try {
+            try
+            {
+                _logger.Info("Caricata pagina Signature");
+
+                
                 if (this.Request.QueryString["printSignatureA4"] == null)
                 {
                     if (FileManager.GetSelectedAttachment() == null)
@@ -340,6 +337,10 @@ namespace NttDataWA.Popup
                 }
                 else
                     fileReq = FileManager.GetFileRequest();
+
+//ABBATANGELI - MIBACT - Riabilitato anche per segnatura permanente
+//this._inizializzaDatiSegnaturaPermanente();
+
                 //if (tb_hidden.Value != null)
                 //{
                 //    if (tb_hidden.Value == "TxtX")
@@ -351,6 +352,8 @@ namespace NttDataWA.Popup
                 //        SetFocus(TxtY);
                 //    }
                 //}
+                _logger.Debug("OPEN SIGNATURE POPUP VALUE :" + OpenSignaturePopup);
+                _logger.Debug("IS POSTBACK :" + Page.IsPostBack);
                 if (!Page.IsPostBack && OpenSignaturePopup)
                 {
                     InitializeComponent();
@@ -361,7 +364,13 @@ namespace NttDataWA.Popup
                 else
                 {
                     RefreshScript();
+                    //if(this._dettaglioSegnatura != null)
+                    //{
+                    //    InitializesPage();
+                    //}
                 }
+
+                // this.NoSignatureStamp.Selected = true;
             }
             catch (System.Exception ex)
             {
@@ -429,6 +438,30 @@ namespace NttDataWA.Popup
             //this.DdlColour.SelectedIndexChanged += new System.EventHandler(this.ColorList_SelectedIndexChanged);
             //this.RblOrientation.SelectedIndexChanged += new System.EventHandler(this.RblOrientation_SelectedIndexChanged);
             //this.ChkDigitalSignatureInfo.CheckedChanged += new System.EventHandler(this.ChkSegnatureInfo_CheckedChanged);
+
+            //this.SignatureBtnPermanent.Attributes["onclick"] = "disallowOp('IdMasterBody')";
+        }
+
+        private void _inizializzaDatiSegnaturaPermanente()
+        {
+            _logger.Info("START");
+
+            try
+            {
+                this._dettaglioSegnatura = UIManager.DocumentManager.GetDettaglioSegnaturaDocumento(fileReq.docNumber);
+                if(this._dettaglioSegnatura != null)
+                {
+                    this.UpdatePanelRblOrientation.Visible = false;
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "$(function() { $('.contentSignatureTopSx').hide(); $('.contentSignatureBottomSx').hide(); $('.contentSignatureDx').css({'margin':'0 auto','float':'none'}); });", true);
+                    this.SignatureBtnConfirm.Visible = false;
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex.Message, ex);
+            }
+
+            _logger.Info("END");
         }
 
         private void SetImageBtnPositionSegnature(CustomImageButton btn, string urlImage)
@@ -450,6 +483,19 @@ namespace NttDataWA.Popup
             {
                 sch = DocumentManager.getDocumentListVersions(this.Page, fileReq.docNumber, fileReq.docNumber);
             }
+            //**********
+            // Alessandro Aiello 18/10/2018
+            // Apposizione firma permanente
+            //********** Inizio
+
+            
+            if (this._dettaglioSegnatura == null)
+            {
+                _logger.Debug("Dettaglio segnatura non trovato");
+            }
+
+            //********** Fine
+
             FileDocumento theDoc;
             if (FileDoc!=null && FileDoc.LabelPdf!=null)
             {
@@ -524,10 +570,60 @@ namespace NttDataWA.Popup
             return theDoc;
         }
 
+        /// <summary>
+        /// ***** Author: Alessandro Aiello 05/12/2018
+        /// Recupero del documento con segnatura permanente apposta
+        /// </summary>
+        /// <param name="fileReq"></param>
+        /// <returns></returns>
+        private FileDocumento DocumentWithSegnaturaPermanente(FileRequest fileReq)
+        {
+            _logger.Info("START");
+            FileDocumento _documento = null;
+            //SchedaDocumento _schedaDocumento = null;
+            try
+            {
+                InfoUtente infoUtente = UserManager.GetInfoUser();
+                //_schedaDocumento = docsPaWS.GetDocumentListVersions(infoUtente, fileReq.docNumber, fileReq.docNumber);
+
+                _documento = _docsPaWS.DocumentoGetFile(fileReq, infoUtente);
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex.Message, ex);
+                _documento = null;
+            }
+            _logger.Info("END");
+            return _documento;
+        }
+
         private void InitializesPage()
         {
+            _logger.Info("START");
+            //***** Alessandro Aiello
+            try
+            {
+                
+                if(this._dettaglioSegnatura == null)
+                {
+                    _logger.Debug("NO permanente");
+                    FileDoc = DocumentWithSignature(fileReq);
+                }
+                else
+                {
+                    _logger.Debug("Permanente OK");
+                    FileDoc = DocumentWithSegnaturaPermanente(fileReq);
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex.Message, ex);
+            }
+
+
             string language = UIManager.UserManager.GetUserLanguage();
             NoTimbroTemp = NoTimbro;
+			//ABBATANGELI - MiBACT - Ripristino segnatura non permanente
             FileDoc = DocumentWithSignature(fileReq);
             if (FileDoc == null)
             {
@@ -535,6 +631,7 @@ namespace NttDataWA.Popup
                 SetImageBtnPositionSegnature(BtnPosRight, urlImageBtnPosSegnature);
                 SetImageBtnPositionSegnature(BtnDownSx, urlImageBtnPosSegnature);
                 SetImageBtnPositionSegnature(BtnDownDx, urlImageBtnPosSegnature);
+
                 HttpContext.Current.Session.Remove("OpenSignaturePopup");
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "$(function() {ajaxDialogModal('ErrorConverPdf', 'error', null, null, null, null, 'parent.closeAjaxModal(\\'Signature\\',\\'\\');');});", true);
                 return;
@@ -755,6 +852,70 @@ namespace NttDataWA.Popup
                  }
              }
 
+
+            //**********
+            // Alessandro Aiello 18/10/2018
+            // Apposizione firma permanente
+            //********** Inizio
+
+            // this.NoSignatureStamp.Selected = true;
+
+
+
+            //this.SignatureBtnPermanent.Visible = true;
+            //this.SignatureBtnPermanent.Text = Utils.Languages.GetLabelFromCode("SegnaturaPermenenteApponiButton", language);
+            //this.SignatureBtnPermanent.ToolTip = Utils.Languages.GetLabelFromCode("SegnaturaPermenenteApponiTooltip", language);
+
+            // Se il documento è stato creato in seguito all'apposizione della variabile segnatura in amministrazione
+            // avrà un riferimento in DPA_SEGN_PERM con le informazioni della segnatura
+            //if (this._dettaglioSegnatura != null)
+            //{
+            //    string _tempIsPermanente = this._dettaglioSegnatura.IsPermanenteProtocollo + this._dettaglioSegnatura.IsPermanenteRepertorio + this._dettaglioSegnatura.IsPermanenteNP;
+            //    this.SignatureBtnPermanent.Enabled = !this._dettaglioSegnatura.Segnato.Equals("1") && _tempIsPermanente.Contains("1");
+            //}
+            //else
+            //{
+            //    // nel caso di documento creato prima del settaggio della segnatura permenente
+            //    SchedaDocumento doc = DocumentManager.getSelectedRecord();
+            //    // verifico se il documento è stato repertoriato
+            //    string _segnaturaRepertorio = docsPaWS.getSegnaturaRepertorioNoHTML(doc.docNumber, currAmm.Codice);
+            //    switch (doc.tipoProto.ToUpper())
+            //    {
+            //        case "A":
+            //        case "P":
+            //        case "I":
+            //            // Documento protocollato
+            //            if (!string.IsNullOrWhiteSpace(_segnaturaRepertorio))
+            //            {
+            //                this.SignatureBtnPermanent.Enabled = currAmm.Segnatura_IsPermanente.Equals("1");
+            //            }
+            //            else
+            //            {
+
+            //            }
+            //            break;
+            //        case "G":
+            //            // documento non protocollato
+            //            if (!string.IsNullOrWhiteSpace(_segnaturaRepertorio))
+            //            {
+            //                this.SignatureBtnPermanent.Enabled = currAmm.SegnaturaNP_IsPermanente.Equals("1");
+            //            }
+            //            else
+            //            {
+
+            //            }
+            //            break;
+            //    }
+
+            //}
+
+
+            //********** Fine
+
+
+
+
+            _logger.Info("END");
             }
 
         //public bool IsPermanentDisplaysSegnature
@@ -767,7 +928,8 @@ namespace NttDataWA.Popup
 
         protected void BtnSignaturePosition_Click(object sender, EventArgs e)
         {
-            try {
+            try
+            {
                 ImageButton buttonClick = (ImageButton)sender;
                 string nameButtonClick = buttonClick.ID;
                 switch(nameButtonClick)
@@ -829,7 +991,6 @@ namespace NttDataWA.Popup
                 }
                 FileDoc.LabelPdf.default_position = positionSignature;
                 FileDoc = DocumentWithSignature(fileReq);
-                this.ChangeSignature = true;
                 UpdatePanelSignaturePosizionePesonalizzata.Update();
                 UpdatePanelFrameSignature.Update();
             }
@@ -842,11 +1003,11 @@ namespace NttDataWA.Popup
 
         protected void ColorList_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            try {
+            try
+            {
                 colorSignature = DdlColour.SelectedIndex.ToString();
                 FileDoc.LabelPdf.sel_color = colorSignature;
                 FileDoc = DocumentWithSignature(fileReq);
-                this.ChangeSignature = true;
                 UpdatePanelFrameSignature.Update();
             }
             catch (System.Exception ex)
@@ -858,11 +1019,11 @@ namespace NttDataWA.Popup
 
         protected void CharacterList_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            try {
+            try
+            {
                 characterSignature = DdlCharacter.SelectedIndex.ToString();
                 FileDoc.LabelPdf.sel_font = characterSignature;
                 FileDoc = DocumentWithSignature(fileReq);
-                this.ChangeSignature = true;
                 UpdatePanelFrameSignature.Update();
             }
             catch (System.Exception ex)
@@ -874,7 +1035,8 @@ namespace NttDataWA.Popup
 
         protected void tbxPos_TextChanged(object sender, System.EventArgs e)
         {
-            try {
+            try
+            {
                 string msgDesc = string.Empty;
                 if ((TxtX.Text != "" && isNan(TxtX)) && (TxtY.Text != "" && isNan(TxtY)))
                 {
@@ -888,8 +1050,9 @@ namespace NttDataWA.Popup
                         SetImageBtnPositionSegnature(BtnDownSx, urlImageBtnPosSegnature);
                         SetImageBtnPositionSegnature(BtnDownDx, urlImageBtnPosSegnature);
                         UpdatePanelcontentSegnatureBtn.Update();
-                        this.ChangeSignature = true;
                         UpdatePanelFrameSignature.Update();
+
+                        _logger.Debug("POSIZIONE: " + positionSignature);
                     }
                     else
                     {
@@ -954,7 +1117,14 @@ namespace NttDataWA.Popup
 
         protected void RblOrientation_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try {
+            try
+            {
+                if(this._dettaglioSegnatura != null)
+                {
+
+                    // return;
+                }
+
                 typeLabel = false;
                 orientationSignature = "false";
                 string orientation = RblOrientation.SelectedValue.ToString();
@@ -978,9 +1148,9 @@ namespace NttDataWA.Popup
                         }
                         NoTimbroTemp = true;
                         FileDoc.LabelPdf.notimbro = true;
+                        FileDoc.LabelPdf.orientamento = string.Empty;
                         this.UpdatePanelRblDigitalSignaturePos.Update();
                         FileDoc = DocumentWithSignature(fileReq);
-                        this.ChangeSignature = true;
                         UpdatePanelFrameSignature.Update();
                         return;
                     }
@@ -988,7 +1158,6 @@ namespace NttDataWA.Popup
                 FileDoc.LabelPdf.tipoLabel = typeLabel;
                 FileDoc.LabelPdf.orientamento = orientationSignature;
                 FileDoc = DocumentWithSignature(fileReq);
-                this.ChangeSignature = true;
                 UpdatePanelFrameSignature.Update();
             }
             catch (System.Exception ex)
@@ -1000,7 +1169,8 @@ namespace NttDataWA.Popup
 
         protected void RblDigitalSignaturePos_Click(object sender, EventArgs e)
         {
-            try {
+            try
+            {
                 if (FileDoc.LabelPdf.digitalSignInfo != null)
                 {
                     FileDoc.LabelPdf.digitalSignInfo.printOnFirstPage = this.SignatureRblPrintOnFirstPage.Selected;
@@ -1008,7 +1178,6 @@ namespace NttDataWA.Popup
                     FileDoc.LabelPdf.digitalSignInfo.printFormatSign = this.RblFormatSign.SelectedValue.Equals("digitalCompleted") ? DocsPaWR.TypePrintFormatSign.Sign_Extended : DocsPaWR.TypePrintFormatSign.Sign_Short;
                 }
                 FileDoc = DocumentWithSignature(fileReq);
-                this.ChangeSignature = true;
                 UpdatePanelFrameSignature.Update();
             }
             catch (System.Exception ex)
@@ -1020,7 +1189,8 @@ namespace NttDataWA.Popup
 
         protected void ChkSegnatureInfo_CheckedChanged(object sender, EventArgs e)
         {
-            try {
+            try
+            {
                 this.RblDigitalSignaturePos.Enabled = this.ChkDigitalSignatureInfo.Checked;
                 this.RblFormatSign.Enabled = this.ChkDigitalSignatureInfo.Checked;
                 if (ChkDigitalSignatureInfo.Checked)
@@ -1043,7 +1213,6 @@ namespace NttDataWA.Popup
                     this.UpdatePanelRblOrientation.Update();
                 }
                 FileDoc = DocumentWithSignature(fileReq);
-                this.ChangeSignature = true;
                 UpdatePanelRblDigitalSignaturePos.Update();
                 UpdatePanelFrameSignature.Update();
             }
@@ -1089,13 +1258,32 @@ namespace NttDataWA.Popup
                 }
             }
             if (this.Request.QueryString["printSignatureA4"] == null)
-                    Response.Write("<html><body><script type=\"text/javascript\">parent.closeAjaxModal('Signature','');</script></body></html>");
+                Response.Write("<html><body><script type=\"text/javascript\">parent.closeAjaxModal('Signature','ritorna ok');</script></body></html>");
             else
-                Response.Write("<html><body><script type=\"text/javascript\">parent.closeAjaxModal('SignatureA4','');</script></body></html>");
+                Response.Write("<html><body><script type=\"text/javascript\">parent.closeAjaxModal('SignatureA4','ritorna ok a4');</script></body></html>");
             HttpContext.Current.Session.Remove("NoTimbroTemp");
             Response.End();
         }
 
+
+        private void _closePopUpAfterSegnaturaPermanente(bool refreshDocument)
+        {
+            try
+            {
+                HttpContext.Current.Session.Remove("OpenSignaturePopup");
+                if (this.Request.QueryString["printSignatureA4"] == null)
+                    Response.Write("<html><body><script type=\"text/javascript\">parent.closeAjaxModal('Signature','" + ( refreshDocument ? "REFRESH" : String.Empty) +  "');</script></body></html>");
+                else
+                    Response.Write("<html><body><script type=\"text/javascript\">parent.closeAjaxModal('SignatureA4','" + (refreshDocument ? "REFRESH" : String.Empty) + "');</script></body></html>");
+
+                Response.End();
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex.Message, ex);
+            }
+
+        }
 
         protected void BtnConfirm_Click(object sender, EventArgs e)
         {
@@ -1169,7 +1357,6 @@ namespace NttDataWA.Popup
             HttpContext.Current.Session.Remove("NoTimbroTemp");
             SchedaDocSystemId = DocumentManager.getSelectedRecord().systemId;
             HttpContext.Current.Session.Remove("OpenSignaturePopup");
-            this.ChangeSignature = true;
             Response.Write("<html><body><script type=\"text/javascript\">parent.closeAjaxModal('Signature', 'up');</script></body></html>");
             Response.End();
         }
@@ -1186,5 +1373,45 @@ namespace NttDataWA.Popup
 
         }
 
+        protected void BtnApponiSegnaturaPermanente_Click(object sender, EventArgs e)
+        {
+            // chiama aspose
+            _logger.Info("Start");
+            try
+            {
+                // ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "$(function() { $('.contentSignatureTopSx').hide(); $('.contentSignatureBottomSx').hide(); $('.contentSignatureDx').css({'margin':'0 auto','float':'none'}); });", true);
+
+                //this.SignatureBtnSave.Enabled = false;
+                //this.SignatureBtnConfirm.Enabled = false;
+                //this.SignatureBtnPermanent.Enabled = false;
+
+                var infoUser = UserManager.GetInfoUser();
+                SchedaDocumento _schedaDocumentoCorrente = null;
+                if (FileManager.GetSelectedAttachment() == null)
+                    _schedaDocumentoCorrente = DocumentManager.getSelectedRecord();
+                else if (DocumentManager.getSelectedRecord().documentoPrincipale == null)
+                {
+                    _schedaDocumentoCorrente = DocumentManager.getDocumentListVersions(this.Page, fileReq.docNumber, fileReq.docNumber);
+                }
+
+                // AsposePDF.AsposeManager._Test();
+
+                // _docsPaWS.AddSegnaturaPermanenteToFile(_schedaDocumentoCorrente.docNumber, infoUser);
+
+                this._closePopUpAfterSegnaturaPermanente(true);
+
+                UpdatePanelFrameSignature.Update();
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex.Message, ex);
+                this._closePopUpAfterSegnaturaPermanente(false);
+            }
+            
+
+            
+            _logger.Info("FINE");
+            
+        }
 	}
 }

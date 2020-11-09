@@ -49,24 +49,6 @@ namespace NttDataWA.Popup {
         protected global::NttDatalLibrary.CustomTextArea txt_DateCheck;
         
         /// <summary>
-        /// litMandateNewHour control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litMandateNewHour;
-        
-        /// <summary>
-        /// ddlHourFrom control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlHourFrom;
-        
-        /// <summary>
         /// plcMessage control.
         /// </summary>
         /// <remarks>

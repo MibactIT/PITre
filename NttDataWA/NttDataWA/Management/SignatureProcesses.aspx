@@ -10,71 +10,80 @@
     <script src="../Scripts/chosen.jquery.min.js" type="text/javascript"></script>
     <link href="../Css/chosen.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
-        .tbl_rounded td {
+        .tbl_rounded td
+        {
             vertical-align: top;
         }
-
-        .tbl_rounded tr.nopointer td {
+        .tbl_rounded tr.nopointer td
+        {
             cursor: default;
         }
-
-        .tbl_rounded tr {
+        .tbl_rounded tr
+        {
             cursor: pointer;
         }
-
-        .tbl_rounded th {
+        .tbl_rounded th
+        {
             white-space: nowrap;
         }
-
-        .recordNavigator2, .recordNavigator2 table, .recordNavigator2 tr, .recordNavigator2 td {
+        .recordNavigator2, .recordNavigator2 table, .recordNavigator2 tr, .recordNavigator2 td
+        {
             background-color: #EEEEEE;
         }
-
-            .recordNavigator2 td {
-                border: 0;
-            }
-
-        .TreeSignatureProcess {
+        .recordNavigator2 td
+        {
+            border: 0;
+        }
+        
+        .TreeSignatureProcess
+        {
             padding: 0;
         }
-
-            .TreeSignatureProcess td, .TreeSignatureProcess th, .TreeSignatureProcess tr {
-                border: 0;
-                padding: 0;
-                margin: 0;
-                height: 20px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .TreeSignatureProcess table {
-                padding: 0;
-                margin: 0;
-                height: 0;
-                border: 0;
-            }
-
-            .TreeSignatureProcess img {
-                width: 20px;
-                height: 20px;
-            }
-
-        .TreeSignatureProcess_node a:link, .TreeSignatureProcess_node a:visited, .TreeSignatureProcess_node a:hover {
+        
+        .TreeSignatureProcess td, .TreeSignatureProcess th, .TreeSignatureProcess tr
+        {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            height: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .TreeSignatureProcess table
+        {
+            padding: 0;
+            margin: 0;
+            height: 0;
+            border: 0;
+        }
+        
+        .TreeSignatureProcess img
+        {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .TreeSignatureProcess_node a:link, .TreeSignatureProcess_node a:visited, .TreeSignatureProcess_node a:hover
+        {
             padding: 0 5px;
         }
-
-        .TreeSignatureProcess_selected {
+        
+        .TreeSignatureProcess_selected
+        {
             background-color: #477FAF;
         }
-
-            .TreeSignatureProcess_selected a:link, .TreeSignatureProcess_selected a:visited, .TreeSignatureProcess_selected a:hover {
-                padding: 0 5px;
-                background-color: transparent;
-                color: #fff;
-            }
-
-        .textInvaledeted fieldset {
+        
+        .TreeSignatureProcess_selected a:link, .TreeSignatureProcess_selected a:visited, .TreeSignatureProcess_selected a:hover
+        {
+            padding: 0 5px;
+            background-color: transparent;
+            color: #fff;
+        }
+        
+        .textInvaledeted fieldset
+        {
             border: 1px solid #FF4500;
             margin-top: 5px;
             margin-bottom: 10px;
@@ -186,15 +195,11 @@
 <asp:Content ID="ContentPlaceHolderContent" ContentPlaceHolderID="ContentPlaceHolderContent"
     runat="server">
     <uc:ajaxpopup2 Id="VisibilitySignatureProcess" runat="server" Url="../popup/VisibilitySignatureProcess.aspx"
-        Width="700" Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpContainerSignatureProcessesTab', '');}" />
+        Width="600" Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpContainerSignatureProcessesTab', '');}" />
     <uc:ajaxpopup2 Id="AddressBook" runat="server" Url="../Popup/AddressBook.aspx" PermitClose="false"
         PermitScroll="false" IsFullScreen="true" CloseFunction="function (event, ui){__doPostBack('UpContainerSignatureProcessesTab', 'closePopupAddressBook');}" />
     <uc:ajaxpopup2 Id="StatisticsSignatureProcess" runat="server" Url="../Popup/StatisticsSignatureProcess.aspx"
         PermitClose="false" Width="1200" Height="800" PermitScroll="false" CloseFunction="function (event, ui){__doPostBack('UpPnlButtons', '');}" />
-    <uc:ajaxpopup2 Id="AddFilterSignatureProcesses" runat="server" Url="../Popup/AddFilterSignatureProcesses.aspx"
-        PermitClose="false" Width="600" Height="450" PermitScroll="false" CloseFunction="function (event, ui){__doPostBack('UpPnlButtons', '');}" />
-    <uc:ajaxpopup2 Id="AddNewProcess" runat="server" Url="../Popup/AddNewProcess.aspx"
-        PermitClose="false" Width="400" Height="300" PermitScroll="false" CloseFunction="function (event, ui){__doPostBack('UpPnlButtons', '');}" />
     <div id="containerTop">
         <div id="containerDocumentTop">
             <div id="containerStandardTop">
@@ -202,8 +207,7 @@
                 </div>
                 <div id="containerStandardTopCx">
                     <p>
-                        <asp:Literal ID="ManagementSignatureProcesses" runat="server"></asp:Literal>
-                    </p>
+                        <asp:Literal ID="ManagementSignatureProcesses" runat="server"></asp:Literal></p>
                 </div>
                 <div id="containerStandardTopDx">
                 </div>
@@ -231,8 +235,7 @@
                                         <div class="row" style="margin-top: 10px">
                                             <div class="col-marginSx2" style="margin-left: 50px;">
                                                 <strong>
-                                                    <asp:Literal ID="lblNameSignatureProcesses" runat="server" />*</strong>
-                                            </div>
+                                                    <asp:Literal ID="lblNameSignatureProcesses" runat="server" />*</strong></div>
                                             <div class="colHalf12">
                                                 <cc1:CustomTextArea ID="txtNameSignatureProcesses" runat="server" CssClass="txt_projectRight"
                                                     CssClassReadOnly="txt_ProjectRight_disabled">
@@ -255,25 +258,7 @@
             <div id="containerStandard2" runat="server" clientidmode="Static">
                 <div id="content">
                     <div id="contentSx">
-                        <asp:Panel ID="pnlFilter" runat="server">
-                            <div id="containerNotificationFilter">
-                                <asp:UpdatePanel runat="server" ID="UpPnlBAction" UpdateMode="Conditional">
-                                    <ContentTemplate>
-                                        <div class="col11" style="padding-left: 10px">
-                                            <cc1:CustomImageButton runat="server" ID="IndexImgAddFilter" ImageUrl="../Images/Icons/home_add_filters.png"
-                                                OnMouseOutImage="../Images/Icons/home_add_filters.png" OnMouseOverImage="../Images/Icons/home_add_filters_hover.png"
-                                                CssClass="clickableRight" ImageUrlDisabled="../Images/Icons/home_add_filters_disabled.png"
-                                                OnClientClick="return ajaxModalPopupAddFilterSignatureProcesses();" />
-                                            <cc1:CustomImageButton runat="server" ID="IndexImgRemoveFilter" ImageUrl="../Images/Icons/home_delete_filters.png"
-                                                OnMouseOutImage="../Images/Icons/home_delete_filters.png" OnMouseOverImage="../Images/Icons/home_delete_filters_hover.png"
-                                                CssClass="clickableRight" ImageUrlDisabled="../Images/Icons/home_delete_filters_disabled.png" OnClick="IndexImgRemoveFilter_Click"
-                                                Enabled="false" />
-                                        </div>
-                                    </ContentTemplate>
-                                </asp:UpdatePanel>
-                            </div>
-                        </asp:Panel>
-                        <div class="box_inside" style="margin-top: 30px">
+                        <div class="box_inside" style="margin-top: 10px">
                             <asp:UpdatePanel ID="upPnlTreeSignatureProcess" runat="server" UpdateMode="Conditional">
                                 <ContentTemplate>
                                     <asp:TreeView ID="TreeSignatureProcess" runat="server" ExpandLevel="10" ShowLines="true"
@@ -322,16 +307,13 @@
                                                                         <%--<uc:messager ID="msgTextInvalidated" runat="server" />--%>
                                                                         <div id="messager" class="messager" runat="server" align="center">
                                                                             <div class="messager_c1">
-                                                                                <img src="<%=Page.ResolveClientUrl("~/Images/Common/messager_warning.png") %>" alt="" />
-                                                                            </div>
+                                                                                <img src="<%=Page.ResolveClientUrl("~/Images/Common/messager_warning.png") %>" alt="" /></div>
                                                                             <div class="messager_c2">
                                                                                 <span>
                                                                                     <asp:Literal runat="server" ID="MessangerWarning"></asp:Literal></span><asp:Literal
-                                                                                        ID="msgTextInvalidated" runat="server" />
-                                                                            </div>
+                                                                                        ID="msgTextInvalidated" runat="server" /></div>
                                                                             <div class="messager_c3">
-                                                                                <img src="<%=Page.ResolveClientUrl("~/Images/Common/messager_warning.png") %>" alt="" />
-                                                                            </div>
+                                                                                <img src="<%=Page.ResolveClientUrl("~/Images/Common/messager_warning.png") %>" alt="" /></div>
                                                                         </div>
                                                                     </asp:Panel>
                                                                 </ContentTemplate>
@@ -344,7 +326,7 @@
                                                                             <strong>
                                                                                 <asp:Literal ID="ltlNr" runat="server" /></strong>
                                                                             <cc1:CustomTextArea ID="txtNr" runat="server" CssClass="txt_input_full onlynumbers"
-                                                                                Style="width: 20px; text-align: center" CssClassReadOnly="txt_input_full_disabled">
+                                                                                Style="width: 15px" CssClassReadOnly="txt_input_full_disabled">
                                                                             </cc1:CustomTextArea>
                                                                         </div>
                                                                     </ContentTemplate>
@@ -420,13 +402,8 @@
                                                                                                 <asp:Literal ID="LtlTypeEvent" runat="server"></asp:Literal></span>
                                                                                         </div>
                                                                                         <div class="colHalf12">
-                                                                                            <asp:DropDownList ID="DdlTypeEvent" OnSelectedIndexChanged="DdlTypeEvent_SelectedIndexChanged"
-                                                                                                Width="98%" runat="server" CssClass="chzn-select-deselect" AutoPostBack="true">
+                                                                                            <asp:DropDownList ID="DdlTypeEvent" Width="70%" runat="server" CssClass="chzn-select-deselect">
                                                                                             </asp:DropDownList>
-                                                                                        </div>
-                                                                                        <div class="colHalf13">
-                                                                                            <asp:CheckBox ID="cbx_automatico" OnCheckedChanged="cbx_automatico_CheckedChanged"
-                                                                                                AutoPostBack="true" Text="Automatico" Visible="false" runat="server" />
                                                                                         </div>
                                                                                     </asp:Panel>
                                                                                 </ContentTemplate>
@@ -436,7 +413,7 @@
                                                                             <ContentTemplate>
                                                                                 <asp:Panel ID="PnlRoleOrTypeRole" runat="server" Visible="False">
                                                                                     <asp:RadioButtonList ID="RblRoleOrTypeRole" CssClass="rblHorizontal" runat="server" RepeatLayout="UnorderedList"
-                                                                                        AutoPostBack="true" OnSelectedIndexChanged="RblRoleOrTypeRole_SelectedIndexChanged">
+                                                                                     AutoPostBack="true" OnSelectedIndexChanged="RblRoleOrTypeRole_SelectedIndexChanged">
                                                                                         <asp:ListItem id="optRole" Value="R" Selected="True"></asp:ListItem>
                                                                                         <asp:ListItem id="optTypeRole" Value="TR"> </asp:ListItem>
                                                                                     </asp:RadioButtonList>
@@ -465,44 +442,36 @@
                                                                         <asp:UpdatePanel ID="UpdPnlRole" UpdateMode="Conditional" runat="server">
                                                                             <ContentTemplate>
                                                                                 <asp:Panel ID="PnlRole" runat="server">
-                                                                                    <div class="row">
-                                                                                        <div class="col">
-                                                                                            <p>
-                                                                                                <span class="weight">
-                                                                                                    <asp:Literal ID="LitSignatureProcessesRole" runat="server" /></strong>
-                                                                                            </p>
+                                                                                    <div class="row" style="padding-top: 10px; width: 100%">
+                                                                                        <div class="colHalf13">
+                                                                                            <strong>
+                                                                                                <asp:Literal ID="LitSignatureProcessesRole" runat="server" />*</strong>
+                                                                                            <cc1:CustomTextArea ID="TxtCodeRole" runat="server" CssClass="txt_addressBookLeft"
+                                                                                                autocomplete="off" AutoPostBack="true" Width="45%" Style="margin-left: 10px"
+                                                                                                CssClassReadOnly="txt_addressBookLeft_disabled" AutoCompleteType="Disabled" OnTextChanged="TxtCode_OnTextChanged">
+                                                                                            </cc1:CustomTextArea>
                                                                                         </div>
-                                                                                        <div class="col-right-no-margin">
+                                                                                        <div class="colHalf12">
+                                                                                            <asp:HiddenField ID="idRuolo" runat="server" />
+                                                                                            <cc1:CustomTextArea ID="TxtDescriptionRole" runat="server" CssClass="txt_addressBookRight"
+                                                                                                CssClassReadOnly="txt_addressBookRight_disabled" autocomplete="off" AutoCompleteType="Disabled"></cc1:CustomTextArea>
+                                                                                            <uc1:AutoCompleteExtender runat="server" ID="RapidRole" TargetControlID="TxtDescriptionRole"
+                                                                                                CompletionListCssClass="autocomplete_completionListElement" CompletionListItemCssClass="single_item"
+                                                                                                CompletionListHighlightedItemCssClass="single_item_hover" ServiceMethod="GetListaCorrispondentiVeloce_trasmD"
+                                                                                                MinimumPrefixLength="3" CompletionInterval="1000" EnableCaching="true" CompletionSetCount="20"
+                                                                                                DelimiterCharacters=";" ServicePath="~/AjaxProxy.asmx" ShowOnlyCurrentWordInCompletionListItem="true"
+                                                                                                UseContextKey="true" OnClientItemSelected="aceSelected" BehaviorID="AutoCompleteExIngressoBIS"
+                                                                                                OnClientPopulated="acePopulated">
+                                                                                            </uc1:AutoCompleteExtender>
+                                                                                            <asp:Button ID="btnRecipient" runat="server" Text="vai" Style="display: none;" />
+                                                                                        </div>
+                                                                                        <div class="colHalf" style="width: 10%; text-align: left; margin-left: 10px">
                                                                                             <cc1:CustomImageButton runat="server" ID="DocumentImgSenderAddressBook" ImageUrl="../Images/Icons/address_book.png"
                                                                                                 OnMouseOutImage="../Images/Icons/address_book.png" OnMouseOverImage="../Images/Icons/address_book_hover.png"
                                                                                                 CssClass="clickableLeft" ImageUrlDisabled="../Images/Icons/address_book_disabled.png"
                                                                                                 OnClick="BtnAddressBook_Click" />
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="row">
-                                                                                        <asp:HiddenField ID="idRuolo" runat="server" />
-                                                                                        <div class="colHalf">
-                                                                                            <cc1:CustomTextArea ID="TxtCodeRole" runat="server" CssClass="txt_addressBookLeft"
-                                                                                                autocomplete="off" AutoPostBack="true" CssClassReadOnly="txt_addressBookLeft_disabled"
-                                                                                                AutoCompleteType="Disabled" OnTextChanged="TxtCode_OnTextChanged">
-                                                                                            </cc1:CustomTextArea>
-                                                                                        </div>
-                                                                                        <div class="colHalf2">
-                                                                                            <div class="colHalf3">
-                                                                                                <cc1:CustomTextArea ID="TxtDescriptionRole" runat="server" CssClass="txt_addressBookRight"
-                                                                                                    CssClassReadOnly="txt_addressBookRight_disabled" autocomplete="off" AutoCompleteType="Disabled"></cc1:CustomTextArea>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <uc1:AutoCompleteExtender runat="server" ID="RapidRole" TargetControlID="TxtDescriptionRole"
-                                                                                        CompletionListCssClass="autocomplete_completionListElement" CompletionListItemCssClass="single_item"
-                                                                                        CompletionListHighlightedItemCssClass="single_item_hover" ServiceMethod="GetListaCorrispondentiVeloce_trasmD"
-                                                                                        MinimumPrefixLength="3" CompletionInterval="1000" EnableCaching="true" CompletionSetCount="20"
-                                                                                        DelimiterCharacters=";" ServicePath="~/AjaxProxy.asmx" ShowOnlyCurrentWordInCompletionListItem="true"
-                                                                                        UseContextKey="true" OnClientItemSelected="aceSelected" BehaviorID="AutoCompleteExIngressoBIS"
-                                                                                        OnClientPopulated="acePopulated">
-                                                                                    </uc1:AutoCompleteExtender>
-                                                                                    <asp:Button ID="btnRecipient" runat="server" Text="vai" Style="display: none;" />
                                                                                 </asp:Panel>
                                                                             </ContentTemplate>
                                                                         </asp:UpdatePanel>
@@ -510,84 +479,16 @@
                                                                         <asp:UpdatePanel ID="UpdPnlUtenteCoinvolto" UpdateMode="Conditional" runat="server">
                                                                             <ContentTemplate>
                                                                                 <asp:Panel ID="PnlUenteCoinvolto" runat="server">
-                                                                                    <div class="row">
-                                                                                        <div class="col">
-                                                                                            <p>
-                                                                                                <span class="weight">
-                                                                                                    <asp:Literal ID="ltlUtenteCoinvolto" runat="server"></asp:Literal></span>
-                                                                                            </p>
+                                                                                    <div class="row" style="width: 100%; margin-top: 10px">
+                                                                                        <div class="col" style="margin-right: 15px">
+                                                                                            <span class="weight">
+                                                                                                <asp:Literal ID="ltlUtenteCoinvolto" runat="server"></asp:Literal></span>
                                                                                         </div>
-                                                                                        <div class="row">
+                                                                                        <div class="colHalf" style="width: 80%">
                                                                                             <asp:DropDownList ID="ddlUtenteCoinvolto" Enabled="false" Width="50%" runat="server"
                                                                                                 CssClass="chzn-select-deselect">
                                                                                             </asp:DropDownList>
                                                                                         </div>
-                                                                                    </div>
-                                                                                </asp:Panel>
-                                                                            </ContentTemplate>
-                                                                        </asp:UpdatePanel>
-                                                                        <%-- CAMPI PASSO AUTOMATICO --%>
-                                                                        <asp:UpdatePanel ID="UpPnlCampiPassoAutomatco" UpdateMode="Conditional" runat="server">
-                                                                            <ContentTemplate>
-                                                                                <asp:Panel ID="PnlCampiPassoAutomatco" runat="server" Visible="false">
-                                                                                    <%-- AOO --%>
-                                                                                    <div class="colHalf15">
-                                                                                        <div class="row">
-                                                                                            <div class="col">
-                                                                                                <p>
-                                                                                                    <span class="weight">
-                                                                                                        <asp:Literal ID="ltlRegistroAOO" runat="server" /></span>
-                                                                                                </p>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="row">
-                                                                                            <asp:DropDownList ID="DdlRegistroAOO" runat="server" Width="100%" AutoPostBack="true"
-                                                                                                CssClass="chzn-select-deselect" OnSelectedIndexChanged="DdlRegistroAOO_SelectedIndexChanged">
-                                                                                            </asp:DropDownList>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <%-- RF --%>
-                                                                                    <div class="colHalf16">
-                                                                                        <asp:UpdatePanel ID="UpPnlRegistroRF" UpdateMode="Conditional" runat="server">
-                                                                                            <ContentTemplate>
-                                                                                                <div class="row">
-                                                                                                    <div class="col">
-                                                                                                        <p>
-                                                                                                            <span class="weight">
-                                                                                                                <asp:Literal ID="ltlRegistroRF" runat="server" /></span>
-                                                                                                        </p>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div class="row">
-                                                                                                    <asp:DropDownList ID="DdlRegistroRF" runat="server" Width="100%" AutoPostBack ="true"
-                                                                                                        CssClass="chzn-select-deselect" OnSelectedIndexChanged ="DdlRegistroRF_SelectedIndexChanged">
-                                                                                                    </asp:DropDownList>
-                                                                                                </div>
-                                                                                            </ContentTemplate>
-                                                                                        </asp:UpdatePanel>
-                                                                                    </div>
-                                                                                    <%-- ELENCO CASELLE --%>
-                                                                                    <div class="colHalf16">
-                                                                                        <asp:UpdatePanel ID="UpPnlElencoCaselle" runat="server" UpdateMode="Conditional">
-                                                                                            <ContentTemplate>
-                                                                                                <asp:Panel ID="PnlElencoCaselle" runat="server" Visible="false">
-                                                                                                    <%-- ELENCO CASELLE --%>
-                                                                                                    <div class="row">
-                                                                                                        <div class="col">
-                                                                                                            <p>
-                                                                                                                <span class="weight">
-                                                                                                                    <asp:Literal ID="ltlElencoCaselle" runat="server" /></span>
-                                                                                                            </p>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    <div class="row">
-                                                                                                        <asp:DropDownList ID="DdlElencoCaselle" Width="100%" runat="server"
-                                                                                                            CssClass="chzn-select-deselect">
-                                                                                                        </asp:DropDownList>
-                                                                                                    </div>
-                                                                                                </asp:Panel>
-                                                                                            </ContentTemplate>
-                                                                                        </asp:UpdatePanel>
                                                                                     </div>
                                                                                 </asp:Panel>
                                                                             </ContentTemplate>
@@ -683,18 +584,15 @@
             <cc1:CustomButton ID="SignatureProcessesBtnSave" runat="server" CssClass="btnEnable"
                 CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClick="SignatureProcessesBtnSave_Click" />
             <cc1:CustomButton ID="SignatureProcessesBtnVisibility" runat="server" CssClass="btnEnable"
-                CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClick="SignatureProcessesBtnVisibility_Click" />
+                CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClientClick="return ajaxModalPopupVisibilitySignatureProcess();" />
             <cc1:CustomButton ID="SignatureProcessesStatistics" runat="server" CssClass="btnEnable"
                 CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClick="SignatureProcessesStatistics_Click" />
             <cc1:CustomButton ID="SignatureProcessesBtnRemove" runat="server" CssClass="btnEnable"
                 CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClick="SignatureProcessesBtnRemove_Click" />
-            <cc1:CustomButton ID="SignatureProcessesBtnDuplica" runat="server" CssClass="btnEnable"
-                CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClientClick="return ajaxModalPopupAddNewProcess();" />
         </ContentTemplate>
     </asp:UpdatePanel>
-    <script type="text/javascript">        $(".chzn-select-deselect").chosen({
-            allow_single_deselect:
-            true, no_results_text: "Nessun risultato trovato"
+    <script type="text/javascript">        $(".chzn-select-deselect").chosen({ allow_single_deselect:
+true, no_results_text: "Nessun risultato trovato"
         }); $(".chzn-select").chosen({
             no_results_text: "Nessun risultato trovato"
         }); </script>

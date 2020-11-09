@@ -644,6 +644,8 @@
                                                             <asp:Literal ID="litTitolario" runat="server" /></strong></div>
                                                     <div class="col">
                                                         <asp:DropDownList ID="ddlTitolario" runat="server" 
+                                                             AutoPostBack="True"
+                                                             OnSelectedIndexChanged="DdlTitolario_SelectedIndexChanged"
                                                             Width="300" />
                                                     </div>
                                                 </div>

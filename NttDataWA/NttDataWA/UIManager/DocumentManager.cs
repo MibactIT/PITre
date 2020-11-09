@@ -10,12 +10,13 @@ using System.Collections;
 using System.Configuration;
 using System.Data;
 using System.Web.SessionState;
-
+using log4net;
 
 namespace NttDataWA.UIManager
 {
     public class DocumentManager
     {
+        private static ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static DocsPaWR.DocsPaWebService docsPaWS = ProxyManager.GetWS();
 
         /// <summary>
@@ -749,9 +750,6 @@ namespace NttDataWA.UIManager
                             break;
                         case DocsPaWR.ResultProtocollazione.ERRORE_WSPIA_PROTOCOLLAZIONE_SEMPLICE:
                             message = " WSPIA - Segnatura restituita nulla o vuota.";
-                            break;
-                        case DocsPaWR.ResultProtocollazione.DOCUMENTO_IN_LIBRO_FIRMA_PASSO_NON_ATTESO:
-                            message = "Passo non atteso.";
                             break;
                     }
 
@@ -2325,7 +2323,6 @@ namespace NttDataWA.UIManager
         //rstituisce 
         // 1: se vi è un errore in caso d'inseriemnto
         // 2: se vi errore in caso di modifica
-        // 3: se è attivo un processo di firma e non è in attesa di un passo di classificazione
         // 0: se è andato tutto a buon fine
         public static int fascicolaRapida(string idProfile, string docnumber, string segnatura, Fascicolo fascicolo, bool ok)
         {
@@ -2340,11 +2337,7 @@ namespace NttDataWA.UIManager
                     if (result)
                         return 0;
                     else
-                    {
-                        if (msg.Equals(ResultFascicolazione.DOCUMENTO_IN_LIBRO_FIRMA_PASSO_NON_ATTESO.ToString()))
-                            return 3;
                         return 1;
-                    }
                 }
                 else
                 {
@@ -2353,11 +2346,7 @@ namespace NttDataWA.UIManager
                     if (result)
                         return 0;
                     else
-                    {
-                        if (msg.Equals(ResultFascicolazione.DOCUMENTO_IN_LIBRO_FIRMA_PASSO_NON_ATTESO.ToString()))
-                            return 3;
                         return 2;
-                    }
                 }
             }
             catch (System.Exception ex)
@@ -2637,20 +2626,6 @@ namespace NttDataWA.UIManager
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return -1;
             }
-        }
-
-        public static List<DocsPaWR.ResultAddAreaLavoro> AddMassiveObjectInADL(List<DocsPaWR.WorkingArea> listAreaLavoro)
-        {
-            List<DocsPaWR.ResultAddAreaLavoro> results = new List<DocsPaWR.ResultAddAreaLavoro>();
-            try
-            {
-                results = docsPaWS.AddMassiveObjectInADL(listAreaLavoro.ToArray(), UserManager.GetInfoUser()).ToList();
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-            }
-            return results;
         }
 
         public static void eliminaDaAreaLavoro(Page page, string idProfile, Fascicolo fasc)
@@ -5616,58 +5591,92 @@ namespace NttDataWA.UIManager
         }
         #endregion
 
-        public static string GetTipoFirmaDocumento(string docnumber)
+
+        #region Segnatura Permanente
+
+        public static DettaglioSegnatura CalcolaDettaglioSegnatura(SchedaDocumento schedaDocumento)
         {
+            logger.Info("START");
+            DettaglioSegnatura _dettaglio = null;
             try
             {
-                return docsPaWS.GetTipoFirmaDocumento(docnumber);
+                InfoUtente infoUtente = UserManager.GetInfoUser();
+                _dettaglio = docsPaWS.CalcolaDettaglioSegnatura(schedaDocumento, infoUtente);
             }
-            catch (System.Exception ex)
+            catch(Exception ex)
             {
-                return NttDataWA.Utils.TipoFirma.NESSUNA_FIRMA;
+                logger.Error(ex.Message, ex);
+                _dettaglio = null;
             }
+            logger.Info("END");
+            return _dettaglio;
         }
 
-        public static bool IsDocumentoInLibroFirma(SchedaDocumento schedaDoc)
+        /// <summary>
+        /// Recupera da DB il dettaglio della segnatura nel caso sia stata apposta
+        /// </summary>
+        /// <param name="systemIdProfile"></param>
+        /// <returns></returns>
+        public static DettaglioSegnatura GetDettaglioSegnaturaDocumento(string systemIdProfile)
         {
-            bool result = false;
-
-            if (!string.IsNullOrEmpty(schedaDoc.systemId) && schedaDoc.documenti != null && schedaDoc.documenti.Count() > 0 && schedaDoc.documenti[0].inLibroFirma)
-                result = true;
-
-            return result;
-        }
-
-        public static bool ExistsTrasmPendenteConWorkflowDocumento(string idProfile, string idRuoloInUO, string idPeople)
-        {
-            bool result = false;
-            InfoUtente infoUtente = UserManager.GetInfoUser();
+            logger.Info("START");
+            DettaglioSegnatura _dettaglio = null;
             try
             {
-                return docsPaWS.ExistsTrasmPendenteConWorkflowDocumento(idProfile, idRuoloInUO, idPeople, infoUtente);
+                if (!String.IsNullOrWhiteSpace(systemIdProfile))
+                {
+                    _dettaglio = docsPaWS.GetDettaglioSegnaturaDocumento(systemIdProfile);
+                }
             }
-            catch(Exception e)
+            catch(Exception ex)
             {
-
+                logger.Error(ex.Message, ex);
+                throw ex;
             }
-
-            return result;
+            logger.Info("END");
+            return _dettaglio;
         }
 
-        public static bool ExistsTrasmPendenteSenzaWorkflowDocumento(string idProfile, string idRuoloInUO, string idPeople)
+        public static bool ApponiSegnaturaPermanente(SchedaDocumento schedaDocumento, DettaglioSegnatura dettaglioSegantura, InfoUtente infoUtente)
         {
-            bool result = false;
-            InfoUtente infoUtente = UserManager.GetInfoUser();
+            logger.Info("START");
+            bool _result = default(bool);
+
             try
             {
-                return docsPaWS.ExistsTrasmPendenteSenzaWorkflowDocumento(idProfile, idRuoloInUO, idPeople, infoUtente);
+                _result = docsPaWS.ApponiSegnaturaPermanenteCompleta(schedaDocumento, dettaglioSegantura, infoUtente);
             }
-            catch (Exception e)
+            catch(Exception ex)
             {
-
+                _result = false;
+                logger.Error(ex.Message, ex);
             }
 
-            return result;
+            logger.Info("END");
+            return _result;
         }
+
+
+        public static DettaglioSegnaturaPosition GetDettaglioSegnaturaPosition(string idProfile)
+        {
+            logger.Info("START");
+            DettaglioSegnaturaPosition _dettaglio = null;
+            try
+            {
+                if (!String.IsNullOrWhiteSpace(idProfile))
+                {
+                    _dettaglio = docsPaWS.DettaglioSegnaturaPosition_Select(idProfile);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
+            logger.Info("END");
+            return _dettaglio;
+        }
+
+        #endregion
     }
 }

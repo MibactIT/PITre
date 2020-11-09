@@ -43,22 +43,6 @@ namespace NttDataWA.Popup
                 Session["ReportSpedizioni_urlImgEsito"] = value;
             }
         }
-
-        public bool IsMonitoring
-        {
-            get
-            {
-                return Request.QueryString.Count > 0 && (Request.QueryString["caller"] != null && Request.QueryString["caller"].Equals("monitoring"));
-            } 
-        }
-
-        private List<string> IdDocumentiSelezionatiMonitoring
-        {
-            get
-            {
-                return (List<string>)HttpContext.Current.Session["IdDocumentiSelezionatiMonitoring"];
-            }
-        }
         #region Events Methods
 
         protected void ddlTipoFiltro_OnSelectedIndexChanged(object sender, EventArgs e)
@@ -195,19 +179,11 @@ namespace NttDataWA.Popup
                 {
                     urlImgEsito = "";
                     InitializeLanguage();
-                    if (!this.IsMonitoring)
+                    FetchRegistri();
+                    SetDefaultDataFilters();
+                    if (!string.IsNullOrEmpty(IdDocumento))
                     {
-                        FetchRegistri();
-                        SetDefaultDataFilters();
-                        if (!string.IsNullOrEmpty(IdDocumento))
-                        {
-                            ReadListaReport();
-                        }
-                    }
-                    else
-                    {
-                        SetFiltriMonitoraggio();
-                        ReadListaReportMonitoring();
+                        ReadListaReport();
                     }
                 }
                 RefreshScript();
@@ -217,17 +193,6 @@ namespace NttDataWA.Popup
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return;
             }
-        }
-
-        private void SetFiltriMonitoraggio()
-        {
-            this.rl_visibilita.SelectedIndex = 1;
-            ckbEsitoOK.Checked = true;
-            ckbEsitoAttesa.Checked = true;
-            ckbEsitoKO.Checked = true;
-            this.tblEspandiChiudi.Visible = false;
-            this.pnlAltriFiltri.Visible = false;
-            this.pnlRegistroCasella.Visible = false;
         }
 
         private void InitializeLanguage()
@@ -351,10 +316,7 @@ namespace NttDataWA.Popup
         protected void btnApplicaFiltri_OnClick(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
-            if (IsMonitoring)
-                ReadListaReportMonitoring();
-            else
-                ReadListaReport();
+            ReadListaReport();
            
         }
 
@@ -369,10 +331,6 @@ namespace NttDataWA.Popup
 
                      ScriptManager.RegisterClientScriptBlock(this.UpSend, this.UpSend.GetType(), "closeAJM", "parent.closeAjaxModal('SendingReportDocument','');", true);
                  }
-                 else if(IsMonitoring)
-                {
-                    ScriptManager.RegisterClientScriptBlock(this.UpSend, this.UpSend.GetType(), "closeAJM", "parent.closeAjaxModal('SendingReportMonitoring','');", true);
-                }
                  else
                  {
                      ScriptManager.RegisterClientScriptBlock(this.UpSend, this.UpSend.GetType(), "closeAJM", "parent.closeAjaxModal('SendingReport','');", true);
@@ -479,35 +437,6 @@ namespace NttDataWA.Popup
             }
         }
 
-        private void ReadListaReportMonitoring()
-        {
-            DocsPaWR.FiltriReportSpedizioni filters = new FiltriReportSpedizioni();
-            filters = getFiltersFromGui();
-            try
-            {
-                List<DocsPaWR.InfoDocumentoSpedito> listSpedizioni = SenderManager.GetReportSpedizioniDocumenti(filters, this.IdDocumentiSelezionatiMonitoring);
-                if (listSpedizioni.Count > 0 && string.IsNullOrEmpty(IdDocumento))
-                {
-                    this.tblEspandiChiudi.Visible = true;
-                    this.lblNumDocTrovati.Text = listSpedizioni.Count.ToString();
-                }
-                else
-                {
-                    this.tblEspandiChiudi.Visible = false;
-                }
-
-                gvlistaDocumenti.DataSource = listSpedizioni;
-                gvlistaDocumenti.DataBind();
-                UpPnlDest.Update();
-                gvlistaDocumenti.Visible = true;
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
-        }
-        
-
         private void ReadListaReport()
         {
             DocsPaWR.DocsPaWebService docsPaSvr = new DocsPaWR.DocsPaWebService();
@@ -596,39 +525,32 @@ namespace NttDataWA.Popup
             filters.TipoRicevuta_EsitoOK = ckbEsitoOK.Checked;
             filters.TipoRicevuta_EsitoAttesa = ckbEsitoAttesa.Checked;
             filters.TipoRicevuta_EsitoKO = ckbEsitoKO.Checked;
-            if (!IsMonitoring)
+            // Tipo Filtro Data
+            switch (ddlTipoFiltro.SelectedValue)
             {
-                // Tipo Filtro Data
-                switch (ddlTipoFiltro.SelectedValue)
-                {
-                    case "Intervallo":
-                        filters.FiltroData = DocsPaWR.TipoFiltroData.Intervallo;
-                        break;
-                    case "MeseCorrente":
-                        filters.FiltroData = DocsPaWR.TipoFiltroData.MeseCorrente;
-                        break;
-                    case "Oggi":
-                        filters.FiltroData = DocsPaWR.TipoFiltroData.Oggi;
-                        break;
-                    case "SettimanaCorrente":
-                        filters.FiltroData = DocsPaWR.TipoFiltroData.SettimanaCorrente;
-                        break;
-                    case "ValoreSingolo":
-                        filters.FiltroData = DocsPaWR.TipoFiltroData.ValoreSingolo;
-                        break;
-                }
+                case "Intervallo":
+                    filters.FiltroData = DocsPaWR.TipoFiltroData.Intervallo;
+                    break;
+                case "MeseCorrente":
+                    filters.FiltroData = DocsPaWR.TipoFiltroData.MeseCorrente;
+                    break;
+                case "Oggi":
+                    filters.FiltroData = DocsPaWR.TipoFiltroData.Oggi;
+                    break;
+                case "SettimanaCorrente":
+                    filters.FiltroData = DocsPaWR.TipoFiltroData.SettimanaCorrente;
+                    break;
+                case "ValoreSingolo":
+                    filters.FiltroData = DocsPaWR.TipoFiltroData.ValoreSingolo;
+                    break;
+            }
 
-                //Data Da
-                if (!string.IsNullOrEmpty(txtDataA.Text))
-                    filters.DataA = Convert.ToDateTime(txtDataA.Text);
-                //Data A
-                if (!string.IsNullOrEmpty(txtDataDa.Text))
-                    filters.DataDa = Convert.ToDateTime(txtDataDa.Text);
-            }
-            else
-            {
-                filters.FiltroData = DocsPaWR.TipoFiltroData.Oggi;
-            }
+            //Data Da
+            if (!string.IsNullOrEmpty(txtDataA.Text))
+                filters.DataA = Convert.ToDateTime(txtDataA.Text);
+            //Data A
+            if (!string.IsNullOrEmpty(txtDataDa.Text))
+                filters.DataDa = Convert.ToDateTime(txtDataDa.Text);
             //Visibilita
             if (rl_visibilita.Items[0].Selected)
                 // AllDocByRuolo

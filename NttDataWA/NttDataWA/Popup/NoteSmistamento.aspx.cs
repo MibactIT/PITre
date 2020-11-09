@@ -89,12 +89,6 @@ namespace NttDataWA.Popup
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshSelect", "refreshSelect();", true);
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshTipsy", "tooltipTipsy();", true);
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshPicker", "DatePicker('" + UIManager.UserManager.GetLanguageData() + "');", true);
-
-            //ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshprojectTxtDescrizione", "charsLeft('projectTxtDescrizione', '2000' , '" + this.projectLtrDescrizione.Text.Replace("'", "\'") + "');", true);
-            //this.projectTxtDescrizione_chars.Attributes["rel"] = "projectTxtDescrizione_'2000'_" + this.projectLtrDescrizione.Text;
-
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshtxtNoteInd", "charsLeft('txtNoteInd', '" + this.txtNoteInd.MaxLength + "' , '" + this.LtrNoteInd.Text.Replace("'", "\'") + "');", true);
-            this.txtNoteInd_chars.Attributes["rel"] = "txtNoteInd_'" + this.txtNoteInd.MaxLength + "'_" + this.LtrNoteInd.Text;
         }
 
         private void InitializePage()
@@ -114,7 +108,6 @@ namespace NttDataWA.Popup
             this.BtnClose.Text = Utils.Languages.GetLabelFromCode("GenericBtnClose", language);
             this.ddl_tipo.Items[0].Text = Utils.Languages.GetLabelFromCode("TransmissionDdlTypeSingle", language);
             this.ddl_tipo.Items[1].Text = Utils.Languages.GetLabelFromCode("TransmissionDdlTypeMulti", language);
-            this.LtrNoteInd.Text = Utils.Languages.GetLabelFromCode("DocumentLitVisibleNotesChars", language) + " ";
         }
 
         private void ImpostaVisibTipoTrasm()

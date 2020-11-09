@@ -13,6 +13,15 @@ namespace NttDataWA.Popup {
     public partial class NoteSmistamento {
         
         /// <summary>
+        /// lblCorr control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblCorr;
+        
+        /// <summary>
         /// lblNoteInd control.
         /// </summary>
         /// <remarks>
@@ -29,33 +38,6 @@ namespace NttDataWA.Popup {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::NttDatalLibrary.CustomTextArea txtNoteInd;
-        
-        /// <summary>
-        /// LtrNoteInd control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal LtrNoteInd;
-        
-        /// <summary>
-        /// txtNoteInd_chars control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl txtNoteInd_chars;
-        
-        /// <summary>
-        /// lblCorr control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblCorr;
         
         /// <summary>
         /// LitNoteSmistamentoScadTitle control.

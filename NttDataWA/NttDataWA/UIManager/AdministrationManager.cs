@@ -86,18 +86,54 @@ namespace NttDataWA.UIManager
 
         public static void RedirectPage(string MessageType, string param)
         {
-            HttpContext.Current.Response.Redirect("~/Login.aspx?MessageType=" + MessageType + "&param=" + param);
+            if (MessageType.Equals("1"))
+            {
+                string logoutRedirectUrl = Utils.InitConfigurationKeys.GetValue("0", Utils.DBKeys.LOGOUT_REDIRECT_URL.ToString());
+                logoutRedirectUrl = "http://localhost/GIADA_LDAP/PitreLogger/Index.aspx";
+                if (string.IsNullOrEmpty(logoutRedirectUrl))
+                    HttpContext.Current.Response.Redirect("~/Login.aspx?MessageType=" + MessageType + "&param=" + param);
+                else
+                {
+                    if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue("0", Utils.DBKeys.FE_LOGIN_LDAP.ToString())))
+                    {
+                        System.Web.HttpContext.Current.Response.Write("<script>window.open('" + logoutRedirectUrl + "','_top')</script>");
+                    }
+                    else
+                        System.Web.HttpContext.Current.Response.Write("<script>window.open('" + logoutRedirectUrl + "','_top')</script>");
+                }
+            }
+            else
+            {
+                HttpContext.Current.Response.Redirect("~/Login.aspx?MessageType=" + MessageType + "&param=" + param);
+            }
+
         }
 
-        public static void CheckSession()
+        public static string CheckSession()
         {
             //Verifica sessione scaduta
+            string url = string.Empty;
             string MessageType = String.Empty;
             if (UIManager.UserManager.GetUserInSession() == null)
             {
                 MessageType = "1";
                 ILog logger = LogManager.GetLogger(typeof(AdministrationManager));
+
+                string logoutRedirectUrl = Utils.InitConfigurationKeys.GetValue("0", Utils.DBKeys.LOGOUT_REDIRECT_URL.ToString());
+                if (string.IsNullOrEmpty(logoutRedirectUrl))
+                    url = "~/Login.aspx?MessageType=" + MessageType + "&param=Step1";
+                else
+                {
+                    if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue("0", Utils.DBKeys.FE_LOGIN_LDAP.ToString())))
+                    {
+                        url = logoutRedirectUrl;
+                    }
+                    else
+                        url = logoutRedirectUrl;
+                }
+
                 logger.Debug("Sessione scaduta");
+                return url;
             }
             else
             {
@@ -152,6 +188,8 @@ namespace NttDataWA.UIManager
                 else
                 { RedirectPage(MessageType, "StepStop"); }
             }
+
+            return url;
         }
 
         public static void DiagnosticError(System.Exception ex)

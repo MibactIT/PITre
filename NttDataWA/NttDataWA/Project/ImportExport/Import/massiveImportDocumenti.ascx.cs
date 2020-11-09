@@ -131,10 +131,6 @@ namespace NttDataWA.Project.ImportExport.Import
                         this.Response.StatusCode = 0;
                         this.Response.StatusDescription = "Errore in aquisizione";
                         break;
-                    case 6:
-                        this.Response.StatusCode = 6;
-                        this.Response.StatusDescription = "Fattura Elettronica non firmata";
-                        break;
                 }
         }
 

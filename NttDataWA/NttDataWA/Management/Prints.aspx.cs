@@ -252,6 +252,8 @@ namespace NttDataWA.Management
             ddl_report.Items[5].Value = "B";
             ddl_report.Items[6].Text = Utils.Languages.GetLabelFromCode("FascetteFascicolo", language);
             ddl_report.Items[6].Value = "F";
+            //ddl_report.Items[7].Text = Utils.Languages.GetLabelFromCode("DocumentsRegisterTransmission", language);
+            //ddl_report.Items[7].Value = "DRT";
             DDLOggettoTab1.Items[0].Text = Utils.Languages.GetLabelFromCode("DigitalSignDialogIdDoc", language);
             DDLOggettoTab1.Items[1].Text = Utils.Languages.GetLabelFromCode("Fascicolo", language);
             ddl_dataTrasm.Items[0].Text = Utils.Languages.GetLabelFromCode("VisibilityOpt0", language);
@@ -540,6 +542,42 @@ namespace NttDataWA.Management
 
                     break;
 
+                case "DRT":
+                    // Stampa documenti registro TRASMISSIONE
+                    if (!CheckRequiredFieldsStampaRegistro())
+                    {
+                        msgDesc = "WarningPrintsCriteriGeneric";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
+                        return;
+                    }
+
+                    string rtn2 = IsValidControlsProtocollo();
+                    if (rtn2 != "")
+                    {
+                        msgDesc = "WarningPrintsCriteriGeneric";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
+                        return;
+                    }
+
+                    // Costruzione oggetto filtro
+                    this.BuildFiltroDocumentiRegistro();
+
+                    try
+                    {
+
+                        ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ExportDati", "ajaxModalPopupExportDati();", true);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        UIManager.AdministrationManager.DiagnosticError(ex);
+                        return;
+                    }
+
+                    infoUtente = null;
+                    ruolo = null;
+
+                    break;
+
                 case "DG":
                     // Stampa documenti grigi
                     if (!CheckRequiredFieldsDocumentiGrigi())
@@ -636,10 +674,11 @@ namespace NttDataWA.Management
             {
                 switch (tipoReport)
                 {
-                    //In questi due casi non fa nulla perchè è la popup di selezione campi che fa la ricerca
+                    //In questi tre casi non fa nulla perchè è la popup di selezione campi che fa la ricerca
                     //ed eventualmente comunica che non sono stati trovati documenti
                     case "DG":
                     case "DR":
+                    case "DRT":
                         break;
 
                     default:
@@ -909,6 +948,20 @@ namespace NttDataWA.Management
                         break;
 
                     case "DR": // Documenti Registro
+                        this.pnlInput.Visible = false;
+                        this.pnl_trasmUO.Visible = false;
+                        this.pnl_StampaBuste.Visible = false;
+                        this.pnl_DocumentiRegistro.Visible = true;
+                        this.pnl_reportAvanzati.Visible = false;
+                        this.pnl_DocumentiGrigi.Visible = false;
+                        this.txt_initDataProt_E.Text = DateTime.Now.ToShortDateString().ToString();
+                        CaricaComboTipologiaAtto(ddl_tipoAttoDR);
+                        // Aggiornamento visibilità campi filtro
+                        this.RefreshFiltersCtlsNumProtocollo();
+                        this.RefreshFiltersCtlsDataProtocollo();
+                        break;
+
+                    case "DRT": // Documenti Registro Trasmissioni
                         this.pnlInput.Visible = false;
                         this.pnl_trasmUO.Visible = false;
                         this.pnl_StampaBuste.Visible = false;
@@ -1434,6 +1487,7 @@ namespace NttDataWA.Management
 
                 this.txt_codUO.Text = tempCorrSingle.codiceRubrica;
                 this.txt_descUO.Text = tempCorrSingle.descrizione;
+                this.hd_systemIdUo.Value = tempCorrSingle.systemId;
                 this.upPnlUO.Update();
             }
 
@@ -1554,13 +1608,17 @@ namespace NttDataWA.Management
                 {
                     fV1 = new DocsPaWR.FiltroRicerca();
 
+                    //if (this.hd_systemIdUo.Value.Equals(""))
+                    //{
+                    //    this.SearchCorrespondent(this.txt_codUO.Text, "txt_codUO");
+                    //}
+
                     if (this.hd_systemIdUo != null && !this.hd_systemIdUo.Value.Equals(""))
                     {
                         fV1.argomento = DocsPaWR.FiltriDocumento.ID_UO_PROT.ToString();
                         fV1.valore = this.hd_systemIdUo.Value;
                     }
-
-
+                    
                     fVList = utils.addToArrayFiltroRicerca(fVList, fV1);
                 }
             }
@@ -1570,13 +1628,17 @@ namespace NttDataWA.Management
                 {
                     fV1 = new DocsPaWR.FiltroRicerca();
 
+                    //if (this.hd_systemIdUo != null && this.hd_systemIdUo.Value.Equals(""))
+                    //{
+                    //    this.SearchCorrespondent(this.txt_codUO.Text, "txt_codUO");
+                    //}
+
                     if (this.hd_systemIdUo != null && !this.hd_systemIdUo.Value.Equals(""))
                     {
                         fV1.argomento = DocsPaWR.FiltriDocumento.ID_UO_PROT_GERARCHIA.ToString();
                         fV1.valore = this.hd_systemIdUo.Value;
                     }
-
-
+                    
                     fVList = utils.addToArrayFiltroRicerca(fVList, fV1);
                 }
                 else
@@ -1894,7 +1956,7 @@ namespace NttDataWA.Management
             qV[0] = fVList;
             this.SearchFilters = qV;
         }
-
+        
         protected void TxtCode_OnTextChanged(object sender, EventArgs e)
         {
             try

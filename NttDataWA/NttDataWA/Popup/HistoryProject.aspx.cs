@@ -12,7 +12,6 @@ namespace NttDataWA.Popup
     public partial class HistoryProject : System.Web.UI.Page
     {
         protected DocsPaWR.DocumentoLogDocumento[] ListaLogFascicolo;
-        protected DocsPaWR.StoricoProfilati[] ListaTipologia;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -44,10 +43,6 @@ namespace NttDataWA.Popup
                     case "projectimghistorystate":
                         this.HistoryProjectLblState.Text = Utils.Languages.GetLabelFromCode("HistoryLblState", UIManager.UserManager.GetUserLanguage());
                         CreateDataGridHistoryStato();
-                        break;
-                    case "projectimghistorytipology":
-                        this.HistoryProjectLblObject.Text = Utils.Languages.GetLabelFromCode("HistoryLblTipology", UIManager.UserManager.GetUserLanguage());
-                        CreateDataGridHistoryTipology();
                         break;
                     default:
                         CreateDataGridHistoryProject();
@@ -82,62 +77,6 @@ namespace NttDataWA.Popup
         {
             string result = valAzione;
             return result;
-        }
-
-        protected string GetRule(string valRule)
-        {
-            string result = valRule;
-            return result;
-        }
-
-        protected string GetUser(string valUser)
-        {
-            string result = valUser;
-            return result;
-        }
-
-        protected string GetModify(string valModify)
-        {
-            string result = valModify;
-            return result;
-        }
-
-        protected void CreateDataGridHistoryTipology()
-        {
-            string language = UIManager.UserManager.GetUserLanguage();
-            Fascicolo Project = UIManager.ProjectManager.getProjectInSession();
-            ListaTipologia = ProjectManager.getStoriaProfilatiFasc(Project.template, Project.systemID.ToString());
-
-            if (ListaTipologia != null)
-            {
-                if (ListaTipologia.Length > 0)
-                {
-                    var filtered_data = (from f in ListaTipologia
-                                         select new
-                                         {
-                                             Data = GetDate(f.dta_modifica),                                             
-                                             Operatore = "<strong>" + GetUser(f.utente.descrizione) + "</strong><br />" + GetRule(f.ruolo.descrizione),
-                                             //Modifica = GetModify(f.var_desc_modifica),
-                                             Azione = GetModify(f.oggetto.DESCRIZIONE + ": " + f.var_desc_modifica),
-                                             Tooltip0 = Utils.Languages.GetLabelFromCode("HistoryTooltipCell0", language),
-                                             Tooltip1 = Utils.Languages.GetLabelFromCode("HistoryTooltipCell1", language),
-                                             Tooltip2 = Utils.Languages.GetLabelFromCode("HistoryTooltipCell3", language)
-                                         }).ToArray();
-
-                    this.GridViewHistoryProject.DataSource = filtered_data;
-                    this.GridViewHistoryProject.DataBind();
-                    Session["filtered_data"] = filtered_data;
-
-                    this.GridViewHistoryProject.HeaderRow.Cells[0].Text = Utils.Languages.GetLabelFromCode("HistoryProjectHeaderGrid0", language);
-                    this.GridViewHistoryProject.HeaderRow.Cells[1].Text = Utils.Languages.GetLabelFromCode("HistoryProjectHeaderGrid1", language);
-                    this.GridViewHistoryProject.HeaderRow.Cells[2].Text = Utils.Languages.GetLabelFromCode("HistoryProjectHeaderGrid2", language);
-                }
-                else
-                {
-                    this.lblDettagli.Text = Utils.Languages.GetLabelFromCode("HistoryLblDettagliNoMod", language);
-                    this.lblDettagli.Visible = true;
-                }
-            }
         }
 
         protected void CreateDataGridHistoryStato()
@@ -348,27 +287,10 @@ namespace NttDataWA.Popup
         }
         protected void GridViewHistoryProject__PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
-            try
-            {
+            try {
                 GridViewHistoryProject.PageIndex = e.NewPageIndex;
                 this.GridViewHistoryProject.DataSource = Session["filtered_data"];
                 this.GridViewHistoryProject.DataBind();
-                string language = UIManager.UserManager.GetUserLanguage();
-                if (this.TypeHistory != null && !string.IsNullOrEmpty(this.TypeHistory))
-                {
-                    switch (this.TypeHistory.ToLower())
-                    {
-                        case "projectimghistorystate":
-                            break;
-                        case "projectimghistorytipology":
-                            this.GridViewHistoryProject.HeaderRow.Cells[0].Text = Utils.Languages.GetLabelFromCode("HistoryProjectHeaderGrid0", language);
-                            this.GridViewHistoryProject.HeaderRow.Cells[1].Text = Utils.Languages.GetLabelFromCode("HistoryProjectHeaderGrid1", language);
-                            this.GridViewHistoryProject.HeaderRow.Cells[2].Text = Utils.Languages.GetLabelFromCode("HistoryProjectHeaderGrid2", language);
-                            break;
-                        default:
-                            break;
-                    }
-                }
             }
             catch (System.Exception ex)
             {

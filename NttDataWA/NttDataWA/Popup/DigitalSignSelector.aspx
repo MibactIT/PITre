@@ -13,6 +13,7 @@
         function signSmartClient() {
             disallowOp('Content1');
             window.frames['uploadFrame'].ViewResult();
+
             reallowOp();
             return false;
         }
@@ -21,10 +22,12 @@
             disallowOp('Content1');
             var docs = "<%=this.GetSelectedDocumentsIds()%>";
             if (docs != null && docs != "") {
+                reallowOp();
                 return this.SignDocuments_Applet(docs.split("|"));
             }
             else {
                 alert('Nessun documento selezionato per la firma');
+                reallowOp();
                 return false;
             }
         }
@@ -38,6 +41,7 @@
             }
             else {
                 alert('Nessun documento selezionato per la firma');
+                reallowOp();
             }
         }
 
@@ -944,7 +948,7 @@ var urlPost = '<%=httpFullPath%>' + '/DigitalSignature/ConvPDFSincrona.aspx';
 
             if (document.getElementById("chkPades"))
                 pades = document.getElementById("chkPades").checked;
-           //console.log('isSigned', "<%=IsSigned()%>"); 
+            console.log('isSigned', "<%=IsSigned()%>"); 
             isSigned = ("<%=IsSigned()%>" === "1");
 
             if (pades)
@@ -1014,10 +1018,8 @@ var urlPost = '<%=httpFullPath%>' + '/DigitalSignature/ConvPDFSincrona.aspx';
         function CloseApplet() {
             disallowOp('Content1');
             try {
-                if (applet) {
+                if (applet)
                     applet.close();
-                    commandType = 'close';
-                }
                 //applet.killApplet();
                 return true;
             }

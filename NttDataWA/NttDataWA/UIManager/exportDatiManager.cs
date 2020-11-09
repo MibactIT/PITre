@@ -30,7 +30,6 @@ namespace NttDataWA.UIManager
         private const string DOC_IN_CESTINO = "docInCest";
         private const string RUBRICA = "rubrica";
         private const string SEARCH_ADDRESS_BOOK = "searchAddressBook";
-        private const string VISIBILITA_PROCESSI_FIRMA = "exportVisibilita";
 
         #endregion
 
@@ -151,9 +150,6 @@ namespace NttDataWA.UIManager
                     break;
                 case SEARCH_ADDRESS_BOOK:
                     this.SetDataSearchAddressBook();
-                    break;
-                case VISIBILITA_PROCESSI_FIRMA:
-                    this.SetDataVisibilitaProcessiFirma();
                     break;
                 }
 		}
@@ -572,60 +568,6 @@ namespace NttDataWA.UIManager
             {
                 exportDatiSessionManager session = new exportDatiSessionManager();
                 session.SetSessionExportFile(this._file);
-            }
-        }
-
-        #endregion
-
-        #region VISIBILITA PROCESSI FIRMA
-
-        private void SetDataVisibilitaProcessiFirma()
-        {
-            DocsPaWR.InfoUtente infoUtente = UserManager.GetInfoUser();
-            List<ProcessoFirma> listaProcessiFirma;
-            if (this.ProcessoDiFirmaSelected != null && !string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
-            {
-                listaProcessiFirma = new List<ProcessoFirma>() { ProcessoDiFirmaSelected };
-            }
-            else
-            {
-                listaProcessiFirma = ListaProcessiDiFirma;
-            }
-            if (this._campiSelezionati == null)
-                this._campiSelezionati = new ArrayList();
-
-            this._file = docsPaWS.ExportVisibilitaProcessiFirma(infoUtente, this._tipologiaExport, this._titolo, this._campiSelezionati.ToArray(), listaProcessiFirma.ToArray());
-
-            if (this._file != null)
-            {
-                exportDatiSessionManager session = new exportDatiSessionManager();
-                session.SetSessionExportFile(this._file);
-            }
-        }
-
-        private ProcessoFirma ProcessoDiFirmaSelected
-        {
-            get
-            {
-                if (HttpContext.Current.Session["ProcessoDiFirmaSelected"] != null)
-                    return (ProcessoFirma)HttpContext.Current.Session["ProcessoDiFirmaSelected"];
-                else
-                    return null;
-            }
-        }
-
-        private List<ProcessoFirma> ListaProcessiDiFirma
-        {
-            get
-            {
-                if (HttpContext.Current.Session["ListaProcessiDiFirma"] != null)
-                    return (List<ProcessoFirma>)HttpContext.Current.Session["ListaProcessiDiFirma"];
-                else
-                    return null;
-            }
-            set
-            {
-                HttpContext.Current.Session["ListaProcessiDiFirma"] = value;
             }
         }
 

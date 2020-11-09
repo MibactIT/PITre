@@ -11,16 +11,12 @@
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
-    <title>Pi.Tre.</title>
-    <link href="<%=Page.ResolveClientUrl("~/Css/Left/Layout.css?v=1") %>" type="text/css" rel="stylesheet" id="CssLayout"/>
+    <title>GIADA</title>
+    <link runat="server" type="text/css" rel="stylesheet" id="CssLayout" />
     <link href="<%=Page.ResolveClientUrl("~/Css/tipsy.css") %>" rel="stylesheet" type="text/css" />
     <link href="<%=Page.ResolveClientUrl("~/css/redmond/jquery-ui-1.8.24.custom.css") %>"
         rel="stylesheet" type="text/css" />
     <link href="<%=Page.ResolveClientUrl("~/css/messager.css") %>" rel="stylesheet" type="text/css" />
-    <link href="<%=Page.ResolveClientUrl("~/css/FileUpload/jquery.fileupload-ui.css") %>" rel="stylesheet" type="text/css" />
-
-
-
     <script src="<%=Page.ResolveClientUrl("~/Scripts/jquery-1.8.1.min.js") %>" type="text/javascript"></script>
     <script src="<%=Page.ResolveClientUrl("~/Scripts/jquery-ui-1.8.23.custom.min.js") %>"
         type="text/javascript"></script>
@@ -28,23 +24,13 @@
         type="text/javascript"></script>
     <script src="<%=Page.ResolveClientUrl("~/Scripts/jquery.jdMenu.js") %>" type="text/javascript"></script>
     <script src="<%=Page.ResolveClientUrl("~/Scripts/jquery.positionBy.js") %>" type="text/javascript"></script>
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/Functions.js") %>" type="text/javascript"></script>
+    <script src="<%=Page.ResolveClientUrl("~/Scripts/Functions.js?v=1") %>" type="text/javascript"></script>
     <script src="<%=Page.ResolveClientUrl("~/Scripts/datetimebylang.js") %>" type="text/javascript"></script>
     <script src="<%=Page.ResolveClientUrl("~/Scripts/jquery.tipsy.js") %>" type="text/javascript"></script>
     <script src="<%=Page.ResolveClientUrl("~/Scripts/jquery.inlineedit.js") %>" type="text/javascript"></script>
     <script src="<%=Page.ResolveClientUrl("~/Scripts/jquery.cookie.js") %>" type="text/javascript"></script>
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/DYMO.Label.Framework.latest.js?v3") %>" type="text/javascript"></script>
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/webclientconnector.js?v=11116") %>" type="text/javascript"></script>
-
-    
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/UploadFile/jquery.tmpl.js?v=3") %>" type="text/javascript"></script>
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/UploadFile/jquery.tmplPlus.js") %>" type="text/javascript"></script>
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/UploadFile/jquery.iframe-transport.js") %>" type="text/javascript"></script>
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/UploadFile/jquery.fileupload.js") %>" type="text/javascript"></script>
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/UploadFile/jquery.fileupload-ui.js") %>" type="text/javascript"></script>
-    <script src="<%=Page.ResolveClientUrl("~/Scripts/UploadFile/application.js?v=7") %>" type="text/javascript"></script>
-
-
+    <script src="<%=Page.ResolveClientUrl("~/Scripts/DYMO.Label.Framework.latest.js") %>" type="text/javascript"></script>
+    <script src="<%=Page.ResolveClientUrl("~/Scripts/webclientconnector.js?v=11119") %>" type="text/javascript"></script>
     <script type="text/javascript">
 
         //        $(document).click(function (event) {
@@ -103,7 +89,7 @@
         <script runat="server">       
             override protected void OnInit(EventArgs e)
             {
-                NttDataWA.UIManager.AdministrationManager.CheckSession();
+                CheckSession();
                 base.OnInit(e);
             }
         </script>
@@ -131,8 +117,6 @@
             PermitClose="false" PermitScroll="false" IsFullScreen="true" CloseFunction="function (event, ui) {__doPostBack('upPnlInfoUser', '');}" />
         <uc:ajaxpopup2 Id="Guide" runat="server" ForceDontClose="true" PermitClose="false"
             PermitScroll="false" IsFullScreen="true" CloseFunction="function (event, ui) {$('#Guide_panel iframe').hide();}" />
-        <uc:ajaxpopup2 Id="ClientBigfile" runat="server" ForceDontClose="true" PermitClose="false" Url="~/ClientBigfile/DownloadClientBigfile.aspx"
-            PermitScroll="false" IsFullScreen="false" Width="400" Height="300" CloseFunction="function (event, ui) {__doPostBack('upPnlInfoUser', '');}" />
         <div id="header">
             <div id="headerSx">
                 <a href="<%=Page.ResolveClientUrl("~/Index.aspx")%>">
@@ -196,11 +180,9 @@
                                     <asp:Label ID="BaseMasterLblImport" runat="server"></asp:Label>
                                     &raquo;</a>
                                     <ul class="level_2">
-                                        <!--[if !IE]><!-->
                                         <li class="li_2" id="LiMenuImportDoc" runat="server"><a href="<%=Page.ResolveClientUrl("~/ImportDati/ImportDocuments.aspx")%>"
                                             onclick="disallowOp('menuTop')">
                                             <asp:Label ID="BaseMasterLblImportDoc" runat="server"></asp:Label></a></li>
-                                        <!--<![endif]-->
                                         <li class="li_2" runat="server" id="LiMenuImportDocPre"><a href="<%=Page.ResolveClientUrl("~/ImportDati/ImportPrevious.aspx")%>"
                                             onclick="disallowOp('menuTop')">
                                             <asp:Label ID="BaseMasterLblImportDocPre" runat="server"></asp:Label></a></li>
@@ -270,6 +252,10 @@
                                 <li id="LiMenuSearchScarti" runat="server"><a href="<%=Page.ResolveClientUrl("~/Search/SearchDisposal.aspx")%>">
                                     <asp:Label ID="BaseMasterLblSearchScarti" runat="server"></asp:Label></a> </li>
                                 <!-- Fine  Deposito -->
+                                
+                                <!-- Archivio EsPI-->
+                                <li id="LiMenuSearchlArchivioESPI" runat="server"><a ID="LinkMenuSearchArchivioESPI" runat="server">
+                                    <asp:Label ID="BaseMasterLblArchivioESPI" runat="server"></asp:Label></a> </li>
                             </ul>
                         </li>
                         <li id="LiMenuManagement" class="menuManagement" runat="server"><a href="#">
@@ -337,11 +323,6 @@
                                 <li id="LiMenuProceedings" runat="server"><a href="<%=Page.ResolveClientUrl("~/Management/Proceedings.aspx")%>"
                                     onclick="disallowOp('menuTop');">
                                     <asp:Label ID="BaseMasterLblProceedings" runat="server"></asp:Label></a></li>
-                                <li id="LiMenuReportAccessi" runat="server"><a href="<%=Page.ResolveClientUrl("~/Management/ReportAccessi.aspx")%>"
-                                    onclick="disallowOp('menuTop');">
-                                    <asp:Label ID="BaseMasterLblReportAccessi" runat="server"></asp:Label></a></li>
-                                <li id="LiMenuClientBigfile" runat="server"><a href="#bigfile" onclick="return ajaxModalPopupClientBigfile();">
-                                    <asp:Label ID="BaseMasterLblClientBigfile" runat="server"></asp:Label></a></li>
                             </ul>
                         </li>
                         <li id="LiMenuOptions" class="menuOptions" runat="server"><a href="#">
@@ -534,16 +515,5 @@
         </div>
         <asp:HiddenField ID="hfRequestVerifier" runat="server" />
     </form>
-
-   
-    <!-- Form per l'upload dei documenti e degli allegati -->
-    <form id="frmUploadDocuments" action="DocumentsUploadHandler.ashx" method="post" enctype="multipart/form-data" style="display:none;">
-        <input id="inputFileDocumentsToUpload" type="file" name="files[]" multiple="multiple" />
-    </form>
-
-    <form id="frmUploadAttachments" action="AttachmentsHandler.ashx" method="post" enctype="multipart/form-data" style="display:none;">
-        <input id="inputFileAttachmentsToUpload" type="file" name="files[]" multiple="multiple" />
-    </form>
-
 </body>
 </html>

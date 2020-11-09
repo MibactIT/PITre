@@ -14,7 +14,6 @@ using System.Text;
 using System.Globalization;
 using System.Data;
 using NttDataWA.UserControls;
-using System.Xml;
 
 namespace NttDataWA.ImportDati
 {
@@ -58,10 +57,6 @@ namespace NttDataWA.ImportDati
             this.LitTxtOptional4.Text = Utils.Languages.GetLabelFromCode("ImportInvoiceTxtOptional4", language);
             this.LitTxtOptional5.Text = Utils.Languages.GetLabelFromCode("ImportInvoiceTxtOptional5", language);
             this.LitTxtOptional6.Text = Utils.Languages.GetLabelFromCode("ImportInvoiceTxtOptional6", language);
-            this.LitTxtOptional7.Text = Utils.Languages.GetLabelFromCode("ImportInvoiceTxtOptional7", language);
-            this.LitTxtOptional8.Text = Utils.Languages.GetLabelFromCode("ImportInvoiceTxtOptional8", language);
-            this.LitTxtOptional9.Text = Utils.Languages.GetLabelFromCode("ImportInvoiceTxtOptional9", language);
-            this.LitTxtOptional10.Text = Utils.Languages.GetLabelFromCode("ImportInvoiceTxtOptional10", language);
 
             this.litAddLine.Text = Utils.Languages.GetLabelFromCode("ImportInvoiceAddLine", language);
 
@@ -107,10 +102,6 @@ namespace NttDataWA.ImportDati
                 this.TxtOptional4.Text = string.Empty;
                 this.TxtOptional5.Text = string.Empty;
                 this.TxtOptional6.Text = string.Empty;
-                this.TxtOptional7.Text = string.Empty;
-                this.TxtOptional8.Text = string.Empty;
-                this.TxtOptional9.Text = string.Empty;
-                this.TxtOptional10.Text = string.Empty;
 
                 string msgDesc = "msgImportInvoiceInvalidCode";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
@@ -121,104 +112,17 @@ namespace NttDataWA.ImportDati
                 string result = UIManager.ImportInvoiceManager.getFattura(codInvoice);
                 if (string.IsNullOrEmpty(result))
                 {
+                    this.TxtRifAmm.Text = string.Empty; //"0017-0000132831"; //
+                    this.TxtIdDoc.Text = string.Empty; // "214000655"; //
+                    this.TxtCIG.Text = string.Empty; // "3737295166"; // 
+                    this.TxtPosFin.Text = string.Empty; //"5U211200900"; //
 
-
-
-
-
-
-                    XmlDocument fatturaXML = Session["invoiceXML"] as XmlDocument;
-
-
-
-                    XmlNamespaceManager xmlnsManager = new XmlNamespaceManager(fatturaXML.NameTable);
-                    //xmlnsManager.AddNamespace("p", "http://www.fatturapa.gov.it/sdi/fatturapa/v1.0");
-                    //xmlnsManager.AddNamespace("p", "http://www.fatturapa.gov.it/sdi/fatturapa/v1.1");
-                    string InvoiceNamespace = System.Configuration.ConfigurationManager.AppSettings["NAMESPACE_FATTURAPA"];
-                    xmlnsManager.AddNamespace("p", InvoiceNamespace);
-                    
-                    if(fatturaXML != null)
-                    {
-                        // [1.2.6] // NON PRESENTE <FatturaElettronicaHeader><CedentePrestatore><RiferimentoAmministrazione>
-                        this.TxtRifAmm.Text = string.Empty; //"0017-0000132831"; //
-                        // [2.1.3.2] <FatturaElettronicaBody><DatiGenerali><DatiContratto><IdDocumento>
-                        XmlNode nodo_2_1_3_2 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiContratto/IdDocumento", xmlnsManager);
-                        this.TxtIdDoc.Text = nodo_2_1_3_2.InnerText.Trim(); // "214000655"; //
-                        // [2.1.3.7] <FatturaElettronicaBody><DatiGenerali><DatiContratto><CodiceCIG>
-                        XmlNode nodo_2_1_3_7 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCIG", xmlnsManager);
-                        this.TxtCIG.Text = nodo_2_1_3_7.InnerText.Trim();
-                        // [2.2.1.16.2] *** NON PRESENTE <FatturaElettronicaBody><DatiBeniServizi><DettaglioLinee><AltriDatiGestionali><RiferimentoTesto>
-                        this.TxtPosFin.Text = string.Empty; //"5U211200900"; //
-                        // [2.1.2.4] <FatturaElettronicaBody><DatiGenerali><DatiOrdineAcquisto><NumItem>
-                        XmlNode nodo_2_1_2_4 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/NumItem", xmlnsManager);
-                        if (nodo_2_1_2_4 != null)
-                        {
-                            this.PnlTxtOptional1.Visible = true;
-                            this.TxtOptional1.Text = nodo_2_1_2_4.InnerText.Trim();
-                        }
-                        else
-                        {
-                            this.PnlTxtOptional1.Visible = false;
-                            this.TxtOptional1.Text = string.Empty;
-                        }
-                        // [2.1.2.5] <FatturaElettronicaBody><DatiGenerali><DatiOrdineAcquisto><CodiceCommessaConvenzione>
-                        XmlNode nodo_2_1_2_5 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCommessaConvenzione", xmlnsManager);
-                        if (nodo_2_1_2_5 != null)
-                        {
-                            this.PnlTxtOptional2.Visible = true;
-                            this.TxtOptional2.Text = nodo_2_1_2_5.InnerText.Trim();
-                        }
-                        else
-                        {
-                            this.PnlTxtOptional2.Visible = false;
-                            this.TxtOptional2.Text = string.Empty;
-                        }
-                        // [2.2.1.7] <FatturaElettronicaBody><DatiBeniServizi><DettaglioLinee><DataInizioPeriodo>
-                        //XmlNode nodo_2_2_1_7 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataInizioPeriodo", xmlnsManager);
-                        //this.TxtOptional3.Text = nodo_2_2_1_7.InnerText.Trim();
-                        // [2.2.1.8] <FatturaElettronicaBody><DatiBeniServizi><DettaglioLinee><DataFinePeriodo>
-                        //XmlNode nodo_2_2_1_8 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataFinePeriodo", xmlnsManager);
-                        //this.TxtOptional4.Text = nodo_2_2_1_8.InnerText.Trim();
-                        // [2.1.3.5]
-                        XmlNode nodo_2_1_3_5 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCommessaConvenzione", xmlnsManager);
-                        this.TxtOptional5.Text = nodo_2_1_3_5.InnerText.Trim();
-                        // [2.2.1.15]
-                        XmlNode nodo_2_2_1_15 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/RiferimentoAmministrazione", xmlnsManager);
-                        this.TxtOptional6.Text = nodo_2_2_1_15.InnerText;
-                        // [2.1.4.2] <FatturaElettronicaBody><DatiGenerali><DatiConvenzione><IdDocumento>
-                        XmlNode nodo_2_1_4_2 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiConvenzione/IdDocumento", xmlnsManager);
-                        if(nodo_2_1_4_2 != null)
-                            this.TxtOptional10.Text = nodo_2_1_4_2.InnerText;
-                        // [2.1.5.1] <FatturaElettronicaBody><DatiGenerali><DatiRicezione><DatiRicezione>				
-                        XmlNode nodo_2_1_5_1 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiRicezione/DatiRicezione", xmlnsManager);
-                        if(nodo_2_1_5_1 != null)
-                            this.TxtOptional7.Text = nodo_2_1_5_1.InnerText;
-                        // [2.1.5.2] <FatturaElettronicaBody><DatiGenerali><DatiRicezione><IdDocumento>				
-                        XmlNode nodo_2_1_5_2 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiRicezione/IdDocumento", xmlnsManager);
-                        if(nodo_2_1_5_2 != null)
-                            this.TxtOptional8.Text = nodo_2_1_5_2.InnerText;
-                        // [2.1.5.4] <FatturaElettronicaBody><DatiGenerali><DatiRicezione><NumItem>				
-                        XmlNode nodo_2_1_5_4 = fatturaXML.SelectSingleNode("p:FatturaElettronica/FatturaElettronicaBody/DatiGenerali/DatiRicezione/NumItem", xmlnsManager);
-                        if(nodo_2_1_5_4 != null)
-                            this.TxtOptional9.Text = nodo_2_1_5_4.InnerText;
-                    }
-                    else
-                    {
-                        this.TxtRifAmm.Text = string.Empty; //"0017-0000132831"; //
-                        this.TxtIdDoc.Text = string.Empty; // "214000655"; //
-                        this.TxtCIG.Text = string.Empty; // "3737295166"; //
-                        this.TxtPosFin.Text = string.Empty; //"5U211200900"; //
-                        this.TxtOptional1.Text = string.Empty;
-                        this.TxtOptional2.Text = string.Empty;
-                        this.TxtOptional3.Text = string.Empty;
-                        this.TxtOptional4.Text = string.Empty;
-                    }
+                    this.TxtOptional1.Text = string.Empty;
+                    this.TxtOptional2.Text = string.Empty;
+                    this.TxtOptional3.Text = string.Empty;
+                    this.TxtOptional4.Text = string.Empty;
                     this.TxtOptional5.Text = string.Empty;
                     this.TxtOptional6.Text = string.Empty;
-                    this.TxtOptional7.Text = string.Empty;
-                    this.TxtOptional8.Text = string.Empty;
-                    this.TxtOptional9.Text = string.Empty;
-                    this.TxtOptional10.Text = string.Empty;
 
                     this.PnlOptionalFields.Visible = true;
                     this.UpPnlOptionalFields.Update();
@@ -285,10 +189,6 @@ namespace NttDataWA.ImportDati
             string optional4 = this.TxtOptional4.Text;
             string optional5 = this.TxtOptional5.Text;
             string optional6 = this.TxtOptional6.Text;
-            string optional7 = this.TxtOptional7.Text;
-            string optional8 = this.TxtOptional8.Text;
-            string optional9 = this.TxtOptional9.Text;
-            string optional10 = this.TxtOptional10.Text;
 
             string strDesc = this.txtDescrizione.Text;
             string strQuant = this.txtQuantita.Text;
@@ -296,7 +196,7 @@ namespace NttDataWA.ImportDati
             string strPrezTot = this.txtPrezzoTotale.Text;
             string strAliquot = this.txtAliquota.Text;
 
-            bool result = ImportInvoiceManager.updateParams(rifAmm, strIdDoc, strCIG, posFin, strDesc, strQuant, strPrezUni, strPrezTot, strAliquot, optional1, optional2, optional3, optional4, optional5, optional6, optional7, optional8, optional9, optional10);
+            bool result = ImportInvoiceManager.updateParams(rifAmm, strIdDoc, strCIG, posFin, strDesc, strQuant, strPrezUni, strPrezTot, strAliquot, optional1, optional2, optional3, optional4, optional5, optional6);
             if (result)
             {
                 this.frame.Attributes["src"] = "PreviewInvoice.aspx";
@@ -324,10 +224,6 @@ namespace NttDataWA.ImportDati
             string optional4 = this.TxtOptional4.Text;
             string optional5 = this.TxtOptional5.Text;
             string optional6 = this.TxtOptional6.Text;
-            string optional7 = this.TxtOptional7.Text;
-            string optional8 = this.TxtOptional8.Text;
-            string optional9 = this.TxtOptional9.Text;
-            string optional10 = this.TxtOptional10.Text;
 
             string strDesc = this.txtDescrizione.Text;
             string strQuant = this.txtQuantita.Text;
@@ -339,7 +235,7 @@ namespace NttDataWA.ImportDati
             if (VerificaCampiLinea(strDesc, strQuant, strPrezUni, strPrezTot, strAliquot, out strErrore))
             {
 
-                bool result = ImportInvoiceManager.updateParams(rifAmm, strIdDoc, strCIG, posFin, strDesc, strQuant, strPrezUni, strPrezTot, strAliquot, optional1, optional2, optional3, optional4, optional5, optional6, optional7, optional8, optional9, optional10);
+                bool result = ImportInvoiceManager.updateParams(rifAmm, strIdDoc, strCIG, posFin, strDesc, strQuant, strPrezUni, strPrezTot, strAliquot, optional1, optional2, optional3, optional4, optional5, optional6);
 
                 if (result)
                     result = ImportInvoiceManager.uploadFattura();
@@ -404,16 +300,16 @@ namespace NttDataWA.ImportDati
             else
             {
                 decimal temDecimal;
-                bool conversion = Decimal.TryParse(strPrezUni, out temDecimal);
+                Decimal.TryParse(strPrezUni, out temDecimal);
 
-                if (conversion)
+                if (temDecimal != null)
                     retVal = true;
                 else
                     strMessage = Utils.Languages.GetMessageFromCode("msgImportInvoiceErrorUnitario", language);
 
                 decimal temDecimal2;
                 Decimal.TryParse(strPrezTot, out temDecimal2);
-                if (retVal && conversion)
+                if (retVal && temDecimal2!=null)
                     retVal = true;
                 else if (retVal)
                 {

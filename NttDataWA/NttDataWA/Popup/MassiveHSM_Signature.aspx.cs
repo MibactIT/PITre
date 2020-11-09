@@ -65,21 +65,6 @@ namespace NttDataWA.Popup
             }
         }
 
-        private int MaxDimFileSign
-        {
-            get
-            {
-                if (HttpContext.Current.Session["MaxDimFileSign"] != null)
-                    return (int)HttpContext.Current.Session["MaxDimFileSign"];
-                else
-                    return 0;
-            }
-            set
-            {
-                HttpContext.Current.Session["MaxDimFileSign"] = value;
-            }
-        }
-
         private bool IsLF
         {
             get
@@ -89,53 +74,6 @@ namespace NttDataWA.Popup
                     return false;
                 else
                     return Request.QueryString["LF"].Equals("1") ? true : false;
-            }
-        }
-
-        private bool FirmaAnnidata
-        {
-            get
-            {
-                if (HttpContext.Current.Session["MassiveHSM_SignatureFirmaAnnidata"] != null)
-                    return (bool)HttpContext.Current.Session["MassiveHSM_SignatureFirmaAnnidata"];
-                else
-                    return false;
-            }
-            set
-            {
-                HttpContext.Current.Session["MassiveHSM_SignatureFirmaAnnidata"] = value;
-            }
-        }
-
-        private bool Continue
-        {
-            get
-            {
-                if (HttpContext.Current.Session["MassiveHSM_SignatureContinue"] != null)
-                    return (bool)HttpContext.Current.Session["MassiveHSM_SignatureContinue"];
-                else
-                    return false;
-            }
-            set
-            {
-                HttpContext.Current.Session["MassiveHSM_SignatureContinue"] = value;
-            }
-        }
-
-        protected Dictionary<String, FileToSign> ListToSign
-        {
-            get
-            {
-                Dictionary<String, FileToSign> result = null;
-                if (HttpContext.Current.Session["listToSign"] != null)
-                {
-                    result = HttpContext.Current.Session["listToSign"] as Dictionary<String, FileToSign>;
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["listToSign"] = value;
             }
         }
 
@@ -154,18 +92,10 @@ namespace NttDataWA.Popup
                 else
                     CommandType = "";
 
-                this.LoadKeys();
                 this.InitializeList();
                 this.InitializePage();
 
             }
-        }
-
-        private void LoadKeys()
-        {
-            if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString())) &&
-                !Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()).Equals("0"))
-                this.MaxDimFileSign = Convert.ToInt32(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()));
         }
 
         public void InitializeList()
@@ -190,8 +120,6 @@ namespace NttDataWA.Popup
         {
             if (CommandType != "close")
             {
-                this.FirmaAnnidata = false;
-                this.Continue = false;
                 this.popolaCampiMemento();
                 if (UIManager.UserManager.IsAuthorizedFunctions("TO_GET_OTP"))
                 {
@@ -253,6 +181,7 @@ namespace NttDataWA.Popup
                         }
                     }
                 }
+
                 this.TxtHsmPin.Focus();
             }
         }
@@ -371,7 +300,7 @@ namespace NttDataWA.Popup
         private bool PutHSMSign()
         {
             bool retVal = false;
-            string errorMsg = string.Empty;
+
             if (!string.IsNullOrEmpty(this.TxtHsmAlias.Text) && !string.IsNullOrEmpty(this.TxtHsmDomain.Text) && !string.IsNullOrEmpty(this.TxtHsmPin.Text) && !string.IsNullOrEmpty(this.TxtHsmLitOtp.Text) && (this.HsmLitPades.Checked || this.HsmLitP7M.Checked))
             {
 
@@ -399,14 +328,14 @@ namespace NttDataWA.Popup
                 string details;
 
                 MassiveOperationReport report = new MassiveOperationReport();
-                if ((IsLF || Continue) && HttpContext.Current.Session["massiveSignReport"] != null)
+                if (IsLF && HttpContext.Current.Session["massiveSignReport"] != null)
                 {
                     report = HttpContext.Current.Session["massiveSignReport"] as MassiveOperationReport;
                 }
 
                 //Lista dei fileReequest da passare in input al servizio di firma massiva
                 List<FileRequest> fileRequestList = new List<FileRequest>();
-                //List<FileRequest> listFileReqLF = new List<FileRequest>();
+                List<FileRequest> listFileReqLF = new List<FileRequest>();
                 this.FileTypes = UIManager.FileManager.GetSupportedFileTypes(Int32.Parse(UIManager.UserManager.GetInfoUser().idAmministrazione));
                 this.IsEnabledSupportedFileTypes = UIManager.FileManager.IsEnabledSupportedFileTypes();
 
@@ -461,14 +390,11 @@ namespace NttDataWA.Popup
                     else
                     {
                         tipoFirma = DigitalSignature.RemoteDigitalSignManager.tipoFirma.CADES;
-                        cofirma = this.HsmRadioCoSign.Checked && !FirmaAnnidata;
                     }
                     List<FirmaResult> firmaResult = null;
                     try
                     {
-                        firmaResult = dsm.HSM_SignMultiSign(fileRequestList.ToArray(), cofirma, timestamp, tipoFirma, alias, dominio, otp, pin).ToList<FirmaResult>();
-                        /*Commento perchè la distinzione tra documenti che devo firmare cades e quelli da firmare pades per il libro firma, la faccio prima, quando vado a selezionare SchedaDocumentList
-                         * if (!IsLF)
+                        if (!IsLF)
                         {
                             firmaResult = dsm.HSM_SignMultiSign(fileRequestList.ToArray(), cofirma, timestamp, tipoFirma, alias, dominio, otp, pin).ToList<FirmaResult>();
                         }
@@ -483,7 +409,6 @@ namespace NttDataWA.Popup
                                 firmaResult = dsm.HSM_SignMultiSign(listFileReqLF.ToArray(), cofirma, timestamp, tipoFirma, alias, dominio, otp, pin).ToList<FirmaResult>();
                             }
                         }
-                        */
                         if (firmaResult != null && ((firmaResult.Count > 1) || (firmaResult.Count == 1 && firmaResult[0].fileRequest != null)))
                         {
                             foreach (FirmaResult r in firmaResult)
@@ -501,16 +426,11 @@ namespace NttDataWA.Popup
                                 }
                                 else
                                 {
-                                    if (r.esito == null || string.IsNullOrEmpty(r.esito.Codice))
-                                        errorMsg = String.Format(
-                                        "Si sono verificati degli errori durante la firma del documento. Dettagli: {0}",
-                                        splitMsg[1]);
-                                    else
-                                        errorMsg = Utils.Languages.GetMessageFromCode(r.esito.Codice, UserManager.GetLanguageData());
-
                                     result = MassiveOperationReport.MassiveOperationResultEnum.KO;
                                     codice = MassiveOperationUtils.getItem(r.fileRequest.docNumber).Codice;
-                                    details = errorMsg;
+                                    details = String.Format(
+                                        "Si sono verificati degli errori durante la firma del documento. Dettagli: {0}",
+                                        splitMsg[1]);
                                     report.AddReportRow(
                                         codice,
                                         result,
@@ -521,13 +441,11 @@ namespace NttDataWA.Popup
                         }
                         else
                         {
-                            //List<FileRequest> list = IsLF ? listFileReqLF : fileRequestList;
+                            List<FileRequest> list = IsLF ? listFileReqLF : fileRequestList;
                             string error = "Si sono verificati degli errori durante la firma del documento";
                             if (firmaResult != null && firmaResult.Count > 0)
                                 error += ": " + firmaResult[0].errore;
-                            if(firmaResult[0].esito != null && !string.IsNullOrEmpty(firmaResult[0].esito.Codice))
-                                error = Utils.Languages.GetMessageFromCode(firmaResult[0].esito.Codice, UserManager.GetUserLanguage());
-                            foreach (FileRequest fr in fileRequestList)
+                            foreach (FileRequest fr in list)
                             {
                                 result = MassiveOperationReport.MassiveOperationResultEnum.KO;
                                 codice = MassiveOperationUtils.getItem(fr.docNumber).Codice;
@@ -541,8 +459,8 @@ namespace NttDataWA.Popup
                     }
                     catch (Exception ex)
                     {
-                        //List<FileRequest> list = IsLF ? listFileReqLF : fileRequestList;
-                        foreach (FileRequest fr in fileRequestList)
+                        List<FileRequest> list = IsLF ? listFileReqLF : fileRequestList;
+                        foreach (FileRequest fr in list)
                         {
                             result = MassiveOperationReport.MassiveOperationResultEnum.KO;
                             codice = MassiveOperationUtils.getItem(fr.docNumber).Codice;
@@ -553,21 +471,6 @@ namespace NttDataWA.Popup
                                 details);
                         }
                     }
-                }
-                if(Continue)
-                {
-                    HttpContext.Current.Session["massiveSignReport"] = report;
-
-                    //Se ho firmato CADES e ci sono documenti da firmare PADES non chiudo la maschera ma visualizzo un worning che
-                    //informa l'utente di inserire un nuovo otp per procedere con la firma
-                    this.TxtHsmLitOtp.Text = string.Empty;
-                    this.HsmLitP7M.Enabled = false;
-                    this.HsmLitPades.Enabled = false;
-                    this.HsmRadioCoSign.Enabled = false;
-                    this.UpOTP.Update();
-                    this.UpPnlSign.Update();
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningRequestNewOTPFirmaAnnidata', 'warning');} else {parent.ajaxDialogModal('WarningRequestNewOTPFirmaAnnidata', 'warning');}", true);
-                    return false;
                 }
 
                 if (!IsLF)
@@ -668,98 +571,13 @@ namespace NttDataWA.Popup
 
             if (selectedItemSystemIdList != null && selectedItemSystemIdList.Count > 0)
             {
-                //Se è il Libro firma seleziono solo gli id documenti che sono da firmare del tipo specificato nel radio
-                DigitalSignature.RemoteDigitalSignManager.tipoFirma tipoFirma = new DigitalSignature.RemoteDigitalSignManager.tipoFirma();
-                tipoFirma = this.HsmLitPades.Checked ? DigitalSignature.RemoteDigitalSignManager.tipoFirma.PADES : DigitalSignature.RemoteDigitalSignManager.tipoFirma.CADES;
-                List<string> idDocumentList = new List<string>();
-
-                //Firma PARALLELA: non posso firmare parallelamente CADES file non firmati o file PADES, quindi la firma verrà applicati in blocchi saparati
-                //e varrà richiesto di inserire un nuovo OTP.
-                if (this.CheckDominioFirmaForzaAnnidata() && this.HsmRadioCoSign.Checked && tipoFirma.Equals(DigitalSignature.RemoteDigitalSignManager.tipoFirma.CADES))
-                {
-                    List<MassiveOperationTarget> selectedItemSystemIdListTemp = null;
-                    if (!this.Continue)
-                    {
-                        //Estraggo per la firma file firmati cades su cui posso applicare firma parallela(non posso fare parallela su CADES)
-                        selectedItemSystemIdListTemp = (from item in selectedItemSystemIdList where IsDocFirmatoCADES(item.Id) select item).ToList();
-                        if (selectedItemSystemIdListTemp != null && selectedItemSystemIdListTemp.Count > 0)
-                        {
-                            //Controllo se sono presenti anche file non firmati o firmati PADES, in caso l'utente dovrà reinserire l'otp per poi procedere di nuovo con la firma
-                            this.Continue = (from item in selectedItemSystemIdList where !IsDocFirmatoCADES(item.Id) select item.Id).FirstOrDefault() != null;
-                            selectedItemSystemIdList = selectedItemSystemIdListTemp;
-                        }
-                        else //se sono presenti solo file non firmati o PADES forzo subito Annidata
-                        {
-                            this.FirmaAnnidata = true;
-                        }
-                    }
-                    else
-                    {
-                        //Estraggo per la firma i file mai firmati O firmati CADES
-                        selectedItemSystemIdListTemp = (from item in selectedItemSystemIdList where !IsDocFirmatoCADES(item.Id) select item).ToList();
-                        selectedItemSystemIdList = selectedItemSystemIdListTemp;
-                        this.FirmaAnnidata = true;
-                        this.Continue = false;
-                    }
-                }
-
-                if (!IsLF)
-                {
-                    idDocumentList = (from temp in selectedItemSystemIdList select temp.Id.Replace("C", "").Replace("P", "")).ToList<string>();
-                }
-                else
-                {
-                    string typeSign = tipoFirma.Equals(DigitalSignature.RemoteDigitalSignManager.tipoFirma.CADES) ? "C" : "P";
-                    idDocumentList = (from temp in selectedItemSystemIdList where temp.Id.Contains(typeSign) select temp.Id.Replace(typeSign, "")).ToList<string>();
-                } 
-
+                List<string> idDocumentList = (from temp in selectedItemSystemIdList select temp.Id.Replace("C", "").Replace("P", "")).ToList<string>();
                 toReturn = DocumentManager.GetSchedaDocuments(idDocumentList, this);
             }
 
             // Restituzione della lista di info documento
             return toReturn;
 
-        }
-
-        /// <summary>
-        /// Restituisce true se per il doiminio indicato è necessario forzare la firma annidata
-        /// </summary>
-        /// <returns></returns>
-        public bool CheckDominioFirmaForzaAnnidata()
-        {
-            bool result = false;
-            string domini = Utils.InitConfigurationKeys.GetValue("0", DBKeys.FE_DOMINI_HSM_FORZA_ANNIDATA.ToString());
-            if (!string.IsNullOrEmpty(domini))
-            {
-                string[] split = domini.Split(';');
-                foreach (string s in split)
-                    if (s.ToLower().Equals(this.TxtHsmDomain.Text.ToLower()))
-                        return true;
-            }
-            return result;
-        }
-
-        public bool IsDocFirmatoCADES(string idDocumento)
-        {
-            bool result = true;
-            FileToSign file = null;
-            try
-            {
-                if (!String.IsNullOrEmpty(idDocumento))
-                {
-                    if (this.ListToSign != null && this.ListToSign.ContainsKey(idDocumento))
-                    {
-                        file = this.ListToSign[idDocumento];
-                        result = file.signed.Equals("1") && !file.signType.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) 
-                            && !file.signType.Equals(NttDataWA.Utils.TipoFirma.PADES) && !file.signType.Equals(NttDataWA.Utils.TipoFirma.PADES_ELETTORNICA);
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-
-            }
-            return result;
         }
 
 
@@ -815,15 +633,6 @@ namespace NttDataWA.Popup
                 }
             }
 
-            #endregion
-
-            #region VERIFICA DIMENSIONE FILE
-            if (this.MaxDimFileSign > 0 && Convert.ToInt32(schedaDoc.documenti[0].fileSize) > this.MaxDimFileSign)
-            {
-                string maxSize = Convert.ToString(Math.Round((double)this.MaxDimFileSign / 1048576, 3));
-                msgError = "La dimensione del file supera il limite massimo consentito per la firma. Il limite massimo consentito è: " + maxSize + " Mb.";
-                return msgError;
-            }
             #endregion
 
             #region DOCUMENTO ANNULLATO
@@ -914,19 +723,19 @@ namespace NttDataWA.Popup
 
             //if (this.HsmRadioCoSign.Checked)
             //{
-                ////Non posso cofirmare PADES
-                //if (this.HsmLitPades.Checked)
-                //{
-                //    msgError = "Non è possibile applicare la cofirma PADES su file firmato";
-                //    return msgError;
-                //}
-               // if (this.HsmLitP7M.Checked && (fileReq.tipoFirma == TipoFirma.PADES || fileReq.tipoFirma == TipoFirma.PADES_ELETTORNICA))
-                //{
-                    //Non posso firmare CADES un file firmato PADES :se l'estensione del file è PDF, il file è stato firmato PADES
-                  //  msgError = "Non è possibile applicare la cofirma CADES su file firmato PADES";
-                //    return msgError;
-                //}
-           // }
+            //    //Non posso cofirmare PADES
+            //    if (this.HsmLitPades.Checked)
+            //    {
+            //        msgError = "Non è possibile applicare la cofirma PADES su file firmato";
+            //        return msgError;
+            //    }
+            //    else if (this.HsmLitP7M.Checked && isPadesSign)
+            //    {
+            //        //Non posso firmare CADES un file firmato PADES :se l'estensione del file è PDF, il file è stato firmato PADES
+            //        msgError = "Non è possibile applicare la firma/cofirma CADES su file firmato PADES";
+            //        return msgError;
+            //    }
+            //}
 
             #endregion
 

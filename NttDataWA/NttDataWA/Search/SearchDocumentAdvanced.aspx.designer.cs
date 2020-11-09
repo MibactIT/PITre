@@ -1219,6 +1219,78 @@ namespace NttDataWA.Search {
         protected global::AjaxControlToolkit.AutoCompleteExtender RapidRecipient;
         
         /// <summary>
+        /// LtlUOProtocollatrice control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal LtlUOProtocollatrice;
+        
+        /// <summary>
+        /// DocumentImgRecipientAddressBookUoProtocollatrice control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomImageButton DocumentImgRecipientAddressBookUoProtocollatrice;
+        
+        /// <summary>
+        /// IdUOProtocollatrice control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField IdUOProtocollatrice;
+        
+        /// <summary>
+        /// txt_codUO_Prot control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomTextArea txt_codUO_Prot;
+        
+        /// <summary>
+        /// txt_descrUO_Prot control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomTextArea txt_descrUO_Prot;
+        
+        /// <summary>
+        /// RapidUoProtocollatrice control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::AjaxControlToolkit.AutoCompleteExtender RapidUoProtocollatrice;
+        
+        /// <summary>
+        /// chk_uo_prot_sottostanti control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chk_uo_prot_sottostanti;
+        
+        /// <summary>
+        /// chk_uo_prot_storicizzati control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chk_uo_prot_storicizzati;
+        
+        /// <summary>
         /// SearchDocumentLit control.
         /// </summary>
         /// <remarks>
@@ -2144,24 +2216,6 @@ namespace NttDataWA.Search {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ListItem optConsFld;
-        
-        /// <summary>
-        /// optConsBfw control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.ListItem optConsBfw;
-        
-        /// <summary>
-        /// optConsBfe control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.ListItem optConsBfe;
         
         /// <summary>
         /// LtlDataVers control.

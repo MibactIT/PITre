@@ -45,7 +45,6 @@ namespace NttDataWA.Popup
         {
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshSelect", "refreshSelect();", true);
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshTipsy", "tooltipTipsy();", true);
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "EnableOnlyPreviousToday", "EnableOnlyPreviousToday();", true);
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshPicker", "DatePicker('" + UIManager.UserManager.GetLanguageData() + "');", true);
         }
 
@@ -80,8 +79,6 @@ namespace NttDataWA.Popup
 
         #endregion
 
-        private const int CODE_CERTIFICATO_SCADUTO = 5127;
-
         #region Methods
 
         protected void InitializePage()
@@ -95,7 +92,6 @@ namespace NttDataWA.Popup
             this.BtnClose.Text = Utils.Languages.GetLabelFromCode("GenericBtnClose", language);
             this.LtlDateCheck.Text = Utils.Languages.GetLabelFromCode("DigitalSignDetailsVerifyCLRDate", language);
             this.BtnCheck.Text = Utils.Languages.GetLabelFromCode("VerifyCLRBtnCheck", language);
-            this.litMandateNewHour.Text = Utils.Languages.GetLabelFromCode("MandateNewHour", language);
         }
 
         private string GetLabel(string id)
@@ -115,15 +111,6 @@ namespace NttDataWA.Popup
             if (!string.IsNullOrEmpty(this.txt_DateCheck.Text))
             {
                 DateTime date = utils.formatStringToDate(this.txt_DateCheck.Text);
-
-                if (!utils.verificaIntervalloDateSenzaOra(System.DateTime.Today.ToShortDateString(),date.ToShortDateString()))
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningVerifyCLRDate', 'warning', '', '');} else {parent.ajaxDialogModal('WarningVerifyCLRDate', 'warning', '', '');}", true);
-                    return;
-                }
-
-                if (!string.IsNullOrEmpty(this.ddlHourFrom.SelectedValue))
-                    date = date.AddHours(Convert.ToDouble(this.ddlHourFrom.SelectedValue));
                 FileDocumento fileDoc = DocumentManager.VerificaValiditaFirmaAllaData(date);
                 if (fileDoc.signatureResult.StatusCode == 0)
                 {
@@ -235,7 +222,7 @@ namespace NttDataWA.Popup
                     {
 
                         bool valid = utils.verificaIntervalloDate(CertificateInfo.ValidToDate.ToString(), date.ToString());
-                        if (valid && (this.CertificateInfo.RevocationStatus == CODE_CERTIFICATO_SCADUTO || this.CertificateInfo.RevocationStatus == 0))
+                        if (valid)
                         {
                             label = "VerifyCRLValid";
                         }

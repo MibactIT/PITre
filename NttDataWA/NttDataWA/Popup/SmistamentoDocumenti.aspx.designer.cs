@@ -67,24 +67,6 @@ namespace NttDataWA.Popup {
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 DigitalSignDetails;
         
         /// <summary>
-        /// ViewNoteGen control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 ViewNoteGen;
-        
-        /// <summary>
-        /// ViewNoteInd control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 ViewNoteInd;
-        
-        /// <summary>
         /// upPnlInfoDocument control.
         /// </summary>
         /// <remarks>
@@ -445,15 +427,6 @@ namespace NttDataWA.Popup {
         protected global::NttDatalLibrary.CustomTextArea txtNoteGen;
         
         /// <summary>
-        /// DocumentImgNoteGenDetail control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton DocumentImgNoteGenDetail;
-        
-        /// <summary>
         /// LtrNote control.
         /// </summary>
         /// <remarks>
@@ -488,15 +461,6 @@ namespace NttDataWA.Popup {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::NttDatalLibrary.CustomTextArea txtAreaNoteInd;
-        
-        /// <summary>
-        /// DocumentImgNoteIndDetail control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton DocumentImgNoteIndDetail;
         
         /// <summary>
         /// DocumentLitTransmRapid control.

@@ -25,7 +25,7 @@ namespace NttDataWA.Popup
         public static string fullpath = "";
         public static bool cartaceo = false;
         public static string randomVersion = "";
-        //public static bool isSaved = false;
+
 
         #region Properties
 
@@ -195,9 +195,6 @@ namespace NttDataWA.Popup
         protected void Page_Load(object sender, EventArgs e)
         {
             try {
-                //isSaved = (string.IsNullOrEmpty(Request.QueryString["idDoc"]) ? false : (Request.QueryString["idDoc"] == "0" ? false : true));
-                
-
                 randomVersion = "?v=" + Guid.NewGuid().ToString("N");
  
                 componentType = UserManager.getComponentType(Request.UserAgent);
@@ -208,31 +205,18 @@ namespace NttDataWA.Popup
                 {
                     this.InitPage();
 
-                    Session["UploadMassivoConversionePDF"] = "0";
-                    Session["UploadMassivoCartaceo"] = "0";
-
-                    if (UserManager.IsAuthorizedFunctions("DO_ENABLE_BIGFILE") && IsSaved())
-                    {
-                        this.headerAccordionBigFile.Visible = true;
-                        this.contentAccordionBigFile.Visible = true;
-                        ///this.optRepository.Visible = true;
-                    }
+                    if (UserManager.IsAuthorizedFunctions("DO_ENABLE_BIGFILE"))
+                        this.optRepository.Visible = true;
                     else
-                    {
-                        ///this.optRepository.Visible = false;
-                        this.headerAccordionBigFile.Visible = false;
-                        this.contentAccordionBigFile.Visible = false;
-                    }
+                        this.optRepository.Visible = false;
 
 
-
-                    //this.optPapery.Selected = true;
-                    //this.optPapery.Enabled = false;
-                    // this.UpdatePanelFsoFile.Visible = false;
-                    //this.UpdatePanelRepository.Visible = false;
-                    ///this.UpdatePanelScanner.Visible = false;
-                    // this.FsoFileUploadSection.Visible = false;
-                    // this.UpdatePanelUploadMassivo.Visible = false;
+                    this.optPapery.Selected = true;
+                    this.optPapery.Enabled = false;
+                    this.UpdatePanelFsoFile.Visible = false;
+                    this.UpdatePanelRepository.Visible = false;
+                    this.UpdatePanelScanner.Visible = true;
+                    this.FsoFileUploadSection.Visible = false;
 
                     this.scanAcquire.Attributes.Remove("onClick");
                     switch (componentType)
@@ -256,45 +240,9 @@ namespace NttDataWA.Popup
                     this.scanAcquire.Attributes.Add("onClick", componentCall); 
 
                     this.UpdatePanelFsoFile.Update();
-                    //this.UpdatePanelScanner.Update();
+                    this.UpdatePanelScanner.Update();
 
                     this.AlreadyOpened = true;
-
-                    SchedaDocumento doc = DocumentManager.getSelectedRecord();
-                    if (String.IsNullOrWhiteSpace(doc.docNumber))
-                    {
-                        this.cellLabelAttachment.Visible = false;
-                        this.cellUploadAttachment.Visible = false;
-                    }
-                    this.labelButtonUploadDocument.Text = "Acquisisci Documento";
-                    this.labelCellHeaderUploadDocument.Text = "Documento Principale";
-
-
-                    var attachId = DocumentManager.getSelectedAttachId();
-                     var fileReq = (DocumentManager.getSelectedAttachId() != null) ?
-                        FileManager.GetFileRequest(DocumentManager.getSelectedAttachId()) :
-                            FileManager.GetFileRequest();
-
-                  
-
-                    if (fileReq != null)
-                    {
-                        if (typeof(Allegato) == fileReq.GetType())
-                        {
-                            this.labelButtonUploadDocument.Text = "Acquisisci Allegato";
-                            this.labelCellHeaderUploadDocument.Text = "Allegato";
-                            this.cellLabelAttachment.Visible = false;
-                            this.cellUploadAttachment.Visible = false;
-                        }
-                        //    var docNUmber = fileReq.docNumber;
-                        //if(!String.IsNullOrWhiteSpace(doc.docNumber) && doc.docNumber != docNUmber)
-                        //{
-                        //    this.labelButtonUploadDocument.Text = "Carica Allegato";
-                        //    this.labelCellHeaderUploadDocument.Text = "Allegato";
-                        //    this.cellLabelAttachment.Visible = false;
-                        //    this.cellUploadAttachment.Visible = false;
-                        //}
-                    }
                 }
             }
             catch (System.Exception ex)
@@ -313,12 +261,10 @@ namespace NttDataWA.Popup
             if (!this.PdfConvertServerSide)
                 this.optPDF.Enabled = false;
 
-            //this.optScanner.Checked = true;
+            this.optScanner.Checked = true;
 
             //if (this.AlreadyOpened)
             //    this.plcApplet.Visible = false;
-
-
         }
 
         private void InitLanguage()
@@ -348,31 +294,23 @@ namespace NttDataWA.Popup
             this.litExists.Text = utils.FormatJs(Utils.Languages.GetLabelFromCode("FileUploadExists", language));
             this.litNone.Text = utils.FormatJs(Utils.Languages.GetLabelFromCode("FileUploadNone", language));
             this.litCompleted.Text = utils.FormatJs(Utils.Languages.GetLabelFromCode("FileUploadCompleted", language));
-            // this.optScanner.Text = Utils.Languages.GetLabelFromCode("FileUploadScanOption", language);
-            
-            // this.optUpload.Text = Utils.Languages.GetLabelFromCode("FileUploadUploadOption", language);
-            // this.litOtherwise.Text = Utils.Languages.GetLabelFromCode("FileUploadOtherwise", language);
+            this.optScanner.Text = Utils.Languages.GetLabelFromCode("FileUploadScanOption", language);
+            this.optUpload.Text = Utils.Languages.GetLabelFromCode("FileUploadUploadOption", language);
+            this.litOtherwise.Text = Utils.Languages.GetLabelFromCode("FileUploadOtherwise", language);
             this.litUploadMax.Text = Utils.Languages.GetLabelFromCode("FileUploadUploadMax", language) + " " + ((double)this.FileAcquisitionSizeMax/1024.0).ToString("n0") + "KB";
             this.scanAcquire.Text = Utils.Languages.GetLabelFromCode("FileUploadScanStart", language);
             if (this.PdfConversionSynchronousLC)
                 this.optPDF.Text = Utils.Languages.GetLabelFromCode("FileUploadPDFOptionSynchronous", language);
             else
                 this.optPDF.Text = Utils.Languages.GetLabelFromCode("FileUploadPDFOptionAsynchronous", language);
-            // this.optPapery.Text = Utils.Languages.GetLabelFromCode("FileUploadPaperyOption", language);
+            this.optPapery.Text = Utils.Languages.GetLabelFromCode("FileUploadPaperyOption", language);
             this.litStatus.Text = Utils.Languages.GetLabelFromCode("FileUploadStatus", language);
             this.litDownloadBytes.Text = Utils.Languages.GetLabelFromCode("FileUploadDownloadBytes", language);
             this.UploadBtnUploadFile.Text = Utils.Languages.GetLabelFromCode("FileUploadConfirm", language);
-            //this.SenderBtnClose.Text = Utils.Languages.GetLabelFromCode("FileUploadClose", language);
+            this.SenderBtnClose.Text = Utils.Languages.GetLabelFromCode("FileUploadClose", language);
 
-            //this.optRepository.Text = Utils.Languages.GetLabelFromCode("FileUploadRepositoryOption", language);
+            this.optRepository.Text = Utils.Languages.GetLabelFromCode("FileUploadRepositoryOption", language);
             this.repositoryOpen.Text = Utils.Languages.GetLabelFromCode("FileUploadRepositoryOpen", language);
-
-            // this.optUploadMassivo.Text = Utils.Languages.GetLabelFromCode("FileUploadMassivoOption", language);
-
-            this.labelCaptionScanner.Text = Utils.Languages.GetLabelFromCode("FileUploadScanOption", language);
-            //this.labelCaptionUploadFile.Text = Utils.Languages.GetLabelFromCode("FileUploadUploadOption", language);
-            this.labelCaptionBigFile.Text = Utils.Languages.GetLabelFromCode("FileUploadRepositoryOption", language);
-            this.labelCaptionUploadMassivo.Text = Utils.Languages.GetLabelFromCode("FileUploadMassivoOption", language);
         }
 
         private void InitSessionObject(){
@@ -448,53 +386,52 @@ namespace NttDataWA.Popup
 
         protected void UploadBtnUploadFile_Click(object sender, EventArgs e)
         {
-            try
-            {
+            try {
                 bool conversionePdfServer = this.fileOptions.Items[0].Selected;
-                bool cartaceo = false; // this.fileOptions.Items[1].Selected;
+                bool cartaceo = this.fileOptions.Items[1].Selected;
 
-                //if (this.optUpload.Checked)
-                //{
-                FileDocumento fileDoc = Session["fileDoc"] as FileDocumento;
-                if (fileDoc != null && fileDoc.content != null)
+                if (this.optUpload.Checked)
                 {
-                    fileDoc.cartaceo = cartaceo;
-
-                    try
+                    FileDocumento fileDoc = Session["fileDoc"] as FileDocumento;
+                    if (fileDoc!=null && fileDoc.content != null)
                     {
-                        string msgError = FileManager.uploadFile(this, fileDoc, cartaceo, conversionePdfServer, this.PdfConversionSynchronousLC);
+                        fileDoc.cartaceo = cartaceo;
 
-                        if (string.IsNullOrEmpty(msgError))
+                        try
                         {
-                            ScriptManager.RegisterClientScriptBlock(this.upPnlGeneral, this.upPnlGeneral.GetType(), "closeAJM", "parent.closeAjaxModal('UplodadFile','up');", true);
-                        }
-                        else
-                        {
-                            if (msgError.Equals("ErrorConversionePdf"))
+                            string msgError = FileManager.uploadFile(this, fileDoc, cartaceo, conversionePdfServer, this.PdfConversionSynchronousLC);
+
+                            if (string.IsNullOrEmpty(msgError))
                             {
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + msgError.Replace("'", @"\'") + "', 'warning', '');", true);
                                 ScriptManager.RegisterClientScriptBlock(this.UpUpdateButtons, this.UpUpdateButtons.GetType(), "closeAJM", "parent.closeAjaxModal('UplodadFile','up');", true);
                             }
                             else
                             {
-                                string msg = "ErrorFileUpload_custom";
-                                msgError = msgError.Equals(ERROR_ACQUIRED_DOCUMENT) ? Utils.Languages.GetMessageFromCode(msgError, UserManager.GetUserLanguage()) : msgError;
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'error', '', '" + utils.FormatJs(msgError) + "');} else {parent.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'error', '', '" + utils.FormatJs(msgError) + "');}; reallowOp();", true);
+                                if (msgError.Equals("ErrorConversionePdf"))
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + msgError.Replace("'", @"\'") + "', 'warning', '');", true);
+                                    ScriptManager.RegisterClientScriptBlock(this.UpUpdateButtons, this.UpUpdateButtons.GetType(), "closeAJM", "parent.closeAjaxModal('UplodadFile','up');", true);
+                                }
+                                else
+                                {
+                                    string msg = "ErrorFileUpload_custom";
+                                    msgError = msgError.Equals(ERROR_ACQUIRED_DOCUMENT) ? Utils.Languages.GetMessageFromCode(msgError, UserManager.GetUserLanguage()) : msgError;
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'error', '', '" + utils.FormatJs(msgError) + "');} else {parent.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'error', '', '" + utils.FormatJs(msgError) + "');}; reallowOp();", true);
+                                }
                             }
                         }
-                    }
-                    catch (Exception exc)
-                    {
-                        string msg = "ErrorFileUpload";
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'error', '');} else {parent.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'error', '');}; reallowOp();", true);
-                    }
-                    finally
-                    {
-                        Session["fileDoc"] = null;
-                        Session["UploadDetail"] = null;
+                        catch (Exception exc)
+                        {
+                            string msg = "ErrorFileUpload";
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'error', '');} else {parent.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'error', '');}; reallowOp();", true);
+                        }
+                        finally
+                        {
+                            Session["fileDoc"] = null;
+                            Session["UploadDetail"] = null;
+                        }
                     }
                 }
-                // }
             }
             catch (System.Exception ex)
             {
@@ -503,56 +440,56 @@ namespace NttDataWA.Popup
             }
         }
 
-        //protected void rdbAquire_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    try {
-        //        return;
-        //        this.UpdatePanelScanner.Visible = false;
-        //        // this.UpdatePanelUploadMassivo.Visible = false;
-        //        this.UpdatePanelFsoFile.Visible = false;
-        //        this.UploadBtnUploadFile.Enabled = false;
-        //        this.fileOptions.Items[1].Selected = cartaceo;
-        //        this.fileOptions.Items[1].Enabled = true;
-        //        this.FsoFileUploadSection.Visible = false;
-        //        //this.UpdatePanelRepository.Visible = false;
+        protected void rdbAquire_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try {
+                if (this.optScanner.Checked)
+                {
+                    this.UpdatePanelFsoFile.Visible = false;
+                    this.UpdatePanelScanner.Visible = true;
+                    this.UploadBtnUploadFile.Enabled = false;
+                    cartaceo = this.fileOptions.Items[1].Selected;
+                    this.fileOptions.Items[1].Selected = true;
+                    this.fileOptions.Items[1].Enabled = false;
+                    this.FsoFileUploadSection.Visible = false;
+                    this.UpdatePanelRepository.Visible = false;
+                }
+                else if (this.optRepository.Checked)
+                {
+                    this.UpdatePanelFsoFile.Visible = false;
+                    this.UpdatePanelScanner.Visible = false;
+                    this.UploadBtnUploadFile.Enabled = false;
+                    this.fileOptions.Items[1].Selected = cartaceo;
+                    this.fileOptions.Items[1].Enabled = true;
+                    this.FsoFileUploadSection.Visible = false;
+                    this.UpdatePanelRepository.Visible = true;
+                }
+                else
+                {
+                    this.UpdatePanelFsoFile.Visible = true;
+                    this.UpdatePanelScanner.Visible = false;
+                    this.UploadBtnUploadFile.Enabled = false;
+                    this.fileOptions.Items[1].Selected = cartaceo;
+                    this.fileOptions.Items[1].Enabled = true;
+                    this.FsoFileUploadSection.Visible = true;
+                    this.UpdatePanelRepository.Visible = false;
+                }
+                this.UpdatePanelFsoFile.Update();
+                this.UpdatePanelScanner.Update();
+                this.UpUpdateButtons.Update();
+                this.FsoFileUploadSection.Update();
 
-        //        if (this.optUpload.Checked)
-        //        {
-        //            this.UpdatePanelFsoFile.Visible = true;
-        //            this.FsoFileUploadSection.Visible = true;
-        //        }
-        //        else if (this.optScanner.Checked)
-        //        {
-        //            this.UpdatePanelScanner.Visible = true;
-        //            cartaceo = this.fileOptions.Items[1].Selected;
-        //            this.fileOptions.Items[1].Enabled = false;
-        //        }
-        //        else if (this.optRepository.Checked)
-        //        {
-        //            this.UpdatePanelRepository.Visible = true;
-        //        }
-        //        else if (this.optUploadMassivo.Checked)
-        //        {
-        //            //this.UpdatePanelUploadMassivo.Visible = true;
-        //        }
-
-        //        this.UpdatePanelFsoFile.Update();
-        //        this.UpdatePanelScanner.Update();
-        //        this.UpUpdateButtons.Update();
-        //        this.FsoFileUploadSection.Update();
-        //        // this.UpdatePanelUploadMassivo.Update();
-
-        //        ScriptManager.RegisterClientScriptBlock(this.UpUpdateButtons, this.UpUpdateButtons.GetType(), "reallow", "reallowOp();", true);
-        //    }
-        //    catch (System.Exception ex)
-        //    {
-        //        UIManager.AdministrationManager.DiagnosticError(ex);
-        //        return;
-        //    }
-        //}
+                ScriptManager.RegisterClientScriptBlock(this.UpUpdateButtons, this.UpUpdateButtons.GetType(), "reallow", "reallowOp();", true);
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+                return;
+            }
+        }
 
 
-
+        
         #region FsoFileUploader
 
         [System.Web.Services.WebMethod]
@@ -642,27 +579,6 @@ namespace NttDataWA.Popup
         }
 
         #endregion
-
-        private bool IsSaved()
-        {
-            bool retVal = false;
-            SchedaDocumento doc = DocumentManager.getSelectedRecord();
-
-            if (doc != null && !string.IsNullOrEmpty(doc.docNumber))
-                retVal = true;
-
-            return retVal;
-        }
-
-        //protected void fileOptions_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        Session["UploadMassivoConversionePDF"] = optPDF.Selected;
-        //        Session["UploadMassivoCartaceo"] = optPapery.Selected;
-        //    }
-        //    catch (Exception) { }
-        //}
 
     }
 }

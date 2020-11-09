@@ -146,16 +146,6 @@ namespace NttDataWA.Popup
             else
                 this.imgCheckCRLResult.Visible = false;
 
-            //Se il file è firmato sia CADES che PADES, la verifica non è applicabile.
-            bool isCadesAndPades = this.CheckIsPresentCadesAndPades();
-            if (isCadesAndPades)
-            {
-                this.lblCheckSigned.Text = Utils.Languages.GetLabelFromCode("DigitalSignDetailsNonApplicabile", language);
-                this.imgCheckSignedResult.ImageUrl = string.Empty;
-                this.lblCRL.Text = Utils.Languages.GetLabelFromCode("DigitalSignDetailsNonApplicabile", language);
-                this.imgCheckCRLResult.ImageUrl = string.Empty;
-            }
-
             //Verifica timestamp
             this.lblCheckTimestamp.Text = Utils.Languages.GetLabelFromCode(fileInformation.TimeStampStatus.ToString(), language);
             if (!string.IsNullOrEmpty(GetImageCheckDetails(fileInformation.TimeStampStatus)))
@@ -236,102 +226,6 @@ namespace NttDataWA.Popup
             }
 
         }
-
-        #region VERIFICA FILE CADES E PADES
-        private bool CheckIsPresentCadesAndPades()
-        {
-            bool result = false;
-            FileDocumento signedDocument = this.GetSignedDocument();
-            bool cades = false;
-            bool pades = false;
-            if (signedDocument != null && signedDocument.signatureResult != null)
-            {
-                VerifySignatureResult signatureResult = signedDocument.signatureResult;
-                foreach (PKCS7Document document in signatureResult.PKCS7Documents)
-                {
-                    if (document.SignatureType == SignType.PADES)
-                        pades = true;
-                    if (document.SignatureType == SignType.CADES)
-                        cades = true;
-                    if (cades && pades)
-                        break;
-                }
-            }
-            result = cades && pades;
-            return result;
-        }
-
-        private FileDocumento GetSignedDocument()
-        {
-            DocsPaWR.FileRequest fileRequest = null;
-            if (DocumentManager.getSelectedAttachId() != null) // ho aggiunto il file ad un allegato
-            {
-                fileRequest = FileManager.GetFileRequest(DocumentManager.getSelectedAttachId());
-            }
-            else // ho aggiunto il file al documento principale
-            {
-                fileRequest = FileManager.getSelectedFile();
-            }
-            //Aggiunto per le versioni
-            if (!IsForwarded)
-            {
-                if (DocumentManager.getSelectedNumberVersion() != null && DocumentManager.ListDocVersions != null)
-                {
-                    fileRequest = (from v in DocumentManager.ListDocVersions where v.version.Equals(DocumentManager.getSelectedNumberVersion()) select v).FirstOrDefault();
-                }
-            }
-            DocsPaWR.FileDocumento signedDocument = null;
-            if (fileRequest != null && fileRequest.fileName != null && fileRequest.fileName != "")
-            {
-                signedDocument = this.DocumentoGetFileCached(fileRequest);
-            }
-
-            return signedDocument;
-        }
-
-        //meccanismo di caching per evitare di fare la getFile tutte le volte, con conseguente controllo del certificato
-        private FileDocumento DocumentoGetFileCached(DocsPaWR.FileRequest fileRequest)
-        {
-            FileDocumento retval = null;
-            if (HttpContext.Current.Session["FileRequest_Cached"] == null)
-                HttpContext.Current.Session["FileDocumento_Cached"] = null;
-
-            if (HttpContext.Current.Session["FileDocumento_Cached"] == null)
-            {
-                retval = DocumentManager.DocumentoGetFile(fileRequest);
-                HttpContext.Current.Session["FileRequest_Cached"] = fileRequest;
-                HttpContext.Current.Session["FileDocumento_Cached"] = retval;
-            }
-            else
-            {
-                if (HttpContext.Current.Session["FileRequest_Cached"] != fileRequest)
-                {
-                    //filerequest è cambiato
-                    retval = DocumentManager.DocumentoGetFile(fileRequest);
-                    HttpContext.Current.Session["FileRequest_Cached"] = fileRequest;
-                    HttpContext.Current.Session["FileDocumento_Cached"] = retval;
-
-                }
-                else
-                {
-                    retval = (FileDocumento)HttpContext.Current.Session["FileDocumento_Cached"];
-                }
-            }
-            return retval;
-        }
-
-        private bool IsForwarded
-        {
-            get
-            {
-                bool result = false;
-                if (HttpContext.Current.Session["IsForwarded"] != null) result = (bool)HttpContext.Current.Session["IsForwarded"];
-                return result;
-
-            }
-        }
-
-        #endregion
         #endregion
 
         #region Event

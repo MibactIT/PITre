@@ -202,6 +202,7 @@ input[readonly="readonly"]
     border: 0px;
     text-align: center;
     background-image: url('../../Images/Common/btn_bg.png');
+    background-size:cover;
     cursor: pointer;
 }
 

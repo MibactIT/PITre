@@ -189,20 +189,6 @@ namespace NttDataWA.Document
                 this.inserisciDocumentoInFascicolo();
             }
 
-            if (!string.IsNullOrEmpty(this.RepositoryView.ReturnValue))
-            {
-                if (this.RepositoryView.ReturnValue == "selected")
-                {
-                    this.ViewDocument.RefreshAcquiredDocument();
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('RepositoryView','');", true);
-                    HttpContext.Current.Session["UploadFileAlreadyOpened" + Session.SessionID] = null;
-                }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('RepositoryView','');", true);
-                    HttpContext.Current.Session["UploadFileAlreadyOpened" + Session.SessionID] = null;
-                }
-            }
 
             if ((!string.IsNullOrEmpty(this.UplodadFile.ReturnValue)) || (!string.IsNullOrEmpty(this.ActiveXScann.ReturnValue)))
             {
@@ -385,26 +371,6 @@ namespace NttDataWA.Document
                 }
 
                 this.UpDocumentButtons.Update();
-            }
-
-            if (!string.IsNullOrEmpty(this.DigitalVisureSelector.ReturnValue))
-            {
-                FileRequest approvingFile = (FileRequest)HttpContext.Current.Session["fileInAccettazione"];
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('DigitalVisureSelector','');", true);
-                HttpContext.Current.Session["fileInAccettazione"] = null;
-                bool isAdvancementProcess = false;
-                string message = string.Empty;
-                if (LibroFirmaManager.PutElectronicSignature(approvingFile, isAdvancementProcess, out message))
-                {
-                    SchedaDocumento temp = DocumentManager.getDocumentListVersions(this.Page, approvingFile.docNumber, approvingFile.docNumber);
-                    FileManager.aggiornaFileRequest(this.Page, temp.documenti.Where(e => e.versionId == approvingFile.versionId).FirstOrDefault(), false);
-                    this.ViewDocument.UpdateProcessLFInAction();
-                }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorPutElectronicSignature', 'warning', '', '" + message + "');} else {parent.ajaxDialogModal('ErrorPutElectronicSignature', 'warning', '', '" + message + "');}", true);
-                    return;
-                }
             }
 
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "resizeFrame", "resizeIframe();", true);
@@ -1020,8 +986,8 @@ namespace NttDataWA.Document
 
 
                 List<Navigation.NavigationObject> navigationList = Navigation.NavigationUtils.GetNavigationList();
-                Navigation.NavigationObject obj = new Navigation.NavigationObject();
-                //navigationList.Remove(obj);
+                Navigation.NavigationObject obj = navigationList.Last();
+                navigationList.Remove(obj);
                 obj.IdObject = doc.systemId;
                 obj.OriginalObjectId = doc.systemId;
                 obj.NumPage = string.Empty;
@@ -1802,9 +1768,6 @@ namespace NttDataWA.Document
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg2.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg2.Replace("'", @"\'") + "', 'error', '');}", true);
 
                             break;
-                        case 3:
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');} else {parent.parent.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');}", true);
-                            break;
                     }
 
                     if (risultato == 0)
@@ -2046,11 +2009,6 @@ namespace NttDataWA.Document
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return;
             }
-        }
-
-        protected string GetIdDocumento()
-        {
-            return (DocumentManager.getSelectedRecord() != null ? (DocumentManager.getSelectedRecord().docNumber != null ? DocumentManager.getSelectedRecord().docNumber : "0") : "0");
         }
     }
 }

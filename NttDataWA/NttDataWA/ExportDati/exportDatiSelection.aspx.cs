@@ -28,7 +28,6 @@ namespace NttDataWA.ExportDati
         private const string EXP_TRASM = "trasm";
         private const string EXP_TO_DO_LIST = "toDoList";
         private const string EXP_NOTIFY = "notify";
-        private const string EXP_VISIBILITA_PROCESSI = "exportVisibilita";
         #endregion
 
         #region Fields
@@ -162,9 +161,6 @@ namespace NttDataWA.ExportDati
                     this.rbl_XlsOrPdf.SelectedIndex = 1;
                     //this.rbl_XlsOrPdf.Items.RemoveAt(2);
                     this.rbl_XlsOrPdf.Items.RemoveAt(0);
-
-                    this.txt_titolo.Visible = false;
-                    this.litAssociateTitle.Visible = false;
                 }
                 else
                 {
@@ -262,7 +258,7 @@ namespace NttDataWA.ExportDati
         private void CloseMask(bool withReturnValue)
         {
             string retValue = withReturnValue ? "true" : "false";
-            if (Request.QueryString["export"] != null && (Request.QueryString["export"] == "rubrica" || Request.QueryString["export"] == "exportVisibilita"))
+            if (Request.QueryString["export"] != null && Request.QueryString["export"] == "rubrica")
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "closeAjaxModal", "parent.closeAjaxModal('ExportDati', '" + retValue + "', parent);", true);
             else if (Request.QueryString["export"] == "searchAddressBook")
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "closeAjaxModal", "parent.closeAjaxModal('ExportSearch', '" + retValue + "', parent);", true);
@@ -449,19 +445,6 @@ namespace NttDataWA.ExportDati
                 }
             }
 
-            if(this.hd_export.Value.Equals(EXP_VISIBILITA_PROCESSI))
-            {
-                this.CaricaListaCampiVisibilitaProcessi();
-                if (this.rbl_XlsOrPdf.SelectedValue.Equals(PDF))
-                {
-                    this.disabilitaCheckBoxGridView();
-                    this.cb_selezionaTutti.Visible = false;
-                }
-                else
-                {
-                    this.cb_selezionaTutti.Visible = true;
-                }
-            }
 
             if (this.hd_export.Value.Equals(EXP_TRASM))
             {
@@ -1217,54 +1200,6 @@ namespace NttDataWA.ExportDati
                 txt_titolo.Text = infoScarto.descrizione + "---" + infoScarto.note;
                 txt_titolo.Enabled = false;
             }
-        }
-
-        private void CaricaListaCampiVisibilitaProcessi()
-        {
-            DataTable dt = new DataTable();
-            dt.Columns.Add("CAMPO_STANDARD");
-            dt.Columns.Add("CAMPO_COMUNE");
-            dt.Columns.Add("CAMPI");
-
-            //Search label field in language file
-            string language = UIManager.UserManager.GetUserLanguage();
-            string labelA = Utils.Languages.GetLabelFromCode("VisibilitaProcessiNomeProcesso", language);
-            string labelB = Utils.Languages.GetLabelFromCode("VisibilitaProcessiCodiceRuolo", language);
-            string labelC = Utils.Languages.GetLabelFromCode("VisibilitaProcessiDescrizioneRuolo", language);
-            string labelD = Utils.Languages.GetLabelFromCode("VisibilitaProcessiTipoVisibilita", language);
-
-            //Add fields
-            DataRow rwA = dt.NewRow();
-            rwA[0] = "1";
-            rwA[1] = "0";
-            rwA[2] = labelA;
-
-            DataRow rwB = dt.NewRow();
-            rwB[0] = "1";
-            rwB[1] = "0";
-            rwB[2] = labelB;
-
-            DataRow rwC = dt.NewRow();
-            rwC[0] = "1";
-            rwC[1] = "0";
-            rwC[2] = labelC;
-
-            DataRow rwD = dt.NewRow();
-            rwD[0] = "1";
-            rwD[1] = "0";
-            rwD[2] = labelD;
-
-            dt.Rows.Add(rwA);
-            dt.Rows.Add(rwB);
-            dt.Rows.Add(rwC);
-            dt.Rows.Add(rwD);
-
-            dt.AcceptChanges();
-            this.gv_listaCampi.DataSource = dt;
-            this.gv_listaCampi.DataBind();
-            this.gv_listaCampi.Visible = true;
-            this.gv_listaCampi.Columns[0].Visible = false;
-            this.gv_listaCampi.Columns[1].Visible = false;
         }
 
         private void Export()

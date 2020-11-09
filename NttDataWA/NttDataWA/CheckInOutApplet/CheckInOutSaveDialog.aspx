@@ -65,8 +65,7 @@
                 // ...viene richiamata la funzione SelezionaTipoSalvataggio passando 
                 // come parametro creaFileUrlSD
                 SelezionaTipoSalvataggio("creaFileUrlSD");    
-
-            
+                
                 
         }
         
@@ -83,7 +82,7 @@
     	            frmSaveDialog.rbClipboard.checked = true;
     	            frmSaveDialog.rbSalvaUrl.checked = false;
     	            frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = false;
     	            
     	            document.getElementById("txtFolderPath").disabled = true;
     	            document.getElementById("btnBrowseForFolder").disabled = true;
@@ -100,7 +99,7 @@
     	            frmSaveDialog.rbClipboard.checked = false;
     	            frmSaveDialog.rbSalvaUrl.checked = false;
     	            frmSaveDialog.rbClipboardSD.checked = true;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = false;
     	            
     	            document.getElementById("txtFolderPath").disabled = true;
     	            document.getElementById("btnBrowseForFolder").disabled = true;
@@ -117,7 +116,7 @@
 	                frmSaveDialog.rbClipboard.checked = false;
 	                frmSaveDialog.rbSalvaUrl.checked = true;
 	                frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = false;
 	                
     	            document.getElementById("txtFolderPath").disabled = false;
     	            document.getElementById("btnBrowseForFolder").disabled = false;
@@ -134,7 +133,7 @@
 	                frmSaveDialog.rbClipboard.checked = false;
 	                frmSaveDialog.rbSalvaUrl.checked = false;
 	                frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = true;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = true;
 	                
     	            document.getElementById("txtFolderPath").disabled = false;
     	            document.getElementById("btnBrowseForFolder").disabled = false;
@@ -142,9 +141,7 @@
     	            estensione.style.display = "none";
     	            estensioneURL.style.display = "block";
     	            
-                    break;
-
-                
+    	            break;
     	            
     	        default:    // Salvataggio del documento su filesystem
     	            // Selezione del radio button salva su file system e deselezionamento
@@ -153,8 +150,7 @@
 	                frmSaveDialog.rbClipboard.checked = false;
 	                frmSaveDialog.rbSalvaUrl.checked = false;
 	                frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
-                    
+    	            frmSaveDialog.rbSalvaUrlSD.checked = false;
 	                // Abilito la text box del path
     	            document.getElementById("txtFolderPath").disabled = false;
     	            // Abilito il bottone del browse for folder

@@ -51,15 +51,14 @@
                      <p>
                         <asp:Label ID="SignatureLblDocumentCustomLocation" Font-Size="0.88em" runat="server" ></asp:Label>
                     </p>
-                    <asp:UpdatePanel ID="UpdatePanelSignaturePosizionePesonalizzata" runat="server" UpdateMode="Conditional" ClientIDMode="Static"  style=" width:100%; height:100%;">
+                    <asp:UpdatePanel ID="UpdatePanelSignaturePosizionePesonalizzata" runat="server" UpdateMode="Conditional" style=" width:100%; height:100%;">
                          <ContentTemplate>
                             <div class="row">
-                                <asp:Label ID="SignatureLblDocumentPosizionePesonalizzataX"  Text="X:" Font-Size="0.88em" runat="server" ></asp:Label>
-                                <cc1:CustomTextArea id="TxtX" runat="server" Width="30px" AutoPostBack="true" OnTextChanged="tbxPos_TextChanged" CssClass="txt_addressBookLeft"
+                                <asp:Label ID="SignatureLblDocumentPosizionePesonalizzataX"  Text="X:" Font-Size="0.88em" runat="server" ></asp:Label><cc1:CustomTextArea id="TxtX" ClientIDMode="Static" runat="server" Width="30px" AutoPostBack="true" OnTextChanged="tbxPos_TextChanged" CssClass="txt_addressBookLeft"
                                         CssClassReadOnly="txt_addressBookLeft_disabled"></cc1:CustomTextArea>
-                                <asp:Label ID="SignatureLblDocumentPosizionePesonalizzataY"  Text="Y:" Font-Size="0.88em" runat="server" ></asp:Label>
-                                <cc1:CustomTextArea id="TxtY" runat="server" Width="30px" AutoPostBack="true" OnTextChanged="tbxPos_TextChanged"
-                                     CssClass="txt_addressBookLeft" CssClassReadOnly="txt_addressBookLeft_disabled"></cc1:CustomTextArea>
+                                <asp:Label ID="SignatureLblDocumentPosizionePesonalizzataY"  Text="Y:" Font-Size="0.88em" runat="server" ></asp:Label><cc1:CustomTextArea id="TxtY" ClientIDMode="Static" runat="server" Width="30px" AutoPostBack="true" OnTextChanged="tbxPos_TextChanged"
+                                CssClass="txt_addressBookLeft"
+                                        CssClassReadOnly="txt_addressBookLeft_disabled"></cc1:CustomTextArea>
                             </div>
                     </ContentTemplate>
                     </asp:UpdatePanel>  
@@ -94,7 +93,7 @@
                     <div class="contentColor" style=" clear: left;">
                         <asp:Label ID="SignatureLblColor" Font-Size="0.88em" runat="server" ></asp:Label>  
                     </div>        
-                    <div class="contentColorList" style=" float: right; margin-top:-15px; width:80%; >
+                    <div class="contentColorList" style="float: right; margin-top:-15px; width:80%;" >
                         <asp:UpdatePanel ID="upanelColor" runat="server" class="row" UpdateMode="Conditional" ClientIdMode="static">
                             <ContentTemplate>
                                 <asp:DropDownList ID="DdlColour" CssClass="chzn-select-deselect"  style="background-color:Red" runat="server" AutoPostBack="True" Width="200px" OnSelectedIndexChanged="ColorList_SelectedIndexChanged">
@@ -142,6 +141,7 @@
     <cc1:CustomButton ID="SignatureBtnSave" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable" OnMouseOver="btnHover" Onclick="BtnConfirm_Click" Visible="False"/>
     <cc1:CustomButton ID="SignatureBtnConfirm" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable" OnMouseOver="btnHover" Onclick="BtnConfirm_Click" />
     <cc1:CustomButton ID="SignatureBtnClose" runat="server" CssClass="btnEnable" OnClick="SenderBtnClose_Click" CssClassDisabled="btnDisable" OnMouseOver="btnHover" />
+    <cc1:CustomButton ID="SignatureBtnPermanent" runat="server" CssClass="btnEnable" OnClick="BtnApponiSegnaturaPermanente_Click" OnMouseOver="btnHover" CssClassDisabled="btnDisable" Visible="false"/>
      <script type="text/javascript">
          $(".chzn-select-deselect").chosen({ allow_single_deselect: true, no_results_text: "Nessun risultato trovato" });
          $(".chzn-select").chosen({ no_results_text: "Nessun risultato trovato" });

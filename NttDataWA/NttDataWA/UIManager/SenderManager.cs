@@ -96,19 +96,6 @@ namespace NttDataWA.UIManager
             }
         }
 
-        public static List<DocsPaWR.InfoDocumentoSpedito> GetReportSpedizioniDocumenti(FiltriReportSpedizioni filters, List<string> idDocumenti)
-        {
-            try
-            {
-                return WsInstance.GetReportSpedizioniDocumenti(filters, idDocumenti.ToArray(), UserManager.GetInfoUser()).ToList();
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return null;
-            }
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -137,9 +124,7 @@ namespace NttDataWA.UIManager
         {
             try
             {
-                InfoUtente infoUtente = UserManager.GetInfoUser();
-                infoUtente.urlWA = Utils.utils.getHttpFullPath();
-                return WsInstance.SpedisciDocumento(infoUtente, schedaDocumento, infoSpedizione);
+                return WsInstance.SpedisciDocumento(UserManager.GetInfoUser(), schedaDocumento, infoSpedizione);
             }
             catch (System.Exception ex)
             {

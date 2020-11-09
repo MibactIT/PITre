@@ -165,19 +165,6 @@ namespace NttDataWA.SmartClient
                     if (fileSize == 0)
                         throw new ApplicationException("Nessun file acquisito per il documento");
 
-                    #region VERIFICA DIMENSIONE MASSIMA FILE
-                    int maxDimFileSign = 0;
-                    if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString())) &&
-                       !Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()).Equals("0"))
-                        maxDimFileSign = Convert.ToInt32(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()));
-                    if (maxDimFileSign > 0 && Convert.ToInt32(fileSize) > maxDimFileSign)
-                    {
-                        string maxSize = Convert.ToString(Math.Round((double)maxDimFileSign / 1048576, 3));
-                        string msg = "La dimensione del file supera il limite massimo consentito per la firma. Il limite massimo consentito e' " + maxSize + " Mb";
-                        throw new ApplicationException(msg);
-                    }
-                    #endregion
-
                     if (string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UIManager.UserManager.GetInfoUser().idAmministrazione, DBKeys.FE_REQ_CONV_PDF.ToString())) || !Utils.InitConfigurationKeys.GetValue(UIManager.UserManager.GetInfoUser().idAmministrazione, DBKeys.FE_REQ_CONV_PDF.ToString()).Equals("1"))
                     {
                         if (!this.IsFormatSupportedForSign(fileRequest))

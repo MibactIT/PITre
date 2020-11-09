@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using NttDataWA.DocsPaWR;
-using NttDatalLibrary;
 using NttDataWA.UIManager;
 
 
@@ -15,7 +14,6 @@ namespace NttDataWA.Repository
     {
         private DocsPaWR.DocsPaWebService ws = new DocsPaWR.DocsPaWebService();
         private string language;
-        private bool deleteFile = false;
 
         public List<FileInUpload> ListaFileDisponibili
         {
@@ -167,7 +165,7 @@ namespace NttDataWA.Repository
 
                     if (isIncomplete)
                     {
-                        int percentage = (elemento.TotalChunkNumber>0?(elemento.ChunkNumber * 100) / elemento.TotalChunkNumber:0);
+                        int percentage = (elemento.ChunkNumber * 100) / elemento.TotalChunkNumber;
 
                         string[] splitName = elemento.FileSenderPath.Split('\\');
                         string fileNameUncompressed = splitName[splitName.Length - 1];
@@ -177,78 +175,28 @@ namespace NttDataWA.Repository
                         string pathImgFileType = FileManager.getFileIconSmall(this, FileManager.getEstensioneIntoSignedFile(reformatFileName));
                         (e.Row.FindControl("lblPercentage") as Label).Text = percentage.ToString() + " %";
                         (e.Row.FindControl("imgPercentage") as Image).ImageUrl = ProgressImgPath(percentage);
-                        (e.Row.FindControl("lblNomeFile") as LinkButton).Text = reformatFileName;// +descriptionFile;
-                        (e.Row.FindControl("lblNomeFile") as LinkButton).CommandName = "UpdateGrid";
-                        (e.Row.FindControl("lblNomeFile") as LinkButton).ToolTip = Utils.Languages.GetLabelFromCode("RepositoryUpdate", language);
-                        if (descriptionFile.Length < 70)
-                            (e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile;
-                        else
-                        {
-                            (e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile.Substring(0, 67) + "...";
-                            (e.Row.FindControl("lblDescrizione") as Label).ToolTip = descriptionFile;
-                        }
-                        
-                        //if (descriptionFile.Length < 30)
-                        //{
-                        //    (e.Row.FindControl("lkbDescrizione") as LinkButton).Visible = false;
-                        //    (e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile;
-                        //}
-                        //else
-                        //{
-                        //    (e.Row.FindControl("lblDescrizione") as Label).Visible = false;
-                        //    (e.Row.FindControl("lkbDescrizione") as LinkButton).Visible = true;
-                        //    (e.Row.FindControl("lkbDescrizione") as LinkButton).CommandName = "Description";
-                        //    (e.Row.FindControl("lkbDescrizione") as LinkButton).Text = descriptionFile.Substring(0, 17) + "...";                          
-                        //}
+                        (e.Row.FindControl("lblNomeFile") as Label).Text = reformatFileName;// +descriptionFile;
+                        (e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile;
                         (e.Row.FindControl("imgFile") as Image).ImageUrl = pathImgFileType;
-                        ((CustomImageButton)e.Row.FindControl("imgDeleteFile")).Visible = false;
-                        //(e.Row.FindControl("imgDeleteFile") as Image).CommandName = false;
                     }
                     else
                     {
-                        (e.Row.FindControl("lblNomeFile") as LinkButton).Text = FileNameReconfigurated(elemento.FileName);// +descriptionFile; //Text='<%# Bind("FileName") %>'
-                        (e.Row.FindControl("lblNomeFile") as LinkButton).CommandName = "AddFile";
-                        (e.Row.FindControl("lblNomeFile") as LinkButton).ToolTip = Utils.Languages.GetLabelFromCode("RepositoryAdd", language);
-                        //(e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile;
-                        (e.Row.FindControl("lkbDescrizione") as LinkButton).Visible = false;
-                        if (descriptionFile.Length < 70)
-                            (e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile;
-                        else
-                        {
-                            (e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile.Substring(0, 67) + "...";
-                            (e.Row.FindControl("lblDescrizione") as Label).ToolTip = descriptionFile;
-                        }
-                        
-                        //if (descriptionFile.Length < 30)
-                        //{
-                        //    (e.Row.FindControl("lkbDescrizione") as LinkButton).Visible = false;
-                        //    (e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile;
-                        //}
-                        //else
-                        //{
-                        //    (e.Row.FindControl("lblDescrizione") as Label).Visible = false;
-                        //    (e.Row.FindControl("lkbDescrizione") as LinkButton).Visible = true;
-                        //    (e.Row.FindControl("lkbDescrizione") as LinkButton).CommandName = "Description";
-                        //    (e.Row.FindControl("lkbDescrizione") as LinkButton).Text = descriptionFile.Substring(0, 17) + "...";
-                        //}
+                        (e.Row.FindControl("lblNomeFile") as Label).Text = FileNameReconfigurated(elemento.FileName);// +descriptionFile; //Text='<%# Bind("FileName") %>'
+                        (e.Row.FindControl("lblDescrizione") as Label).Text = descriptionFile;
                         string pathImgFileType = FileManager.getFileIconSmall(this, FileManager.getEstensioneIntoSignedFile(elemento.FileName));
                         (e.Row.FindControl("imgFile") as Image).ImageUrl = pathImgFileType;
                         (e.Row.FindControl("lblPercentage") as Label).Text = Utils.Languages.GetLabelFromCode("PersonalFileView_Complete", language);
                         (e.Row.FindControl("imgPercentage") as Image).ImageUrl = ProgressImgPath(-1);
-                        ((CustomImageButton)e.Row.FindControl("imgDeleteFile")).ImageUrl = "../Images/Icons/delete2.png";
-                        ((CustomImageButton)e.Row.FindControl("imgDeleteFile")).OnMouseOverImage = "../Images/Icons/delete2.png";
-                        ((CustomImageButton)e.Row.FindControl("imgDeleteFile")).OnMouseOutImage = "../Images/Icons/delete2.png";
-                        ((CustomImageButton)e.Row.FindControl("imgDeleteFile")).ToolTip = Utils.Languages.GetLabelFromCode("RepositoryDelete", language);
-                        //for (int i = 0; i < (e.Row.Cells.Count - 1); i++)
-                        //{
-                        //    if (i == 0)
-                            //{
-                        //        e.Row.Attributes["onclick"] = Page.ClientScript.GetPostBackClientHyperlink(this.grdfileList, "Select$" + e.Row.RowIndex);
-                        //        e.Row.Attributes["style"] = "cursor:pointer";
-                            //}
+                        for (int i = 0; i < (e.Row.Cells.Count - 1); i++)
+                        {
+                            if (i == 0)
+                            {
+                                e.Row.Attributes["onclick"] = Page.ClientScript.GetPostBackClientHyperlink(this.grdfileList, "Select$" + e.Row.RowIndex);
+                                e.Row.Attributes["style"] = "cursor:pointer";
+                            }
 
-                            //e.Row.Cells[i].Attributes["onClick"] = "$('#grid_rowindex').val('" + e.Row.RowIndex.ToString() + "');__doPostBack('UpGrid');disallowOp('ContentPlaceHolderContent');return false;";
-                        //}
+                            e.Row.Cells[i].Attributes["onClick"] = "$('#grid_rowindex').val('" + e.Row.RowIndex.ToString() + "');__doPostBack('UpGrid');disallowOp('ContentPlaceHolderContent');return false;";
+                        }
                     }
                 }
             }
@@ -326,22 +274,22 @@ namespace NttDataWA.Repository
 
             string retVal = string.Empty;
 
-            //if (filename.Length > 36)
-            //{
-            //    int lung = 35;
+            if (filename.Length > 36)
+            {
+                int lung = 35;
 
-            //    int charPrecedenti = 0;
-            //    while (charPrecedenti < filename.Length)
-            //    {
+                int charPrecedenti = 0;
+                while (charPrecedenti < filename.Length)
+                {
 
-            //        if ((charPrecedenti + lung) > filename.Length)
-            //            lung = filename.Length - charPrecedenti;
+                    if ((charPrecedenti + lung) > filename.Length)
+                        lung = filename.Length - charPrecedenti;
 
-            //        retVal = retVal + filename.Substring(charPrecedenti, lung) + " ";
-            //        charPrecedenti = charPrecedenti + 35;
-            //    }
-            //}
-            //else
+                    retVal = retVal + filename.Substring(charPrecedenti, lung) + " ";
+                    charPrecedenti = charPrecedenti + 35;
+                }
+            }
+            else
                 retVal = filename;
 
             return retVal;
@@ -376,91 +324,6 @@ namespace NttDataWA.Repository
         
         protected void gridViewResult_RowCommand(Object sender, GridViewCommandEventArgs e)
         {
-            string msg = string.Empty;
-            string msgError = string.Empty;
-            FileInUpload fileSelected = null;
-            NttDataWA.DocsPaWR.FileDocumento fileDoc = null;
-            //int indexSelected = grdfileList.SelectedRow.RowIndex;
-            string rowIndex = string.Empty;
-
-            switch (e.CommandName)
-            {
-                //Redirect al grigio contenente l'allegato selezionato
-                case "DeleteFile":
-                    rowIndex = (((e.CommandSource as CustomImageButton).Parent.Parent as GridViewRow).FindControl("systemIdElemento") as Label).Text;                    
-                    fileSelected = (from v in ListaFileDisponibili where v.StrIdentity.Equals(rowIndex) select v).FirstOrDefault();
-                    fileDoc = NewFileDoc(fileSelected);
-                    //fileSelected = (FileInUpload)GetSessionValue("personalFileSelected");
-
-                    msgError = FileManager.DeletePersonalFile(this, fileDoc, fileSelected.FileName, fileSelected.FileDescription);
-
-                    if (string.IsNullOrEmpty(msgError))
-                    {
-                        GridViewResult_Bind();
-                    }
-                    else
-                    {
-                        msg = "ErrorFileUpload_custom";
-                        msgError = msgError.Equals("ErrorAcquiredDocument") ? Utils.Languages.GetMessageFromCode(msgError, UserManager.GetUserLanguage()) : msgError;
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + Utils.utils.FormatJs(msg) + "', 'error', '', '" + Utils.utils.FormatJs(msgError) + "');} else {parent.ajaxDialogModal('" + Utils.utils.FormatJs(msg) + "', 'error', '', '" + Utils.utils.FormatJs(msgError) + "');}; reallowOp();", true);
-                    }
-
-                    return;
-                case "AddFile":
-                    rowIndex = (((e.CommandSource as LinkButton).Parent.Parent as GridViewRow).FindControl("systemIdElemento") as Label).Text;
-                    fileSelected = (from v in ListaFileDisponibili where v.StrIdentity.Equals(rowIndex) select v).FirstOrDefault();
-                    fileDoc = NewFileDoc(fileSelected);
-
-                    //fileDoc = (NttDataWA.DocsPaWR.FileDocumento)GetSessionValue("fileDoc");
-                    //fileSelected = (FileInUpload)GetSessionValue("personalFileSelected");
-
-                    msgError = FileManager.uploadPersonalFile(this, fileDoc, fileSelected.FileName, fileSelected.FileDescription);
-
-                    if (string.IsNullOrEmpty(msgError))
-                    {
-                        ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
-                        ScriptManager.RegisterClientScriptBlock(this.UpUpdateButtons, this.UpUpdateButtons.GetType(), "closeAJM", "parent.closeAjaxModal('RepositoryView','selected');", true);
-                    }
-                    else
-                    {
-                        msg = "ErrorFileUpload_custom";
-                        msgError = msgError.Equals("ErrorAcquiredDocument") ? Utils.Languages.GetMessageFromCode(msgError, UserManager.GetUserLanguage()) : msgError;
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + Utils.utils.FormatJs(msg) + "', 'error', '', '" + Utils.utils.FormatJs(msgError) + "');} else {parent.ajaxDialogModal('" + Utils.utils.FormatJs(msg) + "', 'error', '', '" + Utils.utils.FormatJs(msgError) + "');}; reallowOp();", true);
-                    }
-                    return;
-                case "Description":
-                    rowIndex = (((e.CommandSource as LinkButton).Parent.Parent as GridViewRow).FindControl("systemIdElemento") as Label).Text;
-                    fileSelected = (from v in ListaFileDisponibili where v.StrIdentity.Equals(rowIndex) select v).FirstOrDefault();
-                    fileDoc = NewFileDoc(fileSelected);
-
-                    msg = "PersonalFileDetails";
-                    msgError = fileSelected.FileDescription;
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + Utils.utils.FormatJs(msg) + "', 'check', '', '" + Utils.utils.FormatJs(msgError) + "');} else {parent.ajaxDialogModal('" + Utils.utils.FormatJs(msg) + "', 'check', '', '" + Utils.utils.FormatJs(msgError) + "');}; reallowOp();", true);
-                    return;
-                case "UpdateGrid":
-                    GridViewResult_Bind();
-                    return;
-                default:
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
-                    break;
-            }
-        }
-
-        private NttDataWA.DocsPaWR.FileDocumento NewFileDoc(FileInUpload fileSelected)
-        {
-            NttDataWA.DocsPaWR.FileDocumento fileDoc = new NttDataWA.DocsPaWR.FileDocumento();
-
-            fileDoc.name = fileSelected.FileName;
-            fileDoc.fullName = System.IO.Path.Combine(fileSelected.RepositoryPath, fileSelected.FileName);
-            fileDoc.contentType = NttDataWA.UIManager.FileManager.GetMimeType(fileSelected.FileName);
-            fileDoc.length = int.Parse(fileSelected.FileSize.ToString());//this.fileUpload.PostedFile.ContentLength;// ContentLength;// .FileSize;
-            fileDoc.nomeOriginale = fileSelected.StrIdentity;
-
-
-            SetSessionValue("fileDoc", fileDoc);
-            SetSessionValue("personalFileSelected", fileSelected);
-
-            return fileDoc;
         }
 
         protected void gridViewResult_SelectedIndexChanged(Object sender, EventArgs e)
@@ -468,8 +331,8 @@ namespace NttDataWA.Repository
             //GridViewRow row = grdfileList.SelectedRow;
             int indexSelected = grdfileList.SelectedRow.RowIndex;
             FileInUpload fileSelected = ListaFileDisponibili[indexSelected];
-            
-            //InfoUtente infoUtente = UserManager.GetInfoUser();
+
+            InfoUtente infoUtente = UserManager.GetInfoUser();
 
             NttDataWA.DocsPaWR.FileDocumento fileDoc = new NttDataWA.DocsPaWR.FileDocumento();
 
@@ -477,11 +340,22 @@ namespace NttDataWA.Repository
             fileDoc.fullName = System.IO.Path.Combine(fileSelected.RepositoryPath, fileSelected.FileName);
             fileDoc.contentType = NttDataWA.UIManager.FileManager.GetMimeType(fileSelected.FileName);
             fileDoc.length = int.Parse(fileSelected.FileSize.ToString());//this.fileUpload.PostedFile.ContentLength;// ContentLength;// .FileSize;
-            fileDoc.nomeOriginale = fileSelected.StrIdentity;
 
-            
-            SetSessionValue("fileDoc",fileDoc);
-            SetSessionValue("personalFileSelected", fileSelected);
+            Session["fileDoc"] = fileDoc;
+
+            string msgError = FileManager.uploadPersonalFile(this, fileDoc, fileSelected.FileName, fileSelected.FileDescription);
+
+            if (string.IsNullOrEmpty(msgError))
+            {
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
+                ScriptManager.RegisterClientScriptBlock(this.UpUpdateButtons, this.UpUpdateButtons.GetType(), "closeAJM", "parent.closeAjaxModal('RepositoryView','selected');", true);
+            }
+            else
+            {
+                string msg = "ErrorFileUpload_custom";
+                msgError = msgError.Equals("ErrorAcquiredDocument") ? Utils.Languages.GetMessageFromCode(msgError, UserManager.GetUserLanguage()) : msgError;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + Utils.utils.FormatJs(msg) + "', 'error', '', '" + Utils.utils.FormatJs(msgError) + "');} else {parent.ajaxDialogModal('" + Utils.utils.FormatJs(msg) + "', 'error', '', '" + Utils.utils.FormatJs(msgError) + "');}; reallowOp();", true);
+            }
         }
 
         protected void ImgSearch_Click(object sender, EventArgs e)
@@ -543,57 +417,6 @@ namespace NttDataWA.Repository
             if (numPercentage >= 100) result = "100_perc.jpg";
 
             return (numPercentage == -1 ? this.ResolveClientUrl("~/Images/Icons/") : this.ResolveClientUrl("~/Images/progressBar/")) + result;
-        }
-
-        /// <summary>
-        /// Reperimento valore da sessione
-        /// </summary>
-        /// <param name="sessionKey"></param>
-        /// <returns></returns>
-        private static object GetSessionValue(string sessionKey)
-        {
-            try
-            {
-                return System.Web.HttpContext.Current.Session[sessionKey];
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Impostazione valore in sessione
-        /// </summary>
-        /// <param name="sessionKey"></param>
-        /// <param name="sessionValue"></param>
-        private static void SetSessionValue(string sessionKey, object sessionValue)
-        {
-            try
-            {
-                System.Web.HttpContext.Current.Session[sessionKey] = sessionValue;
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-            }
-        }
-
-        /// <summary>
-        /// Rimozione chiave di sessione
-        /// </summary>
-        /// <param name="sessionKey"></param>
-        private static void RemoveSessionValue(string sessionKey)
-        {
-            try
-            {
-                System.Web.HttpContext.Current.Session.Remove(sessionKey);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-            }
         }
     }
 }

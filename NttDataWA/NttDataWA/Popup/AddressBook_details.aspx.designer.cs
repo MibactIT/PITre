@@ -49,15 +49,6 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.Literal lit_registro;
         
         /// <summary>
-        /// ddl_registri control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddl_registri;
-        
-        /// <summary>
         /// pnl_email control.
         /// </summary>
         /// <remarks>
@@ -823,15 +814,6 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.Literal litConfirm;
         
         /// <summary>
-        /// UpPanelButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPanelButton;
-        
-        /// <summary>
         /// BtnDelete control.
         /// </summary>
         /// <remarks>
@@ -848,15 +830,6 @@ namespace NttDataWA.Popup {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::NttDatalLibrary.CustomButton BtnModify;
-        
-        /// <summary>
-        /// BtnInsert control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton BtnInsert;
         
         /// <summary>
         /// BtnClose control.

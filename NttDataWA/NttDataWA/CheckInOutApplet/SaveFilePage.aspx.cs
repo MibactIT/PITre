@@ -41,33 +41,12 @@ namespace NttDataWA.CheckInOutApplet
         protected virtual void DownloadFile()
         {
             string filePath = Request.Params["filePath"];
-            bool package = "1".Equals(Request.Params["package"]);
 
             byte[] fileContent = null;
 
             // Reperimento contenuto del file, verificando se reperire
             // il file firmato o il file originale
-            // la funzione è implementata anche nell'activeX però usa la sessione per non modificare il codice
-
-            try
-            {
-                if (!package)
-                {
-                    object _sessionZipTempValue = System.Web.HttpContext.Current.Session["DownloadZipPackageDocument"];
-                    if (_sessionZipTempValue != null)
-                    {
-                        string _tempValue = (string)_sessionZipTempValue;
-                        package = "1".Equals(_tempValue);
-                    }
-                }
-            }
-            catch (Exception) { }
-
-            if (package)
-            {
-                fileContent = this.GetPackage();
-            }
-            else if (
+            if (
                 filePath.ToUpper().EndsWith(".P7M") ||
                 filePath.ToUpper().EndsWith(".TSD") ||
                 filePath.ToUpper().EndsWith(".M7M") ||
@@ -115,12 +94,6 @@ namespace NttDataWA.CheckInOutApplet
         protected byte[] GetFileContent()
         {
             return SaveFileServices.GetFileContent();
-        }
-
-
-        protected byte[] GetPackage()
-        {
-            return SaveFileServices.GetPackage();
         }
     }
 }

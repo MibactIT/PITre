@@ -235,21 +235,6 @@ namespace NttDataWA.Popup
             }
         }
 
-        private bool ClosePopupSmistamento
-        {
-            get
-            {
-                if (HttpContext.Current.Session["ClosePopupSmistamento"] != null)
-                    return (bool)HttpContext.Current.Session["ClosePopupSmistamento"];
-                else
-                    return false;
-            }
-
-            set
-            {
-                HttpContext.Current.Session["ClosePopupSmistamento"] = value;
-            }
-        }
         #endregion
 
         #region Initialize
@@ -353,10 +338,6 @@ namespace NttDataWA.Popup
             this.LtrNote.Text = Utils.Languages.GetLabelFromCode("DocumentLitVisibleNotesChars", language) + " ";
             this.ImgAddProjects.AlternateText = Utils.Languages.GetLabelFromCode("DocumentImgAddProjects", language);
             this.ImgAddProjects.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgAddProjects", language);
-            this.ViewNoteGen.Title = Utils.Languages.GetLabelFromCode("ViewNoteGen", language);
-            this.ViewNoteInd.Title = Utils.Languages.GetLabelFromCode("ViewNoteInd", language);
-            this.DocumentImgNoteGenDetail.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgNoteGenDetail", language);
-            this.DocumentImgNoteIndDetail.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgNoteIndDetail", language);
         }
 
         #endregion
@@ -386,7 +367,7 @@ namespace NttDataWA.Popup
         {
             SmistaDocManager docManager = this.GetSmistaDocManager();
 
-            if (!IsPostBack  && !ClosePopupSmistamento)
+            if (!IsPostBack)
             {
                 this.InitializePage();
 
@@ -394,7 +375,6 @@ namespace NttDataWA.Popup
                 {
                     //Nessun documento da smistare.
                     string msg = "WarningSmistaDocTrasmNotExists";
-                    this.ClosePopupSmistamento = true;
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'warning');} else {parent.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'warning');}", true);
                     ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "closeAJM", "parent.closeAjaxModal('SmistamentoDocumenti','up');", true);
                     return;
@@ -462,7 +442,6 @@ namespace NttDataWA.Popup
                 this.ReadRetValueFromSearch();
                 this.ReadValueFromPopupSelection();
                 this.ReadValueFromReject();
-                this.ReadValueFromPopupViewNote();
             }
 
            
@@ -554,17 +533,6 @@ namespace NttDataWA.Popup
             this.RefreshScript();
 
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "reallowOp();", true);
-        }
-
-        private void ReadValueFromPopupViewNote()
-        {
-            if(!string.IsNullOrEmpty(this.ViewNoteGen.ReturnValue))
-            {
-                this.txtNoteGen.Text = this.TxtNoteViewer;
-                this.txtNoteGen.ToolTip = this.TxtNoteViewer;
-                this.upPnlNote.Update();
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('ViewNoteGen','');", true);
-            }
         }
 
         private void ReadValueFromReject()
@@ -783,7 +751,6 @@ namespace NttDataWA.Popup
                 this.ChkMantieniSelezione();
 
                 this.FillDataDocumentoTrasmesso();
-                this.SetFlagDestinatarioRaggiutoDaTrasm(this.grdUOApp, this.hdUOapp.Value);
                 this.upPnlInfoDocument.Update();
                 this.UpPnlViewer.Update();
 
@@ -828,7 +795,6 @@ namespace NttDataWA.Popup
                 this.ChkMantieniSelezione();
 
                 this.FillDataDocumentoTrasmesso();
-                this.SetFlagDestinatarioRaggiutoDaTrasm(this.grdUOApp, this.hdUOapp.Value);
                 this.upPnlInfoDocument.Update();
                 this.UpPnlViewer.Update();
 
@@ -919,7 +885,6 @@ namespace NttDataWA.Popup
                 this.ChkMantieniSelezione();
 
                 this.FillDataDocumentoTrasmesso();
-                this.SetFlagDestinatarioRaggiutoDaTrasm(this.grdUOApp, this.hdUOapp.Value);
                 this.upPnlInfoDocument.Update();
                 this.updatePanelUOAppartenenza.Update();
                 this.updatePanelUOInf.Update();
@@ -966,7 +931,6 @@ namespace NttDataWA.Popup
                 this.ChkMantieniSelezione();
 
                 this.FillDataDocumentoTrasmesso();
-                this.SetFlagDestinatarioRaggiutoDaTrasm(this.grdUOApp, this.hdUOapp.Value);
                 this.upPnlInfoDocument.Update();
                 this.UpPnlViewer.Update();
 
@@ -1142,11 +1106,9 @@ namespace NttDataWA.Popup
 
                 //Viene autopopolato il campo relativo alle note generali
                 this.txtNoteGen.Text = docManager.GetNoteGenerali(docManager.GetCurrentDocumentPosition() - 1);
-                this.txtNoteGen.ToolTip = this.txtNoteGen.Text;
 
                 //Viene autopopolato il campo relativo alle note individuali e reso non editabile
                 this.txtAreaNoteInd.Text = docManager.GetNoteIndividuali(docManager.GetCurrentDocumentPosition() - 1);
-                this.txtAreaNoteInd.ToolTip = this.txtAreaNoteInd.Text;
                 this.upPnlNote.Update();
                 
                 // Visualizzazione file
@@ -1486,12 +1448,10 @@ namespace NttDataWA.Popup
             CustomImageButton imgNote = this.GetGridItemControl<CustomImageButton>(row, "imgNote");
             Label hd_disablendTrasm = this.GetGridItemControl<Label>(row, "hd_disablendTrasm");
 
-            CheckBox chkNotificaTuttoRuolo = GetCheckNotificaTuttoRuolo(row);
-
-            this.RefreshItemUoAppartenenza(id, type, chkComp, chkCC, chkNotifica, imgNote, onCheckNotificaTutti, hd_disablendTrasm, chkNotificaTuttoRuolo);
+            this.RefreshItemUoAppartenenza(id, type, chkComp, chkCC, chkNotifica, imgNote, onCheckNotificaTutti, hd_disablendTrasm);
         }
 
-        protected void RefreshItemUoAppartenenza(string id, string type, CheckBox chkComp, CheckBox chkCC, CheckBox chkNotifica, CustomImageButton imgNote, bool onCheckNotificaTutti, Label hd_disablendTrasm, CheckBox chkNotificaTuttoRuolo)
+        protected void RefreshItemUoAppartenenza(string id, string type, CheckBox chkComp, CheckBox chkCC, CheckBox chkNotifica, CustomImageButton imgNote, bool onCheckNotificaTutti, Label hd_disablendTrasm)
         {
             // Determina, tramite il valore del campo nascosto "hdCheckedUtenti",
             // se in fase di selezione di un ruolo deve o meno selezionare in automatico
@@ -1594,14 +1554,9 @@ namespace NttDataWA.Popup
                     // competenza o conoscenza per l'utente
                     chkNotifica.Enabled = false;
                 else
-                {
                     // Il check è abilitato se i flag competenza e conoscenza sono disabilitati e non marcati
                     chkNotifica.Enabled = (!chkComp.Enabled && !chkCC.Enabled);
 
-                    //Se il check notifica del ruolo è abilitato, abilito anche quello ad utente
-                    if(chkNotificaTuttoRuolo != null)
-                        chkNotifica.Enabled = chkNotificaTuttoRuolo.Enabled;
-                }
                 imgNote.Visible = (chkComp.Checked || chkCC.Checked);
 
 
@@ -2055,9 +2010,9 @@ namespace NttDataWA.Popup
             flagCC = false;
             flagNotifica = false;
 
-            CheckBox chkComp = this.GetGridItemControl<CheckBox>(row, "chkComp");// row.Cells[3].FindControl("chkComp") as CheckBox;
-            CheckBox chkCC = this.GetGridItemControl<CheckBox>(row, "chkCC"); //row.Cells[3].FindControl("chkCC") as CheckBox;
-            CheckBox chkNotifica = this.GetGridItemControl<CheckBox>(row, "chkNotifica"); //row.Cells[3].FindControl("chkNotifica") as CheckBox;
+            CheckBox chkComp = row.Cells[3].FindControl("chkComp") as CheckBox;
+            CheckBox chkCC = row.Cells[3].FindControl("chkCC") as CheckBox;
+            CheckBox chkNotifica = row.Cells[3].FindControl("chkNotifica") as CheckBox;
 
             if (chkComp != null && chkCC != null && chkComp.Visible && chkCC.Visible)
             {
@@ -2437,8 +2392,6 @@ namespace NttDataWA.Popup
 
             DisabledOrEnabledCbComFGridUo(this.grdUOApp);
 
-            SetFlagDestinatarioRaggiutoDaTrasm(this.grdUOApp, this.hdUOapp.Value);
-
             this.updatePanelUOAppartenenza.Update();
 
         }
@@ -2449,7 +2402,6 @@ namespace NttDataWA.Popup
 
             DataTable dt = new DataTable("GRID_TABLE");
             dt.Columns.Add("ID", typeof(string));
-            dt.Columns.Add("IDCORR", typeof(string));
             dt.Columns.Add("TYPE", typeof(string));
             dt.Columns.Add("DESCRIZIONE", typeof(string));
             dt.Columns.Add("DESCR", typeof(string));
@@ -2470,7 +2422,7 @@ namespace NttDataWA.Popup
             DocsPaWR.RuoloSmistamento[] ruoloRiferimento = uo.Ruoli.Where(e => e.RuoloRiferimento).ToArray();
             bool isDisabledTrasm = ruoloRiferimento.Length > 0 ? false : true;
 
-            this.AppendDataRow(dt, "U", uo.ID, uo.Descrizione, "", "", isDisabledTrasm, uo.ID);
+            this.AppendDataRow(dt, "U", uo.ID, uo.Descrizione, "", "", isDisabledTrasm);
 
 
         }
@@ -2484,7 +2436,7 @@ namespace NttDataWA.Popup
         {
             DataTable dt = ds.Tables["GRID_TABLE"];
 
-            this.AppendDataRow(dt, "U", uo.ID, uo.Descrizione, "", "", false, uo.ID);
+            this.AppendDataRow(dt, "U", uo.ID, uo.Descrizione, "", "", false);
 
             if (isUOAppartenenza)
             {
@@ -2494,24 +2446,23 @@ namespace NttDataWA.Popup
 
                     if (ruolo.Utenti != null && ruolo.Utenti.Length > 0)
                     {
-                        this.AppendDataRow(dt, "R", ruolo.ID, ruolo.Descrizione, ruolo.ID, ruolo.Gerarchia, ruolo.disabledTrasm, ruolo.ID);
+                        this.AppendDataRow(dt, "R", ruolo.ID, ruolo.Descrizione, ruolo.ID, ruolo.Gerarchia, ruolo.disabledTrasm);
 
 
 
                         foreach (DocsPaWR.UtenteSmistamento utente in ruolo.Utenti)
                         {
-                            this.AppendDataRow(dt, "P", ruolo.ID + "_" + utente.ID, utente.Denominazione, ruolo.ID, ruolo.Gerarchia, ruolo.disabledTrasm, utente.IDCorrGlobali);
+                            this.AppendDataRow(dt, "P", ruolo.ID + "_" + utente.ID, utente.Denominazione, ruolo.ID, ruolo.Gerarchia, ruolo.disabledTrasm);
                         }
                     }
                 }
             }
         }
 
-        private void AppendDataRow(DataTable dt, string type, string id, string descrizione, string padre, string superiore, bool disabledTrasm, string idCorr)
+        private void AppendDataRow(DataTable dt, string type, string id, string descrizione, string padre, string superiore, bool disabledTrasm)
         {
             DataRow row = dt.NewRow();
             row["ID"] = id;
-            row["IDCORR"] = idCorr;
             row["TYPE"] = type;
             row["DESCRIZIONE"] = this.GetImage(type) + " " + descrizione;
             row["DESCR"] = descrizione;
@@ -2571,10 +2522,6 @@ namespace NttDataWA.Popup
 
             CustomImageButton imgNote = this.GetGridItemControl<CustomImageButton>(row, "imgNote");
 
-            if (imgNote != null)
-                imgNote.Visible = visible;
-
-            imgNote = this.GetGridItemControl<CustomImageButton>(row, "ImgButtonTrasmesso");
             if (imgNote != null)
                 imgNote.Visible = visible;
         }
@@ -2825,7 +2772,6 @@ namespace NttDataWA.Popup
 
                     this.UpdateFlagUo(idUOPadre, out selezioneUoApp, out selezioneUoInf, out selezioneUtenteRuolo);
                     this.navigaUO_down(id);
-                    this.SetFlagDestinatarioRaggiutoDaTrasm(this.grdUOApp, id);
                     this.setFlagDataGrid();
                     this.indxUoSel = id;
 
@@ -3127,38 +3073,6 @@ namespace NttDataWA.Popup
                 else
                 {
                     chkComp.Enabled = true;
-                }
-            }
-        }
-
-        private void SetFlagDestinatarioRaggiutoDaTrasm(GridView grid, string idUo)
-        {
-            SmistaDocManager docManager = new SmistaDocManager();
-            List<string> idCorrRaggiunti = docManager.GetIdDestinatariTrasmDocInUo(idUo, this.DocumentInWorking.docNumber);
-            if (idCorrRaggiunti != null && idCorrRaggiunti.Count > 0)
-            {
-                string tipo = string.Empty;
-                foreach (GridViewRow row in grid.Rows)
-                {
-                    tipo = this.GetTipoURP(row);
-                    if (tipo != "U")
-                    {
-                        CustomImageButton img = this.GetGridItemControl<CustomImageButton>(row, "ImgButtonTrasmesso");
-                        img.Visible = IsDestRaggiuntoDaTrasm(row, tipo, idCorrRaggiunti);
-                    }
-                }
-            }
-            else
-            {
-                string tipo = string.Empty;
-                foreach (GridViewRow row in grid.Rows)
-                {
-                    tipo = this.GetTipoURP(row);
-                    if (tipo != "U")
-                    {
-                        CustomImageButton img = this.GetGridItemControl<CustomImageButton>(row, "ImgButtonTrasmesso");
-                        img.Visible = false;
-                    }
                 }
             }
         }
@@ -4576,7 +4490,6 @@ namespace NttDataWA.Popup
 
                 this.ChkMantieniSelezione();
                 this.FillDataDocumentoTrasmesso();
-                this.SetFlagDestinatarioRaggiutoDaTrasm(this.grdUOApp, this.hdUOapp.Value);
                 this.RefreshDocumentCounter();
                 this.upPnlInfoDocument.Update();
 
@@ -5153,100 +5066,6 @@ namespace NttDataWA.Popup
                 else
                     return string.Empty;
             }
-        }
-
-        public string TxtNoteViewer
-        {
-            get
-            {
-                string result = string.Empty;
-                if (HttpContext.Current.Session["TxtNoteViewer"] != null)
-                {
-                    result = HttpContext.Current.Session["TxtNoteViewer"].ToString();
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["TxtNoteViewer"] = value;
-            }
-        }
-
-
-        protected void DocumentImgNoteGenDetail_Click(object o, EventArgs e)
-        {
-            try
-            {
-                this.TxtNoteViewer = this.txtNoteGen.Text;
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ViewObject", "ajaxModalPopupViewNoteGen();", true);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-        protected void DocumentImgNoteIndDetail_Click(object o, EventArgs e)
-        {
-            try
-            {
-                this.TxtNoteViewer = this.txtAreaNoteInd.Text;
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ViewObject", "ajaxModalPopupViewNoteInd();", true);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-        public bool IsDestRaggiuntoDaTrasm(GridViewRow row, string tipo, List<string> idCorrTrasmissioneDocList)
-        {
-            string idCorrGlobali = this.grdUOApp.DataKeys[row.RowIndex].Values["idcorr"].ToString();
-            string id = this.grdUOApp.DataKeys[row.RowIndex].Values["id"].ToString();
-            string idPoeple = string.Empty;
-            if (tipo == "P")
-                idPoeple = GetId(row);
-            foreach (string idCorrTrasm in idCorrTrasmissioneDocList)
-            {
-                if (tipo == "R" && idCorrGlobali.Equals(idCorrTrasm.Split('_')[0]))
-                    return true;
-                //Nel caso di utente devo controllare se ci sono trasm a utente o a ruolo
-                if (tipo == "P")
-                {
-                    //Controllo trasm a ruolo
-                    if (id.Equals(idCorrTrasm))
-                        return true;
-
-                    //Controllo la trasmissione a utente
-                    if ((idCorrGlobali + "_" + idPoeple).Equals(idCorrTrasm))
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        public CheckBox GetCheckNotificaTuttoRuolo(GridViewRow rows)
-        {
-            CheckBox chkNotificaTutti = null;
-            string type = this.GetTipoURP(rows);
-            string idCorrGlobali = string.Empty;
-            if (type.Equals("R"))
-                return this.GetGridItemControl<CheckBox>(rows, "chkNotifica");
-
-            if (type.Equals("P"))
-                idCorrGlobali = this.grdUOApp.DataKeys[rows.RowIndex].Values["id"].ToString().Split('_')[0];
-
-            foreach (GridViewRow row in this.grdUOApp.Rows)
-            {
-                if (this.grdUOApp.DataKeys[row.RowIndex].Values["type"].ToString() == "R" && GetId(row).Equals(idCorrGlobali))
-                {
-                    chkNotificaTutti = this.GetGridItemControl<CheckBox>(row, "chkNotifica");
-                    break;
-                }
-            }
-            return chkNotificaTutti;
         }
     }
 }

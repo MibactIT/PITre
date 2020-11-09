@@ -274,6 +274,24 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.CheckBoxList cbxNotificationOption;
         
         /// <summary>
+        /// cbxNotificationOptionOptCP control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListItem cbxNotificationOptionOptCP;
+        
+        /// <summary>
+        /// cbxNotificationOptionOptIP control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListItem cbxNotificationOptionOptIP;
+        
+        /// <summary>
         /// UpPnlButtons control.
         /// </summary>
         /// <remarks>

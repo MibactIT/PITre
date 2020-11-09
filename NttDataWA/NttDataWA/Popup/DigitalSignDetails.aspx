@@ -221,7 +221,7 @@
     <uc:ajaxpopup Id="DocumentViewer" runat="server" Url="../popup/DocumentViewer.aspx"
         ForceDontClose="true" PermitClose="false" PermitScroll="false" IsFullScreen="true"
         CloseFunction="function (event, ui) {__doPostBack('UpPnlButtons', 'closeZoom');}" />
-    <uc:ajaxpopup Id="VerifyCLR" runat="server" Url="../popup/VerifyCLR.aspx" Width="500"
+    <uc:ajaxpopup Id="VerifyCLR" runat="server" Url="../popup/VerifyCLR.aspx" Width="400"
         Height="300" PermitScroll="false" CloseFunction="function (event, ui) {__doPostBack('UpPnlButtons', '');}" />
     <div class="container">
         <div class="colonnasx2">

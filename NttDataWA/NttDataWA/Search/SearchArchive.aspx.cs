@@ -392,7 +392,8 @@ namespace NttDataWA.Search
                     idregistro = ddlRegistri.SelectedValue;
                 string idAmministrazione = UIManager.UserManager.GetUserInSession().idAmministrazione;
                 string idgruppo = UIManager.RoleManager.GetRoleInSession().idGruppo;
-                string idTitolario = UIManager.ClassificationSchemeManager.GetTitolarioInSession().ID;
+                //string idTitolario = UIManager.ClassificationSchemeManager.GetTitolarioInSession().ID;
+                string idTitolario = this.ddlTitolario.SelectedValue;
                 e.Node.ChildNodes.Clear();
 
                 if (string.IsNullOrEmpty(((myTreeNode)e.Node).TIPO))
@@ -988,6 +989,7 @@ namespace NttDataWA.Search
             this.RecordCount = 0;
             this.SelectedPage = 1;
             Session["templateRicerca"] = null;
+            Session["Titolario"] = null;
             this.Labels = DocumentManager.GetLettereProtocolli();
             this.CellPosition = new Dictionary<string, int>();
             UIManager.RegistryManager.SetRegistryInSession(RoleManager.GetRoleInSession().registri[0]);
@@ -1050,7 +1052,8 @@ namespace NttDataWA.Search
                     }
                 }
 
-                DocsPaWR.OrgTitolario titolarioX = UIManager.ClassificationSchemeManager.GetTitolarioInSession();
+                //DocsPaWR.OrgTitolario titolarioX = UIManager.ClassificationSchemeManager.GetTitolarioInSession();
+                DocsPaWR.OrgTitolario titolarioX = UIManager.ClassificationSchemeManager.getTitolario(ddlTitolario.SelectedValue);
                 if (titolarioX != null)
                 {
                     ddlTitolario.SelectedValue = titolarioX.ID;

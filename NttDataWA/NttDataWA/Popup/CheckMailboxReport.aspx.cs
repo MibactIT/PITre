@@ -411,7 +411,6 @@ namespace NttDataWA.Popup
                     if (mailProcessed.ErrorMessage.Equals("OK. Eccezione non bloccante nella segnatura informatica"))
                     {
                         this.CheckMailboxReportCreateDoc.Visible = true;
-
                         //INC000001079959 - Report casella istituzionale con messaggio di errore non notificato
                         //Non interrompo perchè se sono presenti mail non elaborate non genera il report
                         //break;
@@ -644,8 +643,16 @@ namespace NttDataWA.Popup
             this.txtIndirizzoEmail.Text = MailCheckResponse.MailAddress;
             this.txtRegistro.Text = MailCheckResponse.Registro;
             string errorMessage = "OK";
-            if (MailCheckResponse.ErrorMessage != string.Empty)
+            if ((MailCheckResponse.ErrorMessage != null || MailCheckResponse.ErrorMessage != string.Empty) && MailCheckResponse.ErrorMessage.ToLower().Contains("threw an exception"))
+            {
+                errorMessage = "Temporaneo errore di connessione al server mail di posta. Riprovare più tardi la consultazione della casella.";
+            }
+            else if(MailCheckResponse.ErrorMessage != string.Empty)
+            {
                 errorMessage = MailCheckResponse.ErrorMessage;
+            }
+            //if (MailCheckResponse.ErrorMessage != string.Empty)
+            //    errorMessage = MailCheckResponse.ErrorMessage;
             this.txtEsitoCasella.InnerText = errorMessage;
         }
 

@@ -157,11 +157,6 @@ namespace NttDataWA.Popup
             switch (requestType)
             {
                 case "originalDocument":
-                    //if (CheckIsPresentCadesAndPades())
-                    //{
-                    //    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningDigitalSignDetailsCadesAndPades', 'warning', '', '');} else {parent.ajaxDialogModal('WarningDigitalSignDetailsCadesAndPades', 'warning', '', '');}", true);
-                    //    return;
-                    //}
                     Session["VerifyCLR_OriginalDocument"] = requestType;
                     break;
 
@@ -217,10 +212,8 @@ namespace NttDataWA.Popup
             {
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('DocumentViewer','');", true);
             }
-            string requestType = this.trvDettagliFirma.SelectedNode != null ? this.trvDettagliFirma.SelectedNode.Value : string.Empty;
-            if (requestType.Contains("&")) requestType = requestType.Split('&')[0];
-            if (requestType.Equals("sign") && Session["VerifyCLR_returnValue"] != null &&
-                !string.IsNullOrEmpty(Session["VerifyCLR_returnValue"].ToString()))
+
+            if (!string.IsNullOrEmpty(this.VerifyCLR.ReturnValue))
             {
                 //if (Session["VerifyCLR_returnValue"].ToString() == "OK")
                 //{
@@ -272,6 +265,9 @@ namespace NttDataWA.Popup
                 Session["VerifyCLR_returnValue"] = null;
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('VerifyCLR','');", true);
             }
+
+            string requestType = this.trvDettagliFirma.SelectedNode != null ? this.trvDettagliFirma.SelectedNode.Value : string.Empty;
+            if (requestType.Contains("&")) requestType = requestType.Split('&')[0];
 
             if (requestType.Equals("originalDocument") && Session["VerifyCLR_returnValue"] != null && 
                 !string.IsNullOrEmpty(Session["VerifyCLR_returnValue"].ToString()))
@@ -337,14 +333,12 @@ namespace NttDataWA.Popup
             }
 
             //SE FILE è FIRMATO XADES CHIUDO IL POPUP
-            /*
             if (Path.GetExtension(fileRequest.fileName).ToUpper().EndsWith("XML"))
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "$(function() {ajaxDialogModal('WarningSignDetailsXADES', 'warning', null, null, null, null, 'parent.closeAjaxModal(\\'DigitalSignDetails\\',\\'\\');');});", true);
                 return;
             }
-            */
 
             FileInformation = DocumentManager.GetFileInformation(fileRequest, UserManager.GetInfoUser());
 
@@ -382,7 +376,6 @@ namespace NttDataWA.Popup
         private void RefreshScript()
         {
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshTipsy", "tooltipTipsy();", true);
-            //ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "EnableOnlyPreviousToday", "EnableOnlyPreviousToday();", true);
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "refreshPicker", "DatePicker('" + UIManager.UserManager.GetLanguageData() + "');", true);
         }
 
@@ -395,7 +388,7 @@ namespace NttDataWA.Popup
         private void BuildTreeView()
         {
             FileDocumento signedDocument = this.GetSignedDocument();
-            if (signedDocument != null && signedDocument.signatureResult!=null && signedDocument.signatureResult.StatusCode != -100)
+            if (signedDocument != null && signedDocument.signatureResult!=null)
             {
                 VerifySignatureResult signatureResult = signedDocument.signatureResult;
 
@@ -844,16 +837,6 @@ namespace NttDataWA.Popup
                 }
                 else
                     this.imgCheckCRLResult.Visible = false;
-
-                //Se il file è firmato sia CADES che PADES la verifica non è applicabile
-                //bool isCadesAndPades = this.CheckIsPresentCadesAndPades();
-                //if (isCadesAndPades)
-                //{
-                //    this.lblCheckSigned.Text = Utils.Languages.GetLabelFromCode("DigitalSignDetailsNonApplicabile", language);
-                //    this.imgCheckSignedResult.ImageUrl = string.Empty;
-                //    this.lblCRL.Text = Utils.Languages.GetLabelFromCode("DigitalSignDetailsNonApplicabile", language);
-                //    this.imgCheckCRLResult.ImageUrl = string.Empty;
-                //}
             }
             else
             {
@@ -876,9 +859,7 @@ namespace NttDataWA.Popup
             // filename
             if (isSignedDocument)
             {
-                bool isPades = false;
-                if(signatureResult.PKCS7Documents != null && signatureResult.PKCS7Documents.Length > 0)
-                    isPades = signatureResult.PKCS7Documents[0].SignAlgorithm.Contains("PADES");
+                bool isPades = signatureResult.PKCS7Documents[0].SignAlgorithm.Contains("PADES");
                 this.litMainDocFilename.Text = signatureResult.FinalDocumentName;
 
                 if (isPades)
@@ -1445,29 +1426,6 @@ namespace NttDataWA.Popup
                     this.CreateHeaderTable();
                     break;
             }
-        }
-
-        private bool CheckIsPresentCadesAndPades()
-        {
-            bool result = false;
-            FileDocumento signedDocument = this.GetSignedDocument();
-            bool cades = false;
-            bool pades = false;
-            if (signedDocument != null && signedDocument.signatureResult != null)
-            {
-                VerifySignatureResult signatureResult = signedDocument.signatureResult;
-                foreach (PKCS7Document document in signatureResult.PKCS7Documents)
-                {
-                    if (document.SignatureType == SignType.PADES)
-                        pades = true;
-                    if (document.SignatureType == SignType.CADES)
-                        cades = true;
-                    if (cades && pades)
-                        break;
-                }
-            }
-            result = cades && pades;
-            return result;
         }
 
         private Control GetControlById(Control owner, string controlID)

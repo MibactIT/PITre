@@ -146,10 +146,6 @@
 
         };
 
-        function setTooltipNoteGen() {
-            $get('<%=txtNoteGen.ClientID %>').title = $get('<%=txtNoteGen.ClientID %>').value;
-        }
-
         function closeAjaxModal(id, retval) { // chiude il popup modale [id] e imposta il valore di ritorno [retval] nel campo hidden
             var p = parent.fra_main;
             if (arguments.length > 2 && arguments[2] != null) {
@@ -247,10 +243,6 @@
         Title="Rifiuto Trasmissione" CloseFunction="function (event, ui)  {$('#btnRejectTransmission').click();}" />
     <uc:ajaxpopup Id="DigitalSignDetails" runat="server" Url="../popup/DigitalSignDetails.aspx"
         IsFullScreen="true" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpPnlButtons', ''); }" />
-    <uc:ajaxpopup Id="ViewNoteGen" runat="server" Url="../popup/ViewNote.aspx?tiponota=g" Width="600"
-        Height="400" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpPnlButtons', '');}" />
-    <uc:ajaxpopup Id="ViewNoteInd" runat="server" Url="../popup/ViewNote.aspx?tiponota=i&readonly=true" Width="600"
-        Height="400" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpPnlButtons', '');}" />
     <div class="containerSmistaDoc">
         <div class="contentSmistaDocTopSx">
             <div id="ContentSmistamentoSx">
@@ -436,13 +428,7 @@
                                                 <%--<cc1:CustomTextArea ID="txtNoteGen" runat="server"
                                                         CssClass="txt_textarea" CssClassReadOnly="txt_textarea_disabled" ClientIDMode="Static"></cc1:CustomTextArea>--%>
                                                 <cc1:CustomTextArea ID="txtNoteGen" runat="server" CssClass="txt_input_full" ClientIDMode="Static"
-                                                    CssClassReadOnly="txt_input_full_disabled" onchange="return setTooltipNoteGen();" /></div>
-                                            <div class="col-right-no-marginSmista">
-                                                <cc1:CustomImageButton runat="server" ID="DocumentImgNoteGenDetail" ImageUrl="../Images/Icons/ico_objects.png"
-                                                OnMouseOutImage="../Images/Icons/ico_objects.png" OnMouseOverImage="../Images/Icons/ico_objects_hover.png"
-                                                CssClass="clickableLeftN" ImageUrlDisabled="../Images/Icons/ico_objects_disabled.png"
-                                                OnClick="DocumentImgNoteGenDetail_Click" OnClientClick="disallowOp('Content2');"  />
-                                            </div>
+                                                    CssClassReadOnly="txt_input_full_disabled" /></div>
                                             <div class="row">
                                                 <div class="col-right-no-margin">
                                                     <span class="charactersAvailable">
@@ -456,14 +442,8 @@
                                                 <span class="weight">
                                                     <asp:Literal ID="LitNoteIndividual" runat="server" /></span></div>
                                             <div class="colHalfSmist2">
-                                                <cc1:CustomTextArea ID="txtAreaNoteInd" runat="server" ReadOnly="true" CssClass="clickable txt_input_full"
+                                                <cc1:CustomTextArea ID="txtAreaNoteInd" runat="server" ReadOnly="true" CssClass="txt_input_full"
                                                     CssClassReadOnly="txt_input_full_disabled" /></div>
-                                            <div class="col-right-no-marginSmista">
-                                                <cc1:CustomImageButton runat="server" ID="DocumentImgNoteIndDetail" ImageUrl="../Images/Icons/ico_objects.png"
-                                                OnMouseOutImage="../Images/Icons/ico_objects.png" OnMouseOverImage="../Images/Icons/ico_objects_hover.png"
-                                                CssClass="clickableLeftN" ImageUrlDisabled="../Images/Icons/ico_objects_disabled.png"
-                                                OnClick="DocumentImgNoteIndDetail_Click"  OnClientClick="disallowOp('Content2');" />
-                                            </div>
                                         </div>
                                     </ContentTemplate>
                                 </asp:UpdatePanel>
@@ -557,7 +537,7 @@
                                 <asp:Panel ID="pnlContainerUoAppartenenza" runat="server" ScrollBars="Auto">
                                     <asp:GridView ID="grdUOApp" runat="server" Width="99%" AutoGenerateColumns="False"
                                         CssClass="tbl_rounded_custom round_onlyextreme" AllowCustomPaging="true" ShowHeaderWhenEmpty="True"
-                                        OnRowCommand="grdUOApp_RowCommand" DataKeyNames="id,idcorr,type">
+                                        OnRowCommand="grdUOApp_RowCommand" DataKeyNames="id,type">
                                         <RowStyle CssClass="NormalRow" />
                                         <AlternatingRowStyle CssClass="AltRow" />
                                         <Columns>
@@ -567,7 +547,7 @@
                                                 <ItemTemplate>
                                                     <asp:Label ID="lblDescUO" runat="server" Text='<%# Bind("DESCRIZIONE") %>'></asp:Label>
                                                 </ItemTemplate>
-                                                <HeaderStyle Width="60%" />
+                                                <HeaderStyle Width="70%" />
                                                 <ItemStyle VerticalAlign="Middle" Wrap="True" />
                                             </asp:TemplateField>
                                             <asp:TemplateField ItemStyle-Width="30" ItemStyle-HorizontalAlign="Center">
@@ -586,15 +566,6 @@
                                                     <asp:Label runat="server" ID="hd_id" Text='<%# DataBinder.Eval(Container, "DataItem.PARENT") %>' />
                                                     <asp:Label runat="server" ID="hdGerarchia" Text='<%# DataBinder.Eval(Container, "DataItem.GERARCHIA") %>' />
                                                     <asp:Label runat="server" ID="hd_disablendTrasm" Text='<%# DataBinder.Eval(Container, "DataItem.DISABLED_TRASM") %>' />
-                                                </ItemTemplate>
-                                            </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="TRASM">
-                                                <HeaderStyle Width="30" HorizontalAlign="Center"></HeaderStyle>
-                                                <ItemTemplate>
-                                                    <cc1:CustomImageButton ID="ImgButtonTrasmesso" runat="server" ImageAlign="Middle"
-                                                        ImageUrl="../Images/Icons/flag_ok.png" OnMouseOutImage="../Images/Icons/flag_ok.png"
-                                                        OnMouseOverImage="../Images/Icons/flag_ok.png" CssClass="clickableLeft"
-                                                        ImageUrlDisabled="../Images/Icons/flag_ok.png" ToolTip="Già raggiunto da trasmissione" />
                                                 </ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="COMP">
@@ -630,8 +601,7 @@
                                                         CssClass="clickableLeft" ImageUrlDisabled="../Images/Icons/ico_objects_disabled.png"
                                                         ToolTip="Inserimento dati aggiuntivi" Visible="false" OnClientClick="disallowOp('Content2');" />
                                                 </ItemTemplate>
-                                            </asp:TemplateField>                                         
-                                            <asp:BoundField DataField="IDCORR" Visible="false" HeaderText="IDCORR" />
+                                            </asp:TemplateField>
                                         </Columns>
                                     </asp:GridView>
                                 </asp:Panel>
@@ -647,7 +617,7 @@
                                 <asp:GridView ID="grdUOInf" runat="server" Width="99%" AutoGenerateColumns="False"
                                     CssClass="tbl_rounded_custom round_onlyextreme" AllowCustomPaging="true" ShowHeaderWhenEmpty="True"
                                     OnRowCommand="grdUOInf_RowCommand" OnSelectedIndexChanged="grdUOInf_SelectedIndexChanged"
-                                    DataKeyNames="id,idcorr,type">
+                                    DataKeyNames="id,type">
                                     <RowStyle CssClass="NormalRow" />
                                     <AlternatingRowStyle CssClass="AltRow" />
                                     <Columns>
@@ -706,8 +676,7 @@
                                             <ItemTemplate>
                                                 <asp:Label runat="server" ID="hd_isAllowedSmista" Text='<%# DataBinder.Eval(Container, "DataItem.DISABLED_TRASM") %>' />
                                             </ItemTemplate>
-                                        </asp:TemplateField>                                      
-                                        <asp:BoundField DataField="idcorr" Visible="false" HeaderText="idcorr" />
+                                        </asp:TemplateField>
                                     </Columns>
                                 </asp:GridView>
                             </asp:Panel>

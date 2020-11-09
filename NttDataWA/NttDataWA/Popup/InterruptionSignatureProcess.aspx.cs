@@ -107,10 +107,6 @@ namespace NttDataWA.Popup
                         IstanzaProcessoDiFirma.dataChiusura = DateTime.Now.ToString();
                         IstanzaProcessoDiFirma.statoProcesso = TipoStatoProcesso.STOPPED;
                         IstanzaProcessoDiFirma.ChaInterroDa = 'P';
-
-                        IstanzaProcessoDiFirma.DescUtenteInterruzione = UserManager.GetUserInSession().descrizione;
-                        if (UIManager.UserManager.getUtenteDelegato() != null)
-                            IstanzaProcessoDiFirma.DescUtenteDelegatoInterruzione = UIManager.UserManager.getUtenteDelegato().descrizione;
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "closeMask", "if (parent.fra_main) {parent.fra_main.closeAjaxModal('InterruptionSignatureProcess', 'up');} else {parent.closeAjaxModal('InterruptionSignatureProcess', 'up', parent);};", true);
                     }
                     else

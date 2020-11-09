@@ -1044,6 +1044,22 @@ namespace NttDataWA.Search
                             this.upPnlProprietario.Update();
                         }
                         break;
+                    case "F_X_X_S_4":
+                        if (atList != null && atList.Count > 0)
+                        {
+                            NttDataWA.Popup.AddressBook.CorrespondentDetail corrInSess = atList[0];
+                            Corrispondente tempCorrSingle;
+                            if (!corrInSess.isRubricaComune)
+                                tempCorrSingle = UIManager.AddressBookManager.GetCorrespondentBySystemId(atList[0].SystemID);
+                            else
+                                tempCorrSingle = UIManager.AddressBookManager.getCorrispondenteByCodRubricaRubricaComune(corrInSess.CodiceRubrica);
+
+                            this.txt_codUO_Prot.Text = tempCorrSingle.codiceRubrica;
+                            this.txt_descrUO_Prot.Text = tempCorrSingle.descrizione;
+                            this.IdUOProtocollatrice.Value = tempCorrSingle.systemId;
+                            this.UpProtocollo.Update();
+                        }
+                        break;
                     case "M_D_T_M":
                         if (atList != null && atList.Count > 0)
                         {
@@ -2918,6 +2934,22 @@ namespace NttDataWA.Search
             }
         }
 
+        protected void ImgUoProtocollatriceAddressBook_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.CallType = RubricaCallType.CALLTYPE_OWNER_AUTHOR;
+                HttpContext.Current.Session["AddressBook.from"] = "F_X_X_S_4";
+                HttpContext.Current.Session["AddressBook.EnableOnly"] = "U";
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "AddressBook", "ajaxModalPopupAddressBook();", true);
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+                return;
+            }
+        }
+
         protected void ImgProprietarioAddressBook_Click(object sender, EventArgs e)
         {
             try
@@ -3001,6 +3033,12 @@ namespace NttDataWA.Search
                             this.txtDescrizioneFirmatario.Text = string.Empty;
                             this.idFirmatario.Value = string.Empty;
                             this.UpPnlFirmatario.Update();
+                            break;
+                        case "txt_codUO_Prot":
+                            this.txt_codUO_Prot.Text = string.Empty;
+                            this.txt_descrUO_Prot.Text = string.Empty;
+                            this.IdUOProtocollatrice.Value = string.Empty;
+                            this.UpProtocollo.Update();
                             break;
                     }
                 }
@@ -3180,8 +3218,6 @@ namespace NttDataWA.Search
                 this.cbl_Conservazione.Items[5].Selected = true;
                 this.cbl_Conservazione.Items[6].Selected = true;
                 this.cbl_Conservazione.Items[7].Selected = true;
-                this.cbl_Conservazione.Items[8].Selected = true;
-                this.cbl_Conservazione.Items[9].Selected = true;
                 this.txt_initDataVers.Text = string.Empty;
                 this.txt_fineDataVers.Text = string.Empty;
                 this.TxtObjectAttach.Text = string.Empty;
@@ -4199,7 +4235,10 @@ namespace NttDataWA.Search
             {
                 calltype = RubricaCallType.CALLTYPE_OWNER_AUTHOR;
             }
-
+            if(idControl == "txt_codUO_Prot")
+            {
+                calltype = RubricaCallType.CALLTYPE_OWNER_AUTHOR;
+            }
             return calltype;
         }
 
@@ -6472,8 +6511,6 @@ namespace NttDataWA.Search
             this.optConsErr.Text = Utils.Languages.GetLabelFromCode("optConsErr", language);
             this.optConsTim.Text = Utils.Languages.GetLabelFromCode("optConsTim", language);
             this.optConsFld.Text = Utils.Languages.GetLabelFromCode("optConsFld", language);
-            this.optConsBfw.Text = Utils.Languages.GetLabelFromCode("optConsBfw", language);
-            this.optConsBfe.Text = Utils.Languages.GetLabelFromCode("optConsBfe", language);
             this.ddl_DataVers.Items[0].Text = Utils.Languages.GetLabelFromCode("ddl_data0", language);
             this.ddl_DataVers.Items[1].Text = Utils.Languages.GetLabelFromCode("ddl_data1", language);
             this.ddl_DataVers.Items[2].Text = Utils.Languages.GetLabelFromCode("ddl_data2", language);
@@ -6514,6 +6551,9 @@ namespace NttDataWA.Search
             this.rbOpIS.Text = SimplifiedInteroperabilityManager.SearchItemDescriprion;
             this.rblFiltriNumAllegatiOpIS.Text = SimplifiedInteroperabilityManager.SearchItemDescriprion;
             this.cbxEstendiAFascicoli.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedCbxEstendiAFascicolo", language);
+            this.LtlUOProtocollatrice.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlUOProtocollatrice", language);
+            this.chk_uo_prot_storicizzati.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedChk_uo_prot_storicizzati", language);
+            this.chk_uo_prot_sottostanti.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedChk_uo_prot_sottostanti", language);
         }
 
         protected void ReadRetValueFromPopup()
@@ -7087,6 +7127,7 @@ namespace NttDataWA.Search
             this.RapidCreatore.ContextKey = dataUser + "-" + UIManager.UserManager.GetUserInSession().idAmministrazione + "-" + callType;
             this.RapidProprietario.ContextKey = dataUser + "-" + UIManager.UserManager.GetUserInSession().idAmministrazione + "-" + callType;
             this.RapidFirmatario.ContextKey = dataUser + "-" + UIManager.UserManager.GetUserInSession().idAmministrazione + "-" + callType;
+            this.RapidUoProtocollatrice.ContextKey = dataUser + "-" + UIManager.UserManager.GetUserInSession().idAmministrazione + "-" + callType;
 
             callType = "CALLTYPE_CORR_INT_EST_CON_DISABILITATI";
             this.RapidRecipient.ContextKey = dataUser + "-" + UIManager.UserManager.GetUserInSession().idAmministrazione + "-" + callType;
@@ -7203,40 +7244,30 @@ namespace NttDataWA.Search
                     //caso 0: al codice digitato non corrisponde alcun fascicolo
                     if (listaFasc.Length == 0)
                     {
-                        //Provo il caso in cui il fascicolo è chiuso 
+                        //Provo il caso in cui il fascicolo è chiuso
                         Fascicolo chiusoFasc = ProjectManager.getFascicoloDaCodice(this.Page, this.txt_CodFascicolo.Text);
                         if (chiusoFasc != null && !string.IsNullOrEmpty(chiusoFasc.stato) && chiusoFasc.stato.Equals("C"))
                         {
-                            // 06/06/2018: INC000001089858  se il fascicolo è chiuso devo comunque consentire la ricerca
-                            /*
+                            //string msg = @"Attenzione, il fascicolo scelto è chiuso. Pertanto il documento non può essere inserito nel fascicolo selezionato.";
                             string msg = "WarningDocumentFileNoOpen";
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            */
 
-                            this.IdProject.Value = chiusoFasc.systemID;
-                            this.txt_DescFascicolo.Text = chiusoFasc.descrizione;
-                            if (chiusoFasc.tipo.Equals("G"))
-                            {
-                                codClassifica = chiusoFasc.codice;
-                            }
-                            else
-                            {
-                                //se il fascicolo è procedimentale, ricerco la classifica a cui appartiene
-                                DocsPaWR.FascicolazioneClassifica[] gerClassifica = ProjectManager.getGerarchia(this, chiusoFasc.idClassificazione, UserManager.GetUserInSession().idAmministrazione);
-                                string codiceGerarchia = gerClassifica[gerClassifica.Length - 1].codice;
-                                codClassifica = codiceGerarchia;
-                            }
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
+
                         }
                         else
                         {
                             //string msg = @"Attenzione, codice fascicolo non presente.";
                             string msg = "WarningDocumentCodFileNoFound";
+
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
 
-                            this.txt_DescFascicolo.Text = string.Empty;
-                            this.txt_CodFascicolo.Text = string.Empty;
-                            this.IdProject.Value = string.Empty;
+
+
+
                         }
+                        this.txt_DescFascicolo.Text = string.Empty;
+                        this.txt_CodFascicolo.Text = string.Empty;
+                        this.IdProject.Value = string.Empty;
                     }
                 }
             }
@@ -8015,8 +8046,7 @@ namespace NttDataWA.Search
             {
                 this.PnlNeverTrasm.Visible = false;
             }
-
-            if(UserManager.IsAuthorizedFunctions("DO_RIC_ESTENDI_NODI_FIGLI_E_FASC"))
+            if (UserManager.IsAuthorizedFunctions("DO_RIC_ESTENDI_NODI_FIGLI_E_FASC"))
             {
                 this.PnlEstendiAFascicoli.Visible = true;
             }
@@ -8688,12 +8718,6 @@ namespace NttDataWA.Search
                                         break;
                                     case "F":
                                         value = this.GetLabel("optConsFld");
-                                        break;
-                                    case "B":
-                                        value = this.GetLabel("optConsBfw");
-                                        break;
-                                    case "K":
-                                        value = this.GetLabel("optConsBfe");
                                         break;
                                 }
                                 break;
@@ -9723,6 +9747,42 @@ namespace NttDataWA.Search
                     fV1.valore = utils.DO_AdattaString(this.TxtObjectAttach.Text);
                     fVList = utils.addToArrayFiltroRicerca(fVList, fV1);
                 }
+            }
+            #endregion
+
+            #region filtro uo protocollatrice
+            if(!string.IsNullOrEmpty(this.txt_codUO_Prot.Text) && string.IsNullOrEmpty(this.IdUOProtocollatrice.Value))
+            {
+                // Ricerca dell'id del corrispondente a partire dal codice
+                DocsPaWR.Corrispondente corrByCode = AddressBookManager.getCorrispondenteByCodRubrica(this.txt_codUO_Prot.Text, false);
+                if (corrByCode != null)              
+                    this.IdUOProtocollatrice.Value = corrByCode.systemId;          
+            }
+            if (!string.IsNullOrEmpty(this.IdUOProtocollatrice.Value))
+            {
+                fV1 = new DocsPaWR.FiltroRicerca();
+                fV1.argomento = DocsPaWR.FiltriDocumento.ID_UO_PROT.ToString();
+                fV1.valore = this.IdUOProtocollatrice.Value;
+                fVList = utils.addToArrayFiltroRicerca(fVList, fV1);
+
+                fV1 = new DocsPaWR.FiltroRicerca();
+                fV1.argomento = DocsPaWR.FiltriDocumento.UO_PROT_STORICIZZATE.ToString();
+                fV1.valore = this.chk_uo_prot_storicizzati.Checked.ToString();
+                fVList = utils.addToArrayFiltroRicerca(fVList, fV1);
+
+                //Ricerca per uo e sotto uo
+                fV1 = new DocsPaWR.FiltroRicerca();
+                fV1.argomento = DocsPaWR.FiltriDocumento.UO_PROT_SOTTOSTATNTI.ToString();
+                fV1.valore = this.chk_uo_prot_sottostanti.Checked.ToString();
+                fVList = utils.addToArrayFiltroRicerca(fVList, fV1);
+                
+            }
+            else
+            {
+                fV1 = new DocsPaWR.FiltroRicerca();
+                fV1.argomento = DocsPaWR.FiltriDocumento.DESC_UO_PROT.ToString();
+                fV1.valore = this.txt_descrUO_Prot.Text;
+                fVList = utils.addToArrayFiltroRicerca(fVList, fV1);
             }
             #endregion
 
@@ -11602,6 +11662,12 @@ namespace NttDataWA.Search
                         this.idFirmatario.Value = string.Empty;
                         this.UpPnlFirmatario.Update();
                         break;
+                    case "txt_codUO_Prot":
+                        this.txt_codUO_Prot.Text = string.Empty;
+                        this.txt_descrUO_Prot.Text = string.Empty;
+                        this.IdUOProtocollatrice.Value = string.Empty;
+                        this.UpProtocollo.Update();
+                        break;
                 }
                 if (!multiCorr)
                 {
@@ -11656,6 +11722,23 @@ namespace NttDataWA.Search
                         this.rblFirmatarioType.Items.FindByValue(corr.tipoCorrispondente).Selected = true;
                         this.chkFirmaElettronica.Checked = true;
                         this.UpPnlElectronicSignature.Update();
+                        break;
+                    case "txt_codUO_Prot":
+                        if (corr.tipoCorrispondente.Equals("U"))
+                        {
+                            this.txt_codUO_Prot.Text = corr.codiceRubrica;
+                            this.txt_descrUO_Prot.Text = corr.descrizione;
+                            this.IdUOProtocollatrice.Value = corr.systemId;
+                        }
+                        else
+                        {
+                            this.txt_codUO_Prot.Text = string.Empty;
+                            this.txt_descrUO_Prot.Text = string.Empty;
+                            this.IdUOProtocollatrice.Value = string.Empty;
+                            string msg = "ErrorTransmissionCorrespondentNotFound";
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
+                        }
+                        this.UpProtocollo.Update();
                         break;
                 }
             }
@@ -12472,6 +12555,45 @@ namespace NttDataWA.Search
                                 }
                             }
                             #endregion ID_MITT_DEST
+                            #region DESC_UO_PROT
+                            else if (item.argomento == DocsPaWR.FiltriDocumento.DESC_UO_PROT.ToString())
+                            {
+                                this.txt_descrUO_Prot.Text = item.valore;
+                            }
+                            #endregion
+                            #region COD_UO_PROT
+                            else if (item.argomento == DocsPaWR.FiltriDocumento.COD_UO_PROT.ToString())
+                            {                         
+                                SearchCorrespondent(item.valore, "txt_codUO_Prot");
+                            }
+                            #endregion
+                            #region UO_PROT_STORICIZZATE
+                            else if (item.argomento == DocsPaWR.FiltriDocumento.UO_PROT_STORICIZZATE.ToString())
+                            {
+                                bool chkValue;
+                                bool.TryParse(item.valore, out chkValue);
+                                this.chk_uo_prot_storicizzati.Checked = chkValue;
+                            }
+                            #endregion
+                            #region UO_PROT_SOTTOSTANTI
+                            else if (item.argomento == DocsPaWR.FiltriDocumento.UO_PROT_SOTTOSTATNTI.ToString())
+                            {
+                                bool chkValue;
+                                bool.TryParse(item.valore, out chkValue);
+                                this.chk_uo_prot_sottostanti.Checked = chkValue;
+                            }
+                            #endregion
+                            #region ID_UO_PROT
+                            else if (item.argomento == DocsPaWR.FiltriDocumento.ID_UO_PROT.ToString())
+                            {
+                                DocsPaWR.Corrispondente corr = AddressBookManager.GetCorrespondentBySystemId(item.valore);
+                                if (corr != null)
+                                {
+                                    this.txt_codUO_Prot.Text = corr.codiceRubrica;
+                                    this.txt_descrUO_Prot.Text = corr.descrizione;
+                                }
+                            }
+                            #endregion
                             #region NUM_OGGETTO
                             else if (item.argomento == DocsPaWR.FiltriDocumento.NUM_OGGETTO.ToString())
                             {
@@ -12520,7 +12642,7 @@ namespace NttDataWA.Search
                                 this.cbxEstendiAFascicoli.Checked = true;
                             }
                             #endregion FASCICOLO
-                                #region CODICE_DESCRIZIONE_AMMINISTRAZIONE
+                            #region CODICE_DESCRIZIONE_AMMINISTRAZIONE
                             else if (item.argomento == DocsPaWR.FiltriDocumento.CODICE_DESCRIZIONE_AMMINISTRAZIONE.ToString())
                             {
                                 if (!string.IsNullOrEmpty(item.valore))
@@ -12538,7 +12660,7 @@ namespace NttDataWA.Search
                                     // questo da errore.
                                     //this.ddl_ragioneTrasm.SelectedItem.Text = item.valore;
                                     // anche questo perché non trova l'item.
-                                    //this.ddl_ragioneTrasm.Items.FindByValue(item.valore).Selected = true;
+                                    this.ddl_ragioneTrasm.Items.FindByValue(item.valore).Selected = true;
 
                                     // risoluzione
                                     this.ddl_ragioneTrasm.SelectedIndex = 1;
@@ -12791,8 +12913,6 @@ namespace NttDataWA.Search
                                     this.cbl_Conservazione.Items[5].Selected = item.valore.Contains("E");
                                     this.cbl_Conservazione.Items[6].Selected = item.valore.Contains("T");
                                     this.cbl_Conservazione.Items[7].Selected = item.valore.Contains("F");
-                                    this.cbl_Conservazione.Items[8].Selected = item.valore.Contains("B");
-                                    this.cbl_Conservazione.Items[9].Selected = item.valore.Contains("K");
                                 }
                             }
                             #endregion

@@ -31,6 +31,40 @@ namespace NttDataWA.Popup
             }
         }
 
+        protected string EtichettaContenuto
+        {
+            get
+            {
+                string result = string.Empty;
+                if(HttpContext.Current.Session["etichettaContenuto"] != null)
+                {
+                    result = HttpContext.Current.Session["etichettaContenuto"].ToString();
+                }
+                return result;
+            }
+            set
+            {
+                HttpContext.Current.Session["etichettaContenuto"] = value;
+            }
+        }
+
+        protected string ContenutoProcedimento
+        {
+            get
+            {
+                string result = string.Empty;
+                if(HttpContext.Current.Session["contenutoProcedimento"] != null)
+                {
+                    result = HttpContext.Current.Session["contenutoProcedimento"].ToString();
+                }
+                return result;
+            }
+            set
+            {
+                HttpContext.Current.Session["contenutoProcedimento"] = value;
+            }
+        }
+
         private string ReturnValue
         {
             get
@@ -56,7 +90,7 @@ namespace NttDataWA.Popup
             if (!this.Page.IsPostBack)
             {
                 this.InitLanguage();
-                this.LoadKey();
+                this.LoadKeys();
                 this.InitPage();
             }
             this.RefreshScript();
@@ -73,6 +107,7 @@ namespace NttDataWA.Popup
             this.CreateNewDocumentProject.Text = Utils.Languages.GetLabelFromCode("CreateNewDocumentProject", language);
             this.CreateNewDocumentCodeProject.Text = Utils.Languages.GetLabelFromCode("CreateNewDocumentCodeProject", language);
             this.CreateNewDocumentDescriptionProject.Text = Utils.Languages.GetLabelFromCode("CreateNewDocumentDescriptionProject", language);
+            this.CreateNewDocumentTypology.Text = Utils.Languages.GetLabelFromCode("DocumentLitTypeDocument", language);
         }
 
         private void ReadRetValueFromPopup()
@@ -94,6 +129,23 @@ namespace NttDataWA.Popup
             bool isRootFolder = false;
             Fascicolo project = UIManager.ProjectManager.getProjectInSession();
             Folder folder = project.folderSelezionato;
+            if(project.template != null && project.template.PROCEDIMENTALE == "1")
+            {
+                this.PnlTypology.Visible = true;
+                this.DocumentImgObjectary.Enabled = false;
+                this.TxtCodeObject.Enabled = false;
+                this.TxtObject.Enabled = false;
+                this.PopolaDdlTipologie();
+                foreach(OggettoCustom ogg in project.template.ELENCO_OGGETTI)
+                {
+                    if(ogg.DESCRIZIONE.ToUpper() == this.EtichettaContenuto.ToUpper())
+                    {
+                        this.ContenutoProcedimento = ogg.VALORE_DATABASE;
+                        break;
+                    }
+                }
+
+            }
 
             if (project.codice == folder.descrizione)
             {
@@ -145,6 +197,16 @@ namespace NttDataWA.Popup
             }
         }
 
+        private void PopolaDdlTipologie()
+        {
+            TipologiaAtto[] tipologie = UIManager.DocumentManager.GetCustomDocumentsLite(UserManager.GetInfoUser().idAmministrazione, UserManager.GetInfoUser().idGruppo, "2");
+            ddlTypology.Items.Add(new ListItem() { Text = string.Empty, Value = string.Empty });
+            foreach(TipologiaAtto item in tipologie)
+            {
+                ddlTypology.Items.Add(new ListItem() { Text = item.descrizione, Value = item.systemId });
+            }
+        }
+
         private void CalcolaFascicolazioneRapida(Folder folder, ref string codice, ref string descrizione, ref bool isRootFolder, string codFascicolo)
         {
             Folder parent = null;
@@ -168,11 +230,15 @@ namespace NttDataWA.Popup
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "InitializeLengthCharacters", "charsLeft('TxtObject','" + this.MaxLenghtObject + "','Descrizione oggetto');", true);
         }
 
-        private void LoadKey()
+        private void LoadKeys()
         {
             if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, DBKeys.FE_MAX_LENGTH_OGGETTO.ToString())))
             {
                 this.MaxLenghtObject = int.Parse(Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, DBKeys.FE_MAX_LENGTH_OGGETTO.ToString()));
+            }
+            if(!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue("0", DBKeys.BE_PROCEDIMENTO_CONTENUTO.ToString())))
+            {
+                this.EtichettaContenuto = Utils.InitConfigurationKeys.GetValue("0", DBKeys.BE_PROCEDIMENTO_CONTENUTO.ToString());
             }
         }
         #endregion
@@ -184,6 +250,7 @@ namespace NttDataWA.Popup
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "reallowOp();", true);
             try
             {
+                Fascicolo fascicolo = UIManager.ProjectManager.getProjectInSession();
                 if (string.IsNullOrEmpty(this.TxtObject.Text))
                 {
                     string msgDesc = "WarningDocumentRequestObject";
@@ -195,11 +262,30 @@ namespace NttDataWA.Popup
                 SchedaDocumento newDoc = UIManager.DocumentManager.NewSchedaDocumento();
                 newDoc.oggetto = new Oggetto();
                 newDoc.oggetto.descrizione = this.TxtObject.Text;
+                if(!string.IsNullOrEmpty(this.ddlTypology.SelectedValue))
+                {
+                    newDoc.tipologiaAtto = new TipologiaAtto() { systemId = this.ddlTypology.SelectedItem.Value, descrizione = this.ddlTypology.SelectedItem.Text };
+                    newDoc.template = ProfilerDocManager.getTemplateById(this.ddlTypology.SelectedItem.Value);
+                    if(newDoc.template.ELENCO_OGGETTI != null && fascicolo.template.ELENCO_OGGETTI != null)
+                    {
+                        foreach(OggettoCustom oggDoc in newDoc.template.ELENCO_OGGETTI)
+                        {
+                            foreach(OggettoCustom oggFasc in fascicolo.template.ELENCO_OGGETTI)
+                            {
+                                if(oggDoc.DESCRIZIONE.ToUpper() == oggFasc.DESCRIZIONE.ToUpper())
+                                {
+                                    oggDoc.VALORE_DATABASE = oggFasc.VALORE_DATABASE;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
                 newDoc = DocumentManager.creaDocumentoGrigio(this, newDoc);
 
                 if (newDoc != null && !string.IsNullOrEmpty(newDoc.systemId))
                 {
-                    Fascicolo fascicolo = UIManager.ProjectManager.getProjectInSession();
+                    
                     // se la creazione del doc è andata a buon fine ..
                     //eseguo la fascicolazione RAPIDA
                     if (fascicolo != null && fascicolo.systemID != null)
@@ -313,5 +399,10 @@ namespace NttDataWA.Popup
         }
 
         #endregion
+
+        protected void ddlTypology_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.TxtObject.Text = ddlTypology.SelectedItem.Text + " - " + this.ContenutoProcedimento;
+        }
     }
 }

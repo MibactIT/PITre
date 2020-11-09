@@ -1,0 +1,41 @@
+﻿.fullHeight {
+    height: 100%;
+}
+
+#segnaturaPermanenteMainContent > div {
+    height: 100%;
+    float: left;
+}
+
+.fullWidth {
+    width: 100%;
+}
+
+#blankDocumentPreview {
+    background-color: white;
+    margin: 10px auto;
+    max-width: 595px;
+    max-height: 842px;
+    position: relative;
+}
+
+
+.boxSegnaturePosition {
+    opacity: 0.50;
+    background-color: #808080;
+    position: absolute;
+    cursor: pointer;
+}
+
+    .boxSegnaturePosition.selected {
+        background-color: red !important;
+    }
+
+#pdfPageInfo {
+    width: 90%;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-left: 10px;
+    margin-top: 20px;
+}

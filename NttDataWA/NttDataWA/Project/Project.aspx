@@ -482,7 +482,7 @@
     <uc:ajaxpopup2 Id="ChooseCorrespondent" runat="server" Url="../popup/ChooseCorrespondent.aspx"
         Width="700" Height="500" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('upPnlButtons', '');}" />
     <uc:ajaxpopup2 Id="StartProcessSignature" runat="server" Url="../popup/StartProcessSignature.aspx?from=SearchDocument"
-        Width="1200" Height="800" PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', ''); }" />
+        Width="600" Height="500" PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', ''); }" />
     <uc:ajaxpopup2 Id="InfoSignatureProcessesStarted" runat="server" Url="../popup/InfoSignatureProcessesStarted.aspx"
         PermitClose="false" PermitScroll="false" Width="600" Height="300" CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', '');}" />
     <uc:ajaxpopup2 Id="CreateNewDocument" runat="server" Url="../popup/CreateNewDocument.aspx"
@@ -493,11 +493,8 @@
         Width="750" Height="500" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('upPnlButtons', 'SignatureProcessConcluted');}" />
     <uc:ajaxpopup2 Id="MassiveReportDragAndDrop" runat="server" Url="../popup/MassiveReportDragAndDrop.aspx"
         Width="700" Height="500" PermitClose="true" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('upPnlButtons', 'POPUP_DRAG_AND_DROP');}" />
-    <uc:ajaxpopup2 Id="DescriptionProjectList" runat="server" Url="../Popup/DescriptionProjectList.aspx" IsFullScreen="false"
-        PermitClose="false" PermitScroll="true" Width="800" Height="1000" CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', '');}" />
-    <uc:ajaxpopup2 Id="MassiveTransmissionAccept" runat="server" Url="../popup/MassiveTransmissionAccept.aspx?type=f"
-        ForceDontClose="true" PermitClose="false" PermitScroll="false" IsFullScreen="false" Width="1000" Height="900"
-        CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', '');}" />
+    <uc:ajaxpopup2 Id="RedirectProject" runat="server" Url="../popup/RedirectProject.aspx"
+        Width="650" Height="400" PermitClose="true" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('upPnlButtons', 'RedirectProject');}" />
     <div id="containerTop">
         <asp:UpdatePanel runat="server" ID="UpHeaderProject" UpdateMode="Conditional">
             <ContentTemplate>
@@ -613,17 +610,6 @@
                             </asp:UpdatePanel>
                             <asp:UpdatePanel runat="server" UpdateMode="Conditional" ID="UpPnlDateProject">
                                 <ContentTemplate>
-                                    <div class="col14">   
-                                            <asp:UpdatePanel ID="UpDirittiFascicolo" runat="server" UpdateMode="Conditional">
-                                                <ContentTemplate>
-                                                    <asp:Panel ID="PnlDirittiFascicolo" Visible="false" runat="server">
-                                                        <span class="weight">
-                                                            <asp:Label ID="LblDiritti" runat="server"></asp:Label></span>
-                                                        <asp:Label ID="LblTipoDiritto" runat="server"></asp:Label>
-                                                    </asp:Panel>
-                                                </ContentTemplate>
-                                            </asp:UpdatePanel>                        
-                                    </div>
                                     <div class="row">
                                         <div id="dateProject">
                                             <div class="row">
@@ -1121,12 +1107,6 @@
                 OnMouseOver="btnHover" OnClick="projectBtnAdL_Click" />
             <cc1:CustomButton ID="projectBtnAdlRole" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
                 OnMouseOver="btnHover" OnClick="projectBtnAdLRole_Click" />
-            <%--<cc1:CustomButton ID="ProjectBtnAccept" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" OnClientClick="return ajaxModalPopupMassiveTransmissionAccept();" Visible="false" />--%>
-            <cc1:CustomButton ID="ProjectBtnAccept" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" OnClick="ProjectBtnAccept_Click"  Visible="false" />
-            <cc1:CustomButton ID="ProjectBtnView" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" OnClick="ProjectBtnView_Click"  Visible="false" />
             <asp:Button ID="btnAddressBookPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
                 OnClick="btnAddressBookPostback_Click" />
             <asp:HiddenField runat="server" ID="HiddenRemoveNode" ClientIDMode="Static" />
@@ -1135,6 +1115,8 @@
                 OnClick="addAll_Click" />
             <asp:Button ID="btnLinkCustom" runat="server" CssClass="hidden" ClientIDMode="Static"
                 OnClick="btnLinkCustom_Click" />
+            <cc1:CustomButton ID="projectBtnRedirect" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
+                OnMouseOver="btnHover" OnClientClick="return ajaxModalPopupRedirectProject();"   />
             <asp:HiddenField ID="HiddenItemsChecked" runat="server" ClientIDMode="Static" />
             <asp:HiddenField ID="HiddenItemsUnchecked" runat="server" ClientIDMode="Static" />
             <asp:HiddenField ID="HiddenItemsAll" runat="server" ClientIDMode="Static" />

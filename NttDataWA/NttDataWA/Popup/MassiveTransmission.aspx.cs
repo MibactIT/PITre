@@ -1742,8 +1742,6 @@ namespace NttDataWA.Popup
                     corrAuthoryzed = new AddressbookQueryCorrispondenteAutorizzato();
                     corrAuthoryzed.ragione = singleTransmission.ragione;
                     corrAuthoryzed.ruolo = RoleManager.GetRoleInSession();
-                    corrAuthoryzed.queryCorrispondente = new AddressbookQueryCorrispondente();
-                    corrAuthoryzed.queryCorrispondente.fineValidita = true;
 
                     // Reperimento dell'array dei ruoli
                     roles = UserManager.getRuoliRiferimentoAutorizzati(

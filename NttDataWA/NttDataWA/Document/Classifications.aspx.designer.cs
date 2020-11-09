@@ -238,15 +238,6 @@ namespace NttDataWA.Document {
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 DetailsLFAutomaticMode;
         
         /// <summary>
-        /// DigitalVisureSelector control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 DigitalVisureSelector;
-        
-        /// <summary>
         /// UpUserControlHeaderDocument control.
         /// </summary>
         /// <remarks>

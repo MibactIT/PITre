@@ -332,40 +332,6 @@ namespace NttDataWA.Transmission
             }
         }
 
-        public string TxtNoteViewer
-        {
-            get
-            {
-                string result = string.Empty;
-                if (HttpContext.Current.Session["TxtNoteViewer"] != null)
-                {
-                    result = HttpContext.Current.Session["TxtNoteViewer"].ToString();
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["TxtNoteViewer"] = value;
-            }
-        }
-
-        private int IdCorrispondeteSelezionatoTrasmissione
-        {
-            get
-            {
-
-                int result = 0;
-                if (HttpContext.Current.Session["IdCorrispondeteSelezionatoTrasmissione"] != null)
-                {
-                    result = Int32.Parse(HttpContext.Current.Session["IdCorrispondeteSelezionatoTrasmissione"].ToString());
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["IdCorrispondeteSelezionatoTrasmissione"] = value;
-            }
-        } 
         #endregion
 
         protected void Page_Load(object sender, EventArgs e)
@@ -630,11 +596,11 @@ namespace NttDataWA.Transmission
                     this.proceed_private.Value = "";
                     this.proceed_ownership.Value = "";
                 }
+
                 this.ShowTransmissions();
                 this.EnableButtons();
                 this.ReApplyScripts();
             }
-            //this.ReadValueFromPopupViewNote();
             this.ReApplyScripts();
         }
 
@@ -742,8 +708,6 @@ namespace NttDataWA.Transmission
             this.dtEntryDocImgAddressBookUser.ToolTip = Utils.Languages.GetLabelFromCode("dtEntryDocImgAddressBookUser", language);
             this.AddressBook.Title = Utils.Languages.GetLabelFromCode("AddressBookTitle", language);
             this.LtrNote.Text = Utils.Languages.GetLabelFromCode("DocumentLitVisibleNotesChars", language) + " ";
-            this.ViewNoteGen.Title = Utils.Languages.GetLabelFromCode("ViewNoteGen", language);
-            this.ViewNoteInd.Title = Utils.Languages.GetLabelFromCode("ViewNoteInd", language);
         }
 
         private string GetLabel(string labelId)
@@ -1384,12 +1348,6 @@ namespace NttDataWA.Transmission
             string idState = string.Empty;
             string idDocument = string.Empty;
             string accessRights = string.Empty;
-
-            if (DocumentManager.getSelectedRecord() != null && !string.IsNullOrEmpty(DocumentManager.getSelectedRecord().systemId))
-            {
-                accessRights = DocumentManager.getSelectedRecord().accessRights;
-                idDocument = DocumentManager.getSelectedRecord().systemId;
-            }
 
             /*  if (this.CustomDocuments)
               {
@@ -2290,19 +2248,7 @@ namespace NttDataWA.Transmission
                     //txt_NoteInd.AutoPostBack = true;
                     txt_NoteInd.TextChanged += new EventHandler(this.txt_NoteInd_TextChanged);
 
-                    CustomImageButton btn_NoteInd = new CustomImageButton();
-                    btn_NoteInd.ID = "btn_NoteInd_" + idCorrispondente;
-                    btn_NoteInd.ImageUrl = "../Images/Icons/ico_objects.png";
-                    btn_NoteInd.OnMouseOutImage = "../Images/Icons/ico_objects.png";
-                    btn_NoteInd.OnMouseOverImage = "../Images/Icons/ico_objects_hover.png";
-                    btn_NoteInd.ImageUrlDisabled = "../Images/Icons/ico_objects_disabled.png";
-                    btn_NoteInd.EnableViewState = true;
-                    btn_NoteInd.ToolTip = Utils.Languages.GetLabelFromCode("btn_NoteIndTooltip", UIManager.UserManager.GetUserLanguage());
-                    btn_NoteInd.CssClass = "clickable";
-                    btn_NoteInd.Click += this.btn_NoteInd_OnClick;
-
                     ((TableCell)GetControlById(row, "trasmDetailsNote_" + idCorrispondente)).Controls.Add(txt_NoteInd);
-                    ((TableCell)GetControlById(row, "trasmDetailsNote_" + idCorrispondente)).Controls.Add(btn_NoteInd);
                 }
 
                 {// cell expire date
@@ -2376,22 +2322,6 @@ namespace NttDataWA.Transmission
             }
         }
 
-        private void btn_NoteInd_OnClick(object sender, System.EventArgs e)
-        {
-            try
-            {
-                int idCorrispondente = Int32.Parse(((CustomImageButton)sender).ID.Substring(12));
-                this.IdCorrispondeteSelezionatoTrasmissione = idCorrispondente;
-                this.TxtNoteViewer = ((TextBox)GetControlById(this.plcTransmissions, "txt_NoteInd_" + idCorrispondente)).Text;
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ViewObject", "ajaxModalPopupViewNoteInd();", true);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
         private void txt_expire_TextChanged(object sender, System.EventArgs e)
         {
             try
@@ -2413,22 +2343,6 @@ namespace NttDataWA.Transmission
             catch (System.Exception ex)
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-        protected void btnViewNoteIndPostback_Click(object sender, EventArgs e)
-        {
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
-            if (!string.IsNullOrEmpty(this.ViewNoteInd.ReturnValue))
-            {
-                //this.ShowTransmissions();
-                ((TextBox)GetControlById(this.plcTransmissions, "txt_NoteInd_" + this.IdCorrispondeteSelezionatoTrasmissione)).Text = this.TxtNoteViewer;
-                this.Transmission.trasmissioniSingole[IdCorrispondeteSelezionatoTrasmissione].noteSingole = this.TxtNoteViewer;
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('ViewNoteInd','');", true);
-                //this.ShowTransmissions();
-                //this.EnableButtons();
-                //this.ReApplyScripts();
                 return;
             }
         }

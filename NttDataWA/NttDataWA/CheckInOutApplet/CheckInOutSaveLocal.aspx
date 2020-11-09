@@ -1,26 +1,26 @@
 ﻿<%@ Page Language="C#" CodeBehind="CheckInOutSaveLocal.aspx.cs" Inherits="NttDataWA.CheckInOutApplet.CheckInOutSaveLocal" MasterPageFile="~/MasterPages/Popup.Master" %>
-
 <%@ Register Assembly="NttDatalLibrary" Namespace="NttDatalLibrary" TagPrefix="cc1" %>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="head" runat="server">
-    <script type="text/javascript">
-        var fsoApp;
-        var specialExtension = '';
+<script type="text/javascript">
+    var fsoApp;
+    var specialExtension = '';
 
-        function confirmAction() {
-            var retval = false;
-            var optSelected = document.getElementById("hdnOptSelected").value;
+    function confirmAction() {
+        var retval = false;
+        var optSelected = document.getElementById("hdnOptSelected").value;
 
-            if (fsoApp == undefined) {
-                fsoApp = window.document.plugins[0];
-            }
-            if (fsoApp == undefined) {
-                fsoApp = document.applets[0];
-            }
+        if (fsoApp == undefined) {
+            fsoApp = window.document.plugins[0];
+        }
+        if (fsoApp == undefined) {
+            fsoApp = document.applets[0];
+        }
 
-            try {
-                disallowOp('Content1');
-                switch (optSelected) {
+        try {
+            disallowOp('Content1');
+            switch(optSelected)
+                {
                     case "FS":
                         retval = SaveFileSystem();
                         break;
@@ -40,28 +40,28 @@
                         retval = SaveFileSystem();
                         break;
                 }
-
+                
                 reallowOp();
-            }
-            catch (ex) {
-                alert(ex.toString());
-                reallowOp();
-                retval = false;
-            }
-
-            return retval;
         }
+        catch (ex) {
+            alert(ex.toString());
+            reallowOp();
+            retval = false;
+        }
+        
+        return retval;
+    }
 
-        function confirmActionSocket() {
-            var retval = false;
-            var optSelected = document.getElementById("hdnOptSelected").value;
+    function confirmActionSocket() {
+        var retval = false;
+        var optSelected = document.getElementById("hdnOptSelected").value;
 
-            try {
-                disallowOp('Content1');
-                switch (optSelected) {
+        try {
+            disallowOp('Content1');
+            switch(optSelected)
+                {
                     case "FS":
-                    case "PKG":
-                        SaveFileSystemSocket(function (retVal, connection) {
+                        SaveFileSystemSocket(function (retVal,connection) {
                             //alert("SaveFileSystem retVal" + retVal);
                             if (retVal) {
                                 ShowSuccess();
@@ -101,11 +101,11 @@
                         break;
                     case "CLSD":
                         ClipBoardRecordLinkSocket(function (retVal, connection) {
-                            if (retVal) {
-                                ShowSuccess();
-                                reallowOp();
-                            }
-                            connection.close();
+                           if (retVal) {
+                               ShowSuccess();
+                               reallowOp();
+                           }
+                           connection.close();
                         });
                         break;
                     default:
@@ -118,42 +118,25 @@
                         });
                         break;
                 }
-
-
-            }
-            catch (ex) {
-                alert(ex.toString());
-                reallowOp();
-                retval = false;
-            }
+                
+               
         }
-
-        function setSessionValue(key, value) {
-        $.ajax({
-            type: "POST",
-            url: "../handler/SessionHandler.ashx",
-            data: { sessionKey: key, sessionValue: value },
-            // DO NOT SET CONTENT TYPE to json
-            // contentType: "application/json; charset=utf-8", 
-            // DataType needs to stay, otherwise the response object
-            // will be treated as a single string
-            dataType: "json"
-        });
+        catch (ex) {
+            alert(ex.toString());
+            reallowOp();
+            retval = false;
+        }
     }
 
-        function SaveFileSystem() {
-            var retval = false;
-            var filePath = FisicalFilePath();
+    function SaveFileSystem() {
+        var retval = false;
+        var filePath = FisicalFilePath();
 
-            if (filePath != null && filePath != '') {
-                try {
-                    var optSelected = document.getElementById("hdnOptSelected").value;
-                    var _zip = optSelected == "PKG" ? "1" : "0"
-                    setSessionValue("DownloadZipPackageDocument", _zip);
-                    //console.log("SETTATA " + _zip);
-                    var encodedFilePath = EncodeHtml(filePath);
-                    var paramPost = "<<filePath:" + encodedFilePath + ">>";
-                    var urlPost = '<%=httpFullPath%>' + '/CheckInOutApplet/SaveFilePage.aspx';
+        if (filePath != null && filePath != '') {
+            try {
+                var encodedFilePath = EncodeHtml(filePath);
+                var paramPost = "<<filePath:" + encodedFilePath + ">>";
+                var urlPost = '<%=httpFullPath%>' + '/CheckInOutApplet/SaveFilePage.aspx';
 
                 if (fsoApp.saveFileFromURL(filePath, urlPost, paramPost)) {
                     fsoApp.openFile(filePath);
@@ -167,134 +150,134 @@
             catch (ex) {
                 //ajaxDialogModal('File_DownloadError', 'error', '');
                 alert('<%=this.GetMessage("DOWNLOAD_ERROR")%>:\n' + ex.toString());
-                    retval = false;
-                }
+                retval = false;
             }
-
-            return retval;
         }
 
-        function SaveDocumentImgLink() {
-            specialExtension = 'URL';
-            var filePath = FisicalFilePath();
-            var linkID = "<%= this.Link %>";
+        return retval;
+    }
+
+    function SaveDocumentImgLink() {
+        specialExtension = 'URL';
+        var filePath = FisicalFilePath();
+        var linkID = "<%= this.Link %>";
         var fileContent = new Array("[InternetShortcut]", "URL=" + linkID, "IconFile=" + "<%= this.FileIcona %>", "IconIndex=1", "[{000214A0-0000-0000-C000-000000000046}]", "HotKey=0", "Prop3=19,2");
-            specialExtension = '';
+        specialExtension = '';
 
-            return fsoApp.createTextFile(filePath, true, fileContent);
+        return fsoApp.createTextFile(filePath, true, fileContent);
+    }
+
+    function SaveRecordLink() {
+        specialExtension = 'URL';
+        var filePath = FisicalFilePath();
+        var linkSD = "<%= this.LinkSD %>";
+        var fileContent = new Array("[InternetShortcut]","URL=" + linkSD,"IconFile=" + "<%= this.FileIcona %>", "IconIndex=1", "[{000214A0-0000-0000-C000-000000000046}]", "HotKey=0", "Prop3=19,2");
+        specialExtension = '';
+
+        return fsoApp.createTextFile(filePath,true,fileContent);
+    }
+
+    function ClipBoardDocumentImgLink() {
+        var linkID = "<%= this.Link %>";
+        return fsoApp.copyToClipboard(linkID);
+    }
+
+    function ClipBoardRecordLink() {
+        var linkSD = "<%= this.LinkSD %>";
+        return fsoApp.copyToClipboard(linkSD);
+    }
+
+    function GetFileName() {
+        var fileName = "";
+        var ext = '';
+
+        var txtName = document.getElementById("txtFileName").value;
+
+        if (txtName != '') {
+            if (specialExtension == '')
+                ext = GetFileExtension();
+            else
+                ext = specialExtension;
+
+            if (ext.toUpperCase() == "P7M")
+                fileName = txtName + "<%=this.GetP7mFileExtensions()%>";
+            else
+                fileName = txtName + "." + ext;
         }
 
-        function SaveRecordLink() {
-            specialExtension = 'URL';
-            var filePath = FisicalFilePath();
-            var linkSD = "<%= this.LinkSD %>";
-        var fileContent = new Array("[InternetShortcut]", "URL=" + linkSD, "IconFile=" + "<%= this.FileIcona %>", "IconIndex=1", "[{000214A0-0000-0000-C000-000000000046}]", "HotKey=0", "Prop3=19,2");
-            specialExtension = '';
+        return fileName;
+    }
 
-            return fsoApp.createTextFile(filePath, true, fileContent);
-        }
-
-        function ClipBoardDocumentImgLink() {
-            var linkID = "<%= this.Link %>";
-            return fsoApp.copyToClipboard(linkID);
-        }
-
-        function ClipBoardRecordLink() {
-            var linkSD = "<%= this.LinkSD %>";
-            return fsoApp.copyToClipboard(linkSD);
-        }
-
-        function GetFileName() {
-            var fileName = "";
-            var ext = '';
-
-            var txtName = document.getElementById("txtFileName").value;
-
-            if (txtName != '') {
-                if (specialExtension == '')
-                    ext = GetFileExtension();
-                else
-                    ext = specialExtension;
-
-                if (ext.toUpperCase() == "P7M")
-                    fileName = txtName + "<%=this.GetP7mFileExtensions()%>";
-                else
-                    fileName = txtName + "." + ext;
-            }
-
-            return fileName;
-        }
-
-        function FisicalFilePath() {
-            var filePath = '';
-            var folderPath = fixPath(document.getElementById("txtFolderPath").value);
-            var tempFileName = GetFileName();
-            if (tempFileName != '') {
-                if (folderPath != null && folderPath != '') {
-                    if (fsoApp.folderExists(folderPath)) {
-                        filePath = folderPath + tempFileName;
-                    }
-                    else {
-                        if (confirm('<%=this.GetMessage("CREATE_PATH")%>')) {
-                            if (fsoApp.createFolder(folderPath)) {
-                                filePath = folderPath + tempFileName;
-                            }
-                            else {
-                                ajaxDialogModal('Path_AccessDenied', 'error', '');
-                                filePath = '';
-                            }
+    function FisicalFilePath() {
+        var filePath = '';
+        var folderPath = fixPath(document.getElementById("txtFolderPath").value);
+        var tempFileName = GetFileName();
+        if (tempFileName != '') {
+            if (folderPath != null && folderPath != '') {
+                if (fsoApp.folderExists(folderPath)) {
+                    filePath = folderPath + tempFileName;
+                }
+                else {
+                    if (confirm('<%=this.GetMessage("CREATE_PATH")%>')) {
+                        if (fsoApp.createFolder(folderPath)) {
+                            filePath = folderPath + tempFileName;
+                        }
+                        else {
+                            ajaxDialogModal('Path_AccessDenied', 'error', '');
+                            filePath = '';
                         }
                     }
                 }
-                else {
-                    ajaxDialogModal('Path_Nonexistent', 'warning', '');
-                    filePath = '';
-                }
             }
             else {
-                ajaxDialogModal('File_InvalidName', 'warning', '');
+                ajaxDialogModal('Path_Nonexistent', 'warning', '');
                 filePath = '';
             }
-
-            return filePath;
+        }
+        else {
+            ajaxDialogModal('File_InvalidName', 'warning', '');
+            filePath = '';
         }
 
+        return filePath;
+    }
 
 
-        function setTempFolder() {
-            if (fsoApp == undefined) {
-                fsoApp = window.document.plugins[0];
-            }
-            if (fsoApp == undefined) {
-                fsoApp = document.applets[0];
-            }
 
-            try {
-                disallowOp('Content1');
-                var folderPath = fsoApp.GetSpecialFolder();
-                if (folderPath != null && folderPath != '') {
-                    document.getElementById("txtFolderPath").value = shortfolderPath(folderPath);
-                }
-                reallowOp();
-            }
-            catch (ex) {
-                //alert(ex.toString());
-                reallowOp();
-            }
+    function setTempFolder() {
+        if (fsoApp == undefined) {
+            fsoApp = window.document.plugins[0];
+        }
+        if (fsoApp == undefined) {
+            fsoApp = document.applets[0];
         }
 
-
-        function SelectFolder() {
-
-            if (fsoApp == undefined) {
-                fsoApp = window.document.plugins[0];
+        try {
+            disallowOp('Content1');
+            var folderPath = fsoApp.GetSpecialFolder();
+            if (folderPath != null && folderPath != '') {
+                document.getElementById("txtFolderPath").value = shortfolderPath(folderPath);
             }
-            if (fsoApp == undefined) {
-                fsoApp = document.applets[0];
-            }
+            reallowOp();
+        }
+        catch (ex) {
+            //alert(ex.toString());
+            reallowOp();
+        }
+    }
 
-            var actualFolder = document.getElementById("txtFolderPath").value;
-            var folder = fsoApp.selectFolder('<%=this.GetMessage("SELECT_PATH")%>', actualFolder);
+
+    function SelectFolder() {
+
+        if (fsoApp == undefined) {
+            fsoApp = window.document.plugins[0];
+        }
+        if (fsoApp == undefined) {
+            fsoApp = document.applets[0];
+        }
+
+        var actualFolder = document.getElementById("txtFolderPath").value;
+        var folder = fsoApp.selectFolder('<%=this.GetMessage("SELECT_PATH")%>', actualFolder);
 
         if (folder != "") {
             if (fsoApp.folderExists(folder)) {
@@ -302,36 +285,35 @@
             }
             else {
                 if (confirm('<%=this.GetMessage("CREATE_PATH")%>')) {
-                        if (fsoApp.createFolder(folder)) {
-                            document.getElementById("txtFolderPath").value = folder;
-                        }
-                        else {
-                            ajaxDialogModal('Path_AccessDenied', 'error', '');
-                            document.getElementById("txtFolderPath").value = '';
-                        }
+                    if (fsoApp.createFolder(folder)) {
+                        document.getElementById("txtFolderPath").value = folder;
+                    }
+                    else {
+                        ajaxDialogModal('Path_AccessDenied', 'error', '');
+                        document.getElementById("txtFolderPath").value = '';
                     }
                 }
             }
         }
-        //NO APPLET INIT
-        function SaveFileSystemSocket(callback) {
-            var retval = false;
-            FisicalFilePathSocket(function (filePath, callback) {
-                //console.log('ZIP 1 SaveFileSystemSocket')
-                if (filePath != null && filePath != '') {
-                    try {
-                        var encodedFilePath = EncodeHtml(filePath);
+    }
+    //NO APPLET INIT
+    function SaveFileSystemSocket(callback) {
+        var retval = false;
+        FisicalFilePathSocket(function (filePath, callback) {
+
+            if (filePath != null && filePath != '') {
+                try {
+                    var encodedFilePath = EncodeHtml(filePath);
 
 
-                        var paramPost = "<<filePath:" + encodedFilePath + ">>";
-                        var urlPost = '../CheckInOutApplet/SaveFilePage.aspx?issocket=true';
-                        var optSelected = document.getElementById("hdnOptSelected").value;
-                        //console.log("SELECED: " + optSelected);
-                        $.ajax({
-                            type: 'POST',
-                            url: urlPost,
-                            data: { "filePath": encodedFilePath, "package" : optSelected == "PKG" ? "1" : "0" },
-                            success: function (content) {
+                    var paramPost = "<<filePath:" + encodedFilePath + ">>";
+                    var urlPost = '../CheckInOutApplet/SaveFilePage.aspx?issocket=true';
+
+                    $.ajax({
+                        type: 'POST',
+                        url: urlPost,
+                        data: { "filePath": encodedFilePath },
+                        success: function (content) {                         
                                 //var content = response.responseText;
                                 saveFile(filePath, content, function (retVal, connection) {
                                     connection.close();
@@ -340,7 +322,7 @@
                                         retval = true;
                                         ShowSuccess();
                                         reallowOp();
-                                        if (callback)
+                                        if(callback)
                                             callback(retVal, connection);
                                     }
                                     else {
@@ -351,17 +333,17 @@
                                     }
 
                                 });
-                            },
-                            error: function () {
-                                reallowOp();
-                                sendError();
-                            },
-                            async: true
-                        });
-                    }
-                    catch (ex) {
-                        //ajaxDialogModal('File_DownloadError', 'error', '');
-                        alert('<%=this.GetMessage("DOWNLOAD_ERROR")%>:\n' + ex.toString());
+                        },
+                        error: function () {
+                            reallowOp();
+                            sendError();
+                        },
+                        async: true
+                    });
+                }
+                catch (ex) {
+                    //ajaxDialogModal('File_DownloadError', 'error', '');
+                    alert('<%=this.GetMessage("DOWNLOAD_ERROR")%>:\n' + ex.toString());
                     retval = false;
                     callback(retval);
                 }
@@ -369,142 +351,142 @@
 
         });
 
+        
 
+    }
 
-        }
+    function SaveDocumentImgLinkSocket(callback) {
+        specialExtension = 'URL';
+        FisicalFilePathSocket(function (filePath) {
+              var linkID = "<%= this.Link %>";
+              var fileContent = new Array("[InternetShortcut]", "URL=" + linkID, "IconFile=" + "<%= this.FileIcona %>", "IconIndex=1", "[{000214A0-0000-0000-C000-000000000046}]", "HotKey=0", "Prop3=19,2");
+              specialExtension = '';
+              createTextFile(filePath, true, fileContent, function (retVal, connection) {
 
-        function SaveDocumentImgLinkSocket(callback) {
-            specialExtension = 'URL';
-            FisicalFilePathSocket(function (filePath) {
-                var linkID = "<%= this.Link %>";
-            var fileContent = new Array("[InternetShortcut]", "URL=" + linkID, "IconFile=" + "<%= this.FileIcona %>", "IconIndex=1", "[{000214A0-0000-0000-C000-000000000046}]", "HotKey=0", "Prop3=19,2");
-            specialExtension = '';
-            createTextFile(filePath, true, fileContent, function (retVal, connection) {
-
-                if (retVal === 'true') {
-                    ShowSuccess();
-                    reallowOp();
-                }
+                  if (retVal === 'true') {
+                      ShowSuccess();
+                      reallowOp();
+				}
                 connection.close();
-            });
+              });
 
         });
-        }
+    }
 
-        function SaveRecordLinkSocket(callback) {
-            specialExtension = 'URL';
-            FisicalFilePathSocket(function (filePath) {
-                var linkSD = "<%= this.LinkSD %>";
-            var fileContent = new Array("[InternetShortcut]", "URL=" + linkSD, "IconFile=" + "<%= this.FileIcona %>", "IconIndex=1", "[{000214A0-0000-0000-C000-000000000046}]", "HotKey=0", "Prop3=19,2");
-            specialExtension = '';
-            createTextFile(filePath, true, fileContent, function (retVal, connection) {
+    function SaveRecordLinkSocket(callback) {
+        specialExtension = 'URL';
+        FisicalFilePathSocket(function(filePath){
+              var linkSD = "<%= this.LinkSD %>";
+              var fileContent = new Array("[InternetShortcut]","URL=" + linkSD,"IconFile=" + "<%= this.FileIcona %>", "IconIndex=1", "[{000214A0-0000-0000-C000-000000000046}]", "HotKey=0", "Prop3=19,2");
+              specialExtension = '';
+              createTextFile(filePath, true, fileContent, function (retVal, connection) {
 
-                if (retVal === 'true') {
+                  if (retVal === 'true') {
                     ShowSuccess();
                     reallowOp();
-                }
-                connection.close();
-            });
+                  }
+                  connection.close();
         });
+        });
+    }
+
+    function ClipBoardDocumentImgLinkSocket(callback) {
+        var linkID = "<%= this.Link %>";
+        copyToClipBoard(linkID,callback);
+    }
+
+    function ClipBoardRecordLinkSocket(callback) {
+        var linkSD = "<%= this.LinkSD %>";
+        copyToClipBoard(linkSD,callback);
+    }
+
+    function GetFileName() {
+        var fileName = "";
+        var ext = '';
+
+        var txtName = document.getElementById("txtFileName").value;
+
+        if (txtName != '') {
+            if (specialExtension == '')
+                ext = GetFileExtension();
+            else
+                ext = specialExtension;
+
+            if (ext.toUpperCase() == "P7M")
+                fileName = txtName + "<%=this.GetP7mFileExtensions()%>";
+            else
+                fileName = txtName + "." + ext;
         }
 
-        function ClipBoardDocumentImgLinkSocket(callback) {
-            var linkID = "<%= this.Link %>";
-            copyToClipBoard(linkID, callback);
-        }
+        return fileName;
+    }
 
-        function ClipBoardRecordLinkSocket(callback) {
-            var linkSD = "<%= this.LinkSD %>";
-            copyToClipBoard(linkSD, callback);
-        }
-
-        function GetFileName() {
-            var fileName = "";
-            var ext = '';
-
-            var txtName = document.getElementById("txtFileName").value;
-
-            if (txtName != '') {
-                if (specialExtension == '')
-                    ext = GetFileExtension();
-                else
-                    ext = specialExtension;
-
-                if (ext.toUpperCase() == "P7M")
-                    fileName = txtName + "<%=this.GetP7mFileExtensions()%>";
-                else
-                    fileName = txtName + "." + ext;
-            }
-
-            return fileName;
-        }
-
-        function FisicalFilePathSocket(callback) {
-            var filePath = '';
-            var folderPath = fixPath(document.getElementById("txtFolderPath").value);
-            var tempFileName = GetFileName();
-            if (tempFileName != '') {
-                if (folderPath != null && folderPath != '') {
-                    folderExists(folderPath, function (retVal, connection) {
-                        if (retVal === "true") {
-                            filePath = folderPath + tempFileName;
-                            callback(filePath);
-                        }
-                        else {
-                            if (confirm('<%=this.GetMessage("CREATE_PATH")%>')) {
-                            createFolder(folderPath, function (retVal, connection) {
-                                if (retVal === "true") {
-                                    filePath = folderPath + tempFileName;
-                                    callback(filePath);
-                                }
-                                else {
-                                    ajaxDialogModal('Path_AccessDenied', 'error', '');
-                                    filePath = '';
-                                    callback(filePath);
-                                }
-                                connection.close();
-                            });
-                        }
-                    }
-                    connection.close();
-                });
-                }
-                else {
-                    ajaxDialogModal('Path_Nonexistent', 'warning', '');
+    function FisicalFilePathSocket(callback) {
+        var filePath = '';
+        var folderPath = fixPath(document.getElementById("txtFolderPath").value);
+        var tempFileName = GetFileName();
+        if (tempFileName != '') {
+            if (folderPath != null && folderPath != '') {
+                folderExists(folderPath, function (retVal, connection) { 
+                if (retVal === "true") {
+                    filePath = folderPath + tempFileName;
                     callback(filePath);
                 }
+                else {
+                    if (confirm('<%=this.GetMessage("CREATE_PATH")%>')) {
+                        createFolder(folderPath, function (retVal, connection) { 
+                             if (retVal === "true") {
+                                 filePath = folderPath + tempFileName;
+                                 callback(filePath);
+                             }
+                             else {
+                                 ajaxDialogModal('Path_AccessDenied', 'error', '');
+                                 filePath = '';
+                                 callback(filePath);
+                             }
+                             connection.close();
+                        });
+                    }
+                }
+                    connection.close();
+                });
             }
             else {
-                ajaxDialogModal('File_InvalidName', 'warning', '');
+                ajaxDialogModal('Path_Nonexistent', 'warning', '');
                 callback(filePath);
             }
-
+        }
+        else {
+            ajaxDialogModal('File_InvalidName', 'warning', '');
+            callback(filePath);
         }
 
-        function setTempFolderSocket() {
+    }
 
-            disallowOp('Content1');
-            getSpecialFolder(function (folderPath, connection) {
-                connection.close();
-                if (folderPath != null && folderPath != '') {
-                    document.getElementById("txtFolderPath").value = shortfolderPath(folderPath);
-                }
-                reallowOp();
-            });
-        }
+    function setTempFolderSocket() {
 
-        function SelectFolderSocket() {
+        disallowOp('Content1');
+        getSpecialFolder(function (folderPath, connection) {
+            connection.close();
+            if (folderPath != null && folderPath != '') {
+                        document.getElementById("txtFolderPath").value = shortfolderPath(folderPath);
+            } 
+            reallowOp();
+         });
+    }
+
+    function SelectFolderSocket() {
 
 
-            if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 || isMsie()) {
-                SelectFolderSocketFirefox();
-            } else {
-                var actualFolderValue = document.getElementById("txtFolderPath").value;
-                var btnBrowseForFolder = document.getElementById("btnBrowseForFolder");
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 || isMsie()) {
+            SelectFolderSocketFirefox();
+        } else {
+            var actualFolderValue = document.getElementById("txtFolderPath").value;
+            var btnBrowseForFolder = document.getElementById("btnBrowseForFolder");
 
-                btnBrowseForFolder.disabled = true;
-                //var folder = fsoApp.selectFolder
-                selectFolder('<%=this.GetMessage("SELECT_PATH")%>', actualFolderValue, function (folder, connection) {
+            btnBrowseForFolder.disabled = true;
+            //var folder = fsoApp.selectFolder
+            selectFolder('<%=this.GetMessage("SELECT_PATH")%>', actualFolderValue, function (folder, connection) {
                 if (folder != "") {
                     folderExists(folder,
                         function (exist, connection) {
@@ -537,12 +519,12 @@
                 }
                 connection.close();
             });
-            }
         }
+    }
 
-        function SelectFolderSocketFirefox() {
-            var actualFolder = document.getElementById("txtFolderPath").value;
-            selectFolder('<%=this.GetMessage("SELECT_PATH")%>', actualFolder, function (folder, connection) {
+    function SelectFolderSocketFirefox() {
+        var actualFolder = document.getElementById("txtFolderPath").value;
+        selectFolder('<%=this.GetMessage("SELECT_PATH")%>', actualFolder, function (folder, connection) {
             if (folder != "") {
                 folderExists(folder,
                     function (exist, connection) {
@@ -569,75 +551,75 @@
             }
             connection.close();
         });
-        }
+    }
 
-        function fixPath(tempPath) {
-            strResult = '';
-            totCh = tempPath.length;
-            if (totCh > 0) {
-                ch = tempPath.substring(totCh - 1, totCh);
-                if (ch == '\\' || ch == '/') {
-                    strResult = tempPath;
-                }
-                else {
-                    if (navigator.platform.toUpperCase().indexOf('LINUX') !== -1 || navigator.platform.toUpperCase().indexOf('MAC') !== -1)
-                        strResult = tempPath + '/';
-                    else
-                        strResult = tempPath + '\\';
-                }
-            }
-
-            return strResult;
-        }
-
-        function GetFileExtension() {
-            var fileType = "";
-
-            if (document.getElementById("cboFileTypes") != null)
-                fileType = document.getElementById("cboFileTypes").value;
-            else if (document.getElementById("lblFileType") != null)
-                fileType = document.getElementById("lblFileType").innerHTML;
-
-            return fileType;
-        }
-
-        function shortfolderPath(longpath) {
-            var tempPath = "";
-            var position = longpath.toUpperCase().indexOf("APPDATA");
-            if (position > 0) {
-                tempPath = longpath.substring(0, position) + "Documents";
+    function fixPath(tempPath) {
+        strResult = '';
+        totCh = tempPath.length;
+        if (totCh > 0) {
+            ch = tempPath.substring(totCh - 1, totCh);
+            if (ch == '\\' || ch == '/') {
+                strResult = tempPath;
             }
             else {
-                tempPath = longpath;
+                if (navigator.platform.toUpperCase().indexOf('LINUX') !== -1 || navigator.platform.toUpperCase().indexOf('MAC') !== -1)
+                    strResult = tempPath + '/';
+                else
+                    strResult = tempPath + '\\';
             }
-
-            return tempPath;
         }
 
+        return strResult;
+    }
 
-        function EncodeHtml(value) {
-            value = escape(value);
-            value = value.replace(/\//g, "%2F");
-            value = value.replace(/\?/g, "%3F");
-            value = value.replace(/=/g, "%3D");
-            value = value.replace(/&/g, "%26");
-            value = value.replace(/@/g, "%40");
-            return value;
+    function GetFileExtension() {
+        var fileType = "";
+
+        if (document.getElementById("cboFileTypes") != null)
+            fileType = document.getElementById("cboFileTypes").value;
+        else if (document.getElementById("lblFileType") != null)
+            fileType = document.getElementById("lblFileType").innerHTML;
+
+        return fileType;
+    }
+
+    function shortfolderPath(longpath) {
+        var tempPath = "";
+        var position = longpath.toUpperCase().indexOf("APPDATA");
+        if (position > 0) {
+            tempPath = longpath.substring(0, position) + "Documents";
+        }
+        else {
+            tempPath = longpath;
         }
 
-        function ShowSuccess() {
-            ajaxDialogModal('ChechInOutSuccess', 'check', '');
-        }
-    </script>
+        return tempPath;
+    }
+
+
+    function EncodeHtml(value) {
+        value = escape(value);
+        value = value.replace(/\//g, "%2F");
+        value = value.replace(/\?/g, "%3F");
+        value = value.replace(/=/g, "%3D");
+        value = value.replace(/&/g, "%26");
+        value = value.replace(/@/g, "%40");
+        return value;
+    }
+
+    function ShowSuccess() {
+        ajaxDialogModal('ChechInOutSuccess', 'check', '');
+    }
+</script>
 </asp:Content>
-<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolderContent" runat="server">
-    <asp:UpdatePanel ID="pnlAppletTag" runat="server" ClientIDMode="Static" UpdateMode="Conditional">
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolderContent" runat="server" >
+     <asp:UpdatePanel ID="pnlAppletTag" runat="server" ClientIDMode="Static" UpdateMode="Conditional">
         <ContentTemplate>
-            <applet id='fsoApplet'
-                code='com.nttdata.fsoApplet.gui.FsoApplet'
-                codebase='<%=Page.ResolveClientUrl("~/Libraries/")%>'
+            <applet id='fsoApplet' 
+                code = 'com.nttdata.fsoApplet.gui.FsoApplet' 
+                codebase=  '<%=Page.ResolveClientUrl("~/Libraries/")%>'
                 archive='FsoApplet.jar'
-                width='10' height='9'>
+            	width = '10'   height = '9'>
                 <param name="java_arguments" value="-Xms128m" />
                 <param name="java_arguments" value="-Xmx512m" />
             </applet>
@@ -652,7 +634,6 @@
                         <asp:RadioButtonList ID="rblListSavingOption" runat="server" AutoPostBack="true" OnSelectedIndexChanged="rblSavingOption_SelectedIndexChanged"
                             RepeatDirection="Vertical">
                             <asp:ListItem ID="optFileSystem" Value="FS" Selected="True" runat="server"></asp:ListItem>
-                            <asp:ListItem ID="optPackage" Value="PKG" runat="server"></asp:ListItem>
                             <asp:ListItem ID="optClipboard" Value="CL" runat="server"></asp:ListItem>
                             <asp:ListItem ID="optClipboardSD" Value="CLSD" runat="server"></asp:ListItem>
                             <asp:ListItem ID="optSaveUrl" Value="URL" runat="server"></asp:ListItem>
@@ -662,7 +643,7 @@
                 </asp:UpdatePanel>
             </div>
             <br />
-            <asp:UpdatePanel ID="udpFileSystem" UpdateMode="Conditional" runat="server">
+             <asp:UpdatePanel ID="udpFileSystem" UpdateMode="Conditional" runat="server">
                 <ContentTemplate>
                     <div>
                         <asp:Label ID="lblFolderPath" runat="server"></asp:Label><br />

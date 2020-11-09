@@ -11,11 +11,14 @@ using System.ComponentModel;
 using System.Web.SessionState;
 using System.Web.UI.HtmlControls;
 using NttDataWA.Utils;
+using log4net;
 
 namespace NttDataWA.UserControls
 {
     public partial class HeaderDocument : System.Web.UI.UserControl
     {
+        private ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private const string NOTPROTOCOL = "N";
         private const string ATTACHMENT = "ALL";
         private const int CODE_ATTACH_USER = 1;
@@ -498,7 +501,79 @@ namespace NttDataWA.UserControls
                 this.LblIdDocument.Visible = true;
 
                 this.LblIdDocument.Text = doc.systemId;
-                if (doc.protocollo != null && !string.IsNullOrEmpty(doc.protocollo.segnatura))
+                if (doc.DettaglioSegnatura != null)
+                {
+                    // Aiello Alessandro 
+                    // ****** Gestione Segnatura Permanente
+
+                    // Protocollo
+                    // logger.Debug("Dettaglio segnatura recuperato");
+                    this.LblReferenceCode.Text = String.Empty;
+                    if (!String.IsNullOrWhiteSpace(doc.DettaglioSegnatura.SegnaturaProtocollo))
+                    {
+                        this.LblReferenceCode.Text = doc.DettaglioSegnatura.SegnaturaProtocollo;
+                        this.LblReferenceCode.Visible = true;
+
+                        if (!String.IsNullOrWhiteSpace(doc.DettaglioSegnatura.SegnaturaRepertorio)) //
+                        {
+
+                            if ("1".Equals(doc.DettaglioSegnatura.DettaglioSegnaturaRepertorio?.Onnicomprensiva))
+                            {
+                                this.LblReferenceCode.Text += " " + doc.DettaglioSegnatura.SegnaturaRepertorio;
+                            } 
+                            else
+                            {
+                                this.DocumentLitTypeDocumentHead.Visible = true;
+                                this.DocumentLitTypeDocumentValue.Visible = true;
+                                this.DocumentLitTypeDocumentValue.Text = doc?.template.DESCRIZIONE ?? String.Empty;
+                                if (doc.DettaglioSegnatura.DettaglioSegnaturaRepertorio?.DataAnnullamento.HasValue ?? false)
+                                {
+                                    DocumentLitRepertoryValue.Attributes.Add("class", "redStrike");
+                                }
+                                this.DocumentLitRepertoryValue.Visible = true;
+                                this.DocumentLitRepertory.Visible = true;
+                                this.DocumentLitRepertoryValue.Text = doc.DettaglioSegnatura.SegnaturaRepertorio;
+                            }
+                        }
+                        this.LblReferenceCode.ToolTip = this.LblReferenceCode.Text + ("1".Equals(doc.DettaglioSegnatura.Segnato) ? " (PERMANENTE)" : "");
+                    }
+                    else if(!String.IsNullOrWhiteSpace(doc.DettaglioSegnatura.SegnaturaRepertorio) && "1".Equals(doc.DettaglioSegnatura.IsPermanenteRepertorio))
+                    {
+                        this.LblReferenceCode.Text = doc.DettaglioSegnatura.SegnaturaRepertorio;
+                        this.LblReferenceCode.Visible = true;
+                        this.LblReferenceCode.ToolTip = this.LblReferenceCode.Text + ("1".Equals(doc.DettaglioSegnatura.Segnato) ? " (PERMANENTE)" : "");
+                    }
+
+                    
+
+
+
+                    //switch (doc.tipoProto.ToUpper())
+                    //{
+                    //    case "A":
+                    //    case "P":
+                    //    case "I":
+                    //        // logger.Debug("Tipo Protocollo");
+                    //        this.LblReferenceCode.Text = doc.DettaglioSegnatura.SegnaturaProtocollo;
+                    //        if(doc.template != null)
+                    //        {
+                    //            this.LblReferenceCode.Text += " " + doc.DettaglioSegnatura.SegnaturaRepertorio;
+                    //        }
+                    //        this.LblReferenceCode.ToolTip = this.LblReferenceCode.Text + ("1".Equals(doc.DettaglioSegnatura.Segnato) ? " (PERMANENTE)" : "");
+                    //        break;
+                    //    case "G":
+                    //        // logger.Debug("Tipo NON protocollo");
+                    //        // segnatura disabilitata per i non protocollati
+                    //        if(doc.template != null)
+                    //        {
+                    //            this.LblReferenceCode.Text = doc.DettaglioSegnatura.SegnaturaRepertorio;
+                    //            this.LblReferenceCode.ToolTip = doc.DettaglioSegnatura.SegnaturaRepertorio + ("1".Equals(doc.DettaglioSegnatura.Segnato) ? " (PERMANENTE)" : "" );
+                    //        }
+                    //        break;
+                    //}
+                    // this.LblReferenceCode.ForeColor = System.Drawing.Color.Red;
+                }
+                else if (doc.protocollo != null && !string.IsNullOrEmpty(doc.protocollo.segnatura))
                 {
                     this.DocumentLblReferenceCodeLabel.Visible = true;
                     this.LblReferenceCode.Visible = true;
@@ -506,7 +581,8 @@ namespace NttDataWA.UserControls
                     this.LblReferenceCode.ToolTip = doc.protocollo.segnatura;
                 }
 
-                if (doc.template != null)
+                //***** Alessandro Aiello 11/12/2018
+                if (!"1".Equals(doc.DettaglioSegnatura?.IsPermanenteRepertorio) && doc.template != null)
                 {
                     this.DocumentLitTypeDocumentHead.Visible = true;
                     this.DocumentLitTypeDocumentValue.Visible = true;

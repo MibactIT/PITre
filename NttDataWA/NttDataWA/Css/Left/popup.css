@@ -2192,22 +2192,6 @@ ul.rblHorizontal li
     width: 25%;
 }
 
-.colHalf15
-{
-    float: left;
-    margin: 0px;
-    text-align: left;
-    width: 21%;
-}
-
-.colHalf16
-{
-    float: left;
-    margin-left:10px;
-    text-align: left;
-    width: 37%;
-}
-
 .instanceHash
 {
   cursor:pointer;
@@ -2692,7 +2676,10 @@ a.ViewDocumentLinkFile:hover
 {
     font-style: italic;
 }
-
+.tbl_rounded_custom tr.users td.first
+{
+    padding-left: 25px;
+}
 .tbl_rounded_custom tr.alternate td
 {
     background-color: #E1EAF1;
@@ -3478,10 +3465,10 @@ fieldset.basic4
 
 .colHalfSmist2
 {
-    float: left;
+    float: right;
     margin: 0px;
     text-align: right;
-    width: 70%;
+    width: 74%;
 }
 
 .colHalfEsamina
@@ -3874,73 +3861,4 @@ fieldset.basic4
 {
     text-decoration:none;
     color:#666666;
-}
-
-.contentDxSxEsamina
-{
-    float: left;
-    width: 80%;
-    min-height: 300px;
-}
-
-.contentDxSxEsamina h6 a:link
-{
-    color:#333333;
-    text-decoration:none;
-    background-color:#ffffff;
-}
-.contentDxSxEsamina h6 a:visited
-{
-    color:#333333;
-    text-decoration:none;
-     background-color:#ffffff;
-}
-
-.contentDxSxEsamina  h6 a:hover
-{
-    color:#333333;
-     background-color:#ffffff;
-    text-decoration:underline;
-}
-
-
-.contentDxSxEsamina fieldset
-{
-    margin: 2px;
-    border: 1px solid #cccccc;
-    padding: 5px;
-    width: 101%;
-    border-radius: 5px;
-    -ms-border-radius: 5px; /* ie */
-    -moz-border-radius: 5px; /* firefox */
-    -webkit-border-radius: 5px; /* safari, chrome */
-    -o-border-radius: 5px; /* opera */
-}
-
-.contentDxSxEsamina fieldset#docAcquisition
-{
-    width: 110%;
-    min-height: 300px;
-}
-
-.contentDxSxEsamina h4
-{
-    margin-top: 5%;
-    text-align: center;
-    font-size: 2em;
-}
-
-.contentDxSxEsamina h4.vcenter
-{
-    margin-top: 16%;
-}
-
-.contentMassiveTransmissionAccept
-{
-    margin: 15px;
-}
-
-.marginTopMassiveTransmissionAccept
-{
-    margin-top:50px;
 }

@@ -247,49 +247,49 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.UpdatePanel upPnlGeneral;
         
         /// <summary>
-        /// labelCaptionUploadMassivo control.
+        /// optScanner control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal labelCaptionUploadMassivo;
+        protected global::System.Web.UI.WebControls.RadioButton optScanner;
         
         /// <summary>
-        /// labelCellHeaderUploadDocument control.
+        /// UpdatePanelScanner control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal labelCellHeaderUploadDocument;
+        protected global::System.Web.UI.UpdatePanel UpdatePanelScanner;
         
         /// <summary>
-        /// cellLabelAttachment control.
+        /// scanAcquire control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTableCell cellLabelAttachment;
+        protected global::NttDatalLibrary.CustomButton scanAcquire;
         
         /// <summary>
-        /// labelButtonUploadDocument control.
+        /// litOtherwise control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal labelButtonUploadDocument;
+        protected global::System.Web.UI.WebControls.Literal litOtherwise;
         
         /// <summary>
-        /// cellUploadAttachment control.
+        /// optUpload control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTableCell cellUploadAttachment;
+        protected global::System.Web.UI.WebControls.RadioButton optUpload;
         
         /// <summary>
         /// UpdatePanelFsoFile control.
@@ -308,6 +308,69 @@ namespace NttDataWA.Popup {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal litUploadMax;
+        
+        /// <summary>
+        /// optRepository control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton optRepository;
+        
+        /// <summary>
+        /// UpdatePanelRepository control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel UpdatePanelRepository;
+        
+        /// <summary>
+        /// repositoryOpen control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomButton repositoryOpen;
+        
+        /// <summary>
+        /// fileOptions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList fileOptions;
+        
+        /// <summary>
+        /// optPDF control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListItem optPDF;
+        
+        /// <summary>
+        /// optPapery control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListItem optPapery;
+        
+        /// <summary>
+        /// FsoFileUploadSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel FsoFileUploadSection;
         
         /// <summary>
         /// litStatus control.
@@ -337,22 +400,13 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.Literal litStartDownloadBytes4;
         
         /// <summary>
-        /// fileOptions control.
+        /// UpUpdateButtons control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList fileOptions;
-        
-        /// <summary>
-        /// optPDF control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.ListItem optPDF;
+        protected global::System.Web.UI.UpdatePanel UpUpdateButtons;
         
         /// <summary>
         /// UploadBtnUploadFile control.
@@ -364,66 +418,12 @@ namespace NttDataWA.Popup {
         protected global::NttDatalLibrary.CustomButton UploadBtnUploadFile;
         
         /// <summary>
-        /// labelCaptionScanner control.
+        /// SenderBtnClose control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal labelCaptionScanner;
-        
-        /// <summary>
-        /// scanAcquire control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton scanAcquire;
-        
-        /// <summary>
-        /// headerAccordionBigFile control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl headerAccordionBigFile;
-        
-        /// <summary>
-        /// labelCaptionBigFile control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal labelCaptionBigFile;
-        
-        /// <summary>
-        /// contentAccordionBigFile control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl contentAccordionBigFile;
-        
-        /// <summary>
-        /// repositoryOpen control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton repositoryOpen;
-        
-        /// <summary>
-        /// UpUpdateButtons control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpUpdateButtons;
+        protected global::NttDatalLibrary.CustomButton SenderBtnClose;
     }
 }

@@ -51,7 +51,7 @@
         </div>
         <!--Fine Messaggio di avviso -->
 
-        <div id="containerLogin">
+        <div id="containerLogin" runat="server">
             <asp:UpdatePanel ID="UpPnlLogin" runat="server" UpdateMode="Conditional">
                 <ContentTemplate>
                     <asp:HiddenField runat="server" ID="HiForcerLogin" ClientIDMode="Static" />
@@ -114,9 +114,6 @@
                                     OnMouseOver="btnHover" OnClick="BtnLogin_Click" />
                             </fieldset>
                             <h4><asp:LinkButton runat="server" ID="LogInLinkAccessibleVersion" Visible="false"></asp:LinkButton></h4>
-                            <!--[if lte IE 9 ]>
-                              <p style="margin: 0px 20px; top: 25px; position: absolute; font-weight:bold;">La versione di Internet Explorer installata su questo PC non supporta le funzioni di acquisizione massiva di file in PITre introdotte dalla versione 3.2.15 in data 30-05-2019</p>
-                            <![endif]-->
                         </div>
                     </div>
                 </ContentTemplate>

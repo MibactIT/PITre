@@ -13,10 +13,8 @@
     }
 
     function CloseWaitingPage() {
-        if (typeof (wndAttendi) != 'undefined') {
-            if (!wndAttendi.closed)
-                wndAttendi.close();
-        }
+        if (wndAttendi != null)
+            wndAttendi.close();
     }
 
     function attendi() {
@@ -225,67 +223,9 @@
         }
     }
 
-    if (!String.prototype.repeat) {
-        String.prototype.repeat = function (count) {
-            'use strict';
-            if (this == null) {
-                throw new TypeError('can\'t convert ' + this + ' to object');
-            }
-            var str = '' + this;
-            count = +count;
-            if (count != count) {
-                count = 0;
-            }
-            if (count < 0) {
-                throw new RangeError('repeat count must be non-negative');
-            }
-            if (count == Infinity) {
-                throw new RangeError('repeat count must be less than infinity');
-            }
-            count = Math.floor(count);
-            if (str.length == 0 || count == 0) {
-                return '';
-            }
-            // Ensuring count is a 31-bit integer allows us to heavily optimize the
-            // main part. But anyway, most current (August 2014) browsers can't handle
-            // strings 1 << 28 chars or longer, so:
-            if (str.length * count >= 1 << 28) {
-                throw new RangeError('repeat count must not overflow maximum string size');
-            }
-            var maxCount = str.length * count;
-            count = Math.floor(Math.log(count) / Math.log(2));
-            while (count) {
-                str += str;
-                count--;
-            }
-            str += str.substring(0, maxCount - str.length);
-            return str;
-        }
-    }
-
-
-    // https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
-    if (!String.prototype.padStart) {
-        String.prototype.padStart = function padStart(targetLength, padString) {
-            targetLength = targetLength >> 0; //truncate if number or convert non-number to 0;
-            padString = String((typeof padString !== 'undefined' ? padString : ' '));
-            if (this.length > targetLength) {
-                return String(this);
-            }
-            else {
-                targetLength = targetLength - this.length;
-                if (targetLength > padString.length) {
-                    padString += padString.repeat(targetLength / padString.length); //append to original to ensure we are longer than needed
-                }
-                return padString.slice(0, targetLength) + String(this);
-            }
-        };
-    }
-
     function stringForReport(stato, tipo, percorso) {
         var today = new Date()
-        var data = (today.getDate()).toString().padStart(2, '0') + "/" + (today.getMonth() + 1).toString().padStart(2, '0') + "/" + today.getFullYear().toString() + "  " + today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var data = today.getDate().toString() + "/" + today.getMonth().toString() + "/" + today.getFullYear().toString() + "  " + today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         var resultStr = data + "@-@" + tipo + "@-@" + percorso + "@-@" + stato + "\r\n";
         return resultStr;
     }
@@ -324,6 +264,7 @@
         }
 
     function setTempFolder() {
+
         disallowOp('Content1');
         getSpecialFolder(function (folderPath, connection) {
             connection.close();
@@ -352,6 +293,7 @@
 
         var actualFolder = document.getElementById("txtFolderPath");
         var btnBrowseForFolder = document.getElementById("btnBrowseForFolder");
+
         btnBrowseForFolder.disabled = true;
         //var folder = fsoApp.selectFolder
         selectFolder('<%=this.GetMessage("SELECT_PATH")%>', actualFolder.value, function (folder, connection) {
@@ -509,7 +451,7 @@
                     <div><br />
                         <asp:Label ID="lblFolderPath" runat="server"></asp:Label><br />
                         <asp:TextBox ID="txtFolderPath" runat="server" Width="400px" ClientIDMode="Static"></asp:TextBox>
-                        <asp:Button ID="btnBrowseForFolder" runat="server" Text="..." OnClientClick="SelectFolder(); return false;" ClientIDMode="Static"></asp:Button>
+                        <asp:Button ID="btnBrowseForFolder" runat="server" Text="..." OnClientClick="SelectFolder();" ClientIDMode="Static"></asp:Button>
                     </div>
                     <asp:HiddenField ID="hdResult" runat="server" ClientIDMode="Static" />
                     <uc4:ImportProjectApplet ID="ImportProjectApplet" runat="server" />

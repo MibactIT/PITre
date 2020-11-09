@@ -4,8 +4,6 @@
 <%@ Register Assembly="NttDatalLibrary" Namespace="NttDatalLibrary" TagPrefix="cc1" %>
 <%@ Register Src="~/UserControls/Calendar.ascx" TagPrefix="uc2" TagName="Calendar" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-        <script src="../Scripts/chosen.jquery.min.js" type="text/javascript"></script>
-    <link href="../Css/chosen.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
         .container
         {
@@ -22,6 +20,9 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolderContent" runat="server">
     <div class="container">
         <div class="row">
+            <div class="col">
+                <asp:Label ID="lblCorr" runat="server"></asp:Label>
+            </div>
         </div>
         <div class="row">
             <div class="col">
@@ -32,24 +33,11 @@
         <div class="row">
             <div class="col-full">
                 <cc1:CustomTextArea ID="txtNoteInd" runat="server" TextMode="MultiLine" CssClass="txt_textarea"
-                    CssClassReadOnly="txt_textarea_disabled" MaxLength="250" ClientIDMode="Static" Width="98%">
+                    CssClassReadOnly="txt_textarea_disabled" ClientIDMode="Static" Width="98%">
                 </cc1:CustomTextArea>
             </div>
         </div>
         <div class="row">
-            <div class="col-right-no-margin">
-                <span class="charactersAvailable">
-                    <asp:Literal ID="LtrNoteInd" runat="server" ClientIDMode="Static"> </asp:Literal>
-                    <span id="txtNoteInd_chars" clientidmode="Static" runat="server"></span>
-                </span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <span class="weight">
-                <asp:Label ID="lblCorr" runat="server"></asp:Label>
-                    </span>
-            </div>
             <div class="col">
                 <span class="weight">
                     <asp:Literal runat="server" ID="LitNoteSmistamentoScadTitle"></asp:Literal>

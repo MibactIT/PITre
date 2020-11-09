@@ -19,7 +19,7 @@ namespace NttDataWA {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Html;
+        protected global::System.Web.UI.HtmlControls.HtmlElement Html;
         
         /// <summary>
         /// CssLayout control.
@@ -65,6 +65,15 @@ namespace NttDataWA {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label msgLoginText;
+        
+        /// <summary>
+        /// containerLogin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl containerLogin;
         
         /// <summary>
         /// UpPnlLogin control.

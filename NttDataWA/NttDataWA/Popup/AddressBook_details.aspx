@@ -208,8 +208,7 @@
                 <div class="col col-label">
                     <asp:Literal ID="lbl_registro" runat="server" /></div>
                 <div class="col-no-margin">
-                    <asp:Literal ID="lit_registro" runat="server" Visible="false" />
-                    <asp:DropDownList ID="ddl_registri" runat="server" AutoPostBack="true" CssClass="chzn-select-deselect" width="300px" OnSelectedIndexChanged="ddl_registri_SelectedIndexChanged" />
+                    <asp:Literal ID="lit_registro" runat="server" />
                 </div>
             </div>
         </asp:PlaceHolder>
@@ -604,21 +603,14 @@
     </div>
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="ContentPlaceOldersButtons" runat="server">
-    <asp:UpdatePanel ID="UpPanelButton" runat="server" UpdateMode="Conditional">
-        <ContentTemplate>
-            <cc1:CustomButton ID="BtnDelete" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" ClientIDMode="Static" OnClientClick="disallowOp('Content2');"
-                OnClick="BtnDelete_Click" Visible="false" />
-            <cc1:CustomButton ID="BtnModify" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" ClientIDMode="Static" OnClientClick="disallowOp('Content2');"
-                OnClick="BtnModify_Click" Visible="false" />
-            <cc1:CustomButton ID="BtnInsert" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" ClientIDMode="Static" OnClientClick="disallowOp('Content2');"
-                OnClick="BtnInsert_Click" Visible="false" />
-            <cc1:CustomButton ID="BtnClose" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" ClientIDMode="Static" OnClientClick="disallowOp('Content2');"
-                OnClick="BtnClose_Click" />
-            <asp:HiddenField ID="proceed_delete" runat="server" ClientIDMode="Static" />
-        </ContentTemplate>
-    </asp:UpdatePanel>
+    <cc1:CustomButton ID="BtnDelete" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
+        OnMouseOver="btnHover" ClientIDMode="Static" OnClientClick="disallowOp('Content2');"
+        OnClick="BtnDelete_Click" Visible="false" />
+    <cc1:CustomButton ID="BtnModify" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
+        OnMouseOver="btnHover" ClientIDMode="Static" OnClientClick="disallowOp('Content2');"
+        OnClick="BtnModify_Click" Visible="false" />
+    <cc1:CustomButton ID="BtnClose" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
+        OnMouseOver="btnHover" ClientIDMode="Static" OnClientClick="disallowOp('Content2');"
+        OnClick="BtnClose_Click" />
+    <asp:HiddenField ID="proceed_delete" runat="server" ClientIDMode="Static" />
 </asp:Content>

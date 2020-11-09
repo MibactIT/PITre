@@ -7456,15 +7456,15 @@ namespace NttDataWA.Search
             get
             {
                 List<int> result = new List<int>();
-                if (HttpContext.Current.Session["colorSearchTransmission"] != null)
+                if (HttpContext.Current.Session["color"] != null)
                 {
-                    result = HttpContext.Current.Session["colorSearchTransmission"] as List<int>;
+                    result = HttpContext.Current.Session["color"] as List<int>;
                 }
                 return result;
             }
             set
             {
-                HttpContext.Current.Session["colorSearchTransmission"] = value;
+                HttpContext.Current.Session["color"] = value;
             }
         }
 

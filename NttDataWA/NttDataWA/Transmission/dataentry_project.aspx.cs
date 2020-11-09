@@ -2877,8 +2877,6 @@ namespace NttDataWA.Transmission
                 DocsPaWR.AddressbookQueryCorrispondenteAutorizzato qca = new DocsPaWR.AddressbookQueryCorrispondenteAutorizzato();
                 qca.ragione = trasmissioneSingola.ragione;
                 qca.ruolo = UserManager.GetSelectedRole();
-                qca.queryCorrispondente = new AddressbookQueryCorrispondente();
-                qca.queryCorrispondente.fineValidita = true;
 
                 //DocsPaWR.Ruolo[] ruoli = UserManager.getListaRuoliInUO(this, theUo, UserManager.getInfoUtente());
                 DocsPaWR.Ruolo[] ruoli = UserManager.getRuoliRiferimentoAutorizzati(this, qca, theUo);

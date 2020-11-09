@@ -137,11 +137,11 @@ namespace NttDataWA.Home
             }
         }
 
-        private List<FiltroElementiLibroFirma> FiltersElement
+        private FiltroElementiLibroFirma FiltersElement
         {
             get
             {
-                return (List<FiltroElementiLibroFirma>)HttpContext.Current.Session["FiltersElement"];
+                return (FiltroElementiLibroFirma)HttpContext.Current.Session["FiltersElement"];
             }
             set
             {
@@ -201,22 +201,6 @@ namespace NttDataWA.Home
             }
         }
 
-        private bool AddElementiInADL
-        {
-            get
-            {
-                bool result = false;
-                if (HttpContext.Current.Session["AddElementiInADL"] != null)
-                {
-                    result = bool.Parse(HttpContext.Current.Session["AddElementiInADL"].ToString());
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["AddElementiInADL"] = value;
-            }
-        }
         #endregion
 
         #region Const
@@ -281,9 +265,7 @@ namespace NttDataWA.Home
             if (!string.IsNullOrEmpty(this.HiddenRespingiSelezionati.Value))
             {
                 this.HiddenRespingiSelezionati.Value = string.Empty;
-                this.SelectedRow = "-1";
                 RespingiSelezionati();
-                this.HomeTabs.RefreshLayoutTab();
                 return;
             }
 
@@ -323,12 +305,12 @@ namespace NttDataWA.Home
                 }
                 if (this.Request.Form["__EVENTARGUMENT"] != null && (this.Request.Form["__EVENTARGUMENT"].Equals(CLOSE_POPUP_SIGNATURE_SELECTED_ITEMS)))
                 {
-                    HttpContext.Current.Session.Remove("AddElementiInADL");
-                    this.SelectedRow = "-1";
+                    //this.totalFileSize = (from i in this.ListaElementiLibroFirma
+                    //                      where i.StatoFirma == TipoStatoElemento.DA_FIRMARE
+                    //                      select i.FileSize).Sum();
                     LoadElementiLbroFirma();
-                    this.ApplyFilters();
                     this.GridViewResult_Bind();
-                    this.HomeTabs.RefreshLayoutTab();
+                    //this.UpnlGrid.Update();
                     return;
                 }
                 else
@@ -464,8 +446,6 @@ namespace NttDataWA.Home
             this.DetailsLFAutomaticMode.Title = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeTitle", language);
             this.TipoFirmaDigitale_People.ToolTip = Utils.Languages.GetLabelFromCode("ToolTipPreferenzaFirma", language);
             this.LibroFirmaImgRefresh.ToolTip = Utils.Languages.GetLabelFromCode("IndexImgRefreshTooltip", language);
-            this.LibroFirmaFirmaSelezionatiAdl.Text = Utils.Languages.GetLabelFromCode("LibroFirmaFirmaSelezionatiAdl", language);
-            this.LibroFirmaFirmaSelezionatiAdl.ToolTip = Utils.Languages.GetLabelFromCode("LibroFirmaFirmaSelezionatiAdlTooltip", language);
         }
 
         private void ClearSession()
@@ -858,13 +838,10 @@ namespace NttDataWA.Home
 
         protected void TipoFirmaDigitale_People_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //Se l'utente esercita in delega non memorizzo il tipo di firma scelto
-            InfoUtente infoUtente = UserManager.GetInfoUser();
             if (!string.IsNullOrEmpty(TipoFirmaDigitale_People.SelectedValue.ToString()))
             {
                 UpdateTipoFirma(TipoFirmaDigitale_People.SelectedValue.ToString().ToUpper());
-                if (infoUtente.delegato == null || string.IsNullOrEmpty(infoUtente.delegato.idPeople))
-                    UIManager.UserManager.SetSignTypePreference(UIManager.UserManager.GetUserInSession().idPeople, cha_TipoFirma_People);
+                UIManager.UserManager.SetSignTypePreference(UIManager.UserManager.GetUserInSession().idPeople, cha_TipoFirma_People);
             }
         }
 
@@ -882,12 +859,6 @@ namespace NttDataWA.Home
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningNoElementsToRejectSelected', 'warning', '', '');} else {parent.ajaxDialogModal('WarningNoElementsToRejectSelected', 'warning', '', '');}", true);
             }
-        }
-
-        protected void LibroFirmaFirmaSelezionatiAdl_Click(object sender, EventArgs e)
-        {
-            this.AddElementiInADL = true;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxModalPopupSignatureSelectedItems", "ajaxModalPopupSignatureSelectedItems();", true);
         }
 
         private void RespingiSelezionati()
@@ -1358,582 +1329,6 @@ namespace NttDataWA.Home
             }
 
             this.ListaElementiFiltrati = tmp;
-        }
-
-        private void ApplyFilters()
-        {
-            if (FiltersElement != null && FiltersElement.Count > 0)
-            {
-                List<ElementoInLibroFirma> tmpListElemetsFilter = new List<ElementoInLibroFirma>();
-                ListaElementiFiltrati.Clear();
-                foreach (DocsPaWR.FiltroElementiLibroFirma item in FiltersElement)
-                {
-                    #region TIPO
-                    #region PROTOCOLLO_ARRIVO
-                    if (item.Argomento == DocsPaWR.FiltriDocumento.PROT_ARRIVO.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiLibroFirma
-                                                     where e.InfoDocumento.TipoProto.Equals("A") && !string.IsNullOrEmpty(e.InfoDocumento.NumProto)
-                                                     select e).ToList());
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    #endregion
-                    #region PROTOCOLLO_PARTENZA
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.PROT_PARTENZA.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiLibroFirma
-                                                     where e.InfoDocumento.TipoProto.Equals("P") && !string.IsNullOrEmpty(e.InfoDocumento.NumProto)
-                                                     select e).ToList());
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    #endregion
-                    #region PROTOCOLLO_INTERNO
-
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.PROT_INTERNO.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiLibroFirma
-                                                     where e.InfoDocumento.TipoProto.Equals("I") && !string.IsNullOrEmpty(e.InfoDocumento.NumProto)
-                                                     select e).ToList());
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    #endregion
-                    #region GRIGI
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.GRIGIO.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiLibroFirma
-                                                     where e.InfoDocumento.TipoProto.Equals("G") && string.IsNullOrEmpty(e.InfoDocumento.IdDocumentoPrincipale)
-                                                     select e).ToList());
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    #endregion
-                    #region PREDISPOSTI
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.PREDISPOSTO.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiLibroFirma
-                                                     where !e.InfoDocumento.TipoProto.Equals("G") && string.IsNullOrEmpty(e.InfoDocumento.NumProto)
-                                                     select e).ToList());
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    #endregion
-                    #region ALLEGATI
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.ALLEGATO.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiLibroFirma where !string.IsNullOrEmpty(e.InfoDocumento.IdDocumentoPrincipale) select e).ToList());
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    #endregion
-                    #endregion
-                    #region OGGETTO
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.OGGETTO.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati where e.InfoDocumento.Oggetto.ToUpper().Trim().Contains(item.Valore.ToUpper().Trim()) select e).ToList());
-                        this.ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion OGGETTO
-                    #region NUMERO_PROTOCOLLO
-
-                    #region NUM_PROTOCOLLO
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.NUM_PROTOCOLLO.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.NumProto) && Convert.ToInt32(e.InfoDocumento.NumProto) == Convert.ToInt32(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion NUM_PROTOCOLLO
-                    #region NUM_PROTOCOLLO_DAL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.NUM_PROTOCOLLO_DAL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiLibroFirma
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.NumProto) && Convert.ToInt32(e.InfoDocumento.NumProto) >= Convert.ToInt32(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion NUM_PROTOCOLLO_DAL
-                    #region NUM_PROTOCOLLO_AL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.NUM_PROTOCOLLO_AL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiLibroFirma
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.NumProto) && Convert.ToInt32(e.InfoDocumento.NumProto) <= Convert.ToInt32(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion NUM_PROTOCOLLO_AL
-
-                    #endregion
-                    #region DATA_PROTOCOLLO
-
-                    #region DATA_PROT_IL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_PROT_IL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataProtocollo) && Utils.dateformat.ConvertToDate(e.InfoDocumento.DataProtocollo).ToShortDateString().Equals(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_PROT_IL
-                    #region DATA_PROT_SUCCESSIVA_AL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_PROT_SUCCESSIVA_AL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataProtocollo) && Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.InfoDocumento.DataProtocollo).ToShortDateString(), item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_PROT_SUCCESSIVA_AL
-                    #region DATA_PROT_PRECEDENTE_IL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_PROT_PRECEDENTE_IL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataProtocollo) && Utils.utils.verificaIntervalloDateSenzaOra(item.Valore, Utils.dateformat.ConvertToDate(e.InfoDocumento.DataProtocollo).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_PROT_PRECEDENTE_IL
-                    #region DATA_PROT_SC
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_PROT_SC.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataProtocollo)
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.InfoDocumento.DataProtocollo).ToShortDateString(), NttDataWA.Utils.dateformat.getFirstDayOfWeek())
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(NttDataWA.Utils.dateformat.getLastDayOfWeek(), Utils.dateformat.ConvertToDate(e.InfoDocumento.DataProtocollo).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region DATA_PROT_MC
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_PROT_MC.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataProtocollo)
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.InfoDocumento.DataProtocollo).ToShortDateString(), NttDataWA.Utils.dateformat.getFirstDayOfMonth())
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(NttDataWA.Utils.dateformat.getLastDayOfMonth(), Utils.dateformat.ConvertToDate(e.InfoDocumento.DataProtocollo).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region DATA_PROT_TODAY
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_PROT_TODAY.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataProtocollo) && Utils.dateformat.ConvertToDate(e.InfoDocumento.DataProtocollo).ToShortDateString().Equals(NttDataWA.Utils.dateformat.getDataOdiernaDocspa())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #endregion
-                    #region DESTINATARIO
-
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.COD_MITT_DEST.ToString())
-                    {
-                        List<string> idElements = LibroFirmaManager.GetElementiInLibroFirmaByDestinatario(new Corrispondente() { codiceRubrica = item.Valore });
-                        if (idElements != null)
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                     where idElements.Contains(e.IdElemento)
-                                                     select e).ToList());
-                            ListaElementiFiltrati.Clear();
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.ID_MITT_DEST.ToString())
-                    {
-                        List<string> idElements = LibroFirmaManager.GetElementiInLibroFirmaByDestinatario(new Corrispondente() { systemId = item.Valore });
-                        if (idElements != null)
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                     where idElements.Contains(e.IdElemento)
-                                                     select e).ToList());
-                            ListaElementiFiltrati.Clear();
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.MITT_DEST.ToString())
-                    {
-                        List<string> idElements = LibroFirmaManager.GetElementiInLibroFirmaByDestinatario(new Corrispondente() { descrizione = item.Valore });
-                        if (idElements != null)
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                     where idElements.Contains(e.IdElemento)
-                                                     select e).ToList());
-                            ListaElementiFiltrati.Clear();
-                            this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                        }
-                    }
-                    #endregion
-                    #region PROPONENTE
-
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.CODICE_PROPONENTE.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where e.UtenteProponente.userId.Equals(item.Valore) || e.RuoloProponente.codiceRubrica.Equals(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.ID_PROPONENTE.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where e.UtenteProponente.systemId.Equals(item.Valore) || e.RuoloProponente.systemId.Equals(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DESCRIZIONE_PROPONENTE.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where e.UtenteProponente.descrizione.ToUpper().Contains(item.Valore.ToUpper()) || e.RuoloProponente.descrizione.ToUpper().Contains(item.Valore.ToUpper())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-
-                    #endregion
-                    #region DOCNUMBER
-
-                    #region DOCNUMBER
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DOCNUMBER.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where e.InfoDocumento.Docnumber.Equals(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DOCNUMBER
-                    #region DOCNUMBER_DAL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DOCNUMBER_DAL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where Convert.ToInt32(e.InfoDocumento.Docnumber) >= Convert.ToInt32(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DOCNUMBER_DAL
-                    #region DOCNUMBER_AL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DOCNUMBER_AL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where Convert.ToInt32(e.InfoDocumento.Docnumber) <= Convert.ToInt32(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DOCNUMBER_AL
-
-                    #endregion
-                    #region DATA_CREAZIONE
-
-                    #region DATA_CREAZIONE_IL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_CREAZIONE_IL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataCreazione) && Utils.dateformat.ConvertToDate(e.InfoDocumento.DataCreazione).ToShortDateString().Equals(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_CREAZIONE_IL
-                    #region DATA_CREAZIONE_SUCCESSIVA_AL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_CREAZIONE_SUCCESSIVA_AL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataCreazione) && Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.InfoDocumento.DataCreazione).ToShortDateString(), item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_CREAZIONE_SUCCESSIVA_AL
-                    #region DATA_CREAZIONE_PRECEDENTE_IL
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_CREAZIONE_PRECEDENTE_IL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataCreazione) && Utils.utils.verificaIntervalloDateSenzaOra(item.Valore, Utils.dateformat.ConvertToDate(e.InfoDocumento.DataCreazione).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_CREAZIONE_PRECEDENTE_IL
-                    #region DATA_CREAZ_SC
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_CREAZ_SC.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataCreazione)
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.InfoDocumento.DataCreazione).ToShortDateString(), NttDataWA.Utils.dateformat.getFirstDayOfWeek())
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(NttDataWA.Utils.dateformat.getLastDayOfWeek(), Utils.dateformat.ConvertToDate(e.InfoDocumento.DataCreazione).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region DATA_CREAZ_MC
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_CREAZ_MC.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataCreazione)
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.InfoDocumento.DataCreazione).ToShortDateString(), NttDataWA.Utils.dateformat.getFirstDayOfMonth())
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(NttDataWA.Utils.dateformat.getLastDayOfMonth(), Utils.dateformat.ConvertToDate(e.InfoDocumento.DataCreazione).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region DATA_CREAZ_TODAY
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.DATA_CREAZ_TODAY.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where !string.IsNullOrEmpty(e.InfoDocumento.DataCreazione) && Utils.dateformat.ConvertToDate(e.InfoDocumento.DataCreazione).ToShortDateString().Equals(NttDataWA.Utils.dateformat.getDataOdiernaDocspa())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #endregion
-                    #region TIPOLOGIA
-
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.TIPO_ATTO.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where e.InfoDocumento.TipologiaDocumento.Equals(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region TIPO FIRMA
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.FIRMA_DIGITALE_CADES.ToString())
-                    {
-                        tmpListElemetsFilter.Clear();
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                     where e.TipoFirma.Equals(LibroFirmaManager.TypeEvent.SIGN_CADES)
-                                                     select e).ToList());
-                        }
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.FIRMA_DIGITALE_PADES.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter.AddRange((from e in this.ListaElementiFiltrati
-                                                           where e.TipoFirma.Equals(LibroFirmaManager.TypeEvent.SIGN_PADES)
-                                                           select e).ToList());
-                        }
-                    }
-
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.FIRMA_ELETTRONICA_SOTTOSCRIZIONE.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter.AddRange((from e in this.ListaElementiFiltrati
-                                                           where e.TipoFirma.Equals(LibroFirmaManager.TypeEvent.VERIFIED)
-                                                           select e).ToList());
-                        }
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.FIRMA_ELETTRONICA_AVANZAMENTO.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter.AddRange((from e in this.ListaElementiFiltrati
-                                                           where e.TipoFirma.Equals(LibroFirmaManager.TypeEvent.ADVANCEMENT_PROCESS)
-                                                           select e).ToList());
-                        }
-                        this.ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region MODALITA
-
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.MODALITA_AUTOMATICA.ToString())
-                    {
-                        tmpListElemetsFilter.Clear();
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                     where e.Modalita.Equals("A")
-                                                     select e).ToList());
-                        }
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.MODALITA_MANUALE.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter.AddRange((from e in this.ListaElementiFiltrati
-                                                           where e.Modalita.Equals("M")
-                                                           select e).ToList());
-                        }
-                        this.ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-
-                    #endregion
-                    #region STATO
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.PROPOSTO.ToString())
-                    {
-                        tmpListElemetsFilter.Clear();
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                     where e.StatoFirma.Equals(TipoStatoElemento.PROPOSTO)
-                                                     select e).ToList());
-                        }
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DA_FIRMARE.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter.AddRange((from e in this.ListaElementiFiltrati
-                                                           where e.StatoFirma.Equals(TipoStatoElemento.DA_FIRMARE)
-                                                           select e).ToList());
-                        }
-                    }
-
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DA_RESPINGERE.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter.AddRange((from e in this.ListaElementiFiltrati
-                                                           where e.StatoFirma.Equals(TipoStatoElemento.DA_RESPINGERE)
-                                                           select e).ToList());
-                        }
-                        this.ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region STATO CON_ERRORI/SENZA ERRORI
-
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.CON_ERRORI.ToString())
-                    {
-                        tmpListElemetsFilter.Clear();
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter.AddRange((from e in this.ListaElementiFiltrati
-                                                           where !string.IsNullOrEmpty(e.ErroreFirma)
-                                                           select e).ToList());
-                        }
-                    }
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.SENZA_ERRORI.ToString())
-                    {
-                        if (Convert.ToBoolean(item.Valore))
-                        {
-                            tmpListElemetsFilter.AddRange((from e in this.ListaElementiFiltrati
-                                                           where string.IsNullOrEmpty(e.ErroreFirma)
-                                                           select e).ToList());
-                        }
-                        this.ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-
-                    #endregion
-                    #region NOTE
-
-                    else if (item.Argomento == DocsPaWR.FiltriDocumento.NOTE.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where e.Note.ToUpper().Trim().Contains(item.Valore.ToUpper().Trim())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-
-                    #endregion
-                    #region DATA_INSERIMENTO
-
-                    #region DATA_INSERIMENTO_IL
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INSERIMENTO_IL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where Utils.dateformat.ConvertToDate(e.DataInserimento).ToShortDateString().Equals(item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_INSERIMENTO_IL
-                    #region DATA_INSERIMENTO_SUCCESSIVA_AL
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INSERIMENTO_SUCCESSIVA_AL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.DataInserimento).ToShortDateString(), item.Valore)
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_INSERIMENTO_SUCCESSIVA_AL
-                    #region DATA_INSERIMENTO_PRECEDENTE_IL
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INSERIMENTO_PRECEDENTE_IL.ToString())
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where Utils.utils.verificaIntervalloDateSenzaOra(item.Valore, Utils.dateformat.ConvertToDate(e.DataInserimento).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion DATA_INSERIMENTO_PRECEDENTE_IL
-                    #region DATA_INSERIMENTO_SC
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INSERIMENTO_SC.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.DataInserimento).ToShortDateString(), NttDataWA.Utils.dateformat.getFirstDayOfWeek())
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(NttDataWA.Utils.dateformat.getLastDayOfWeek(), Utils.dateformat.ConvertToDate(e.DataInserimento).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region DATA_INSERIMENTO_MC
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INSERIMENTO_MC.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where Utils.utils.verificaIntervalloDateSenzaOra(Utils.dateformat.ConvertToDate(e.DataInserimento).ToShortDateString(), NttDataWA.Utils.dateformat.getFirstDayOfMonth())
-                                                    && Utils.utils.verificaIntervalloDateSenzaOra(NttDataWA.Utils.dateformat.getLastDayOfMonth(), Utils.dateformat.ConvertToDate(e.DataInserimento).ToShortDateString())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #region DATA_INSERIMENTO_TODAY
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INSERIMENTO_TODAY.ToString() && item.Valore == "1")
-                    {
-                        tmpListElemetsFilter = ((from e in this.ListaElementiFiltrati
-                                                 where Utils.dateformat.ConvertToDate(e.DataInserimento).ToShortDateString().Equals(NttDataWA.Utils.dateformat.getDataOdiernaDocspa())
-                                                 select e).ToList());
-                        ListaElementiFiltrati.Clear();
-                        this.ListaElementiFiltrati.AddRange(tmpListElemetsFilter);
-                    }
-                    #endregion
-                    #endregion
-                }
-                this.OrderListElement();
-            }
         }
 
         private void LoadElementiLbroFirma()

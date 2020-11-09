@@ -102,10 +102,10 @@
         ClientIDMode="Static">
         <ContentTemplate>
             <cc1:CustomButton ID="btn_ok" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" Text="Salva"  OnClientClick=" disallowOp('ContentPlaceHolderContent'); return __doPostBack('UpdatePanelButtons');"
-                OnClick="btn_ok_Click"/>
+                OnMouseOver="btnHover" Text="Salva"  OnClientClick=" return __doPostBack('UpdatePanelButtons');"
+                OnClick="btn_ok_Click" />
             <cc1:CustomButton ID="btn_annulla" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" Text="Chiudi"  OnClientClick="disallowOp('ContentPlaceHolderContent'); return __doPostBack('UpdatePanelButtons');"
+                OnMouseOver="btnHover" Text="Chiudi"  OnClientClick=" return __doPostBack('UpdatePanelButtons');"
                 OnClick="btn_annulla_Click" />
         </ContentTemplate>
     </asp:UpdatePanel>

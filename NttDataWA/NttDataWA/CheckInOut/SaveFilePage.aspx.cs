@@ -34,14 +34,10 @@ namespace NttDataWA.CheckInOut
             string filePath = Request.QueryString["filePath"];
 
             byte[] fileContent = null;
-            
+
             // Reperimento contenuto del file, verificando se reperire
             // il file firmato o il file originale
-            if (filePath.ToUpper().EndsWith(".ZIP"))
-            {
-                fileContent = this.GetPackage();
-            }
-            else if (
+            if (
                 filePath.ToUpper().EndsWith(".P7M") ||
                 filePath.ToUpper().EndsWith(".TSD") ||
                 filePath.ToUpper().EndsWith(".M7M") ||
@@ -80,11 +76,6 @@ namespace NttDataWA.CheckInOut
         protected byte[] GetFileContent()
         {
             return SaveFileServices.GetFileContent();
-        }
-
-        protected byte[] GetPackage()
-        {
-            return SaveFileServices.GetPackage();
         }
     }
 }

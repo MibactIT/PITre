@@ -499,22 +499,13 @@ namespace NttDataWA.Project {
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 MassiveReportDragAndDrop;
         
         /// <summary>
-        /// DescriptionProjectList control.
+        /// RedirectProject control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 DescriptionProjectList;
-        
-        /// <summary>
-        /// MassiveTransmissionAccept control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 MassiveTransmissionAccept;
+        protected global::AjaxPopupControl.UserControls.ajaxpopup21 RedirectProject;
         
         /// <summary>
         /// UpHeaderProject control.
@@ -740,42 +731,6 @@ namespace NttDataWA.Project {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.UpdatePanel UpPnlDateProject;
-        
-        /// <summary>
-        /// UpDirittiFascicolo control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpDirittiFascicolo;
-        
-        /// <summary>
-        /// PnlDirittiFascicolo control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlDirittiFascicolo;
-        
-        /// <summary>
-        /// LblDiritti control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblDiritti;
-        
-        /// <summary>
-        /// LblTipoDiritto control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblTipoDiritto;
         
         /// <summary>
         /// projectLblDataApertura control.
@@ -1741,24 +1696,6 @@ namespace NttDataWA.Project {
         protected global::NttDatalLibrary.CustomButton projectBtnAdlRole;
         
         /// <summary>
-        /// ProjectBtnAccept control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton ProjectBtnAccept;
-        
-        /// <summary>
-        /// ProjectBtnView control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton ProjectBtnView;
-        
-        /// <summary>
         /// btnAddressBookPostback control.
         /// </summary>
         /// <remarks>
@@ -1802,6 +1739,15 @@ namespace NttDataWA.Project {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnLinkCustom;
+        
+        /// <summary>
+        /// projectBtnRedirect control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomButton projectBtnRedirect;
         
         /// <summary>
         /// HiddenItemsChecked control.

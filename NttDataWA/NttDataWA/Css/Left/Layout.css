@@ -60,7 +60,7 @@
     margin: 0px;
     padding: 0px;
     margin-top: 28px;
-    margin-left: 50px;
+    margin-left: 65px;
     color: #ffffff;
     font-weight: normal;
     position: absolute;
@@ -421,21 +421,6 @@
     background-color: #eeeeee;
 }
 
-#contentSxMonitoring
-{
-    float: left;
-    width: 50%;
-    height: 100%;
-}
-
-#contentDxMonitoring
-{
-    float: right;
-    width: 50%;
-    height: 100%;
-}
-
-
 #contentSx2
 {
     float: left;
@@ -459,7 +444,7 @@
     position: fixed;
     top: 220px;
     left: 0px;
-    bottom: 60px;
+    bottom: 55px;
     right: 0px;
     overflow: auto;
     background: #ffffff;
@@ -1288,44 +1273,6 @@ textarea:focus
     margin-left: 5px;
 }
 
-.btnEnable1
-{
-    font-family: Verdana;
-    font-size: 13px;
-    margin: 0px;
-    padding: 0px;
-    width: 80px;
-    height: 34px;
-    line-height: 34px;
-    color: #ffffff;
-    font-weight: normal;
-    border: 0px;
-    text-align: center;
-    background-color: transparent;
-    background-image: url('../../Images/Common/btn_bg_90.png');
-    cursor: pointer;
-    margin-left: 5px;
-}
-
-.btnHover1
-{
-    font-family: Verdana;
-    font-size: 13px;
-    margin: 0px;
-    padding: 0px;
-    width: 99px;
-    height: 34px;
-    line-height: 34px;
-    color: #ffffff;
-    font-weight: normal;
-    border: 0px;
-    text-align: center;
-    background-color: transparent;
-    background-image: url('../../Images/Common/btn_bg_hover.png');
-    cursor: pointer;
-    margin-left: 5px;
-}
-
 .btnHover
 {
     font-family: Verdana;
@@ -1360,44 +1307,6 @@ textarea:focus
     text-align: center;
     background-color: transparent;
     background-image: url('../../Images/Common/btn_bg_disabled.png');
-    margin-left: 5px;
-}
-
-.btnEnable1
-{
-    font-family: Verdana;
-    font-size: 13px;
-    margin: 0px;
-    padding: 0px;
-    width: 80px;
-    height: 34px;
-    line-height: 34px;
-    color: #ffffff;
-    font-weight: normal;
-    border: 0px;
-    text-align: center;
-    background-color: transparent;
-    background-image: url('../../Images/Common/btn_bg_80.png');
-    cursor: pointer;
-    margin-left: 5px;
-}
-
-.btnHover1
-{
-    font-family: Verdana;
-    font-size: 13px;
-    margin: 0px;
-    padding: 0px;
-    width: 80px;
-    height: 34px;
-    line-height: 34px;
-    color: #ffffff;
-    font-weight: normal;
-    border: 0px;
-    text-align: center;
-    background-color: transparent;
-    background-image: url('../../Images/Common/btn_bg_80_hover.png');
-    cursor: pointer;
     margin-left: 5px;
 }
 
@@ -2471,22 +2380,6 @@ ul.level_2 ul
     width: 15%;
 }
 
-.colHalf15
-{
-    float: left;
-    margin: 0px;
-    text-align: left;
-    width: 22%;
-}
-
-.colHalf16
-{
-    float: left;
-    margin-left:10px;
-    text-align: left;
-    width: 37%;
-}
-
 .colS
 {
     float: left;
@@ -2531,6 +2424,11 @@ ul.level_2 ul
     float: right;
     margin: 0 10px 0 30px;
     text-align: right;
+}
+
+.col-left
+{
+    float: left;
 }
 
 .col-marginSx
@@ -3244,18 +3142,6 @@ ul.level_2 ul
     margin-top: 3px;
 }
 
-#colBottom4
-{
-    margin-left: 15px;
-    font-size: 1em;
-    margin-top: 3px;
-}
-#colBottom5
-{
-    margin-left: 5px;
-    font-size: 1em;
-    margin-top: 3px;
-}
 .orange
 {
     color: #fba02b;
@@ -5708,7 +5594,6 @@ ul.level_2 ul
     color: #404040;
 }
 
-
 #containerHomeTab
 {
     width: 70%;
@@ -5820,79 +5705,6 @@ ul.level_2 ul
     line-height: 35px;
     float: left;
     width: 123px;
-    text-align: center;
-    color: #ffffff;
-}
-
-.homeIAmHomeUnderline a:link
-{
-    background: url(../../Images/Standard/standard_bg_menu_here_home.png);
-    text-decoration: underline;
-    height: 35px;
-    line-height: 35px;
-    float: left;
-    width: 123px;
-    text-align: center;
-    color: #404040;
-}
-
-.homeIAmHomeUnderline a:visited
-{
-    background: url(../../Images/Standard/standard_bg_menu_here_home.png);
-      text-decoration: underline;
-    height: 35px;
-    line-height: 35px;
-    float: left;
-    width: 123px;
-    text-align: center;
-    color: #404040;
-}
-
-.homeIAmHomeUnderline a:hover
-{
-    background: url(../../Images/Standard/standard_bg_menu_here_home.png);
-    text-decoration: underline;
-    height: 35px;
-    line-height: 35px;
-    float: left;
-    width: 120px;
-    text-align: center;
-    color: #404040;
-}
-
-
-.homeOtherUnderline a:link
-{
-    background: url(../../Images/Standard/standard_bg_menu_home.png);
-    text-decoration: underline;
-    height: 35px;
-    line-height: 35px;
-    float: left;
-    width: 123px;
-    text-align: center;
-    color: #404040;
-}
-
-.homeOtherUnderline a:visited
-{
-    background: url(../../Images/Standard/standard_bg_menu_home.png);
-      text-decoration: underline;
-    height: 35px;
-    line-height: 35px;
-    float: left;
-    width: 123px;
-    text-align: center;
-    color: #404040;
-}
-
-.homeOtherUnderline a:hover
-{
-    background: url(../../Images/Standard/standard_bg_menu_hover_home.png);
-    text-decoration: underline;
-    height: 35px;
-    line-height: 35px;
-    float: left;
-    width: 120px;
     text-align: center;
     color: #ffffff;
 }

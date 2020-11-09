@@ -301,15 +301,6 @@ namespace NttDataWA.Home {
         protected global::NttDatalLibrary.CustomButton LibroFirmaFirmaSelezionati;
         
         /// <summary>
-        /// LibroFirmaFirmaSelezionatiAdl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton LibroFirmaFirmaSelezionatiAdl;
-        
-        /// <summary>
         /// LibroFirmaRespingiSelezionati control.
         /// </summary>
         /// <remarks>

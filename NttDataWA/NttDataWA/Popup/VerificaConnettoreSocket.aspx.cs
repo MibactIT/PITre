@@ -13,11 +13,7 @@ namespace NttDataWA.Popup
     public partial class VerificaConnettoreSocket : System.Web.UI.Page
     {
         # region Constants
-        private const string LINUX_OS = "Linux";
-        private const string MACINTOSH_OS = "Macintosh";
         private const string appName = "NOAPPLET"; 
-        private const string appNameLinux = "NOAPPLET_LINUX";
-        private const string VERSIONE_NON_RILEVATA = "0.0.0";
         # endregion
         # region Property
         private string Version
@@ -71,16 +67,7 @@ namespace NttDataWA.Popup
             {
                 InitializeLanguage();
                 this.lblLastVesion.Text = this.desktopApp != null && !String.IsNullOrEmpty(this.desktopApp.Versione) ? this.desktopApp.Versione : "";
-                if (this.Version.Equals(VERSIONE_NON_RILEVATA))
-                {
-                    string language = UIManager.UserManager.GetUserLanguage();
-                    this.PnlVersion.Visible = false;
-                    this.messager.Text = Utils.Languages.GetMessageFromCode("VerificaConnettoreSocketMessageVersioneNonRilevata", language);
-                }
-                else
-                {
-                    this.lblVersion.Text = this.Version;
-                }
+                this.lblVersion.Text = this.Version;
                 //this.desktopApp != null && !String.IsNullOrEmpty(this.desktopApp.Path) ? this.desktopApp.Path : "";
                 if (IsCheckVersion)
                 {
@@ -112,10 +99,8 @@ namespace NttDataWA.Popup
         {
             NttDataWA.DocsPaWR.DocsPaWebService ws = new NttDataWA.DocsPaWR.DocsPaWebService();
             InfoUtente infoUtente = UIManager.UserManager.GetInfoUser();
-            if ((Request.UserAgent.IndexOf(LINUX_OS) > 0 || Request.UserAgent.IndexOf(MACINTOSH_OS) > 0))
-                this.desktopApp = ws.GetDesktopApp(appNameLinux, infoUtente);
-            else
-                this.desktopApp = ws.GetDesktopApp(appName, infoUtente);
+            this.desktopApp = ws.GetDesktopApp(appName, infoUtente);
+
             if (
                 !String.IsNullOrEmpty(this.Version) &&
                 this.desktopApp != null &&

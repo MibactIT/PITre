@@ -15,7 +15,6 @@ namespace NttDataWA.CheckInOutApplet
     public partial class CheckInOutSaveLocal : System.Web.UI.Page
     {
         private const string OPT_FILE_SYSTEM = "FS";
-        private const string OPT_PACKAGE = "PKG";
         private const string OPT_CLIP_BOARD = "CL";
         private const string OPT_CLIP_BOARD_SD = "CLSD";
         private const string OPT_URL = "URL";
@@ -27,8 +26,6 @@ namespace NttDataWA.CheckInOutApplet
 
         private string componentType = Constans.TYPE_APPLET;
 
-        private NttDataWA.DocsPaWR.SchedaDocumento schedaDocumento;
-
         protected void Page_Load(object sender, EventArgs e)
         {
             Response.Expires = -1;
@@ -38,25 +35,15 @@ namespace NttDataWA.CheckInOutApplet
             {
                 this.FetchFileTypes();
 
-                this.schedaDocumento = UIManager.DocumentManager.getSelectedRecord();
+                NttDataWA.DocsPaWR.SchedaDocumento schedaDocumento = UIManager.DocumentManager.getSelectedRecord();
 
-                if(this.schedaDocumento.documentoPrincipale != null)
+                if (UIManager.DocumentManager.getSelectedAttachId() == null && schedaDocumento != null && schedaDocumento.protocollo != null && schedaDocumento.protocollo.segnatura != null && !string.IsNullOrEmpty(schedaDocumento.protocollo.segnatura))
                 {
-                    rblListSavingOption.Items.RemoveAt(1);
-                }
-
-
-
-
-
-
-                if (UIManager.DocumentManager.getSelectedAttachId() == null && this.schedaDocumento != null && this.schedaDocumento.protocollo != null && !string.IsNullOrEmpty(this.schedaDocumento.protocollo.segnatura))
-                {
-                    file_name = UIManager.UserManager.normalizeStringPropertyValue(this.schedaDocumento.protocollo.segnatura);
+                    file_name = UIManager.UserManager.normalizeStringPropertyValue(schedaDocumento.protocollo.segnatura);
                 }
                 else
                 {
-                    if (this.schedaDocumento != null && this.schedaDocumento.docNumber != null && !string.IsNullOrEmpty(this.schedaDocumento.docNumber))
+                    if (schedaDocumento != null && schedaDocumento.docNumber != null && !string.IsNullOrEmpty(schedaDocumento.docNumber))
                     {
                         String selectedVersionId = null;
 
@@ -67,22 +54,23 @@ namespace NttDataWA.CheckInOutApplet
                                 UIManager.FileManager.GetFileRequest(UIManager.DocumentManager.getSelectedAttachId()) :
                                     UIManager.FileManager.GetFileRequest(selectedVersionId);
 
-                        FileDocumento doc = FileManager.getInstance(this.schedaDocumento.systemId).getInfoFile(this.Page, fileReq);
+                        FileDocumento doc = FileManager.getInstance(schedaDocumento.systemId).getInfoFile(this.Page, fileReq);
                         if (doc != null && !string.IsNullOrEmpty(doc.nomeOriginale))
                         {
                             file_name = cleanFileName(doc.nomeOriginale);
                         }
                         else
                         {
-                            file_name = this.schedaDocumento.docNumber;
+                            file_name = schedaDocumento.docNumber;
                         }
-                        //file_name = (UIManager.DocumentManager.getSelectedAttachId() != null ? UIManager.DocumentManager.getSelectedAttachId() : this.schedaDocumento.docNumber);
+                        //file_name = (UIManager.DocumentManager.getSelectedAttachId() != null ? UIManager.DocumentManager.getSelectedAttachId() : schedaDocumento.docNumber);
                     }
                 }
 
+                
+
                 this.initForm();
             }
-            
         }
 
         private void initForm()
@@ -94,7 +82,6 @@ namespace NttDataWA.CheckInOutApplet
             this.language = NttDataWA.UIManager.UserManager.GetUserLanguage();
             this.lblSavingOption.Text = this.Request.QueryString["title"]; //Languages.GetLabelFromCode("DigitalSignDialogCertificateList", language);
             this.optFileSystem.Text = Languages.GetLabelFromCode("CheckInOutSaveLocalFileSystem", language);
-            this.optPackage.Text = Languages.GetLabelFromCode("CheckInOutSavePackage", language);
             this.optClipboard.Text = Languages.GetLabelFromCode("CheckInOutSaveLocalClipboard", language);
             this.optClipboardSD.Text = Languages.GetLabelFromCode("CheckInOutSaveLocalClipboardSD", language);
             this.optSaveUrl.Text = Languages.GetLabelFromCode("CheckInOutSaveLocalUrl", language);
@@ -106,6 +93,7 @@ namespace NttDataWA.CheckInOutApplet
             this.CheckInOutCloseButton.Text = Languages.GetLabelFromCode("CheckInOutSaveLocalCloseButton", language);
             this.pnlAppletTag.Visible = true; ;
 
+            NttDataWA.DocsPaWR.SchedaDocumento schedaDocumento = UIManager.DocumentManager.getSelectedRecord();
 
             componentType = UserManager.getComponentType(Request.UserAgent);
             if (componentType == Constans.TYPE_SOCKET)
@@ -119,9 +107,6 @@ namespace NttDataWA.CheckInOutApplet
             this.btnBrowseForFolder.OnClientClick = selectFolderScript;
             ScriptManager.RegisterStartupScript(this, this.GetType(), "InitializeCtrlScript", setTempFolderScript, true);
             
-
-
-
             this.txtFileName.Text = file_name;
         }
 
@@ -134,32 +119,22 @@ namespace NttDataWA.CheckInOutApplet
                 return Path.GetFileNameWithoutExtension(inputFile);
         }
 
-        private void FetchFileTypes(bool package = false)
+        private void FetchFileTypes()
         {
             // Reperimento modelli di documento
-            if (!package)
+            string[] types = GetDocumentModelTypes();
+
+            this.cboFileTypes.Visible = (types.Length != 1);
+            this.lblFileType.Visible = !this.cboFileTypes.Visible;
+
+            if (this.cboFileTypes.Visible)
             {
-                string[] types = GetDocumentModelTypes();
-
-                this.cboFileTypes.Visible = (types.Length != 1);
-                this.lblFileType.Visible = !this.cboFileTypes.Visible;
-
-                if (this.cboFileTypes.Visible)
-                {
-                    foreach (string item in types)
-                        this.cboFileTypes.Items.Add(item);
-                }
-
-                else if (types.Length > 0)
-                    this.lblFileType.Text = types[0];
+                foreach (string item in types)
+                    this.cboFileTypes.Items.Add(item);
             }
-            else
-            {
-                this.cboFileTypes.Visible = false;
-                this.lblFileType.Visible = package;
-                this.lblFileType.Text = "zip";
-            }
-            
+
+            else if (types.Length > 0)
+                this.lblFileType.Text = types[0];
         }
 
         private void HydeExtension()
@@ -281,6 +256,7 @@ namespace NttDataWA.CheckInOutApplet
         {
             string extensions = string.Empty;
 
+            NttDataWA.DocsPaWR.SchedaDocumento schedaDocumento = UIManager.DocumentManager.getSelectedRecord();
 
             String selectedVersionId = null;
 
@@ -298,7 +274,7 @@ namespace NttDataWA.CheckInOutApplet
              * */
             //DocsPaWR.FileDocumento fileInfo = SaveFileServices.GetFileInfo();
 
-            FileDocumento doc = FileManager.getInstance(this.schedaDocumento.systemId).getInfoFile(this.Page, fileInfo);
+            FileDocumento doc = FileManager.getInstance(schedaDocumento.systemId).getInfoFile(this.Page, fileInfo);
 
             //string fileName = fileInfo.fileName;
             //string fileName = doc.nomeOriginale;
@@ -336,21 +312,12 @@ namespace NttDataWA.CheckInOutApplet
                         this.hdnOptSelected.Value = OPT_FILE_SYSTEM;
                         this.FetchFileTypes();
                     break;
-                    case OPT_PACKAGE:
-                        this.txtFolderPath.Enabled = true;
-                        this.btnBrowseForFolder.Enabled = true;
-                        this.txtFileName.Enabled = true;
-                        this.hdnOptSelected.Value = OPT_PACKAGE;
-                        this.FetchFileTypes(true);
-
-                        break;
                     case OPT_CLIP_BOARD:
                         this.txtFolderPath.Enabled = false;
                         this.btnBrowseForFolder.Enabled = false;
                         this.txtFileName.Enabled = false;
                         this.hdnOptSelected.Value = OPT_CLIP_BOARD;
-                        this.HydeExtension();
-                        break;
+                    break;
                     case OPT_CLIP_BOARD_SD:
                         this.txtFolderPath.Enabled = false;
                         this.btnBrowseForFolder.Enabled = false;
@@ -375,9 +342,9 @@ namespace NttDataWA.CheckInOutApplet
 
                 this.udpFileSystem.Update();
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
-                
+                //Errore impossibile...
             }
         }
 
@@ -480,28 +447,5 @@ namespace NttDataWA.CheckInOutApplet
         {
             ScriptManager.RegisterClientScriptBlock(this.UpUpdateButtons, this.UpUpdateButtons.GetType(), "closeAJM", "parent.closeAjaxModal('SaveDialog','up');", true);
         }
-
-
-        private void _updateFilName()
-        {
-            try
-            {
-                if(this.rblListSavingOption.SelectedValue != OPT_PACKAGE)
-                {
-                    this.txtFileName.Text = file_name;
-                }
-                else
-                {
-                    this.txtFileName.Text = Path.ChangeExtension(file_name, "zip");
-                }
-                
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
-
     }
 }

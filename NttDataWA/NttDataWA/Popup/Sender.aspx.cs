@@ -32,21 +32,6 @@ namespace NttDataWA.Popup
             }
         }
 
-        private int MaxFileSizeSend
-        {
-            get
-            {
-                if (HttpContext.Current.Session["MaxFileSizeSend"] != null)
-                    return (int)HttpContext.Current.Session["MaxFileSizeSend"];
-                else
-                    return 0;
-            }
-            set
-            {
-                HttpContext.Current.Session["MaxFileSizeSend"] = value;
-            }
-        }
-
         private List<DocsPaWR.Messaggio> NextMessages
         {
             get
@@ -98,21 +83,6 @@ namespace NttDataWA.Popup
                     {
                         string language = UIManager.UserManager.GetUserLanguage();
                         this.messager.Text = Utils.Languages.GetMessageFromCode("SenderMessageNoDocument", language);
-                    }
-
-                    //Controllo dimensione massima dei file
-                    if (CheckSendInterop(infoSpedizione.DestinatariEsterni))
-                    {
-
-                        if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, Utils.DBKeys.FE_DO_SEND_BIG_FILE.ToString())) &&
-                            !Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, Utils.DBKeys.FE_DO_SEND_BIG_FILE.ToString()).Equals("0"))
-                            this.MaxFileSizeSend = Convert.ToInt32(Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, Utils.DBKeys.FE_DO_SEND_BIG_FILE.ToString()));
-                        if (this.MaxFileSizeSend > 0 && FileManager.TolatFileSizeDocument(schedaDocumento.docNumber) > this.MaxFileSizeSend)
-                        {
-                            string maxSize = Convert.ToString(Math.Round((double)this.MaxFileSizeSend / 1048576, 3));
-                            string language = UIManager.UserManager.GetUserLanguage();
-                            this.messager.Text = Utils.Languages.GetMessageFromCode("WarningSenderMessageMaxFileSizeSend", language).Replace("@@", maxSize.ToString());
-                        }
                     }
                     //    this.Session["showConfirmSpedizioneAutomatica"] = true;
                     //else
@@ -270,23 +240,6 @@ namespace NttDataWA.Popup
                     }
                 }
             }
-        }
-
-        private bool CheckSendInterop(DocsPaWR.DestinatarioEsterno[] destinatari)
-        {
-            bool result = false;
-
-            foreach (DocsPaWR.DestinatarioEsterno dest in destinatari)
-            {
-                if (dest.DatiDestinatari[0].canalePref != null && (!string.IsNullOrEmpty(dest.DatiDestinatari[0].canalePref.descrizione)) &&
-                            ((dest.DatiDestinatari[0].canalePref.descrizione.ToUpper().Equals("MAIL")) ||
-                            (dest.DatiDestinatari[0].canalePref.descrizione.ToUpper().Equals("INTEROPERABILITA")) ||
-                            (dest.DatiDestinatari[0].canalePref.descrizione.ToUpper().Equals("PORTALE"))))
-                {
-                    return true;
-                }
-            }
-            return result;
         }
 
         /// <summary>
@@ -630,7 +583,7 @@ namespace NttDataWA.Popup
         {
             DocsPaWR.SpedizioneDocumento instance = this.ViewState["SpedizioniDocumento"] as DocsPaWR.SpedizioneDocumento;
 
-            if (instance == null || !instance.IdDocumento.Equals(DocumentManager.getSelectedRecord().docNumber))
+            if (instance == null)
             {
                 if (DocumentManager.getSelectedRecord().spedizioneDocumento == null)
                     instance = SenderManager.GetSpedizioneDocumento(DocumentManager.getSelectedRecord());
@@ -750,14 +703,7 @@ namespace NttDataWA.Popup
 
             // Impostazione dello stato della spedizione nei dettagli
             this.listaDestinatariInterni.SetStatoSpedizione(infoSpedizione.Spedito);
-            if (this.MaxFileSizeSend > 0 && FileManager.TolatFileSizeDocument(DocumentManager.getSelectedRecord().docNumber) > this.MaxFileSizeSend)
-            {
-                this.listaDestinatariInteroperanti.DisableStatoSpedizione();
-            }
-            else
-            {
-                this.listaDestinatariInteroperanti.SetStatoSpedizione(infoSpedizione.Spedito);
-            }
+            this.listaDestinatariInteroperanti.SetStatoSpedizione(infoSpedizione.Spedito);
             this.listaDestinatatiInteropSempl.SetStatoSpedizione(infoSpedizione.Spedito);
             this.listaDestinatariNonInteroperanti.SetStatoSpedizione(infoSpedizione.Spedito);
 

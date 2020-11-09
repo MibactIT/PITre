@@ -56,7 +56,7 @@ function DocumentDragAndDropMain() {
                                         try {
                                             response = JSON.parse(response);
                                         } catch (ex) {
-                                           //console.log(ex);
+                                            console.log(ex);
                                             response = { Success: false, Error: 'Generic Error' };
                                         }
                                     }
@@ -64,7 +64,7 @@ function DocumentDragAndDropMain() {
                                     if (response.Success)
                                         fileModel.uploadSuccessful(true);
                                     else {
-                                       //console.log(response.Error);
+                                        console.log(response.Error);
                                         fileModel.uploadSuccessful(false);
                                     }
                                     fileModel.uploadCompleted(true);

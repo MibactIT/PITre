@@ -1310,7 +1310,6 @@ namespace NttDataWA.Popup
                         this.AddressBookLitA.Text = destinationList_atText;
                         break;
                     case "VISIBILITY_SIGNATURE_PROCESS":
-                    case "FILTER_VISIBILITY_SIGNATURE_PROCESS":
                         this.multipleSelection = true;
                         this.GrdCctSelection.Visible = this.ccTableVisible = AddressBookLitCc.Visible = this.LitAddressBookCc.Visible = false;
                         this.AddressBookLitA.Text = destinationList_atText;
@@ -1327,9 +1326,6 @@ namespace NttDataWA.Popup
                         break;
 
                     case "SIGNATURE_PROCESS":
-                    case "START_SIGNATURE_PROCESS":
-                    case "FILTER_SIGNATURE_PROCESS_ROLE":
-                    case "FILTER_SIGNATURE_PROCESS_USER":
                         this.multipleSelection = false;
                         this.GrdCctSelection.Visible = this.ccTableVisible = AddressBookLitCc.Visible = this.LitAddressBookCc.Visible = false;
                         this.AddressBookLitA.Text = destinationList_atText;
@@ -1535,10 +1531,6 @@ namespace NttDataWA.Popup
                 {
                     ScriptManager.RegisterClientScriptBlock(this.UpPnlButtons, this.UpPnlButtons.GetType(), "closeAJM", "parent.closeAjaxModal('ManageAddressBook',''" + parent + ");", true);
                 }
-                else if (HttpContext.Current.Session["AddressBook.from"].ToString().Equals("START_SIGNATURE_PROCESS"))
-                {
-                    ScriptManager.RegisterClientScriptBlock(this.UpPnlButtons, this.UpPnlButtons.GetType(), "closeAJM", "parent.closeAjaxModal('AddressBookFromPopup',''" + parent + ");", true);
-                }
                 else
                 {
                     ScriptManager.RegisterClientScriptBlock(this.UpPnlButtons, this.UpPnlButtons.GetType(), "closeAJM", "parent.closeAjaxModal('AddressBook',''" + parent + ");", true);
@@ -1561,14 +1553,7 @@ namespace NttDataWA.Popup
                 {
                     parent = ",parent";
                 }
-                if (HttpContext.Current.Session["AddressBook.from"].ToString().Equals("START_SIGNATURE_PROCESS"))
-                {
-                    ScriptManager.RegisterClientScriptBlock(this.UpPnlButtons, this.UpPnlButtons.GetType(), "closeAJM", "parent.closeAjaxModal('AddressBookFromPopup','up'" + parent + ");", true);
-                }
-                else
-                {
-                    ScriptManager.RegisterClientScriptBlock(this.UpPnlButtons, this.UpPnlButtons.GetType(), "closeAJM", "parent.closeAjaxModal('AddressBook','up'" + parent + ");", true);
-                }
+                ScriptManager.RegisterClientScriptBlock(this.UpPnlButtons, this.UpPnlButtons.GetType(), "closeAJM", "parent.closeAjaxModal('AddressBook','up'" + parent + ");", true);
             }
             catch (System.Exception ex)
             {
@@ -2675,7 +2660,7 @@ namespace NttDataWA.Popup
                         if (element.disabled) { startSpecialStyle = "<span class=\"redStrike\">"; endSpecialStyle = "</span>"; enabled = false; }
 
                         CorrespondentDetail newElement = new CorrespondentDetail();
-                        newElement.SystemID = (element.isRubricaComune && element.rubricaComune != null ? "RC_" + element.rubricaComune.IdRubricaComune.ToString() : element.systemId);
+                        newElement.SystemID = (element.isRubricaComune ? "RC_" + element.rubricaComune.IdRubricaComune.ToString() : element.systemId);
                         newElement.Descrizione = startSpecialStyle + element.descrizione + endSpecialStyle + " (" + element.codice + ")";
                         if(element.tipo.Equals("L"))
                         {
@@ -2833,7 +2818,7 @@ namespace NttDataWA.Popup
         private string getAddressBookType(ElementoRubrica er)
         {
             string codRegTemp = er.codiceRegistro;
-            if (er.isRubricaComune == true || er.isDisbledAndRC)
+            if (er.isRubricaComune == true)
             {
                 codRegTemp = "RC";
             }

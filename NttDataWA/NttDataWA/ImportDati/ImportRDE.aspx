@@ -70,7 +70,7 @@
                         <asp:UpdatePanel ID="box_upload" runat="server">
                             <ContentTemplate>
                                 <fieldset class="basic4">
-                                    <div class="col-right"><img src="../Images/Icons/small_xls.png" alt="" /> <asp:HyperLink ID="lnkTemplate" runat="server" NavigateUrl="ImportDocumenti.xls" Target="_blank" /></div>
+                                    <div class="col-right"><img src="../Images/Icons/small_xls.png" alt="" style="visibility:hidden"/> <asp:HyperLink ID="lnkTemplate" runat="server" NavigateUrl="ImportDocumenti.xls" Target="_blank"  Visible="false"/></div>
                                     <div class="col"><asp:Literal ID="lblFilename" runat="server" /></div>
                                     <div class="col"><input type="file" id="fileUpload" runat="server" onchange="controlla_estensione(this);"  /></div>
                                 </fieldset>

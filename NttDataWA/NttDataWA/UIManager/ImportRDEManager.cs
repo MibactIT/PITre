@@ -151,6 +151,41 @@ namespace NttDataWA.UIManager
 
         }
 
+        public static ResultsContainer ImportRDEDocuments(
+           DocumentRowDataContainer container,
+           InfoUtente userInfo,
+           Ruolo role,
+           string serverPath)
+        {
+            // Impostazione del timeout ad infinito
+            ws.Timeout = System.Threading.Timeout.Infinite;
+
+            // Lettura del valore di configurazione utilizzato per indicare
+            // se è obbligatoria la classificazione del documento
+            bool isClassificationRequired = false;
+            if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, DBKeys.FE_FASC_RAPIDA_REQUIRED.ToString())))
+                isClassificationRequired = bool.Parse(Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, DBKeys.FE_FASC_RAPIDA_REQUIRED.ToString()));
+
+            try
+            {
+                // Chiamata del webservice per l'importazione RDE e restituzione 
+                // della lista dei risultati
+                return ws.ImportRDEDocuments(
+                    container,
+                    userInfo,
+                    role,
+                    serverPath,
+                    isClassificationRequired,
+                    false,
+                    false);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Ricevuto errore dal servizio.");
+            }
+
+        }
+
         /// <summary>
         /// Funzione per il reperimento del valore associato al flag di presenza dei
         /// protocolli interni
@@ -264,12 +299,21 @@ namespace NttDataWA.UIManager
                 drdc.OutDocument.Length +
                 drdc.OwnDocument.Length;
 
+            report = ImportRDEManager.ImportRDEDocuments(
+                    drdc,
+                    userInfo,
+                    role,
+                    userInfo.urlWA);
+
+            #region VECCHIO CODICE(L'ORDINE DELLA NUMERAZIONE DI PROTOCOLLO IN DOCSPA NON COINCIDEVA CON L'ORDINE DEL PROTOCOLLO DI EMERGENZA)
+            /*
             #region Importazione documenti in arrivo
 
             // Inizializzazione della lista da utulizzare per
             // memorizzare temporaneamente il report sull'importazione dei
             // documenti in ingresso
             tempReport = new List<ImportResult>();
+
 
             // Importazione dei documenti in ingresso
             foreach (DocumentRowData rowData in drdc.InDocument)
@@ -401,7 +445,8 @@ namespace NttDataWA.UIManager
             report.OwnDocument = tempReport.ToArray();
 
             #endregion
-
+            */
+            #endregion
             // Sospensione del thread fino a quando non viene letto
             // il report o non passano 1 minuto
             //waitReading.WaitOne(new TimeSpan(0,1,0));

@@ -13,33 +13,6 @@ namespace NttDataWA.Popup {
     public partial class StartProcessSignature {
         
         /// <summary>
-        /// AddressBook control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 AddressBook;
-        
-        /// <summary>
-        /// UpDettaglioProcessi control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpDettaglioProcessi;
-        
-        /// <summary>
-        /// PnlDettaglioProcessi control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlDettaglioProcessi;
-        
-        /// <summary>
         /// plcNoSignatureProcess control.
         /// </summary>
         /// <remarks>
@@ -83,15 +56,6 @@ namespace NttDataWA.Popup {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal lblStartProcessSignature;
-        
-        /// <summary>
-        /// PnlTreeViewProcessoFirma control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlTreeViewProcessoFirma;
         
         /// <summary>
         /// UpdatePanelTreeView control.
@@ -157,15 +121,6 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl txtNotes_chars;
         
         /// <summary>
-        /// UpPnlNotificationOption control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPnlNotificationOption;
-        
-        /// <summary>
         /// PlcNotificationOption control.
         /// </summary>
         /// <remarks>
@@ -193,31 +148,22 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.CheckBoxList cbxNotificationOption;
         
         /// <summary>
-        /// UpPnlDettaglioPassi control.
+        /// cbxNotificationOptionOptCP control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPnlDettaglioPassi;
+        protected global::System.Web.UI.WebControls.ListItem cbxNotificationOptionOptCP;
         
         /// <summary>
-        /// PnlPassi control.
+        /// cbxNotificationOptionOptIP control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlPassi;
-        
-        /// <summary>
-        /// PnlDettaglioPassi control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder PnlDettaglioPassi;
+        protected global::System.Web.UI.WebControls.ListItem cbxNotificationOptionOptIP;
         
         /// <summary>
         /// upReport control.
@@ -281,14 +227,5 @@ namespace NttDataWA.Popup {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::NttDatalLibrary.CustomButton BtnReport;
-        
-        /// <summary>
-        /// btnAddressBookPostback control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddressBookPostback;
     }
 }

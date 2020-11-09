@@ -34,6 +34,19 @@ namespace NttDataWA.UIManager
             }
         }
 
+        public static bool CheckScaricoOtherRole(string idReg, string mail)
+        {
+            try
+            {
+                return docsPaWS.CheckScaricoOtherRole(idReg, mail);
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+                return false;
+            }
+        }
+
         public delegate bool CheckMailBoxDelegate(string serverName, DocsPaWR.Registro reg, DocsPaWR.Utente user, DocsPaWR.Ruolo role);
 
         /// <summary>

@@ -30,30 +30,15 @@
             overflow: auto;
         }
         
-        .TreeSignatureProcess img
-        {
-            width: 20px;
-            height: 20px;
-        }
-
-
         .disabled
         {
             color: #848484;
         }
         
-        .TreeSignatureProcessRoot
+        .TreeSignatureProcess img
         {
-            padding: 0;
-            margin-right: 30px;
-            color: #0f64a1;
-            overflow: auto;
-        }
-
-       .TreeSignatureProcessRoot img
-        {
-            width: 30px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
         }
         
         .TreeSignatureProcess_node a:link, .TreeSignatureProcess_node a:visited, .TreeSignatureProcess_node a:hover
@@ -141,14 +126,10 @@
                     <asp:UpdatePanel ID="upPnlTreeSignatureProcess" runat="server" UpdateMode="Conditional"
                         ClientIDMode="Static">
                         <ContentTemplate>
-                            <asp:TreeView ID="TreeSignatureProcess" runat="server" ExpandLevel="10" ShowLines="true" CssClass="TreeSignatureProcess"
-                                Width="100%" OnSelectedNodeChanged="TreeSignatureProcess_SelectedNodeChanged" OnTreeNodeCollapsed="TreeSignatureProcess_Collapsed"
-                                OnTreeNodeExpanded="TreeSignatureProcess_Expanded">
-                                <NodeStyle CssClass="TreeSignatureProcess_node" />
-                                <LeafNodeStyle CssClass="TreeSignatureProcess" />
-                                <RootNodeStyle CssClass="TreeSignatureProcessRoot" />
-                                <SelectedNodeStyle CssClass="TreeSignatureProcess_selected" />
-                            </asp:TreeView>
+                            <asp:TreeView ID="TreeSignatureProcess" runat="server" ExpandLevel="10" ShowLines="true"
+                                Width="100%" NodeStyle-CssClass="TreeSignatureProcess_node" SelectedNodeStyle-CssClass="TreeSignatureProcess_selected"
+                                OnSelectedNodeChanged="TreeSignatureProcess_SelectedNodeChanged" OnTreeNodeCollapsed="TreeSignatureProcess_Collapsed"
+                                OnTreeNodeExpanded="TreeSignatureProcess_Expanded" CssClass="TreeSignatureProcess" />
                         </ContentTemplate>
                     </asp:UpdatePanel>
                 </div>
@@ -232,6 +213,8 @@
                                     </div>
                                     <div class="row">
                                         <asp:CheckBoxList ID="cbxNotificationOption" runat="server" RepeatDirection="Vertical">
+                                            <asp:ListItem Value="CP" runat="server" ID="cbxNotificationOptionOptCP"></asp:ListItem>
+                                            <asp:ListItem Value="IP" runat="server" ID="cbxNotificationOptionOptIP"></asp:ListItem>
                                         </asp:CheckBoxList>
                                     </div>
                                 </div>

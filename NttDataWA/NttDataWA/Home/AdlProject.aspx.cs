@@ -1105,7 +1105,6 @@ namespace NttDataWA.Home
             this.SelectedGrid.Fields.Where(e => e.FieldId == "U1").FirstOrDefault().Visible = true;
             this.SelectedGrid.Fields.Where(e => e.FieldId == "DTA_ADL").FirstOrDefault().Visible = true;
             this.SelectedGrid.Fields.Where(e => e.FieldId == "DTA_ADL").FirstOrDefault().Position = 0;
-            this.SelectedGrid.Fields.Where(e => e.FieldId == "MOTIVO_ADL").FirstOrDefault().Visible = true;
 
             this.SelectedRow = string.Empty;
             this.Result = null;
@@ -1994,17 +1993,6 @@ namespace NttDataWA.Home
                             //DATE INSERT IN ADL
                             case "DTA_ADL":
                                 value = prj.SearchObjectField.Where(e => e.SearchObjectFieldID.Equals(field.FieldId)).FirstOrDefault().SearchObjectFieldValue;
-                                break;
-                            //MOTIVO INSERIMENTO IN ADL
-                            case "MOTIVO_ADL":
-                                if ((prj.SearchObjectField.Where(e => e.SearchObjectFieldID.Equals(field.FieldId)).FirstOrDefault() != null))
-                                {
-                                    value = prj.SearchObjectField.Where(e => e.SearchObjectFieldID.Equals(field.FieldId)).FirstOrDefault().SearchObjectFieldValue;
-                                }
-                                else
-                                {
-                                    value = "";
-                                }
                                 break;
                             //OGGETTI CUSTOM
                             default:

@@ -23,11 +23,21 @@ namespace NttDataWA
             }
             else
             {
-                string logoutRedirectUrl = System.Configuration.ConfigurationManager.AppSettings[Utils.WebConfigKeys.LOGOUT_REDIRECT_URL.ToString()];
+                //string logoutRedirectUrl = System.Configuration.ConfigurationManager.AppSettings[Utils.WebConfigKeys.LOGOUT_REDIRECT_URL.ToString()];
+                string logoutRedirectUrl = Utils.InitConfigurationKeys.GetValue("0", Utils.DBKeys.LOGOUT_REDIRECT_URL.ToString());
                 if (string.IsNullOrEmpty(logoutRedirectUrl))
                     Response.Redirect("Login.aspx");
                 else
-                    System.Web.HttpContext.Current.Response.Redirect(logoutRedirectUrl,true);
+                {
+                    if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue("0", Utils.DBKeys.FE_LOGIN_LDAP.ToString())))
+                    {
+                        System.Web.HttpContext.Current.Response.Write("<script>window.open('" + logoutRedirectUrl + "','_top')</script>");
+                    }
+                    else
+                        System.Web.HttpContext.Current.Response.Write("<script>window.open('"+ logoutRedirectUrl + "','_top')</script>");
+
+                }
+                    
             }
         }
     }

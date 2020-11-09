@@ -279,13 +279,11 @@ namespace NttDataWA.Document
                 }
                 if (!IsPostBack)
                 {
-                    
                     //la prima volta che entro nella pagina se non si tratta di un nuovo documento aggiorno 
                     //con una chiamata al backend doc principale e allegati
                     SchedaDocumento documentTab = DocumentManager.getSelectedRecord();
                     if (!DocumentManager.IsNewDocument())
                     {
-                        this.AttachmentsBtnUploadAllegati.Enabled = true;
                         documentTab.checkOutStatus = DocumentManager.GetCheckOutDocumentStatus(documentTab.systemId);
                         /* ABBA 10092013
                         CheckOutStatus allegato_checkOutStatus = null;
@@ -301,7 +299,6 @@ namespace NttDataWA.Document
                         if (DocumentManager.IsDocumentCheckedOut() || CheckInOut.CheckInOutServices.IsCheckedOutDocument(DocumentManager.getSelectedRecord().docNumber, DocumentManager.getSelectedRecord().docNumber, UserManager.GetInfoUser(), true, DocumentManager.getSelectedRecord()))
                         {
                             this.AttachmentsBtnAdd.Enabled = false;
-                            this.AttachmentsBtnUploadAllegati.Enabled = false;
                         }
                     }
                     // Gabriele Melini 15-01-2014
@@ -428,52 +425,16 @@ namespace NttDataWA.Document
         /// </summary>
         protected void ReadRetValueFromPopup()
         {
-            if (!string.IsNullOrEmpty(this.RepositoryView.ReturnValue))
-            {
-                if (this.RepositoryView.ReturnValue == "selected")
-                {
-                    if (DocumentManager.getSelectedAttachId() != null)
-                    {
-                        grdAllegati_BindLight();
-                    }
-                    this.ViewDocument.RefreshAcquiredDocument();
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('RepositoryView','');", true);
-                    HttpContext.Current.Session["UploadFileAlreadyOpened" + Session.SessionID] = null;
-                }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('RepositoryView','');", true);
-                    HttpContext.Current.Session["UploadFileAlreadyOpened" + Session.SessionID] = null;
-                }
-            }
-            if (!String.IsNullOrWhiteSpace(this.AttachmentsUpload.ReturnValue))
-            {
-                if(this.AttachmentsUpload.ReturnValue == "ok")
-                {
-                    Response.Redirect("Attachments.aspx", false);
-                }
-            }
-
-
             if ((!string.IsNullOrEmpty(this.UplodadFile.ReturnValue)) || (!string.IsNullOrEmpty(this.ActiveXScann.ReturnValue)))
             {
-                if (this.UplodadFile.ReturnValue != "repository")
+                if (DocumentManager.getSelectedAttachId() != null)
                 {
-                    if (DocumentManager.getSelectedAttachId() != null)
-                    {
-                        grdAllegati_BindLight();
-                    }
-                    this.ViewDocument.RefreshAcquiredDocument();
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('UplodadFile','')", true);
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('ActiveXScann','')", true);
-                    return;
+                    grdAllegati_BindLight();
                 }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('UplodadFile','');", true);
-                    HttpContext.Current.Session["UploadFileAlreadyOpened" + Session.SessionID] = null;
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "RepView", "ajaxModalPopupRepositoryView();", true);
-                }
+                this.ViewDocument.RefreshAcquiredDocument();
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('UplodadFile','')", true);
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('ActiveXScann','')", true);
+                return;
             }
 
             if (!string.IsNullOrEmpty(this.DigitalSignSelector.ReturnValue))
@@ -619,12 +580,12 @@ namespace NttDataWA.Document
                     return;
                 }
                 //popup confirm eliminazione allegato
-                /*if (this.Request.Form["__EVENTARGUMENT"] != null && this.Request.Form["__EVENTARGUMENT"].Equals(CONFIRM_REMOVE_ATTACHMENTS))
+                if (this.Request.Form["__EVENTARGUMENT"] != null && this.Request.Form["__EVENTARGUMENT"].Equals(CONFIRM_REMOVE_ATTACHMENTS))
                 {
                     string versionLabelAttachment = FileManager.GetFileRequest(VersionIdAttachSelected).versionLabel;
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "if (parent.fra_main) {parent.fra_main.ajaxConfirmModal('ConfirmRemoveAttachment', 'HiddenRemoveAttachment', '','" + versionLabelAttachment + "');} else {parent.ajaxConfirmModal('ConfirmRemoveAttachment', 'HiddenRemoveAttachment', '','" + versionLabelAttachment + "');}", true);
                     return;
-                }*/
+                }
                 grdAllegati_Bind();
                 EnableButtons();
                 panelButtons.Update();
@@ -731,7 +692,6 @@ namespace NttDataWA.Document
                     this.AttachmentsBtnModify.Enabled = false;
                     this.AttachmentsBtnRemove.Enabled = false;
                     this.AttachmentsBtnSwap.Enabled = false;
-                    this.AttachmentsBtnUploadAllegati.Enabled = false;
 
                 }
                 else
@@ -740,7 +700,6 @@ namespace NttDataWA.Document
                     this.AttachmentsBtnModify.Enabled = true;
                     this.AttachmentsBtnRemove.Enabled = true;
                     this.AttachmentsBtnSwap.Enabled = true;
-                    this.AttachmentsBtnUploadAllegati.Enabled = true;
                 }
 
 
@@ -1183,7 +1142,6 @@ namespace NttDataWA.Document
             AttachmentsBtnModify.Enabled = false;
             AttachmentsBtnSwap.Enabled = false;
             AttachmentsBtnRemove.Enabled = false;
-            this.AttachmentsBtnUploadAllegati.Enabled = false;
         }
 
         /// <summary>
@@ -1195,7 +1153,6 @@ namespace NttDataWA.Document
             AttachmentsBtnModify.Enabled = false;
             AttachmentsBtnRemove.Enabled = false;
             AttachmentsBtnSwap.Enabled = false;
-            this.AttachmentsBtnUploadAllegati.Enabled = false;
             AttachmentsBtnAnnulla.Visible = false;
         }
 
@@ -1206,7 +1163,6 @@ namespace NttDataWA.Document
             AttachmentsBtnRemove.Enabled = false;
             AttachmentsBtnSwap.Enabled = swap;
             AttachmentsBtnAnnulla.Visible = true;
-            this.AttachmentsBtnUploadAllegati.Enabled = false;
         }
 
         /// <summary>
@@ -1221,12 +1177,10 @@ namespace NttDataWA.Document
             if (!DocumentManager.IsDocumentInBasket() && !DocumentManager.IsDocumentAnnul() && !DocumentManager.IsDocumentInArchive())
             {
                 AttachmentsBtnAdd.Enabled = true;
-                this.AttachmentsBtnUploadAllegati.Enabled = true;
                 if (DocumentManager.IsDocumentCheckedOut() || CheckInOut.CheckInOutServices.IsCheckedOutDocument(DocumentManager.getSelectedRecord().docNumber, DocumentManager.getSelectedRecord().docNumber, UserManager.GetInfoUser(), true, DocumentManager.getSelectedRecord()))
                 {
                     checkOut = true;
                     AttachmentsBtnAdd.Enabled = !checkOut;
-                    this.AttachmentsBtnUploadAllegati.Enabled = !checkOut;
                 }
                 //se è presente almeno un allegato
                 if (!string.IsNullOrEmpty(DocumentManager.getSelectedAttachId()) && this.grdAllegati.Rows.Count > 0 && this.grdAllegati.SelectedRow != null)
@@ -1254,8 +1208,7 @@ namespace NttDataWA.Document
                     bool isRepertoriato = DocumentManager.IsDocumentoRepertoriato(Doc.template);
                     if (isRepertoriato)
                     {
-                        if(AttachmentsBtnRemove.Enabled)
-                            AttachmentsBtnRemove.Enabled = !this.disableBtnRemoveDocRep;
+                        AttachmentsBtnRemove.Enabled = !this.disableBtnRemoveDocRep;
                         AttachmentsBtnSwap.Enabled = !this.disableBtnSwapDocRep;
                     }
 
@@ -1286,7 +1239,7 @@ namespace NttDataWA.Document
             }
 
             //disabilito tutti i pulsanti se l'utente non ha i diritti di scrittura sul documento e non è un predisposto alla proto
-            if (!UserManager.IsRightsWritingInherits() && !Doc.predisponiProtocollazione && !(DocumentManager.IsNewDocument() && Doc.repositoryContext != null))
+            if (!UserManager.IsRightsWritingInherits() && !Doc.predisponiProtocollazione)
             {
                 this.DisableAllButtons();
             }
@@ -1298,7 +1251,6 @@ namespace NttDataWA.Document
                 {
                     DocsPaWR.Registro[] userRegistri = UserManager.GetRegistersList();
                     if (AttachmentsBtnAdd.Enabled) AttachmentsBtnAdd.Enabled = UserManager.verifyRegNoAOO(Doc, userRegistri);
-                    if (AttachmentsBtnUploadAllegati.Enabled) AttachmentsBtnUploadAllegati.Enabled = UserManager.verifyRegNoAOO(Doc, userRegistri);
                     if (AttachmentsBtnModify.Enabled) AttachmentsBtnModify.Enabled = UserManager.verifyRegNoAOO(Doc, userRegistri);
                     if (AttachmentsBtnRemove.Enabled) AttachmentsBtnRemove.Enabled = UserManager.verifyRegNoAOO(Doc, userRegistri);
                     if (AttachmentsBtnSwap.Enabled) AttachmentsBtnSwap.Enabled = UserManager.verifyRegNoAOO(Doc, userRegistri);
@@ -1332,12 +1284,10 @@ namespace NttDataWA.Document
             if (UserManager.IsAuthorizedFunctions("DO_ALL_AGGIUNGI"))
             {
                 AttachmentsBtnAdd.Visible = true;
-                this.AttachmentsBtnUploadAllegati.Visible = true;
             }
             else
             {
                 AttachmentsBtnAdd.Visible = false;
-                this.AttachmentsBtnUploadAllegati.Visible = false;
             }
             if (UserManager.IsAuthorizedFunctions("DO_ALL_MODIFICA"))
             {
@@ -1387,7 +1337,6 @@ namespace NttDataWA.Document
                     {
                         SchedaDocumento documentTab = DocumentManager.getSelectedRecord();
                         documentTab.allegati = DocumentManager.getAttachments(DocumentManager.getSelectedRecord(), TYPE_ALL, "");
-                        documentTab.documenti = DocumentManager.GetVersionsMainDocument(UserManager.GetInfoUser(), documentTab.docNumber);
                         DocumentManager.setSelectedRecord(documentTab);
                         FileManager.setSelectedFile(documentTab.documenti[0]);
                     }
@@ -1594,30 +1543,6 @@ namespace NttDataWA.Document
             Page_Load(sender, e);
         }
 
-        protected void AttachmentsAdd_Click(object sender, EventArgs e)
-        {
-            SchedaDocumento schedaDoc = DocumentManager.getSelectedRecord();
-            if (DocumentManager.IsDocumentoInLibroFirma(schedaDoc) && LibroFirmaManager.IsAttivoBloccoModificheDocumentoInLibroFirma())
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');} else {parent.parent.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');}", true);
-                return;
-            }
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "AttachmentsAdd", "ajaxModalPopupAttachmentsAdd();", true);
-        }
-
-        protected void AttachmentsBtnRemove_Click(object sender, EventArgs e)
-        {
-            SchedaDocumento schedaDoc = DocumentManager.getSelectedRecord();
-            if (DocumentManager.IsDocumentoInLibroFirma(schedaDoc) && LibroFirmaManager.IsAttivoBloccoModificheDocumentoInLibroFirma())
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');} else {parent.parent.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');}", true);
-                return;
-            }
-            string versionLabelAttachment = FileManager.GetFileRequest(VersionIdAttachSelected).versionLabel;
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "if (parent.fra_main) {parent.fra_main.ajaxConfirmModal('ConfirmRemoveAttachment', 'HiddenRemoveAttachment', '','" + versionLabelAttachment + "');} else {parent.ajaxConfirmModal('ConfirmRemoveAttachment', 'HiddenRemoveAttachment', '','" + versionLabelAttachment + "');}", true);
-            return;
-        }
-
         protected void AttachmentsBtnSwap_Click(object sender, EventArgs e)
         {
             if (this.EnabledManagingSwapAttachments)
@@ -1676,16 +1601,6 @@ namespace NttDataWA.Document
                 this.ViewDocument.ShowDocumentAcquired(false);
                 Page_Load(sender, e);
             }
-        }
-
-        protected string GetIdDocumento()
-        {
-            return (DocumentManager.GetSelectedAttachment() != null ? (DocumentManager.GetSelectedAttachment().docNumber != null ? DocumentManager.GetSelectedAttachment().docNumber : "0") : "0");
-        }
-
-        protected void AttachmentsBtnUploadAllegati_Click(object sender, EventArgs e)
-        {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "AttachmentsAdd", "ajaxModalPopupAttachmentsUpload();", true);
         }
     }
 

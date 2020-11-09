@@ -161,15 +161,14 @@ namespace NttDataWA.DigitalSignature
 
 
 
-        public bool HSM_Sign(FileRequest fr, bool cofirma, bool timestamp, tipoFirma TipoFirma, String AliasCertificato, String DominioCertificato, String OtpFirma, String PinCertificato, bool ConvertPdf, out DocsPaWR.FirmaResult esito)
+        public bool HSM_Sign(FileRequest fr, bool cofirma, bool timestamp, tipoFirma TipoFirma, String AliasCertificato, String DominioCertificato, String OtpFirma, String PinCertificato, bool ConvertPdf)
         {
             InfoUtente infoUt = NttDataWA.UIManager.UserManager.GetInfoUser();
-            esito = new FirmaResult();
             DocsPaWR.DocsPaWebService docsPaWS = ProxyManager.GetWS();
             try
             {
                 string tipoFirmaSTR = TipoFirma.ToString();
-                return docsPaWS.HSM_SignConEsito(infoUt, fr, cofirma, timestamp, tipoFirmaSTR, AliasCertificato, DominioCertificato, OtpFirma, PinCertificato, ConvertPdf, out esito);
+                return docsPaWS.HSM_Sign(infoUt, fr, cofirma, timestamp, tipoFirmaSTR, AliasCertificato, DominioCertificato, OtpFirma, PinCertificato, ConvertPdf);
             }
             catch (System.Exception ex)
             {

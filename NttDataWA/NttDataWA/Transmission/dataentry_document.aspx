@@ -110,10 +110,6 @@
         Width="500" Height="400" PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui) {__doPostBack('upPnlTransmissionSaved', '');}" />
     <uc:ajaxpopup Id="AddressBook" runat="server" Url="../popup/AddressBook.aspx" PermitClose="false"
         PermitScroll="false" IsFullScreen="true" CloseFunction="function (event, ui)  {$('#btnAddressBookPostback').click();}" />
-    <uc:ajaxpopup Id="ViewNoteGen" runat="server" Url="../popup/ViewNote.aspx?tiponota=g" Width="600"
-        Height="400" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('panelButtons', '');}" />
-    <uc:ajaxpopup Id="ViewNoteInd" runat="server" Url="../popup/ViewNote.aspx?tiponota=i" Width="600"
-        Height="400" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) {$('#btnViewNoteIndPostback').click();}" />
     <div id="containerTop">
         <asp:UpdatePanel ID="UpUserControlHeaderDocument" runat="server" UpdateMode="Conditional">
             <ContentTemplate>
@@ -368,8 +364,6 @@
                 Style="display: none" />
             <asp:Button ID="btnAddressBookPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
                 OnClick="btnAddressBookPostback_Click" />
-            <asp:Button ID="btnViewNoteIndPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
-                OnClick="btnViewNoteIndPostback_Click" OnClientClick="disallowOp('ContentPlaceHolderContent')" />
         </ContentTemplate>
     </asp:UpdatePanel>
     <script type="text/javascript">

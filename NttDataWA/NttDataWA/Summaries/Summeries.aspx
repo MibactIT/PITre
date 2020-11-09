@@ -12,9 +12,6 @@
     <link href="../Css/chosen.css" rel="stylesheet" type="text/css" />
     <script src="../Scripts/chosen.jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript">
-
-        
-
         function closeAjaxModal(id, retval) { // chiude il popup modale [id] e imposta il valore di ritorno [retval] nel campo hidden
             var p = parent.fra_main;
             if (arguments.length > 2 && arguments[2] != null) {
@@ -188,16 +185,6 @@
     <script type="text/javascript">
         var fsoApp;
 
-        function generateRendomExportFileName() {
-            var text = "_";
-            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-            for (var i = 0; i < 5; i++)
-                text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-            return text;
-        }
-
         function OpenFileApplet(typeFile) {
             var filePath;
             var exportUrl;
@@ -233,19 +220,19 @@
                 path = fsoApp.GetSpecialFolder();
 
                 if (typeFile == "PDF") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".pdf";
+                    filePath = path + "\\export.pdf";
                     applName = "Adobe Acrobat";
                 }
                 else if (typeFile == "XLS") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".xls";
+                    filePath = path + "\\export.xls";
                     applName = "Microsoft Excel";
                 }
                 else if (typeFile == "Model") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".xls";
+                    filePath = path + "\\export.xls";
                     applName = "Microsoft Excel";
                 }
                 else if (typeFile == "ODS") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".ods";
+                    filePath = path + "\\export.ods";
                     applName = "Open Office";
                 }
 
@@ -306,19 +293,19 @@
                 getSpecialFolder(function (path, connection) {
 
                     if (typeFile == "PDF") {
-                        filePath = path + "\export" + generateRendomExportFileName() + ".pdf";
+                        filePath = path + "\export.pdf";
                         applName = "Adobe Acrobat";
                     }
                     else if (typeFile == "XLS") {
-                        filePath = path + "\export" + generateRendomExportFileName() + ".xls";
+                        filePath = path + "\export.xls";
                         applName = "Microsoft Excel";
                     }
                     else if (typeFile == "Model") {
-                        filePath = path + "\export" + generateRendomExportFileName() + ".xls";
+                        filePath = path + "\export.xls";
                         applName = "Microsoft Excel";
                     }
                     else if (typeFile == "ODS") {
-                        filePath = path + "\export" + generateRendomExportFileName() + ".ods";
+                        filePath = path + "\export.ods";
                         applName = "Open Office";
                     }
                     var encodedFilePath = EncodeHtml(filePath);
@@ -387,19 +374,19 @@
                 path = fso.GetSpecialFolder(2).Path;
 
                 if (typeFile == "PDF") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".pdf";
+                    filePath = path + "\\export.pdf";
                     applName = "Adobe Acrobat";
                 }
                 else if (typeFile == "XLS") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".xls";
+                    filePath = path + "\\export.xls";
                     applName = "Microsoft Excel";
                 }
                 else if (typeFile == "Model") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".xls";
+                    filePath = path + "\\export.xls";
                     applName = "Microsoft Excel";
                 }
                 else if (typeFile == "ODS") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".ods";
+                    filePath = path + "\\export.ods";
                     applName = "Open Office";
                 }
 

@@ -54,7 +54,7 @@ function AttachmentsDragAndDropMain() {
                                         try {
                                             response = JSON.parse(response);
                                         } catch (ex) {
-                                           //console.log(ex);
+                                            console.log(ex);
                                             response = { Success: false, Error: 'Generic Error' };
                                         }
                                     }
@@ -62,7 +62,7 @@ function AttachmentsDragAndDropMain() {
                                     if (response.Success)
                                         fileModel.uploadSuccessful(true);
                                     else {
-                                       //console.log(response.Error);
+                                        console.log(response.Error);
                                         fileModel.uploadSuccessful(false);
                                     }
                                     fileModel.uploadCompleted(true);
@@ -80,7 +80,7 @@ function AttachmentsDragAndDropMain() {
                     try {
                          models.applyBindings(uploadsModel, context);
                     } catch (ex) {
-                       //console.log('models.applyBindings', ex);
+                        console.log('models.applyBindings', ex);
                     }
                 });
             }

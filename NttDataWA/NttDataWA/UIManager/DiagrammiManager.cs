@@ -140,7 +140,7 @@ namespace NttDataWA.UIManager
                     docSel != null && docSel.documenti != null && !String.IsNullOrEmpty(docSel.documenti[0].fileName))
                 {
                     DocsPaWR.Stato statoAttuale = DiagrammiManager.GetStateDocument(docNumber);
-                    if (statoAttuale != null && statoAttuale.CONVERSIONE_PDF)
+                    if (statoAttuale.CONVERSIONE_PDF)
                     {
                         FileManager fileManager = new FileManager();
                         DocsPaWR.FileDocumento fileDocumento = fileManager.getFile(page);

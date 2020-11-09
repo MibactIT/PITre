@@ -151,7 +151,6 @@
                                                         </div>
                                                     </div>
                                                     <!--OPTIONAL -->
-                                                    <asp:Panel runat="server" ID="PnlTxtOptional1">
                                                     <div class="row">
                                                         <div class="col">
                                                             <p>
@@ -167,8 +166,7 @@
                                                             CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
                                                         </div>
                                                     </div>
-                                                    </asp:Panel>
-                                                    <asp:Panel runat="server" ID="PnlTxtOptional2">
+
                                                     <div class="row">
                                                         <div class="col">
                                                             <p>
@@ -184,8 +182,7 @@
                                                             CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
                                                         </div>
                                                     </div>
-                                                    </asp:Panel>
-                                                    <asp:Panel runat="server" ID="pnlDataInizioFine" Visible="false">
+
                                                     <div class="row">
                                                         <div class="col">
                                                             <p>
@@ -197,10 +194,11 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-full">
-                                                            <cc1:CustomTextArea runat="server" ID="TxtOptional3" CssClass="txt_input_full"
+                                                            <cc1:CustomTextArea runat="server" ID="TxtOptional3" CssClass="txt_input_full" 
                                                             CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
                                                         </div>
                                                     </div>
+
                                                     <div class="row">
                                                         <div class="col">
                                                             <p>
@@ -216,7 +214,7 @@
                                                             CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
                                                         </div>
                                                     </div>
-                                                    </asp:Panel>
+
                                                     <div class="row">
                                                         <div class="col">
                                                             <p>
@@ -248,71 +246,6 @@
                                                             CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
                                                         </div>
                                                     </div>
-                                                    
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <p>
-                                                                <span class="weight">
-                                                                    <asp:Literal runat="server" ID="LitTxtOptional10"></asp:Literal>
-                                                                </span>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-full">
-                                                            <cc1:CustomTextArea runat="server" ID="TxtOptional10" CssClass="txt_input_full" 
-                                                            CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <p>
-                                                                <span class="weight">
-                                                                    <asp:Literal runat="server" ID="LitTxtOptional7"></asp:Literal>
-                                                                </span>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-full">
-                                                            <cc1:CustomTextArea runat="server" ID="TxtOptional7" CssClass="txt_input_full" 
-                                                            CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <p>
-                                                                <span class="weight">
-                                                                    <asp:Literal runat="server" ID="LitTxtOptional8"></asp:Literal>
-                                                                </span>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-full">
-                                                            <cc1:CustomTextArea runat="server" ID="TxtOptional8" CssClass="txt_input_full" 
-                                                            CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <p>
-                                                                <span class="weight">
-                                                                    <asp:Literal runat="server" ID="LitTxtOptional9"></asp:Literal>
-                                                                </span>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-full">
-                                                            <cc1:CustomTextArea runat="server" ID="TxtOptional9" CssClass="txt_input_full" 
-                                                            CssClassReadOnly="txt_input_full_disabled"></cc1:CustomTextArea>
-                                                        </div>
-                                                    </div>
-
                                             </fieldset>
                                         </div>
                                     </asp:PlaceHolder>

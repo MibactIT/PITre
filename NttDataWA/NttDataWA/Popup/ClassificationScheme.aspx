@@ -158,15 +158,6 @@
           $(".chzn-select-deselect").chosen({ allow_single_deselect: true, no_results_text: "Nessun risultato trovato" });
           $(".chzn-select").chosen({ no_results_text: "Nessun risultato trovato" });
 
-          function generateRendomExportFileName() {
-              var text = "_";
-              var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-              for (var i = 0; i < 5; i++)
-                  text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-              return text;
-          }
   
 			function OpenFile()
 			{
@@ -184,7 +175,7 @@
 				    alert('folder:' + folder);
 				    path = folder.Path;
 				    alert('path:' + path);
-				    filePath = path + "\\export" + generateRendomExportFileName() + ".xls";
+					filePath = path + "\\export.xls";
 					applName = "Microsoft Excel";	
 					//exportUrl= "..\\exportDati\\exportDatiPage.aspx";				
 					http = CreateObject("MSXML2.XMLHTTP");

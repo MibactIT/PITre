@@ -150,15 +150,7 @@ namespace NttDataWA.Project.ImportExport.Import
                     break;
                 case 0:
                     this.Response.StatusCode = 0;
-                    this.Response.StatusDescription = "Errore in acquisizione";
-                    break;
-                case 6:
-                    this.Response.StatusCode = 6;
-                    this.Response.StatusDescription = "Fattura Elettronica non firmata";
-                    break;
-                case 7:
-                    this.Response.StatusCode = 6;
-                    this.Response.StatusDescription = "Errore in acquisizione: il nome del file supera il limite massimo consentito.";
+                    this.Response.StatusDescription = "Errore in aquisizione";
                     break;
             }
         }

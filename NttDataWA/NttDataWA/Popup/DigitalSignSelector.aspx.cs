@@ -111,7 +111,7 @@ namespace NttDataWA.Popup
                                                                 e.FileTypeUsed && e.FileTypeSignature);
                         retVal = (count > 0);
 
-                        this.chkConverti.Checked = !retVal;
+                        //this.chkConverti.Checked = !retVal;
                     }
                     this.chkPades.Visible = false;
                 }
@@ -119,34 +119,11 @@ namespace NttDataWA.Popup
                 {
                     this.chkPades.Visible = true;
                     this.chkConverti.Enabled = false;
-
-                    //Se il documento è in libro firma non posso scegliere il tipo firma, ma di pende dal passo.
-                    if (fileReq.inLibroFirma)
-                    {
-                        this.chkPades.Enabled = false;
-                        string typeSignature = LibroFirmaManager.GetTypeSignatureToBeEntered(fileReq);
-                        if (typeSignature.Equals(LibroFirmaManager.TypeEvent.SIGN_PADES))
-                        {
-                            this.chkPades.Checked = true;
-                        }
-                    }
                 }
             }
 
             if (!signHash) // se non posso firmare con l'HASH allora non posso neanche firmare pades
                 this.chkPades.Visible = false;
-
-
-            //Se il documento è in libro firma non posso scegliere il tipo firma, ma di pende dal passo.
-            if (fileReq.inLibroFirma)
-            {
-                this.chkPades.Enabled = false;
-                string typeSignature = LibroFirmaManager.GetTypeSignatureToBeEntered(fileReq);
-                if (typeSignature.Equals(LibroFirmaManager.TypeEvent.SIGN_PADES))
-                {
-                    this.chkPades.Checked = true;
-                }
-            }
 
             //PDZ - Nuova gestione firma/cofirma
             //Valore della Chiave FE_SET_TIPO_FIRMA
@@ -458,7 +435,6 @@ namespace NttDataWA.Popup
         protected void DigitalSignDialogBtnSign_Click(object sender, EventArgs e)
         {
             //try {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "reallowOp", "reallowOp();", true);
                 this.grdResult.DataSource = FirmaDigitaleResultManager.CurrentData;
                 this.grdResult.DataBind();
                 this.pnlGridResultContainer.Update();

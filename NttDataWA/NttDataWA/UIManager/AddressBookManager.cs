@@ -42,8 +42,7 @@ namespace NttDataWA.UIManager
 
                 if (callType == DocsPaWR.RubricaCallType.CALLTYPE_CORR_INT || 
                     callType == DocsPaWR.RubricaCallType.CALLTYPE_OWNER_AUTHOR ||
-                    callType == DocsPaWR.RubricaCallType.CALLTYPE_CORR_INT_NO_UO ||
-                    callType == DocsPaWR.RubricaCallType.CALLTYPE_PROTO_INT_DEST
+                    callType == DocsPaWR.RubricaCallType.CALLTYPE_CORR_INT_NO_UO
                     )
                 {
                     qco.tipoIE = DocsPaWR.AddressbookTipoUtente.INTERNO;
@@ -275,6 +274,19 @@ namespace NttDataWA.UIManager
             try
             {
                 return new ArrayList(docsPaWS.getCorrispondentiByCodRF(codiceRF));
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+                return null;
+            }
+        }
+
+        public static ArrayList getCorrispondentiByCodRFIdAmm(string codiceRF, string idAmm)
+        {
+            try
+            {
+                return new ArrayList(docsPaWS.getCorrispondentiByCodRFIdAmm(codiceRF, idAmm));
             }
             catch (System.Exception ex)
             {

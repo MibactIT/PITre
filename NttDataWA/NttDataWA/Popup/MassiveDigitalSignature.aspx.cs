@@ -509,16 +509,10 @@ namespace NttDataWA.Popup
                 if (this.ListToSign != null && this.ListToSign.ContainsKey(idDocumento))
                 {
                     file = this.ListToSign[idDocumento];
-                    if (file != null)
-                    {
-                        file.signType = UIManager.DocumentManager.GetTipoFirmaDocumento(idDocumento.Replace("C", "").Replace("P", ""));
-                        file.signed = (!string.IsNullOrEmpty(file.signType) && !file.signType.Equals(NttDataWA.Utils.TipoFirma.NESSUNA_FIRMA)) ? "1" : "0";
-
-                        if (file.signed != null && file.signed.Trim() == "1")
-                            signed = "1";
-                        if (!String.IsNullOrEmpty(file.signType) && file.signType.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA))
-                            signed = "0";
-                    }
+                    if (file != null && file.signed != null && file.signed.Trim() == "1")
+                        signed = "1";
+                    if (file != null && !String.IsNullOrEmpty(file.signType) && file.signType.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA))
+                        signed = "0";
                 }
 
             }

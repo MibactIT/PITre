@@ -108,36 +108,6 @@ namespace NttDataWA.Popup
             }
         }
 
-        private List<string> ListIdDocumentSigned
-        {
-            get
-            {
-                List<string> result = null;
-                if (HttpContext.Current.Session["ListIdDocumentSigned"] != null)
-                {
-                    result = HttpContext.Current.Session["ListIdDocumentSigned"] as List<string>;
-                }
-                return result;
-            }
-
-            set
-            {
-                HttpContext.Current.Session["ListIdDocumentSigned"] = value;
-            }
-        }
-
-        private bool AddElementiInADL
-        {
-            get
-            {
-                bool result = false;
-                if (HttpContext.Current.Session["AddElementiInADL"] != null)
-                {
-                    result = bool.Parse(HttpContext.Current.Session["AddElementiInADL"].ToString());
-                }
-                return result;
-            }
-        }
         #endregion
 
         #region Standard method
@@ -160,8 +130,6 @@ namespace NttDataWA.Popup
             GetMessaggeConfirm();
 			this.ListToSign = new Dictionary<string, FileToSign>();
             HttpContext.Current.Session["massiveSignReport"] = null;
-            NttDataWA.SmartClient.FirmaDigitaleResultManager.ClearData();
-            this.ListIdDocumentSigned = null;
         }
 
         private void InitializeLanguage()
@@ -236,13 +204,12 @@ namespace NttDataWA.Popup
             {
                 ReportSignatureSelected = new MassiveOperationReport();
                 //MassiveOperationReport report = new MassiveOperationReport();
-                MassiveOperationUtils.ItemsStatus = null;
                 MassiveOperationReport.MassiveOperationResultEnum result;
                 string oggetto = string.Empty;
                 string details;
                 string popupCall = string.Empty;
                 List<FileRequest> fileReqToSign = new List<FileRequest>();
-                this.ListIdDocumentSigned = new List<string>();
+                List<string> idDocumentSigned = null;
                 Allegato attach;
                 Documento doc;
 
@@ -288,6 +255,7 @@ namespace NttDataWA.Popup
 
                     if (firmaResult != null)
                     {
+                        idDocumentSigned = new List<string>();
                         foreach (FirmaResult r in firmaResult)
                         {
                             if (string.IsNullOrEmpty(r.errore))
@@ -299,7 +267,7 @@ namespace NttDataWA.Popup
                                     oggetto,
                                     result,
                                     details);
-                                ListIdDocumentSigned.Add(r.fileRequest.docNumber);
+                                idDocumentSigned.Add(r.fileRequest.docNumber);
                             }
                             else
                             {
@@ -316,6 +284,9 @@ namespace NttDataWA.Popup
                             }
 
                         }
+                        //Rimuovo dalla lista gli elementi elaborati correttamente
+                        this.ListaElementiLibroFirma.RemoveAll(x => idDocumentSigned.Contains(x.InfoDocumento.Docnumber));
+                        this.ListaElementiFiltrati.RemoveAll(x => idDocumentSigned.Contains(x.InfoDocumento.Docnumber));
                     }
                 }
                 #endregion
@@ -339,7 +310,6 @@ namespace NttDataWA.Popup
                                 versionId = element.InfoDocumento.VersionId,
                                 version = element.InfoDocumento.NumVersione.ToString(),
                                 versionLabel = element.InfoDocumento.NumAllegato.ToString(),
-                                tipoFirma = element.TipoFirmaFile,
                                 inLibroFirma = true
 
                             };
@@ -354,7 +324,6 @@ namespace NttDataWA.Popup
                                 versionId = element.InfoDocumento.VersionId,
                                 version = element.InfoDocumento.NumVersione.ToString(),
                                 versionLabel = element.InfoDocumento.NumAllegato.ToString(),
-                                tipoFirma = element.TipoFirmaFile,
                                 inLibroFirma = true
 
                             };
@@ -366,6 +335,7 @@ namespace NttDataWA.Popup
 
                     if (firmaResult != null)
                     {
+                        idDocumentSigned = new List<string>();
                         foreach (FirmaResult r in firmaResult)
                         {
                             if (string.IsNullOrEmpty(r.errore))
@@ -377,7 +347,7 @@ namespace NttDataWA.Popup
                                     oggetto,
                                     result,
                                     details);
-                                ListIdDocumentSigned.Add(r.fileRequest.docNumber);
+                                idDocumentSigned.Add(r.fileRequest.docNumber);
                             }
                             else
                             {
@@ -393,6 +363,9 @@ namespace NttDataWA.Popup
                             }
 
                         }
+                        //Rimuovo dalla lista gli elementi elaborati correttamente
+                        this.ListaElementiLibroFirma.RemoveAll(x => idDocumentSigned.Contains(x.InfoDocumento.Docnumber));
+                        this.ListaElementiFiltrati.RemoveAll(x => idDocumentSigned.Contains(x.InfoDocumento.Docnumber));
                     }
                 }
 
@@ -505,6 +478,7 @@ namespace NttDataWA.Popup
                     }
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "MassiveSignatureHSM", popupCall, true);
                 }
+
             }
             catch (System.Exception ex)
             {
@@ -607,21 +581,28 @@ namespace NttDataWA.Popup
             if (report != null)
             {
                 List<string> idDocumentSigned = new List<string>();
-                string idDocumento = string.Empty;
                 foreach (DataRow row in report.GetDataSet().Tables[0].Rows)
                 {
-                    idDocumento = row["ObjId"].ToString().Replace("P", "").Replace("C", "");
                     string oggetto = (from i in this.ListaElementiLibroFirma
-                                      where i.InfoDocumento.Docnumber.Equals(idDocumento)
+                                      where i.InfoDocumento.Docnumber.Equals(row["ObjId"].ToString().Replace("P", "").Replace("C", ""))
                                       select i.InfoDocumento.Oggetto).FirstOrDefault();
                     ReportSignatureSelected.AddReportRow(
                         oggetto,
                         ((MassiveOperationReport.MassiveOperationResultEnum)Enum.Parse(typeof(MassiveOperationReport.MassiveOperationResultEnum),
                         row["Result"].ToString())), row["Details"].ToString());
-
                     if (row["Result"].ToString().Equals(MassiveOperationReport.MassiveOperationResultEnum.OK.ToString()))
-                        this.ListIdDocumentSigned.Add(idDocumento);
+                    {
+                        idDocumentSigned.Add(row["ObjId"].ToString().Replace("P", "").Replace("C", ""));
+                    }
+                    if (row["Result"].ToString().Equals(MassiveOperationReport.MassiveOperationResultEnum.KO.ToString()))
+                    {
+                        this.ListaElementiLibroFirma.Where(x => x.InfoDocumento.Docnumber.Equals(row["ObjId"].ToString().Replace("P", "").Replace("C", ""))).ToList().ForEach(f => f.ErroreFirma = row["Details"].ToString());
+                        this.ListaElementiFiltrati.Where(x => x.InfoDocumento.Docnumber.Equals(row["ObjId"].ToString().Replace("P", "").Replace("C", ""))).ToList().ForEach(f => f.ErroreFirma = row["Details"].ToString());
+                    }
+                    
                 }
+                //this.ListaElementiLibroFirma.RemoveAll(x => idDocumentSigned.Contains(x.InfoDocumento.Docnumber));
+                //this.ListaElementiFiltrati.RemoveAll(x => idDocumentSigned.Contains(x.InfoDocumento.Docnumber));
 
             }
             else
@@ -639,18 +620,13 @@ namespace NttDataWA.Popup
 
         private void DigitalSignatureSelectedItem()
         {
-            //Per tutti i documenti lavorati aggiungo in area di lavoro
-            if(AddElementiInADL && ListIdDocumentSigned.Count> 0)
-                this.AggiungiInADL(ListIdDocumentSigned);
 
-            HttpContext.Current.Session.Remove("ListIdDocumentSigned");
             // Introduzione della riga di summary
             if (ReportSignatureSelected.NotWorked == 0)
             {
                 ScriptManager.RegisterClientScriptBlock(this.UpPnlButtons, this.UpPnlButtons.GetType(), "closeAJM", "parent.closeAjaxModal('SignatureSelectedItems','');", true);
                 return;
             }
-
             string[] pars = new string[] { "" + ReportSignatureSelected.Worked, "" + ReportSignatureSelected.NotWorked };
             ReportSignatureSelected.AddSummaryRow("Documenti lavorati: {0} - Documenti non lavorati: {1}", pars);
 
@@ -700,53 +676,6 @@ namespace NttDataWA.Popup
         #endregion
 
         #region Utils
-
-        private void AggiungiInADL(List<string> listIdDocToAdd)
-        {
-            try
-            {
-                List<WorkingArea> listWorkingArea = new List<WorkingArea>();
-                WorkingArea objectArea = null;
-                string idDocumentoPrincipale = string.Empty;
-                InfoDocumento infoDocPrincipale;
-                foreach (string id in listIdDocToAdd)
-                {
-                    ElementoInLibroFirma elemento = (from e in this.ListaElementiFiltrati
-                                                     where e.InfoDocumento.Docnumber.Equals(id)
-                                                     select e).FirstOrDefault();
-                    if (elemento != null)
-                    {
-                        objectArea = new WorkingArea();
-                        objectArea.ObjectType = AreaLavoroTipoOggetto.DOCUMENTO;
-                        if (!string.IsNullOrEmpty(elemento.InfoDocumento.IdDocumentoPrincipale) &&
-                            !ListIdDocumentSigned.Contains(elemento.InfoDocumento.IdDocumentoPrincipale))
-                        {
-                            idDocumentoPrincipale = elemento.InfoDocumento.IdDocumentoPrincipale;
-                            infoDocPrincipale = UIManager.DocumentManager.GetInfoDocumento(idDocumentoPrincipale, idDocumentoPrincipale, this);
-                            objectArea.IdObject = idDocumentoPrincipale;
-                            objectArea.TipoDocumento = infoDocPrincipale.tipoProto;
-                            objectArea.IdRegistro = infoDocPrincipale.idRegistro;
-                            objectArea.Motivo = Utils.Languages.GetLabelFromCode("SignatureSelectedItemAreaMotivoAllegato", UIManager.UserManager.GetUserLanguage());
-                        }
-                        else
-                        {
-                            objectArea.IdObject = elemento.InfoDocumento.Docnumber;
-                            objectArea.TipoDocumento = elemento.InfoDocumento.TipoProto;
-                            objectArea.IdRegistro = elemento.InfoDocumento.IdRegistro;
-                            objectArea.Motivo = Utils.Languages.GetLabelFromCode("SignatureSelectedItemAreaMotivo", UIManager.UserManager.GetUserLanguage());
-                        }
-                        listWorkingArea.Add(objectArea);
-                    }
-                }
-                if (listWorkingArea != null && listWorkingArea.Count > 0)
-                    UIManager.DocumentManager.AddMassiveObjectInADL(listWorkingArea);
-            }
-            catch (Exception e)
-            {
-
-            }
-        }
-
         private void GetMessaggeConfirm()
         {
             string language = UserManager.GetUserLanguage();
@@ -756,7 +685,7 @@ namespace NttDataWA.Popup
             int countSingatureSelectedItems = (from i in this.ListaElementiLibroFirma
                                                where i.StatoFirma.Equals(TipoStatoElemento.DA_FIRMARE)
                                                select i).ToList().Count;
-            if (countSingatureSelectedItems > 0)
+            if (countSingatureSelectedItems != null && countSingatureSelectedItems > 0)
             {
                 int countDigitalSignatureCades = (from i in this.ListaElementiLibroFirma
                                                   where i.TipoFirma.Equals(LibroFirmaManager.TypeEvent.SIGN_CADES) && i.StatoFirma.Equals(TipoStatoElemento.DA_FIRMARE)

@@ -30,7 +30,6 @@ namespace NttDataWA.Project.ImportExport.Import
             bool daAggiornareUffRef;
             bool inFolder;
             bool fileFormat = false;
-            bool fattDaImport = false;
 
             try
             {
@@ -93,62 +92,15 @@ namespace NttDataWA.Project.ImportExport.Import
                                             UIManager.DocumentManager.addDocumentoInFolder(page, scheda.systemId, folderRoot.systemID, false, out inFolder, out message);
 
                                             //acq img
-                                            string errorMessage = string.Empty;
                                             if (scheda.documenti != null && scheda.documenti[0] != null)
                                             {
                                                 fr = (NttDataWA.DocsPaWR.FileRequest)scheda.documenti[0];
-                                                fr = docsPaWS.DocumentoPutFileImport(fr, fd, UIManager.UserManager.GetInfoUser(), out errorMessage);
+                                                fr = docsPaWS.DocumentoPutFile(fr, fd, UIManager.UserManager.GetInfoUser());
 
-                                                if (fr != null)
-                                                    retValue = 1;
-                                                else  //se l'acquisizione non va a buon fine cestino il documento
-                                                {
-                                                    if (!string.IsNullOrEmpty(errorMessage) && errorMessage.Equals("NOME_FILE_TROPPO_LUNGO"))
-                                                    {
-                                                        UIManager.DocumentManager.CestinaDocumento(page, scheda, scheda.tipoProto, "Errore nell'acquisizione del documento da import", out errorMessage);
-                                                        retValue = 7;
-                                                    }
-                                                }
-                                                    
+                                                if (fr != null) retValue = 1;
                                             }
 
-                                            // controllo fattura
-                                            if ((externalExt.ToUpper() == "P7M" || externalExt.ToUpper() == "M7M" || externalExt.ToUpper() == "TSD")
-                                                && (getEnvelopedExt(rootFolder[i].ToString())).ToUpper() == "XML")
-                                            {
-                                                fattDaImport = true;
-                                            }
-                                            else if(externalExt.ToUpper() == "XML")
-                                            {
-                                                string xmlFatt = System.Text.Encoding.UTF8.GetString(fd.content);
-                                                xmlFatt = xmlFatt.Trim();
-                                                System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
-                                                if (xmlFatt.Contains("xml version=\"1.1\""))
-                                                {
-                                                    logger.Debug("Versione XML 1.1. Provo conversione");
-                                                    xmlFatt = xmlFatt.Replace("xml version=\"1.1\"", "xml version=\"1.0\"");
-                                                }
-                                                xmlDoc.LoadXml(xmlFatt);
-                                                if (xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://www.fatturapa.gov.it/sdi/fatturapa/v1") ||
-                                                    xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/"))
-                                                {
-                                                    fattDaImport = true;
-                                                }
-                                                else
-                                                {
-                                                    logger.Debug("Il file xml non è una fattura.");
-                                                }
-                                            }
 
-                                            if (fattDaImport)
-                                            {
-                                                // eseguo il metodo esposto che va fino al FattElAttiveDaImport
-                                                string retImpFAtt= docsPaWS.FattElAttiveDaImport(scheda.systemId, UIManager.UserManager.GetInfoUser());
-                                                if (retImpFAtt == "Fattura non firmata")
-                                                {
-                                                    retValue = 6;
-                                                }
-                                            }
 
                                         }
                                     }

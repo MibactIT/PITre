@@ -136,9 +136,6 @@ namespace NttDataWA.Project.ImportExport
                 case "CREATE_PATH":
                     message = Utils.Languages.GetMessageFromCode("Path_CreateIt", language);
                     break;
-                case "EXISTS_FILE":
-                    message = Utils.Languages.GetMessageFromCode("File_Exists", language);
-                    break;
             }
 
             return message;

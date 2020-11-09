@@ -20,12 +20,14 @@ namespace NttDataWA
         private ILog logger = LogManager.GetLogger(typeof(Login));
         private string sessionend = string.Empty;
         private string userid = string.Empty;
-        private string tempPass = string.Empty;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(Request.Form.Get("portale")) || (Request.Form.Get("portale").ToUpper() == "FALSE"))
             {
+                msgLoginDiv.Attributes.Add("style", "visibility:block");
+                containerLogin.Attributes.Add("style", "visibility:block");
+
                 string qs = Request.QueryString.ToString();
                 debug.InnerHtml = "qs=" + qs;
                 //Link da Word per accedere al documento 
@@ -67,7 +69,6 @@ namespace NttDataWA
                     {
                         msgLoginDiv.Visible = false;
                     }
-
 
                     if (GetShibSSOEnabled())
                     {
@@ -198,10 +199,6 @@ namespace NttDataWA
 
                     RefreshScript();
                 }
-            }
-            else
-            {
-
             }
         }
 
@@ -665,7 +662,6 @@ namespace NttDataWA
 
             bool continueLogon = true;
 
-
             if (string.IsNullOrEmpty(TxtUserId.Text) || string.IsNullOrEmpty(TxtPassword.Text))
             {
                 LblError.Visible = true;
@@ -673,7 +669,6 @@ namespace NttDataWA
             }
             else
             {
-                this.tempPass = TxtPassword.Text;
                 string failDetails = string.Empty;
                 string message = string.Empty;
                 try
@@ -707,6 +702,7 @@ namespace NttDataWA
                             LblError.Text = message;
                         }
                     }
+
                 }
                 catch (Exception exception)
                 {
@@ -821,8 +817,6 @@ namespace NttDataWA
             bool resLogin = false;
             message = string.Empty;
             string ipaddress = string.Empty;
-            this.TxtPassword.Text = string.Empty;
-            this.TxtPassword.Attributes.Add("value", string.Empty);
 
             DocsPaWR.LoginResult loginResult;
             DocsPaWR.Utente utente = UIManager.LoginManager.Login(this, lgn, out loginResult, out ipaddress);
@@ -893,12 +887,6 @@ namespace NttDataWA
                     caricaComboAmministrazioni();
                     UpPnlDllAdmin.Update();
                     message = "Selezionare un'amministrazione";
-
-                    if (!string.IsNullOrEmpty(this.tempPass))
-                    {
-                        this.TxtPassword.Text = this.tempPass;
-                        this.TxtPassword.Attributes.Add("value", this.tempPass);
-                    }
                     break;
 
                 case DocsPaWR.LoginResult.PASSWORD_EXPIRED:

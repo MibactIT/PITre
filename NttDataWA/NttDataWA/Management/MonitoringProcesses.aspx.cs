@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -111,87 +110,10 @@ namespace NttDataWA.Management
                 HttpContext.Current.Session["PageCountMonitoringProcesses"] = value;
             }
         }
-
-        private string IdInstanceProcess
-        {
-            set
-            {
-                HttpContext.Current.Session["IdInstanceProcess"] = value;
-            }
-        }
-
-        private RubricaCallType CallType
-        {
-            get
-            {
-                if (HttpContext.Current.Session["callType"] != null)
-                    return (RubricaCallType)HttpContext.Current.Session["callType"];
-                else return RubricaCallType.CALLTYPE_PROTO_INT_DEST;
-            }
-            set
-            {
-                HttpContext.Current.Session["callType"] = value;
-            }
-        }
-
-        private DataSet IstanzeProcessoResult
-        {
-            get
-            {
-                return (DataSet)HttpContext.Current.Session["IstanzeProcessoResult"];
-            }
-            set
-            {
-                HttpContext.Current.Session["IstanzeProcessoResult"] = value;
-            }
-        }
-
-        private List<string> IdIstanzeProcessoSelezionate
-        {
-            get
-            {
-                return (List<string>)HttpContext.Current.Session["IdIstanzeProcessoSelezionate"];
-            }
-            set
-            {
-                HttpContext.Current.Session["IdIstanzeProcessoSelezionate"] = value;
-            }
-        }
-
-        private List<string> IdDocumentiSelezionatiMonitoring
-        {
-            get
-            {
-                return (List<string>)HttpContext.Current.Session["IdDocumentiSelezionatiMonitoring"];
-            }
-            set
-            {
-                HttpContext.Current.Session["IdDocumentiSelezionatiMonitoring"] = value;
-            }
-        }
-
-        protected bool CheckAllIstanze
-        {
-            get
-            {
-                bool result = false;
-                if (HttpContext.Current.Session["CheckAllIstanze"] != null)
-                {
-                    result = bool.Parse(HttpContext.Current.Session["CheckAllIstanze"].ToString());
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["CheckAllIstanze"] = value;
-            }
-        }
         #endregion
 
         private const string ALLEGATO = "A";
         private const string PANEL_GRID_INDEXES = "upPnlGridIndexes";
-        private const string CLOSE_POPUP_ADDRESS_BOOK = "closePopupAddressBook";
-        private const string EVENT = "E";
 
         #region Standard method
         protected void Page_Load(object sender, EventArgs e)
@@ -212,23 +134,15 @@ namespace NttDataWA.Management
                     }
                     int numTotPage = 0;
                     int nRec = 0;
-                    this.SearchIstanzeProcessiFirma(this.SelectedPage, numTotPage, nRec);
+                    this.ListaIstanzaProcessiFirmaFiltered = LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(FiltersInstanceProcesses, this.SelectedPage, gridViewResult.PageSize, out numTotPage, out nRec);
+                    this.RecordCount = nRec;
+                    this.PageCount = (int)Math.Round(((double)nRec / (double)gridViewResult.PageSize) + 0.49);
+                    GridViewResult_Bind();
+                    this.UpPnlGridView.Update();
                 }
-
-                ReadRetValueFromPopup();
             }
 
             RefreshScript();
-        }
-
-        private void ReadRetValueFromPopup()
-        {
-            if (this.Request.Form["__EVENTARGUMENT"] != null && (this.Request.Form["__EVENTARGUMENT"].Equals(CLOSE_POPUP_ADDRESS_BOOK)))
-            {
-                btnAddressBookPostback();
-                HttpContext.Current.Session["AddressBook.from"] = null;
-                return;
-            }
         }
 
         private void InitializaPage()
@@ -250,7 +164,6 @@ namespace NttDataWA.Management
             this.LtlAIdDoc.Visible = false;
             this.LtlDaIdDoc.Visible = false;
 
-            this.LoadEventTypes();
             //Back
             if (this.Request.QueryString["back"] != null && this.Request.QueryString["back"].Equals("1"))
             {
@@ -278,7 +191,12 @@ namespace NttDataWA.Management
                     {
                         int numTotPage = 0;
                         int nRec = 0;
-                        this.SearchIstanzeProcessiFirma(this.SelectedPage, numTotPage, nRec);
+                        this.ListaIstanzaProcessiFirmaFiltered = LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(FiltersInstanceProcesses, Int32.Parse(obj.NumPage), gridViewResult.PageSize, out numTotPage, out nRec);
+
+                        this.RecordCount = nRec;
+                        this.PageCount = (int)Math.Round(((double)nRec / (double)gridViewResult.PageSize) + 0.49);
+
+                        GridViewResult_Bind();
 
                         string idProfile = string.Empty;
                         foreach (GridViewRow grd in this.gridViewResult.Rows)
@@ -319,18 +237,6 @@ namespace NttDataWA.Management
             }
         }
 
-        private void SearchIstanzeProcessiFirma(int numPage, int numTotPage, int nRec)
-        {
-            DataSet istanzeProcessi = null;
-            this.ListaIstanzaProcessiFirmaFiltered = LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(FiltersInstanceProcesses, numPage, gridViewResult.PageSize, out numTotPage, out nRec, out istanzeProcessi);
-            this.IstanzeProcessoResult = istanzeProcessi;
-            this.RecordCount = nRec;
-            this.PageCount = (int)Math.Round(((double)nRec / (double)gridViewResult.PageSize) + 0.49);
-
-            GridViewResult_Bind();
-            this.UpPnlGridView.Update();
-        }
-
         private void DisabledSearch()
         {
             this.pnlNoProcesses.Visible = true;
@@ -364,16 +270,6 @@ namespace NttDataWA.Management
             HttpContext.Current.Session.Remove("ListaIstanzaProcessiFirmaFiltered");
             HttpContext.Current.Session.Remove("FiltersInstanceProcesses");
             HttpContext.Current.Session.Remove("selectedRowMonitoringProcesses");
-            HttpContext.Current.Session.Remove("recordCountMonitoringProcesses");
-            HttpContext.Current.Session.Remove("selectedPageMonitoringProcesses");
-            HttpContext.Current.Session.Remove("selectedPageMonitoringProcesses");
-            HttpContext.Current.Session.Remove("selectedPageMonitoringProcesses");
-            HttpContext.Current.Session.Remove("PageCountMonitoringProcesses");
-            HttpContext.Current.Session.Remove("IdIstanzeProcessoSelezionate");
-            HttpContext.Current.Session.Remove("CheckAllIstanze");
-            HttpContext.Current.Session.Remove("IdIstanzeProcessoResult");
-            HttpContext.Current.Session.Remove("IdDocumentiSelezionatiMonitoring");
-            HttpContext.Current.Session.Remove("IstanzeProcessoResult");            
         }
 
         private void InitializeLanguage()
@@ -389,9 +285,6 @@ namespace NttDataWA.Management
             this.ddl_StartDate.Items[2].Text = Utils.Languages.GetLabelFromCode("ddl_data2", language);
             this.ddl_StartDate.Items[3].Text = Utils.Languages.GetLabelFromCode("ddl_data3", language);
             this.ddl_StartDate.Items[4].Text = Utils.Languages.GetLabelFromCode("ddl_data4", language);
-            this.ddl_StartDate.Items[5].Text = Utils.Languages.GetLabelFromCode("ddl_data5", language);
-            this.ddl_StartDate.Items[6].Text = Utils.Languages.GetLabelFromCode("ddl_data6", language);
-            this.ddl_StartDate.Items[7].Text = Utils.Languages.GetLabelFromCode("ddl_data7", language);
             this.LtlNotesStartup.Text = Utils.Languages.GetLabelFromCode("StatisticsSignatureProcessNotesStartup", language);
             this.LtlCompletitionDate.Text = Utils.Languages.GetLabelFromCode("StatisticsSignatureProcessCompletitionDate", language);
             this.LtlDaCompletitionDate.Text = Utils.Languages.GetLabelFromCode("VisibilityOneField", language);
@@ -401,9 +294,6 @@ namespace NttDataWA.Management
             this.ddl_CompletitionDate.Items[2].Text = Utils.Languages.GetLabelFromCode("ddl_data2", language);
             this.ddl_CompletitionDate.Items[3].Text = Utils.Languages.GetLabelFromCode("ddl_data3", language);
             this.ddl_CompletitionDate.Items[4].Text = Utils.Languages.GetLabelFromCode("ddl_data4", language);
-            this.ddl_CompletitionDate.Items[5].Text = Utils.Languages.GetLabelFromCode("ddl_data5", language);
-            this.ddl_CompletitionDate.Items[6].Text = Utils.Languages.GetLabelFromCode("ddl_data6", language);
-            this.ddl_CompletitionDate.Items[7].Text = Utils.Languages.GetLabelFromCode("ddl_data7", language);
             this.LtlInterruptionDate.Text = Utils.Languages.GetLabelFromCode("StatisticsSignatureProcessInterruptionDate", language);
             this.LtlNotesInterruption.Text = Utils.Languages.GetLabelFromCode("StatisticsSignatureProcessNotesInterruption", language);
             this.LtlDaInterruptionDate.Text = Utils.Languages.GetLabelFromCode("VisibilityOneField", language);
@@ -413,15 +303,11 @@ namespace NttDataWA.Management
             this.ddl_InterruptionDate.Items[2].Text = Utils.Languages.GetLabelFromCode("ddl_data2", language);
             this.ddl_InterruptionDate.Items[3].Text = Utils.Languages.GetLabelFromCode("ddl_data3", language);
             this.ddl_InterruptionDate.Items[4].Text = Utils.Languages.GetLabelFromCode("ddl_data4", language);
-            this.ddl_InterruptionDate.Items[5].Text = Utils.Languages.GetLabelFromCode("ddl_data5", language);
-            this.ddl_InterruptionDate.Items[6].Text = Utils.Languages.GetLabelFromCode("ddl_data6", language);
-            this.ddl_InterruptionDate.Items[7].Text = Utils.Languages.GetLabelFromCode("ddl_data7", language);
             this.LtlState.Text = Utils.Languages.GetLabelFromCode("StatisticsSignatureProcessState", language);
             this.opIN_EXEC.Text = Utils.Languages.GetLabelFromCode("IN_EXEC", language);
             this.opSTOPPED.Text = Utils.Languages.GetLabelFromCode("STOPPED", language);
             this.opCLOSED.Text = Utils.Languages.GetLabelFromCode("CLOSED", language);
             this.opTRUNCATED.Text = Utils.Languages.GetLabelFromCode("TRUNCATED", language);
-            this.opIN_ERROR.Text = Utils.Languages.GetLabelFromCode("IN_ERROR", language);
             this.monitoringProcessesResultCount.Text = Utils.Languages.GetLabelFromCode("monitoringProcessesResultCount", language);
             this.LtlIdDoc.Text = Utils.Languages.GetLabelFromCode("LtlIdDoc", language);
             this.ddl_idDoc.Items[0].Text = Utils.Languages.GetLabelFromCode("ddl_numProt_E0", language);
@@ -431,21 +317,6 @@ namespace NttDataWA.Management
             this.LtlObject.Text = Utils.Languages.GetLabelFromCode("MonitoringProcessesObject", language);
             this.MonitoringProcessesClearFilter.Text = Utils.Languages.GetLabelFromCode("MonitoringProcessesClearFilter", language);
             this.lblNoProcesses.Text = Utils.Languages.GetLabelFromCode("NoVisibleProcesses", language);
-            this.StateInstanceProcessSignature.Title = Utils.Languages.GetLabelFromCode("MonitoringProcessesStateInstance", language);
-            this.ltlRuoloTitolare.Text = Utils.Languages.GetLabelFromCode("AddFilterSignatureProcessRuoloTitolare", language);
-            this.ltlUtenteTitolare.Text = Utils.Languages.GetLabelFromCode("AddFilterSignatureProcessUtenteTitolare", language);
-            this.AddressBook.Title = Utils.Languages.GetLabelFromCode("AddFilterAddressBookTitle", language);
-            this.ltlNomeProcesso.Text = Utils.Languages.GetLabelFromCode("lblNameSignatureProcesses", language);
-            this.ltlProcesso.Text = Utils.Languages.GetLabelFromCode("ltlProcesso", language);
-            this.ImgRitenta.ToolTip = Utils.Languages.GetLabelFromCode("MonitoringProcessesImgRitenta", language);
-            this.ImgReportSpedizioni.ToolTip = Utils.Languages.GetLabelFromCode("MonitoringProcessesImgReportSpedizioni", language);
-            this.SendingReportMonitoring.Title = Utils.Languages.GetLabelFromCode("MonitoringProcessesImgReportSpedizioni", language);
-            this.ltlTipoPassoAutomatico.Text = Utils.Languages.GetLabelFromCode("MonitoringProcessesLtlTipoPassoAutomatico", language);
-            this.DdlTipoPassoAutomatico.Attributes.Add("data-placeholder", Utils.Languages.GetLabelFromCode("MonitoringProcessesDdlTipoPassoAutomatico", language));
-            this.LtlTipoVisibilita.Text = Utils.Languages.GetLabelFromCode("MonitoringProcessesLtlTipoVisibilita", language);
-            this.rb_Utente.Text = Utils.Languages.GetLabelFromCode("MonitoringProcessesLtlTipoVisibilitaRbUtente", language);
-            this.rb_Ruolo.Text = Utils.Languages.GetLabelFromCode("MonitoringProcessesLtlTipoVisibilitaRbRuolo", language);
-            this.rb_Monitoratore.Text = Utils.Languages.GetLabelFromCode("MonitoringProcessesLtlTipoVisibilitaRbMonitoratore", language);
         }
 
         private void RefreshScript()
@@ -460,7 +331,7 @@ namespace NttDataWA.Management
             List<ProcessoFirma> listSignatureProcesses = new List<ProcessoFirma>();
             try
             {
-                listSignatureProcesses = UIManager.SignatureProcessesManager.GetProcessesSignatureVisibleRole(true, true);
+                listSignatureProcesses = UIManager.SignatureProcessesManager.GetProcessesSignatureVisibleRole();
             }
             catch (System.Exception ex)
             {
@@ -485,7 +356,14 @@ namespace NttDataWA.Management
                     int numTotPage = 0;
                     int nRec = 0;
                     this.SelectedPage = 0;
-                    this.SearchIstanzeProcessiFirma(numPage, numTotPage, nRec);
+                    this.ListaIstanzaProcessiFirmaFiltered = LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(FiltersInstanceProcesses, numPage, gridViewResult.PageSize, out numTotPage, out nRec);
+
+                    this.RecordCount = nRec;
+                    this.PageCount = (int)Math.Round(((double)nRec / (double)gridViewResult.PageSize) + 0.49);
+
+                    GridViewResult_Bind();
+                    this.UpPnlGridView.Update();
+
                 }
                 else
                     return;
@@ -591,33 +469,6 @@ namespace NttDataWA.Management
                         this.LtlDaStartDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
                         this.LtlAStartDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlA", language);
                         break;
-                    case 5: //Ieri
-                        this.LtlAStartDate.Visible = false;
-                        this.txt_finedataStartDate.Visible = false;
-                        this.txt_initStartDate.ReadOnly = true;
-                        this.txt_initStartDate.Text = NttDataWA.Utils.dateformat.GetYesterday();
-                        this.LtlDaStartDate.Text = Utils.Languages.GetLabelFromCode("VisibilityOneField", language);
-                        break;
-                    case 6: //Ultimi 7 giorni
-                        this.LtlAStartDate.Visible = true;
-                        this.txt_finedataStartDate.Visible = true;
-                        this.txt_initStartDate.Text = NttDataWA.Utils.dateformat.GetLastSevenDay();
-                        this.txt_finedataStartDate.Text = NttDataWA.Utils.dateformat.toDay();
-                        this.txt_finedataStartDate.ReadOnly = true;
-                        this.txt_initStartDate.ReadOnly = true;
-                        this.LtlDaStartDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
-                        this.LtlAStartDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlA", language);
-                        break;
-                    case 7: //Ultimi 31 giorni
-                        this.LtlAStartDate.Visible = true;
-                        this.txt_finedataStartDate.Visible = true;
-                        this.txt_initStartDate.Text = NttDataWA.Utils.dateformat.GetLastThirtyOneDay();
-                        this.txt_finedataStartDate.Text = NttDataWA.Utils.dateformat.toDay();
-                        this.txt_finedataStartDate.ReadOnly = true;
-                        this.txt_initStartDate.ReadOnly = true;
-                        this.LtlDaStartDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
-                        this.LtlAStartDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlA", language);
-                        break;
                 }
             }
             catch (System.Exception ex)
@@ -672,33 +523,6 @@ namespace NttDataWA.Management
                         this.txt_finedataCompletitionDate.Visible = true;
                         this.txt_initCompletitionDate.Text = NttDataWA.Utils.dateformat.getFirstDayOfMonth();
                         this.txt_finedataCompletitionDate.Text = NttDataWA.Utils.dateformat.getLastDayOfMonth();
-                        this.txt_finedataCompletitionDate.ReadOnly = true;
-                        this.txt_initCompletitionDate.ReadOnly = true;
-                        this.LtlDaCompletitionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
-                        this.LtlACompletitionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlA", language);
-                        break;
-                    case 5: //Ieri
-                        this.LtlACompletitionDate.Visible = false;
-                        this.txt_finedataCompletitionDate.Visible = false;
-                        this.txt_initCompletitionDate.ReadOnly = true;
-                        this.txt_initCompletitionDate.Text = NttDataWA.Utils.dateformat.GetYesterday();
-                        this.LtlDaCompletitionDate.Text = Utils.Languages.GetLabelFromCode("VisibilityOneField", language);
-                        break;
-                    case 6: //Ultimi 7 giorni
-                        this.LtlACompletitionDate.Visible = true;
-                        this.txt_finedataCompletitionDate.Visible = true;
-                        this.txt_initCompletitionDate.Text = NttDataWA.Utils.dateformat.GetLastSevenDay();
-                        this.txt_finedataCompletitionDate.Text = NttDataWA.Utils.dateformat.toDay();
-                        this.txt_finedataCompletitionDate.ReadOnly = true;
-                        this.txt_initCompletitionDate.ReadOnly = true;
-                        this.LtlDaCompletitionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
-                        this.LtlACompletitionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlA", language);
-                        break;
-                    case 7: //Ultimi 31 giorni
-                        this.LtlACompletitionDate.Visible = true;
-                        this.txt_finedataCompletitionDate.Visible = true;
-                        this.txt_initCompletitionDate.Text = NttDataWA.Utils.dateformat.GetLastThirtyOneDay();
-                        this.txt_finedataCompletitionDate.Text = NttDataWA.Utils.dateformat.toDay();
                         this.txt_finedataCompletitionDate.ReadOnly = true;
                         this.txt_initCompletitionDate.ReadOnly = true;
                         this.LtlDaCompletitionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
@@ -762,282 +586,11 @@ namespace NttDataWA.Management
                         this.LtlDaInterruptionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
                         this.LtlAInterruptionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlA", language);
                         break;
-                    case 5: //Ieri
-                        this.LtlAInterruptionDate.Visible = false;
-                        this.txt_finedataInterruptionDate.Visible = false;
-                        this.txt_initInterruptionDate.ReadOnly = true;
-                        this.txt_initInterruptionDate.Text = NttDataWA.Utils.dateformat.GetYesterday();
-                        this.LtlDaInterruptionDate.Text = Utils.Languages.GetLabelFromCode("VisibilityOneField", language);
-                        break;
-                    case 6: //Ultimi 7 giorni
-                        this.LtlAInterruptionDate.Visible = true;
-                        this.txt_finedataInterruptionDate.Visible = true;
-                        this.txt_initInterruptionDate.Text = NttDataWA.Utils.dateformat.GetLastSevenDay();
-                        this.txt_finedataInterruptionDate.Text = NttDataWA.Utils.dateformat.toDay();
-                        this.txt_finedataInterruptionDate.ReadOnly = true;
-                        this.txt_initInterruptionDate.ReadOnly = true;
-                        this.LtlDaInterruptionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
-                        this.LtlAInterruptionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlA", language);
-                        break;
-                    case 7: //Ultimi 31 giorni
-                        this.LtlAInterruptionDate.Visible = true;
-                        this.txt_finedataInterruptionDate.Visible = true;
-                        this.txt_initInterruptionDate.Text = NttDataWA.Utils.dateformat.GetLastThirtyOneDay();
-                        this.txt_finedataInterruptionDate.Text = NttDataWA.Utils.dateformat.toDay();
-                        this.txt_finedataInterruptionDate.ReadOnly = true;
-                        this.txt_initInterruptionDate.ReadOnly = true;
-                        this.LtlDaInterruptionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlDa", language);
-                        this.LtlAInterruptionDate.Text = Utils.Languages.GetLabelFromCode("SearchDocumentAdvancedLtlA", language);
-                        break;
                 }
             }
             catch (System.Exception ex)
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-        protected void TxtCode_OnTextChanged(object sender, EventArgs e)
-        {
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
-            try
-            {
-                CustomTextArea caller = sender as CustomTextArea;
-                string codeAddressBook = string.Empty;
-                if (caller.ID == "txtCodiceRuoloTitolare")
-                {
-                    codeAddressBook = this.txtCodiceRuoloTitolare.Text;
-                }
-                if (caller.ID == "txtCodiceUtenteTitolare")
-                {
-                    codeAddressBook = this.txtCodiceUtenteTitolare.Text;
-                }
-
-                if (!string.IsNullOrEmpty(codeAddressBook))
-                {
-                    RubricaCallType calltype = RubricaCallType.CALLTYPE_PROTO_INT_MITT;
-                    ElementoRubrica[] listaCorr = null;
-                    Corrispondente corr = null;
-                    UIManager.RegistryManager.SetRegistryInSession(RoleManager.GetRoleInSession().registri[0]);
-                    listaCorr = UIManager.AddressBookManager.getElementiRubricaMultipli(codeAddressBook, calltype, true);
-                    if (listaCorr != null && (listaCorr.Count() == 1))
-                    {
-                        if (listaCorr.Count() == 1)
-                        {
-                            corr = UIManager.AddressBookManager.getCorrispondenteRubrica(codeAddressBook, calltype);
-                        }
-                        if (corr == null)
-                        {
-                            if (caller.ID == "txtCodiceRuoloTitolare")
-                            {
-                                ClearRuoloCoinvolto();
-                                this.UpdPnlRuoloTitolare.Update();
-                            }
-                            if (caller.ID == "txtCodiceUtenteTitolare")
-                            {
-                                ClearUtenteConvolto();
-                                this.UpdPnlUtenteTitolare.Update();
-                            }
-                            string msg = "ErrorTransmissionCorrespondentNotFound";
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            return;
-                        }
-                        if (caller.ID == "txtCodiceRuoloTitolare")
-                        {
-                            ClearRuoloCoinvolto();
-                            if (!corr.tipoCorrispondente.Equals("R"))
-                            {
-                                string msg = "WarningCorrespondentAsRole";
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) { parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else { parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            }
-                            else
-                            {
-                                this.txtCodiceRuoloTitolare.Text = corr.codiceRubrica;
-                                this.txtDescrizioneRuoloTitolare.Text = corr.descrizione;
-                                this.idRuoloTitolare.Value = corr.systemId;
-                            }
-                            this.UpdPnlRuoloTitolare.Update();
-                        }
-                        if (caller.ID == "txtCodiceUtenteTitolare")
-                        {
-                            ClearUtenteConvolto();
-                            if (!corr.tipoCorrispondente.Equals("P"))
-                            {
-                                string msg = "WarningCorrespondentAsRole";
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) { parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else { parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            }
-                            else
-                            {
-                                this.txtCodiceUtenteTitolare.Text = corr.codiceRubrica;
-                                this.txtDescrizioneUtenteTitolare.Text = corr.descrizione;
-                                this.idUtenteTitolare.Value = corr.systemId;
-                            }
-                            this.UpdPnlUtenteTitolare.Update();
-                        }
-                    }
-                    else
-                    {
-                        string msg = "ErrorTransmissionCorrespondentNotFound";
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    }
-                }
-                else
-                {
-                    if (caller.ID == "txtCodiceRuoloTitolare")
-                    {
-                        ClearRuoloCoinvolto();
-                        this.UpdPnlRuoloTitolare.Update();
-                    }
-                    if (caller.ID == "txtCodiceUtenteTitolare")
-                    {
-                        ClearUtenteConvolto();
-                        this.UpdPnlUtenteTitolare.Update();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                string msg = "ErrorSignatureProcess";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                return;
-            }
-        }
-
-        private void ClearUtenteConvolto()
-        {
-            this.txtCodiceUtenteTitolare.Text = string.Empty;
-            this.txtDescrizioneUtenteTitolare.Text = string.Empty;
-            this.idUtenteTitolare.Value = string.Empty;
-        }
-
-        private void ClearRuoloCoinvolto()
-        {
-            this.txtCodiceRuoloTitolare.Text = string.Empty;
-            this.txtDescrizioneRuoloTitolare.Text = string.Empty;
-            this.idRuoloTitolare.Value = string.Empty;
-        }
-
-        protected void BtnAddressBookRuoloTitolare_Click(object sender, EventArgs e)
-        {
-            this.CallType = RubricaCallType.CALLTYPE_CORR_INT;
-            HttpContext.Current.Session["AddressBook.from"] = "FILTER_SIGNATURE_PROCESS_ROLE";
-            HttpContext.Current.Session["AddressBook.EnableOnly"] = "R";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxModalPopupAddressBook", "ajaxModalPopupAddressBook();", true);
-        }
-
-        protected void BtnAddressBookUtenteTitolare_Click(object sender, EventArgs e)
-        {
-            this.CallType = RubricaCallType.CALLTYPE_CORR_INT;
-            HttpContext.Current.Session["AddressBook.from"] = "FILTER_SIGNATURE_PROCESS_USER";
-            HttpContext.Current.Session["AddressBook.EnableOnly"] = "P";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxModalPopupAddressBook", "ajaxModalPopupAddressBook();", true);
-        }
-
-        protected void btnAddressBookPostback()
-        {
-            try
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
-                List<NttDataWA.Popup.AddressBook.CorrespondentDetail> atList = (List<NttDataWA.Popup.AddressBook.CorrespondentDetail>)HttpContext.Current.Session["AddressBook.At"];
-                if (atList != null && atList.Count > 0)
-                {
-                    Corrispondente corr = UIManager.AddressBookManager.GetCorrespondentBySystemId(atList[0].SystemID);
-                    string addressBookCallFrom = HttpContext.Current.Session["AddressBook.from"].ToString();
-                    if (addressBookCallFrom.Equals("FILTER_SIGNATURE_PROCESS_ROLE"))
-                    {
-                        if (corr != null)
-                        {
-                            this.txtCodiceRuoloTitolare.Text = corr.codiceRubrica;
-                            this.txtDescrizioneRuoloTitolare.Text = corr.descrizione;
-                            this.idRuoloTitolare.Value = corr.systemId;
-                            this.UpdPnlRuoloTitolare.Update();
-                        }
-                    }
-                    if (addressBookCallFrom.Equals("FILTER_SIGNATURE_PROCESS_USER"))
-                    {
-                        this.txtCodiceUtenteTitolare.Text = corr.codiceRubrica;
-                        this.txtDescrizioneUtenteTitolare.Text = corr.descrizione;
-                        this.idUtenteTitolare.Value = corr.systemId;
-                        this.UpdPnlUtenteTitolare.Update();
-                    }
-                }
-                HttpContext.Current.Session["AddressBook.At"] = null;
-                HttpContext.Current.Session["AddressBook.Cc"] = null;
-                HttpContext.Current.Session["AddressBook.type"] = null;
-                HttpContext.Current.Session["AddressBook.from"] = null;
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-        protected void ImgRitenta_Click(object sender, EventArgs e)
-        {
-            string msg;
-            try
-            {
-                SetCheckBox();
-                if(this.IdIstanzeProcessoSelezionate == null || this.IdIstanzeProcessoSelezionate.Count == 0)
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningMonitoringProcessesNoIstanzeSelezionate', 'warning', '');} else {parent.ajaxDialogModal('WarningMonitoringProcessesNoIstanzeSelezionate', 'warning', '');};", true);
-                    return;
-                }
-                List<IstanzaProcessoDiFirma> istanzeProcessi = SignatureProcessesManager.GetIstanzeProcessiInErrore(IdIstanzeProcessoSelezionate);
-                if (istanzeProcessi == null || istanzeProcessi.Count == 0)
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningMonitoringProcessesNoIstanzeInErrorSelezionate', 'warning', '');} else {parent.ajaxDialogModal('WarningMonitoringProcessesNoIstanzeSelezionate', 'warning', '');};", true);
-                    return;
-                }
-                if (SignatureProcessesManager.RitentaIstanzeProcessiInErrore(istanzeProcessi))
-                {
-                    int numTotPage = 0;
-                    int nRec = 0;
-                    this.SearchIstanzeProcessiFirma(this.SelectedPage, numTotPage, nRec);
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('SuccessMonitoringProcessesRitentaIstanzeInErrore', 'check', '');} else {parent.ajaxDialogModal('SuccessMonitoringProcessesRitentaIstanzeInErrore', 'check', '');}", true);
-                }
-                else
-                {
-                    msg = "ErrorSignatureProcess";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                msg = "ErrorSignatureProcess";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                return;
-            }
-        }
-
-        protected void ImgReportSpedizioni_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                SetCheckBox();
-                if (this.IdIstanzeProcessoSelezionate == null || this.IdIstanzeProcessoSelezionate.Count == 0)
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningMonitoringProcessesNoIstanzeSelezionate', 'warning', '');} else {parent.ajaxDialogModal('WarningMonitoringProcessesNoIstanzeSelezionate', 'warning', '');};", true);
-                    return;
-                }
-                IdDocumentiSelezionatiMonitoring = new List<string>();
-                foreach(DataRow row in IstanzeProcessoResult.Tables[0].Rows)
-                {
-                    string idIstanzaProcesso = row["ID_ISTANZA"].ToString();
-                    string idDocumento = row["ID_DOCUMENTO"].ToString();
-
-                    if (IdIstanzeProcessoSelezionate.Contains(idIstanzaProcesso) && !IdDocumentiSelezionatiMonitoring.Contains(idDocumento))
-                        IdDocumentiSelezionatiMonitoring.Add(idDocumento);
-                }
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxModalPopupSendingReportMonitoring", "ajaxModalPopupSendingReportMonitoring();", true);
-            }
-            catch (Exception ex)
-            {
-                string msg = "ErrorSignatureProcess";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
                 return;
             }
         }
@@ -1056,80 +609,6 @@ namespace NttDataWA.Management
             filters.Add(filter);
 
             #endregion;
-
-            #region NOME_PROCESSO
-            if(!string.IsNullOrEmpty(this.ctxNomeProcesso.Text))
-            {
-                filter = new FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriProcessoFirma.NOME.ToString();
-                filter.Valore = this.ctxNomeProcesso.Text;
-                filters.Add(filter);
-            }
-            #endregion
-
-            #region TIPO_VISIBILITA
-            if (this.RblTipoVisibilita.SelectedValue.Equals("U"))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.ID_RUOLO_PROPONENTE.ToString();
-                filter.Valore = UserManager.GetInfoUser().idGruppo;
-                filters.Add(filter);
-
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.ID_UTENTE_PROPONENTE.ToString();
-                filter.Valore = UserManager.GetInfoUser().idPeople;
-                filters.Add(filter);
-
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.TIPO_VISIBILITA.ToString();
-                filter.Valore = "P";
-                filters.Add(filter);
-            }
-            if (this.RblTipoVisibilita.SelectedValue.Equals("R"))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.ID_RUOLO_PROPONENTE.ToString();
-                filter.Valore = UserManager.GetInfoUser().idGruppo;
-                filters.Add(filter);
-
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.TIPO_VISIBILITA.ToString();
-                filter.Valore = "P";
-                filters.Add(filter);
-            }
-            if (this.RblTipoVisibilita.SelectedValue.Equals("M"))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.TIPO_VISIBILITA.ToString();
-                filter.Valore = "M";
-                filters.Add(filter);
-            }
-
-            #endregion
-
-            #region RUOLO COINVOLTO
-
-            if (!string.IsNullOrEmpty(this.txtCodiceRuoloTitolare.Text))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriProcessoFirma.RUOLO_COINVOLTO.ToString();
-                filter.Valore = this.idRuoloTitolare.Value;
-                filters.Add(filter);
-            }
-
-            #endregion
-
-            #region UTENTE COINVOLTO
-
-            if (!string.IsNullOrEmpty(this.txtCodiceUtenteTitolare.Text))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriProcessoFirma.UTENTE_COINVOLTO.ToString();
-                filter.Valore = this.idUtenteTitolare.Value;
-                filters.Add(filter);
-            }
-
-            #endregion
 
             #region ID DOCUMENTO
 
@@ -1197,30 +676,6 @@ namespace NttDataWA.Management
                 // siamo nel caso di Mese corrente
                 filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
                 filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_MC.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 5)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_YESTERDAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 6)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_LAST_SEVEN_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 7)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_LAST_THIRTY_ONE_DAYS.ToString();
                 filter.Valore = "1";
                 filters.Add(filter);
             }
@@ -1303,30 +758,6 @@ namespace NttDataWA.Management
                 filter.Valore = "1";
                 filters.Add(filter);
             }
-            if (this.ddl_CompletitionDate.SelectedIndex == 5)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_YESTERDAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_CompletitionDate.SelectedIndex == 6)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_LAST_SEVEN_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_CompletitionDate.SelectedIndex == 7)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_LAST_THIRTY_ONE_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
             if (this.ddl_CompletitionDate.SelectedIndex == 0)
 
                 if (this.ddl_CompletitionDate.SelectedIndex == 0)
@@ -1391,30 +822,6 @@ namespace NttDataWA.Management
                 // siamo nel caso di Mese corrente
                 filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
                 filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_MC.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 5)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_YESTERDAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 6)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_LAST_SEVEN_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 7)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_LAST_THIRTY_ONE_DAYS.ToString();
                 filter.Valore = "1";
                 filters.Add(filter);
             }
@@ -1485,17 +892,6 @@ namespace NttDataWA.Management
                 filters.Add(filter);
             }
 
-            if (this.cbxState.Items.FindByValue("IN_ERROR") != null)
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.STATO_IN_ERRORE.ToString();
-                if (this.cbxState.Items.FindByValue("IN_ERROR").Selected)
-                    filter.Valore = "true";
-                else
-                    filter.Valore = "false";
-                filters.Add(filter);
-            }
-
             if (this.cbxState.Items.FindByValue("STOPPED") != null)
             {
                 filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
@@ -1527,18 +923,6 @@ namespace NttDataWA.Management
 
             #endregion
 
-            #region TIPO_PASSO_AUTOMATICO
-
-            if(!string.IsNullOrEmpty(this.DdlTipoPassoAutomatico.SelectedValue))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.TIPO_PASSO_AUTOMATICO.ToString();
-                filter.Valore = this.DdlTipoPassoAutomatico.SelectedValue;
-                filters.Add(filter);
-            }
-
-            #endregion
-
             this.FiltersInstanceProcesses = filters;
 
             return true;
@@ -1563,41 +947,6 @@ namespace NttDataWA.Management
                         }
                     }
 
-                    #endregion
-
-                    #region NOME_PROCESSO
-
-                    if(item.Argomento == DocsPaWR.FiltriProcessoFirma.NOME.ToString())
-                    {
-                        this.ctxNomeProcesso.Text = item.Valore;
-                    }
-
-                    #endregion
-
-                    #region RUOLO COINVOLTO
-                    if (item.Argomento == DocsPaWR.FiltriProcessoFirma.RUOLO_COINVOLTO.ToString())
-                    {
-                        DocsPaWR.Corrispondente corr = AddressBookManager.GetCorrespondentBySystemId(item.Valore);
-                        if (corr != null)
-                        {
-                            this.txtCodiceRuoloTitolare.Text = corr.codiceRubrica;
-                            this.txtDescrizioneRuoloTitolare.Text = corr.descrizione;
-                        }
-                        this.idRuoloTitolare.Value = item.Valore;
-                    }
-                    #endregion
-
-                    #region UTENTE COINVOLTO
-                    else if (item.Argomento == DocsPaWR.FiltriProcessoFirma.UTENTE_COINVOLTO.ToString())
-                    {
-                        DocsPaWR.Corrispondente corr = AddressBookManager.GetCorrespondentBySystemId(item.Valore);
-                        if (corr != null)
-                        {
-                            this.txtCodiceUtenteTitolare.Text = corr.codiceRubrica;
-                            this.txtDescrizioneUtenteTitolare.Text = corr.descrizione;
-                        }
-                        this.idUtenteTitolare.Value = item.Valore;
-                    }
                     #endregion
 
                     #region ID_DOCUMENTO
@@ -1704,32 +1053,6 @@ namespace NttDataWA.Management
 
                     #endregion
 
-                    #region DATA_AVVIO_YESTERDAY
-
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_YESTERDAY.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_StartDate.SelectedIndex = 5;
-                        this.ddl_StartDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
-
-                    #endregion
-
-                    #region DATA_AVVIO_LAST_SEVEN_DAYS
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_LAST_SEVEN_DAYS.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_StartDate.SelectedIndex = 6;
-                        this.ddl_StartDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
-                    #endregion
-
-                    #region DATA_AVVIO_LAST_THIRTY_ONE_DAYS
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_LAST_THIRTY_ONE_DAYS.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_StartDate.SelectedIndex = 7;
-                        this.ddl_StartDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
-                    #endregion
-
                     #endregion
 
                     #region NOTE_AVVIO
@@ -1807,32 +1130,6 @@ namespace NttDataWA.Management
 
                     #endregion
 
-                    #region DATA_CONCLUSIONE_YESTERDAY
-
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_YESTERDAY.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_CompletitionDate.SelectedIndex = 5;
-                        this.ddl_CompletitionDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
-
-                    #endregion
-
-                    #region DATA_CONCLUSIONE_LAST_SEVEN_DAYS
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INSERIMENTO_LAST_SEVEN_DAYS.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_CompletitionDate.SelectedIndex = 6;
-                        this.ddl_CompletitionDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
-                    #endregion
-
-                    #region DATA_CONCLUSIONE_LAST_THIRTY_ONE_DAYS
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INSERIMENTO_LAST_THIRTY_ONE_DAYS.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_CompletitionDate.SelectedIndex = 7;
-                        this.ddl_CompletitionDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
-                    #endregion
-
                     #endregion
 
                     #region DATA_INTERRUZIONE
@@ -1895,36 +1192,10 @@ namespace NttDataWA.Management
 
                     else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_TODAY.ToString() && item.Valore == "1")
                     {
-                        this.ddl_InterruptionDate.SelectedIndex = 2;
-                        this.ddl_InterruptionDate_SelectedIndexChanged(null, new System.EventArgs());
+                        this.ddl_CompletitionDate.SelectedIndex = 2;
+                        this.ddl_CompletitionDate_SelectedIndexChanged(null, new System.EventArgs());
                     }
 
-                    #endregion
-
-                    #region DATA_INTERRUZIONE_YESTERDAY
-
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_YESTERDAY.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_InterruptionDate.SelectedIndex = 5;
-                        this.ddl_InterruptionDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
-
-                    #endregion
-
-                    #region DATA_INTERRUZIONE_LAST_SEVEN_DAYS
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_LAST_SEVEN_DAYS.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_InterruptionDate.SelectedIndex = 6;
-                        this.ddl_InterruptionDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
-                    #endregion
-
-                    #region DATA_INTERRUZIONE_LAST_THIRTY_ONE_DAYS
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_LAST_THIRTY_ONE_DAYS.ToString() && item.Valore == "1")
-                    {
-                        this.ddl_InterruptionDate.SelectedIndex = 7;
-                        this.ddl_InterruptionDate_SelectedIndexChanged(null, new System.EventArgs());
-                    }
                     #endregion
 
                     #endregion
@@ -1952,17 +1223,6 @@ namespace NttDataWA.Management
                     {
                         this.cbxState.Items.FindByValue("STOPPED").Selected = Convert.ToBoolean(item.Valore);
                     }
-                    else if (item.Argomento == DocsPaWR.FiltriElementoLibroFirma.STATO_IN_ERRORE.ToString())
-                    {
-                        this.cbxState.Items.FindByValue("IN_ERROR").Selected = Convert.ToBoolean(item.Valore);
-                    }
-                    #endregion
-
-                    #region TIPO_VISIBILITA
-
-                    #endregion
-
-                    #region TIPO_PASSO_ATUOMATICO
                     #endregion
                 }
             }
@@ -2005,16 +1265,7 @@ namespace NttDataWA.Management
             this.opCLOSED.Selected = true;
             this.opIN_EXEC.Selected = true;
             this.opSTOPPED.Selected = true;
-            this.opIN_ERROR.Selected = true;
             this.opTRUNCATED.Checked = false;
-
-            this.ctxNomeProcesso.Text = string.Empty;
-            this.DdlTipoPassoAutomatico.SelectedIndex = -1;
-
-            this.CheckAllIstanze = false;
-
-            ClearRuoloCoinvolto();
-            ClearUtenteConvolto();
 
             this.UpFilters.Update();
         }
@@ -2037,17 +1288,13 @@ namespace NttDataWA.Management
         {
             try
             {
-                TreeNode root = new TreeNode();
-                root.Text = Utils.Languages.GetLabelFromCode("ManagementMonitoringProcessesTutti", UIManager.UserManager.GetUserLanguage());
-                root.Value = "";
-                root.Selected = true;
                 foreach (ProcessoFirma p in listSignatureProcesses)
                 {
-                    root.ChildNodes.Add(AddNode(p));
+                    this.AddNode(p);
                 }
-                this.TreeProcessSignature.Nodes.Add(root);
                 this.TreeProcessSignature.DataBind();
                 this.TreeProcessSignature.CollapseAll();
+                this.TreeProcessSignature.Nodes[0].Selected = true;
             }
             catch (System.Exception ex)
             {
@@ -2059,8 +1306,7 @@ namespace NttDataWA.Management
         private TreeNode AddNode(ProcessoFirma p)
         {
             TreeNode root = new TreeNode();
-            string infoModello = p.IsProcessModel ? Utils.Languages.GetLabelFromCode("ManagementSignatureProcessModel", UserManager.GetUserLanguage()) : string.Empty;
-            root.Text = p.nome + " " + infoModello;
+            root.Text = p.nome;
             root.Value = p.idProcesso;
             root.ToolTip = p.nome;
             foreach (PassoFirma passo in p.passi)
@@ -2203,22 +1449,6 @@ namespace NttDataWA.Management
                         (e.Row.FindControl("BtnDocument") as CustomImageButton).OnMouseOutImage = "../Images/Icons/ico_previous_details.png";
                         (e.Row.FindControl("BtnDocument") as CustomImageButton).OnMouseOverImage = "../Images/Icons/ico_previous_details_hover.png";
                     }
-
-                    CheckBox checkBox = e.Row.FindControl("cbxSel") as CheckBox;
-                    if (checkBox != null)
-                    {
-                        checkBox.Attributes["onclick"] = "SetItemCheck(this, '" + istanzaProcesso.idIstanzaProcesso + "')";
-                        if (this.IdIstanzeProcessoSelezionate != null && this.IdIstanzeProcessoSelezionate.Contains(istanzaProcesso.idIstanzaProcesso))
-                            checkBox.Checked = true;
-                        else
-                            checkBox.Checked = false;
-                        string tmp = istanzaProcesso.oggetto.Substring(istanzaProcesso.oggetto.Length - 1);
-                        if (tmp.Equals("0"))
-                        {
-                            //Non si possiedono diritti di visibilità su documento
-                            checkBox.Enabled = false;
-                        }
-                    }
                 }
             }
             catch (System.Exception ex)
@@ -2230,16 +1460,12 @@ namespace NttDataWA.Management
 
         protected void gridViewResult_PreRender(object sender, EventArgs e)
         {
-            CheckBox chkBxHeader = (CheckBox)this.gridViewResult.HeaderRow.FindControl("cbxSelAll");
-            if (chkBxHeader != null)
-            {
-                chkBxHeader.Checked = this.CheckAllIstanze;
-            }
+
         }
 
         protected void gridViewResult_ItemCreated(object sender, GridViewRowEventArgs e)
         {
-            
+
         }
 
         protected void gridViewResult_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -2281,13 +1507,6 @@ namespace NttDataWA.Management
                 UIManager.DocumentManager.setSelectedRecord(schedaDocumento);
                 Response.Redirect("~/Document/Document.aspx");
             }
-            if (e.CommandName == "viewStateInstanceProcess")
-            {
-                string idInstance = (((e.CommandSource as Control).Parent.Parent as GridViewRow).FindControl("systemIdIstanzaProcesso") as Label).Text;
-                this.IdInstanceProcess = idInstance;
-                this.BuildGridNavigator();
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxModalPopupStateInstanceProcessSignature", "ajaxModalPopupStateInstanceProcessSignature();", true);
-            }
         }
 
         protected void gridViewResult_PageIndexChanging(object sender, GridViewPageEventArgs e)
@@ -2297,85 +1516,6 @@ namespace NttDataWA.Management
                 this.gridViewResult.PageIndex = e.NewPageIndex;
                 GridViewResult_Bind();
                 this.UpPnlGridView.Update();
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-        protected void cbxSelAll_CheckedChanged(object sender, EventArgs e)
-        {
-            CheckBox cbxSelAll = (CheckBox)gridViewResult.HeaderRow.FindControl("cbxSelAll");
-            if (IstanzeProcessoResult != null)
-            {
-                this.IdIstanzeProcessoSelezionate = new List<string>();
-                foreach (GridViewRow row in gridViewResult.Rows)
-                {
-                    CheckBox cbxSel = (CheckBox)row.FindControl("cbxSel");
-                    if (cbxSel.Enabled)
-                        cbxSel.Checked = cbxSelAll.Checked;
-                }
-                if (cbxSelAll.Checked)
-                {
-                    bool isDocVisibleARuolo = true;
-
-                    foreach (DataRow row in IstanzeProcessoResult.Tables[0].Rows)
-                    {
-                        isDocVisibleARuolo = row["SECURITY"].ToString().Equals("1");
-                        if (isDocVisibleARuolo)
-                            this.IdIstanzeProcessoSelezionate.Add(row["ID_ISTANZA"].ToString());
-                    }
-                }
-                this.CheckAllIstanze = cbxSelAll.Checked;
-                this.HiddenItemsChecked.Value = string.Empty;
-                this.HiddenItemsUnchecked.Value = string.Empty;
-                this.BuildGridNavigator();
-            }
-        }
-
-        private void SetCheckBox()
-        {
-            try
-            {
-                if(IdIstanzeProcessoSelezionate == null)
-                    IdIstanzeProcessoSelezionate = new List<string>();
-
-                if (!string.IsNullOrEmpty(this.HiddenItemsChecked.Value))
-                {
-                    //salvo i check spuntati alla pagina cliccata in precedenza
-                    string[] items = new string[1] { this.HiddenItemsChecked.Value };
-                    if (this.HiddenItemsChecked.Value.IndexOf(",") > 0)
-                        items = this.HiddenItemsChecked.Value.Split(',');
-
-                    foreach (string id in items)
-                    {
-                        if (!this.IdIstanzeProcessoSelezionate.Contains(id))
-                            this.IdIstanzeProcessoSelezionate.Add(id);
-                    }
-                }
-
-
-                if (!string.IsNullOrEmpty(this.HiddenItemsUnchecked.Value))
-                {
-                    this.CheckAllIstanze = false;
-
-                    // salvo i check non spuntati alla pagina cliccata in precedenza
-                    string[] items = new string[1] { this.HiddenItemsUnchecked.Value };
-                    if (this.HiddenItemsUnchecked.Value.IndexOf(",") > 0)
-                        items = this.HiddenItemsUnchecked.Value.Split(',');
-
-                    foreach (string id in items)
-                    {
-                        if (this.IdIstanzeProcessoSelezionate.Contains(id))
-                            this.IdIstanzeProcessoSelezionate.Remove(id);
-                    }
-                }
-
-                this.HiddenItemsChecked.Value = string.Empty;
-                this.HiddenItemsUnchecked.Value = string.Empty;
-                this.UpPnlButtons.Update();
             }
             catch (System.Exception ex)
             {
@@ -2432,44 +1572,10 @@ namespace NttDataWA.Management
             {
                 string currentStep = Utils.Languages.GetLabelFromCode("MonitoringProcesseNumStep", UIManager.UserManager.GetUserLanguage()) + " " + istanza.istanzePassoDiFirma[0].numeroSequenza.ToString();
                 result = Utils.Languages.GetLabelFromCode(istanza.statoProcesso.ToString(), UIManager.UserManager.GetUserLanguage()) + " (" + currentStep + ")";
-                string tipoPasso = string.Empty;
-                switch (istanza.istanzePassoDiFirma[0].Evento.TipoEvento)
-                {
-                    case LibroFirmaManager.TypeStep.SIGN:
-                        tipoPasso = Utils.Languages.GetLabelFromCode("MonitoringProcesseTipoPassoFirma", UIManager.UserManager.GetUserLanguage());
-                        break;
-                    case LibroFirmaManager.TypeStep.WAIT:
-                        tipoPasso = Utils.Languages.GetLabelFromCode("MonitoringProcesseTipoPassoWait", UIManager.UserManager.GetUserLanguage());
-                        break;
-                    case LibroFirmaManager.TypeStep.EVENT:
-                        //tipoPasso = Utils.Languages.GetLabelFromCode("MonitoringProcesseTipoPasso" + istanza.istanzePassoDiFirma[0].Evento.CodiceAzione, UIManager.UserManager.GetUserLanguage());
-                        if (istanza.istanzePassoDiFirma[0].Evento.CodiceAzione.Equals(Azione.RECORD_PREDISPOSED.ToString()))
-                            tipoPasso = Utils.Languages.GetLabelFromCode("MonitoringProcesseTipoPassoProtocollazione", UIManager.UserManager.GetUserLanguage());
-                        if (istanza.istanzePassoDiFirma[0].Evento.CodiceAzione.Equals(Azione.DOCUMENTO_REPERTORIATO.ToString()))
-                            tipoPasso = Utils.Languages.GetLabelFromCode("MonitoringProcesseTipoPassoRepertoriazione", UIManager.UserManager.GetUserLanguage());
-                        if (istanza.istanzePassoDiFirma[0].Evento.CodiceAzione.Equals(Azione.DOCUMENTOSPEDISCI.ToString()))
-                            tipoPasso = Utils.Languages.GetLabelFromCode("MonitoringProcesseTipoPassoSpedizione", UIManager.UserManager.GetUserLanguage());
-                        break;
-                }
-                if(istanza.istanzePassoDiFirma[0].IsAutomatico)
-                    tipoPasso += " " + Utils.Languages.GetLabelFromCode("MonitoringProcesseTipoPassoAutomatico", UIManager.UserManager.GetUserLanguage());
-                if (!string.IsNullOrEmpty(tipoPasso))
-                    result += "<br />" + tipoPasso;
-
             }
             else
             {
                 result = Utils.Languages.GetLabelFromCode(istanza.statoProcesso.ToString(), UIManager.UserManager.GetUserLanguage());
-            }
-            return result;
-        }
-
-        protected string GetNota(IstanzaProcessoDiFirma istanza)
-        {
-            string result = string.Empty;
-            if (istanza.IsTroncato)
-            {
-                result = Utils.Languages.GetLabelFromCode("TRUNCATED", UIManager.UserManager.GetUserLanguage());
             }
             return result;
         }
@@ -2495,7 +1601,7 @@ namespace NttDataWA.Management
             { 
                 //Non si possiedono diritti di visibilità su documento
                 result = Utils.Languages.GetLabelFromCode("MonitoringProcessNoVisibilityObject", UIManager.UserManager.GetUserLanguage());
-                result = "<font color='#808080'>" + result + "</font>";
+                //result = "<font color='#808080'>" + result + "</font>";
             }
             else
             {
@@ -2513,36 +1619,6 @@ namespace NttDataWA.Management
             result = DocumentManager.CheckRevocationAcl();
             DocumentManager.setSelectedRecord(null);
             return result;
-        }
-
-        private void LoadEventTypes()
-        {
-            this.DdlTipoPassoAutomatico.Items.Clear();
-            List<AnagraficaEventi> listEventTypes = SignatureProcessesManager.GetEventTypes(EVENT);
-            if (listEventTypes != null && listEventTypes.Count > 0)
-            {
-                ListItem empty = new ListItem("", "");
-                this.DdlTipoPassoAutomatico.Items.Add(empty);
-                this.DdlTipoPassoAutomatico.SelectedIndex = -1;
-
-                List<ListItem> listItem = new List<ListItem>();
-                foreach (AnagraficaEventi evento in listEventTypes)
-                {
-                    if (evento.automatico)
-                    {
-                        listItem.Add(new ListItem()
-                        {
-                            Text = evento.descrizione,
-                            Value = evento.codiceAzione
-                        });
-                    }
-                }
-                this.DdlTipoPassoAutomatico.Items.AddRange(listItem.ToArray());
-            }
-            else
-            {
-                this.PnlTipoPassoAutomatico.Visible = false;
-            }
         }
         #endregion
     }

@@ -3,6 +3,12 @@
 }
 
 function endRequest(sender, args) {
+    // Alessandro Aiello
+    // evito il blocco delle pagine
+    if (args.get_error() !== undefined) {
+        args.set_errorHandled(true);
+    }
+    // fine
     $find("mdlWait").hide();
 }
 
@@ -394,21 +400,6 @@ function DatePicker(lang) {
     $('input.datepicker').each(function (index, e) {
         permitOnlyNumbers(e.id)
         FormatDate(e.id);
-    });
-}
-
-function EnableOnlyPreviousToday() {
-    $('input.datepicker').datepicker({
-        showOn: "both",
-        showButtonPanel: true,
-        changeMonth: true,
-        changeYear: true,
-        buttonImage: "../Images/Icons/calendar.png",
-        buttonImageOnly: true,
-        dateFormat: 'dd/mm/yy',
-        showOtherMonths: true,
-        selectOtherMonths: true,
-        maxDate: new Date()
     });
 }
 

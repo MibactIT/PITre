@@ -370,41 +370,33 @@
         FisicalFilePathSocket(function (filePath) {
             if (filePath != null && filePath != '') {
                 try {
-                    FileExists(function (existsFile) {
-                        if (existsFile != true) {
-                            idDocument = "<%=this.DocumentId%>";
-                            documentNumber = "<%=this.DocumentNumber%>";
-                            disallowOp('Content1');
-                            GetModelAndProcessSocket(idDocument, "<%=this.ModelloDocumentoCorrente%>", filePath, function (modelProcessed) {
-                                try {
-                                    if (modelProcessed != false) {
-                                        CheckOutDocumentSocket(idDocument, documentNumber, filePath, function (open) {
-                                            if (open) {
-                                                openFile(filePath,
-                                                    function (msg, connection) {
-                                                        connection.close();
-                                                        reallowOp();
-                                                        callback(true);
-                                                    });
-                                            }
-                                            else
-                                                throw new Error("Impossibile bloccare il documento num. '" + documentNumber + "'.");
-                                        });
+                    idDocument = "<%=this.DocumentId%>";
+                    documentNumber = "<%=this.DocumentNumber%>";
+                    disallowOp('Content1');
+                    GetModelAndProcessSocket(idDocument, "<%=this.ModelloDocumentoCorrente%>", filePath, function (modelProcessed) {
+                        try {
+                            if (modelProcessed != false) {
+                                CheckOutDocumentSocket(idDocument, documentNumber, filePath, function (open) {
+                                    if (open) {
+                                        openFile(filePath,
+                                            function (msg, connection) {
+                                                connection.close();
+                                                reallowOp();
+                                                callback(true);
+                                            });
                                     }
-                                    else {
-                                        throw new Error("Impossibile scaricare il file '" + filePath + "'.\nPotrebbe non essere presente alcun modello predefinito.");
-                                    }
-                                }
-                                catch (ex) {
-                                    alert(ex.toString());
-                                    reallowOp();
-                                    callback(false);
-                                }
-                            });
+                                    else
+                                        throw new Error("Impossibile bloccare il documento num. '" + documentNumber + "'.");
+                                });
+                            }
+                            else {
+                                throw new Error("Impossibile scaricare il file '" + filePath + "'.\nPotrebbe non essere presente alcun modello predefinito.");
+                            }
                         }
-                        else
-                        {
+                        catch (ex) {
+                            alert(ex.toString());
                             reallowOp();
+                            callback(false);
                         }
                     });
                 }
@@ -578,35 +570,6 @@
 
     }
 
-    function FileExists(callback) {
-        var filePath = '';
-        var folderPath = fixPath(document.getElementById("txtFolderPath").value);
-        var tempFileName = GetFileName();
-        if (tempFileName != '') {
-            if (folderPath != null && folderPath != '') {
-                fileExists(folderPath + tempFileName, function (retVal, connection) {
-                    if (retVal === "true") {
-                        ajaxDialogModal('File_Exists', 'error', '');
-                        filePath = '';
-                        callback(true);
-                    }
-                    else
-                    {
-                        callback(false);
-                    }
-                    connection.close();
-                });
-            }
-            else {
-                ajaxDialogModal('Path_Nonexistent', 'warning', '');
-                callback(false);
-            }
-        }
-        else {
-            ajaxDialogModal('File_InvalidName', 'warning', '');
-            callback(false);
-        }
-    }
 
     function FisicalFilePathSocket(callback) {
         var filePath = '';

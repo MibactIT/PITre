@@ -373,33 +373,6 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.GridView gridViewResult;
         
         /// <summary>
-        /// plcNavigator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder plcNavigator;
-        
-        /// <summary>
-        /// upPnlGridIndexes control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel upPnlGridIndexes;
-        
-        /// <summary>
-        /// grid_pageindex control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField grid_pageindex;
-        
-        /// <summary>
         /// UpPnlButtons control.
         /// </summary>
         /// <remarks>

@@ -71,25 +71,26 @@ namespace NttDataWA.Popup
                 //{
                 //    this.PnlTypeSign.Visible = false;
                 //}
+
+                //se il documento è in libro firma, forzo la selezione al radio button relativo al tipo di firma richiesto
+                if (fileReq.inLibroFirma)
+                {
+                    this.HsmLitPades.Enabled = false;
+                    this.HsmLitP7M.Enabled = false;
+                    string typeSignature = LibroFirmaManager.GetTypeSignatureToBeEntered(fileReq);
+                    if (typeSignature.Equals(LibroFirmaManager.TypeEvent.SIGN_PADES))
+                    {
+                        this.HsmLitPades.Checked = true;
+                        this.HsmLitP7M.Checked = false;
+                    }
+                    else
+                    {
+                        this.HsmLitPades.Checked = false;
+                        this.HsmLitP7M.Checked = true;
+                    }
+                }
             }
 
-            //se il documento è in libro firma, forzo la selezione al radio button relativo al tipo di firma richiesto
-            if (fileReq.inLibroFirma)
-            {
-                this.HsmLitPades.Enabled = false;
-                this.HsmLitP7M.Enabled = false;
-                string typeSignature = LibroFirmaManager.GetTypeSignatureToBeEntered(fileReq);
-                if (typeSignature.Equals(LibroFirmaManager.TypeEvent.SIGN_PADES))
-                {
-                    this.HsmLitPades.Checked = true;
-                    this.HsmLitP7M.Checked = false;
-                }
-                else
-                {
-                    this.HsmLitPades.Checked = false;
-                    this.HsmLitP7M.Checked = true;
-                }
-            }
             //ABBATANGELI - Nuova gestione firma/cofirma
             //if (string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue("0", DBKeys.LOCK_COFIRMA.ToString())) || Utils.InitConfigurationKeys.GetValue("0", DBKeys.LOCK_COFIRMA.ToString()).Equals("0"))
             //Valore della Chiave FE_SET_TIPO_FIRMA
@@ -115,7 +116,7 @@ namespace NttDataWA.Popup
             }
             else
             {
-                if (fileReq.firmato.Equals("1") && !fileReq.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA))
+                if (fileReq.firmato.Equals("1"))
                 {
                     this.optCofirma.Checked = true;
 
@@ -281,20 +282,6 @@ namespace NttDataWA.Popup
                 //{
                 //    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningHsmSignPDF', 'warning');} else {parent.ajaxDialogModal('WarningHsmSignPDF', 'warning');}", true);
                 //}
-                #region VERIFICA DIMENSIONE MASSIMA FILE
-                int maxDimFileSign = 0;
-                if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString())) &&
-                   !Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()).Equals("0"))
-                    maxDimFileSign = Convert.ToInt32(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()));
-                if (maxDimFileSign > 0 && Convert.ToInt32(fileReq.fileSize) > maxDimFileSign)
-                {
-                    string maxSize = Convert.ToString(Math.Round((double)maxDimFileSign / 1048576, 3));
-                    string msgDesc = "WarningStartProcessSignatureMaxDimFile";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + maxSize + "');} else {parent.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + maxSize + "');}", true);
-                    return;
-                }
-                #endregion
-
                 string msgError = CheckSign(fileReq, isPdf);
                 if (!string.IsNullOrEmpty(msgError))
                 {
@@ -309,7 +296,8 @@ namespace NttDataWA.Popup
 
                     //ABBATANGELI - Nuova gestione sign/cosign
                     //bool cofirma = this.HsmRadioCoSign.Checked; //prendere dalla checkbox cofirma
-                    bool cofirma = this.optCofirma.Checked;
+                    bool cofirma = this.optCofirma.Checked; 
+                    
                     bool timestamp = this.HsmCheckMarkTemporal.Checked; //prendere dalla checkbox timestamp
                     DigitalSignature.RemoteDigitalSignManager.tipoFirma tipoFirma = new DigitalSignature.RemoteDigitalSignManager.tipoFirma();
                     if (this.HsmLitPades.Checked)
@@ -319,10 +307,8 @@ namespace NttDataWA.Popup
                     else
                     {
                         tipoFirma = DigitalSignature.RemoteDigitalSignManager.tipoFirma.CADES;
-                        //Non posso firmare parallelemente un file firmato PADES con CADES, quindi impongo firma annidata
-                        if (fileReq.firmato.Equals("1") && (fileReq.tipoFirma == TipoFirma.PADES || fileReq.tipoFirma == TipoFirma.PADES_ELETTORNICA))
-                            cofirma = false;
                     }
+
 
                     try
                     {
@@ -338,14 +324,13 @@ namespace NttDataWA.Popup
 
                     bool retval = false;
                     bool convert = !isPdf && this.HsmCheckConvert.Checked;
-                    DocsPaWR.FirmaResult firmaResult = new FirmaResult();
                     try
                     {
                         //ABBATANGELI - Rischiesta sempre "cofirma" nel caso sia stata già apposta la prima firma
                         //if (fileReq.firmato == "1")
                         //    cofirma = true;
 
-                        retval = dsm.HSM_Sign(fileReq, cofirma, timestamp, tipoFirma, alias, dominio, otp, pin, convert, out firmaResult);
+                        retval = dsm.HSM_Sign(fileReq, cofirma, timestamp, tipoFirma, alias, dominio, otp, pin, convert);
                     }
                     catch (System.Exception ex)
                     {
@@ -362,16 +347,7 @@ namespace NttDataWA.Popup
                     else
                     {
                         // è accaduto un inconveniente.. la firma non è andata a buon fine...
-                        string warningEsitoFirma = string.Empty;
-                        string errorText = string.Empty;
-                        if (firmaResult.esito != null && !string.IsNullOrEmpty(firmaResult.esito.Codice))
-                            warningEsitoFirma = firmaResult.esito.Codice;
-
-                        if(string.IsNullOrEmpty(warningEsitoFirma))
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorHsmSign', 'error', '', '" + errorText + "');} else {parent.ajaxDialogModal('ErrorHsmSign', 'error', '', '" + errorText + "');}", true);
-                        else
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + warningEsitoFirma + "', 'warning');} else {parent.ajaxDialogModal('" + warningEsitoFirma + "', 'warning');}", true);
-
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorHsmSign', 'error');} else {parent.ajaxDialogModal('ErrorHsmSign', 'error');}", true);
                     }
                 }
             }
@@ -379,6 +355,7 @@ namespace NttDataWA.Popup
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningHsmSign', 'warning');} else {parent.ajaxDialogModal('WarningHsmSign', 'warning');}", true);
             }
+
         }
 
         protected void HsmLitPades_Change(object sender, EventArgs e)
@@ -461,31 +438,17 @@ namespace NttDataWA.Popup
         private void SetNewFile(FileRequest fileReq)
         {
             SchedaDocumento doc = DocumentManager.getSelectedRecord();
+            doc.documenti = DocumentManager.ListDocVersions = DocumentManager.getDocumentListVersions(this.Page, fileReq.docNumber, fileReq.docNumber).documenti;
+            UIManager.DocumentManager.setSelectedRecord(doc);
             DocumentManager.setSelectedNumberVersion("0");
-            DocumentManager.ListDocVersions = DocumentManager.getDocumentListVersions(this.Page, fileReq.docNumber, fileReq.docNumber).documenti;
+            ///
+            DocsPaWR.InfoUtente infoUser = UserManager.GetInfoUser();
+
             if (DocumentManager.ListDocVersions != null && DocumentManager.ListDocVersions.Length > 0)
             {
                 if (DocumentManager.getSelectedNumberVersion().Equals("0"))
                     DocumentManager.setSelectedNumberVersion((from docs in DocumentManager.ListDocVersions select Convert.ToInt32(docs.version)).Max().ToString());
             }
-            if (UIManager.DocumentManager.getSelectedAttachId() != null)
-            {
-                FileRequest filRequestNew = (from v in DocumentManager.ListDocVersions where v.version.Equals(DocumentManager.getSelectedNumberVersion()) select v).FirstOrDefault();
-                FileManager.aggiornaFileRequest(this.Page, filRequestNew, false);
-            }
-            else
-            {
-                doc.documenti = DocumentManager.ListDocVersions;// = DocumentManager.getDocumentListVersions(this.Page, fileReq.docNumber, fileReq.docNumber).documenti;
-                UIManager.DocumentManager.setSelectedRecord(doc);
-            }
-
-            //doc.documenti = DocumentManager.ListDocVersions = DocumentManager.getDocumentListVersions(this.Page, fileReq.docNumber, fileReq.docNumber).documenti;
-            //UIManager.DocumentManager.setSelectedRecord(doc);
-
-            ///
-            //DocsPaWR.InfoUtente infoUser = UserManager.GetInfoUser();
-
-
 
             //FileRequest fileDoc = ((from v in DocumentManager.ListDocVersions select Convert.ToInt32(v.version)).Max().ToString());
 
@@ -577,7 +540,7 @@ namespace NttDataWA.Popup
             #endregion
 
             #region COFIRMA
-            //Non posso firmare parallelemente un file firmato PADES con CADES, quindi impongo firma annidata
+
             //La cofirma può essere solo di tipo CADES e applicabile so su file firmato CADES
 
             //if (this.HsmRadioCoSign.Checked)
@@ -598,30 +561,6 @@ namespace NttDataWA.Popup
             //}
 
             #endregion
-
-            #region FORMATO AMMESSO ALLA FIRMA
-
-            if(!this.HsmCheckConvert.Checked && UIManager.FileManager.IsEnabledSupportedFileTypes())
-            {
-                string extensionFile = (fileReq.fileName.Split('.').Length > 1) ? (fileReq.fileName.Split('.'))[fileReq.fileName.Split('.').Length - 1] : string.Empty;
-                this.FileTypes = UIManager.FileManager.GetSupportedFileTypes(Int32.Parse(UIManager.UserManager.GetInfoUser().idAmministrazione));
-
-                bool retVal = true;
-
-                int count = FileTypes.Count(e => e.FileExtension.ToLowerInvariant() == extensionFile.ToLowerInvariant() &&
-                                                            e.FileTypeUsed && e.FileTypeSignature);
-
-                retVal = (count > 0);
-                if(!retVal)
-                {
-                    msgError = "WarningFormatoNonAmmessoAllaFirma";
-                }
-            }
-
-
-            #endregion
-
-
 
             return msgError;
         }

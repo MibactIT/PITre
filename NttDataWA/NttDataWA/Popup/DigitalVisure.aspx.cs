@@ -159,45 +159,9 @@ namespace NttDataWA.Popup
 
         protected void ConfirmButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UIManager.UserManager.GetInfoUser().idAmministrazione, DBKeys.FE_REQ_CONV_PDF.ToString())) || !Utils.InitConfigurationKeys.GetValue(UIManager.UserManager.GetInfoUser().idAmministrazione, DBKeys.FE_REQ_CONV_PDF.ToString()).Equals("1"))
-            {
-                if (!this.IsFormatSupportedForSign(fileReq))
-                {
-                    string msgDesc = "WarningDigitalVisureFileNonAmmessoAllaFirma";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + utils.FormatJs(msgDesc) + "');} else {parent.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + utils.FormatJs(msgDesc) + "');}", true);
-                    return;
-                }
-            }
             setSessionVal();
             ScriptManager.RegisterClientScriptBlock(this.UpUpdateButtons, this.UpUpdateButtons.GetType(), "closeAJM", "parent.closeAjaxModal('DigitalVisureSelector','true');", true);
             return;
-        }
-
-        private bool IsFormatSupportedForSign(DocsPaWR.FileRequest fileRequest)
-        {
-            bool retValue = false;
-
-            if (!NttDataWA.FormatiDocumento.Configurations.SupportedFileTypesEnabled)
-            {
-                retValue = true;
-            }
-            else
-            {
-                string extension = System.IO.Path.GetExtension(fileRequest.fileName);
-
-                if (!string.IsNullOrEmpty(extension))
-                {
-                    // Rimozione del primo carattere dell'estensione (punto)
-                    extension = extension.Substring(1);
-
-                    DocsPaWR.SupportedFileType[] fileTypes = ProxyManager.GetWS().GetSupportedFileTypes(Convert.ToInt32(UIManager.UserManager.GetInfoUser().idAmministrazione));
-
-                    retValue = fileTypes.Count(e => e.FileExtension.ToLower() == extension.ToLower() &&
-                                                e.FileTypeUsed && e.FileTypeSignature) > 0;
-                }
-            }
-
-            return retValue;
         }
     }
 }

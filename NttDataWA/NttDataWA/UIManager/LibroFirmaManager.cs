@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data;
 using System.Web;
 using NttDataWA.Utils;
 using NttDataWA.DocsPaWR;
@@ -28,22 +27,6 @@ namespace NttDataWA.UIManager
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return null;
-            }
-        }
-
-        /// <summary>
-        /// Estrae il numero totale di elementi presenti in libro firma per l'utente
-        /// </summary>
-        /// <returns></returns>
-        public static int CountElementiInLibroFirma()
-        {
-            try
-            {
-                return docsPaWS.CountElementiInLibroFirma(UserManager.GetInfoUser());
-            }
-            catch (Exception e)
-            {
-                return 0;
             }
         }
 
@@ -176,64 +159,6 @@ namespace NttDataWA.UIManager
             }
         }
 
-        public static bool IsTitolarePassoInAttesa(string docNumber, DocsPaWR.Azione azione)
-        {
-            try
-            {
-                return docsPaWS.IsTitolarePassoInAttesa(docNumber, UserManager.GetInfoUser(), azione);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return false;
-            }
-        }
-
-        public static bool CheckAzioneAttesaPassoFirma(SchedaDocumento schedaDoc)
-        {
-            InfoUtente infoUtente = UserManager.GetInfoUser();
-            bool result = true;
-            try
-            {
-                //Attualmente le operazioni che vanno controllate sono passi attesi dal passo in esecuzione di un processo di firma sono REPERTORIAZIONE, FASCICOLAZIONE, SPEDIZIONE, PROTOCOLLAZIONE
-                //FASCICOLAZIONE E PROTOCOLLAZIONE vengono gestite nel BE
-                IstanzaPassoDiFirma istanza = docsPaWS.GetIstanzaPassoFirmaInAttesaByDocnumber(schedaDoc.docNumber);
-                //Controllo l'azione del passo di firma
-                #region REPERTORIO
-                bool daRepertoriare = false;
-                Templates template = schedaDoc.template;
-                if (template != null && !string.IsNullOrEmpty(template.ID_TIPO_ATTO) && template.ELENCO_OGGETTI != null && template.ELENCO_OGGETTI.Count() > 0)
-                {
-                    OggettoCustom ogg = (from o in template.ELENCO_OGGETTI.Cast<OggettoCustom>()
-                                                                       where o.TIPO.DESCRIZIONE_TIPO.Equals("Contatore") && o.REPERTORIO.Equals("1")
-                                                                       && o.CONTATORE_DA_FAR_SCATTARE && string.IsNullOrEmpty(o.VALORE_DATABASE)
-                                                                       select o).FirstOrDefault();
-                    if (ogg != null)
-                        daRepertoriare = true;
-                }
-                if (daRepertoriare)
-                {
-                    if (!infoUtente.idGruppo.Equals(istanza.RuoloCoinvolto.idGruppo))
-                        return false;
-                    if (!string.IsNullOrEmpty(istanza.UtenteCoinvolto.idPeople) && !infoUtente.idPeople.Equals(istanza.UtenteCoinvolto.idPeople))
-                        return false;
-                    if (!string.IsNullOrEmpty(istanza.UtenteLocker) && !infoUtente.idPeople.Equals(istanza.UtenteCoinvolto.idPeople))
-                        return false;
-                    if(!istanza.TipoFirma.Equals(Azione.DOCUMENTO_REPERTORIATO.ToString()))
-                        return false;
-                }
-                #endregion
-
-
-            }
-            catch(Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return false;
-            }
-            return result;
-        }
-
         /// <summary>
         /// Metodo per verificare il tipo di firma da apporre, nel caso in cui il documento è stato inserito in libro firma
         /// </summary>
@@ -347,32 +272,6 @@ namespace NttDataWA.UIManager
             }
         }
 
-        public static bool CheckAllegatiInLibroFirma(string idDocumentoPrincipale)
-        {
-            try
-            {
-                return docsPaWS.CheckAllegatiInLibroFirma(idDocumentoPrincipale);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return false;
-            }
-        }
-
-        public static bool IsModelloDiFirma(string idProcesso)
-        {
-            try
-            {
-                return docsPaWS.IsModelloDiFirma(idProcesso);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return false;
-            }
-        }
-
         public static bool IsDocOrAllInLibroFirma(string docnumber)
         {
             try
@@ -386,12 +285,11 @@ namespace NttDataWA.UIManager
             }
         }
 
-        public static List<IstanzaProcessoDiFirma> GetIstanzaProcessiDiFirmaByFilter(List<FiltroIstanzeProcessoFirma> filters, int numPage, int pageSize, out int numTotPage, out int nRec, out DataSet istanzeProcessi)
+        public static List<IstanzaProcessoDiFirma> GetIstanzaProcessiDiFirmaByFilter(List<FiltroIstanzeProcessoFirma> filters, int numPage, int pageSize, out int numTotPage, out int nRec)
         {
             numTotPage = 0;
             nRec = 0;
-            istanzeProcessi = null;
-            return docsPaWS.GetIstanzaProcessiDiFirmaByFilter(filters.ToArray(), UserManager.GetInfoUser(), numPage, pageSize, out numTotPage, out nRec, out istanzeProcessi).ToList();
+            return docsPaWS.GetIstanzaProcessiDiFirmaByFilter(filters.ToArray(), UserManager.GetInfoUser(), numPage, pageSize, out numTotPage, out nRec).ToList();
         }
 
 
@@ -414,10 +312,7 @@ namespace NttDataWA.UIManager
             {
                 case LibroFirmaManager.TypeStep.EVENT:
                     //url = "../Images/Icons/LibroFirma/event.png";
-                    if(!passo.IsAutomatico)
-                        url = passo.utenteCoinvolto != null && !string.IsNullOrEmpty(passo.utenteCoinvolto.idPeople) ? "../Images/Icons/LibroFirma/Event_People.png" : "../Images/Icons/LibroFirma/Event_Role.png";
-                    else
-                        url = "../Images/Icons/LibroFirma/Event_Automatic.png";
+                    url = passo.utenteCoinvolto != null && !string.IsNullOrEmpty(passo.utenteCoinvolto.idPeople) ? "../Images/Icons/LibroFirma/Event_People.png" : "../Images/Icons/LibroFirma/Event_Role.png";
                     break;
                 case LibroFirmaManager.TypeStep.SIGN:
                     tipoEvento = passo.Evento.CodiceAzione.ToLower();
@@ -496,10 +391,7 @@ namespace NttDataWA.UIManager
             {
                 case LibroFirmaManager.TypeStep.EVENT:
                     tipoEvento = passo.Evento.Gruppo.ToLower();
-                    if (!passo.IsAutomatico)
-                        url = "../Images/Icons/LibroFirma/" + tipoEvento + ".png";
-                    else
-                        url = "../Images/Icons/LibroFirma/Event_Automatic.png";
+                    url = "../Images/Icons/LibroFirma/" + tipoEvento + ".png";
                     break;
                 case LibroFirmaManager.TypeStep.SIGN:
                     tipoEvento = passo.Evento.CodiceAzione.ToLower();
@@ -652,55 +544,7 @@ namespace NttDataWA.UIManager
             public const string SIGN_PADES = "DOC_SIGNATURE_P";
             public const string VERIFIED = "DOC_VERIFIED";
             public const string ADVANCEMENT_PROCESS = "DOC_STEP_OVER";
-            public const string DOCUMENTO_REPERTORIATO = "DOCUMENTO_REPERTORIATO";
-            public const string RECORD_PREDISPOSED = "RECORD_PREDISPOSED";
         }
         #endregion
-
-        public static bool IsAttivoBloccoModificheDocumentoInLibroFirma()
-        {
-            bool result = false;
-            try
-            {
-                string attivo = Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, DBKeys.BLOCCO_MODIFICHE_DOC_IN_LF.ToString()); 
-                if (!string.IsNullOrEmpty(attivo) && !attivo.Equals("0"))
-                    result = true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            return result;
-        }
-
-        public static string DocumentoSelezionatoPerFirma()
-        {
-            string docnumber = string.Empty;
-
-            List<ElementoInLibroFirma> result = null;
-            if (HttpContext.Current.Session["ListaElementiSelezionati"] != null)
-            {
-                result = HttpContext.Current.Session["ListaElementiSelezionati"] as List<ElementoInLibroFirma>;
-                if (result != null && result.Count > 0)
-                {
-                    int elSelezionato = Convert.ToInt32(HttpContext.Current.Session["ElementoSelezionato"]);
-                    docnumber = result[elSelezionato].InfoDocumento.Docnumber;
-                }
-            }
-            return docnumber;
-        }
-
-        private List<ElementoInLibroFirma> ListaElementiSelezionati
-        {
-            get
-            {
-                List<ElementoInLibroFirma> result = null;
-                if (HttpContext.Current.Session["ListaElementiSelezionati"] != null)
-                {
-                    result = HttpContext.Current.Session["ListaElementiSelezionati"] as List<ElementoInLibroFirma>;
-                }
-                return result;
-            }
-        }
     }
 }

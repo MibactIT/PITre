@@ -110,23 +110,6 @@
         {
             border: 0;
         }
-        .customEnableButton {
-                        
-                        padding: 8px 5px;
-                        background-size: cover;
-                        background-position-y: center;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        border: 1px solid #3377ff;
-                        margin: 0 !important;
-                    }
-
-        #AttachmentsBtnUploadAllegati {
-            width: 140px;
-            background-size: cover;
-            background-position-y: -1px;
-            border-radius: 3px;
-        }
     </style>
     <script type="text/javascript">
         function verEditable() {
@@ -158,10 +141,8 @@
 </asp:Content>
 <asp:Content ID="ContentPlaceHolderContent" ContentPlaceHolderID="ContentPlaceHolderContent"
     runat="server">
-    <uc:ajaxpopup Id="UplodadFile" runat="server" Url="../popup/UploadFile.aspx?idDoc=<%=GetIdDocumento()%>" Width="600"
+    <uc:ajaxpopup Id="UplodadFile" runat="server" Url="../popup/UploadFile.aspx" Width="600"
         Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('panelButtons', '');}" />
-    <uc:ajaxpopup Id="RepositoryView" runat="server" Url="../Repository/RepositoryView.aspx" Width="850"
-        Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', '');}" />
     <uc:ajaxpopup Id="Signature" runat="server" Url="../popup/Signature.aspx" IsFullScreen="false"
         PermitClose="false" PermitScroll="false" Width="1000" Height="1200" CloseFunction="function (event, ui) {__doPostBack('panelButtons', '');}" />
     <uc:ajaxpopup Id="SignatureA4" runat="server" Url="../popup/Signature.aspx?printSignatureA4=true"
@@ -174,9 +155,6 @@
         CloseFunction="function (event, ui) {__doPostBack('panelButtons', '');}" />
     <uc:ajaxpopup Id="AttachmentsAdd" runat="server" Title="Nuovo allegato" Url="../popup/attachment.aspx"
         Width="400" Height="350" PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui) {$('#grid_rowindex').val('-2'); __doPostBack('panelAllegati','');}" />
-
-    <uc:ajaxpopup Id="AttachmentsUpload" runat="server" Title="Acquisisci Allegati" Url="../popup/AttachmentsUpload.aspx" Width="700" Height="500" PermitClose="true"  CloseFunction="function (event, ui) {__doPostBack('panelAllegati', '');}" />
-
     <uc:ajaxpopup Id="AttachmentsModify" runat="server" Title="Modifica allegato" Url="../popup/attachment.aspx?t=modify"
         Width="400" Height="400" PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui) {__doPostBack('panelAllegati', '');}" />
     <uc:ajaxpopup Id="AttachmentsSwap" runat="server" Title="Scambia" Url="../popup/attachment.aspx?t=swap"
@@ -221,7 +199,7 @@
         IsFullScreen="false" PermitClose="false" PermitScroll="true" Width="700" Height="400"
         CloseFunction="function (event, ui) {__doPostBack('panelButtons', '');}" />
     <uc:ajaxpopup Id="StartProcessSignature" runat="server" Url="../popup/StartProcessSignature.aspx"
-        Width="1200" Height="800" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('panelButtons', '');}" />
+        Width="600" Height="500" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('panelButtons', '');}" />
     <uc:ajaxpopup Id="DetailsLFAutomaticMode" runat="server" Url="../popup/DetailsLFAutomaticMode.aspx"
         Width="750" Height="400" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('panelButtons', 'SignatureProcessConcluted');}" />
     <uc:ajaxpopup Id="PrintLabel" runat="server" Url="../popup/PrintLabel.aspx"
@@ -380,20 +358,17 @@
     <asp:UpdatePanel ID="panelButtons" runat="server" UpdateMode="Conditional" ClientIDMode="Static">
         <ContentTemplate>
             <cc1:CustomButton ID="AttachmentsBtnAdd" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" Text="Nuovo" ClientIDMode="Static"  OnClick="AttachmentsAdd_Click" />
+                OnMouseOver="btnHover" Text="Nuovo" ClientIDMode="Static" OnClientClick="return ajaxModalPopupAttachmentsAdd();" />
             <cc1:CustomButton ID="AttachmentsBtnModify" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
                 OnMouseOver="btnHover" Text="Modifica" ClientIDMode="Static" OnClick="AttachmentsBtnModify_Click" />
             <%--OnClientClick="return ajaxModalPopupAttachmentsModify();" --%>
             <cc1:CustomButton ID="AttachmentsBtnSwap" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
                 OnMouseOver="btnHover" Text="Scambia" OnClick="AttachmentsBtnSwap_Click" ClientIDMode="Static" />
             <cc1:CustomButton ID="AttachmentsBtnRemove" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" Text="Rimuovi" ClientIDMode="Static" OnClick="AttachmentsBtnRemove_Click"  />
+                OnMouseOver="btnHover" Text="Rimuovi" ClientIDMode="Static" OnClientClick="__doPostBack('panelAllegati', 'CONFIRM_REMOVE_ATTACHMENTS'); return false;" />
             <cc1:CustomButton ID="AttachmentsBtnAnnulla" runat="server" CssClass="btnEnable"
                 CssClassDisabled="btnDisable" OnMouseOver="btnHover" Text="Annulla" ClientIDMode="Static"
                 OnClick="AttachmentsBtnAnnulla_Click" />
-            <!--[if !IE]><!-->
-            <cc1:CustomButton ID="AttachmentsBtnUploadAllegati" Enabled="false" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable" OnMouseOver="btnHover" ClientIDMode="Static" Text="Acquisisci Allegati" OnClick="AttachmentsBtnUploadAllegati_Click" />
-        <!--<![endif]-->
         </ContentTemplate>
     </asp:UpdatePanel>
     <script type="text/html" id="template-uploads">

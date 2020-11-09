@@ -58,20 +58,6 @@
     </script>
     <script src="../Scripts/chosen.jquery.min.js" type="text/javascript"></script>
     <link href="../Css/chosen.css" rel="stylesheet" type="text/css" />
-    <style type="text/css">
-        .messager_c1 {float: left; width: 15%; text-align: right;}
-        .messager_c2 {float: left; width: 60%; text-align: center; margin: 0 3%;}
-        .messager_c2 span 
-        {
-            color: #f5ae44;
-            font-weight: bold;
-	        text-transform: uppercase;
-	        padding: 15px 0 0 0;
-	        margin: 0;
-	        display: block;
-        }
-        .messager_c3 {float: left; width: 15%; text-align: left;}
-    </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolderContent" runat="server">

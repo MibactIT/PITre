@@ -128,7 +128,7 @@ namespace NttDataWA.UserControls
                             this.LiVisibility.Attributes["onclick"] = "disallowOp('IdMasterBody')";
                             this.LiEvents.Attributes["onclick"] = "disallowOp('IdMasterBody')";
                         }
-                        else if (this.IsForwarded || (UIManager.DocumentManager.IsNewDocument() && doc.repositoryContext != null))
+                        else if (this.IsForwarded)
                         {
                             this.LinkAttachedFiles.Enabled = true;
                             this.LiAttachedFiles.Attributes.Remove("class");
@@ -144,10 +144,6 @@ namespace NttDataWA.UserControls
                             {
                                 this.LinkAttachedFiles.ToolTip = "0" + " " + attachment;
                             }
-                            if(!this.IsForwarded)
-                                this.LiAttachedFiles.Attributes["onclick"] = "$('#btnChangeTabNewDocument').click();return false;";
-                            
-                                //this.LiAttachedFiles.Attributes["onclick"] = "disallowOp('IdMasterBody');__doPostBack('UpDocumentTabs', 'EditDocumentInWorking');return false;";
                         }
                         break;
 
@@ -218,12 +214,11 @@ namespace NttDataWA.UserControls
                             this.LiEvents.Attributes["onclick"] = "disallowOp('IdMasterBody')";
 
                         }
-                        else if (this.IsForwarded || (UIManager.DocumentManager.IsNewDocument() && doc.repositoryContext != null))
+                        else if (this.IsForwarded)
                         {
                             this.LinkProfile.Enabled = true;
                             this.LiProfile.Attributes.Remove("class");
                             this.LiProfile.Attributes.Add("class", "docOther");
-                            this.LinkProfile.Attributes["onclick"] = "disallowOp('IdMasterBody')";
                         }
                         break;
 
@@ -484,17 +479,6 @@ namespace NttDataWA.UserControls
             this.LiVisibility.Attributes.Remove("onclick");
             this.LiEvents.Attributes.Remove("onclick");
 
-            SchedaDocumento doc = UIManager.DocumentManager.getSelectedRecord();
-            if (doc.repositoryContext != null)
-            {
-                this.LinkAttachedFiles.Enabled = true;
-                this.LiAttachedFiles.Attributes.Add("class", "docOther");
-                string language = UIManager.UserManager.GetUserLanguage();
-                string attachment = Utils.Languages.GetLabelFromCode("DocumentTabAttachment", language);
-                this.LinkAttachedFiles.ToolTip = "0" + " " + attachment;
-            }
-
-
             this.UpDocumentTabs.Update();
         }
 
@@ -561,41 +545,31 @@ namespace NttDataWA.UserControls
                     break;
 
                 case "ATTACHMENTS":
-                    SchedaDocumento doc = UIManager.DocumentManager.getSelectedRecord();
-                    if (doc != null && !string.IsNullOrEmpty(doc.systemId))
-                    {
-                        this.LinkProfile.Enabled = true;
-                        this.LinkClassificationSchemes.Enabled = true;
-                        this.LinkAttachedFiles.Enabled = true;
-                        this.LinkTransmissions.Enabled = true;
-                        this.LinkVisibility.Enabled = true;
-                        this.LinkEvents.Enabled = true;
+                    this.LinkProfile.Enabled = true;
+                    this.LinkClassificationSchemes.Enabled = true;
+                    this.LinkAttachedFiles.Enabled = true;
+                    this.LinkTransmissions.Enabled = true;
+                    this.LinkVisibility.Enabled = true;
+                    this.LinkEvents.Enabled = true;
 
-                        this.LiProfile.Attributes.Remove("class");
-                        this.LiClassificationSchemes.Attributes.Remove("class");
-                        this.LiTransmissions.Attributes.Remove("class");
-                        this.LiVisibility.Attributes.Remove("class");
-                        this.LiEvents.Attributes.Remove("class");
+                    this.LiProfile.Attributes.Remove("class");
+                    this.LiClassificationSchemes.Attributes.Remove("class");
+                    this.LiTransmissions.Attributes.Remove("class");
+                    this.LiVisibility.Attributes.Remove("class");
+                    this.LiEvents.Attributes.Remove("class");
 
-                        this.LiProfile.Attributes.Add("class", "docOther");
-                        this.LiClassificationSchemes.Attributes.Add("class", "docOther");
-                        this.LiTransmissions.Attributes.Add("class", "docOther");
-                        this.LiVisibility.Attributes.Add("class", "docOther");
-                        this.LiEvents.Attributes.Add("class", "docOther");
+                    this.LiProfile.Attributes.Add("class", "docOther");
+                    this.LiClassificationSchemes.Attributes.Add("class", "docOther");
+                    this.LiTransmissions.Attributes.Add("class", "docOther");
+                    this.LiVisibility.Attributes.Add("class", "docOther");
+                    this.LiEvents.Attributes.Add("class", "docOther");
 
-                        this.LinkProfile.Attributes["onclick"] = "disallowOp('IdMasterBody')";
-                        this.LiClassificationSchemes.Attributes["onclick"] = "disallowOp('IdMasterBody')";
-                        this.LiAttachedFiles.Attributes["onclick"] = "disallowOp('IdMasterBody')";
-                        this.LiTransmissions.Attributes["onclick"] = "disallowOp('IdMasterBody')";
-                        this.LiVisibility.Attributes["onclick"] = "disallowOp('IdMasterBody')";
-                        this.LiEvents.Attributes["onclick"] = "disallowOp('IdMasterBody')";
-                    }
-                    else if (this.IsForwarded || (UIManager.DocumentManager.IsNewDocument() && doc.repositoryContext != null))
-                    {
-                        this.LinkProfile.Enabled = true;
-                        this.LiProfile.Attributes.Remove("class");
-                        this.LiProfile.Attributes.Add("class", "docOther");
-                    }
+                    this.LinkProfile.Attributes["onclick"] = "disallowOp('IdMasterBody')";
+                    this.LiClassificationSchemes.Attributes["onclick"] = "disallowOp('IdMasterBody')";
+                    this.LiAttachedFiles.Attributes["onclick"] = "disallowOp('IdMasterBody')";
+                    this.LiTransmissions.Attributes["onclick"] = "disallowOp('IdMasterBody')";
+                    this.LiVisibility.Attributes["onclick"] = "disallowOp('IdMasterBody')";
+                    this.LiEvents.Attributes["onclick"] = "disallowOp('IdMasterBody')";
 
                     break;
 

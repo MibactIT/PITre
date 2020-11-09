@@ -91,6 +91,10 @@
         PermitScroll="false" IsFullScreen="true" CloseFunction="function (event, ui)  {$('#btnAddressBookPostback').click();}" />
     <uc:ajaxpopup2 Id="ExportDati" runat="server" Url="../ExportDati/exportDatiSelection.aspx?export=doc"
         Width="600" Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('upPnlButtons', '');}" />
+
+    <uc:ajaxpopup2 Id="ExportDatiTrasm" runat="server" Url="../ExportDati/exportDatiSelection.aspx?export=doctrasm"
+        Width="600" Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('upPnlButtons', '');}" />
+
     <uc:ajaxpopup2 Id="visualReport_iframe" runat="server" Url="../popup/visualReport_iframe.aspx?fr=P"
         Width="400" Height="350" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', '');}" />
     <uc:ajaxpopup2 Id="TransmissionsPrint" runat="server" 
@@ -182,6 +186,7 @@
                                                     <asp:ListItem Value="DG"></asp:ListItem>
                                                     <asp:ListItem Value="B"></asp:ListItem>
                                                     <asp:ListItem Value="F"></asp:ListItem>
+                                                    <%--<asp:ListItem Value="DRT"></asp:ListItem>--%>
                                                 </asp:DropDownList>
                                             </div>
                                         </div>

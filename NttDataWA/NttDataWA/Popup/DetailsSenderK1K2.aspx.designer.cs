@@ -364,15 +364,6 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.Literal lit_registro;
         
         /// <summary>
-        /// ddl_registri control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddl_registri;
-        
-        /// <summary>
         /// pnl_email control.
         /// </summary>
         /// <remarks>

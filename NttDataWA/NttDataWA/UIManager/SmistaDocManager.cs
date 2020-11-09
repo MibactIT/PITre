@@ -648,19 +648,6 @@ namespace NttDataWA.UIManager
             this._uoAppartenenza = ws.GetUOAppartenenza(this._infoUtente.idCorrGlobali, this._mittenteSmistamento, false);
         }
 
-        public List<string> GetIdDestinatariTrasmDocInUo(string idUo, string docnumber)
-        {
-            DocsPaWR.DocsPaWebService ws = new DocsPaWR.DocsPaWebService();
-            try
-            {
-                return ws.GetIdDestinatariTrasmDocInUo(idUo, docnumber).ToList();
-            }
-            catch(Exception e)
-            {
-                return null;
-            }
-        }
-
         private void FillUOInf(string idUO)
         {
             DocsPaWR.DocsPaWebService ws = new DocsPaWR.DocsPaWebService();

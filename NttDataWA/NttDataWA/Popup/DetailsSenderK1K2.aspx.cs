@@ -547,8 +547,7 @@ namespace NttDataWA.Popup
 
         protected void BtnRecord_Click(object sender, EventArgs e)
         {
-            try
-            {
+            try {
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
                 string message = string.Empty;
                 string corr_type = ddl_tipoCorr.SelectedValue;
@@ -561,690 +560,57 @@ namespace NttDataWA.Popup
                     if (!((CustomButton)sender).Text.Equals(this.BtnSaveOccasionalAndRecord.Text))
                     {
 
-                        switch (corr_type)
-                        {
-                            case "U":
-                                if (DocumentInWorking.interop.Equals("S") || this.ddl_tipoCorr.SelectedValue.Equals("U"))
-                                    this.modifyUO(ref datiModifica);
-                                else if ((DocumentInWorking.interop.Equals("P") || DocumentInWorking.interop.Equals("E")) && (this.ddl_tipoCorr.SelectedValue.Equals("P")))
-                                {
-                                    modifyUtente(ref datiModifica);
-                                }
-                                else if ((DocumentInWorking.interop.Equals("P") || DocumentInWorking.interop.Equals("E")) && (this.ddl_tipoCorr.SelectedValue.Equals("R")))
-                                {
-                                    modifyRuolo(ref datiModifica);
-                                }
-                                break;
-                            case "R":
-                                this.modifyRuolo(ref datiModifica);
-                                break;
-                            case "P":
-                                this.modifyUtente(ref datiModifica);
-                                break;
-                        }
+                    switch (corr_type)
+                    {
+                        case "U":
+                            if (DocumentInWorking.interop.Equals("S") || this.ddl_tipoCorr.SelectedValue.Equals("U"))
+                                this.modifyUO(ref datiModifica);
+                            else if ((DocumentInWorking.interop.Equals("P") || DocumentInWorking.interop.Equals("E")) && (this.ddl_tipoCorr.SelectedValue.Equals("P")))
+                            {
+                                modifyUtente(ref datiModifica);
+                            }
+                            else if ((DocumentInWorking.interop.Equals("P") || DocumentInWorking.interop.Equals("E")) && (this.ddl_tipoCorr.SelectedValue.Equals("R")))
+                            {
+                                modifyRuolo(ref datiModifica);
+                            }
+                            break;
+                        case "R":
+                            this.modifyRuolo(ref datiModifica);
+                            break;
+                        case "P":
+                            this.modifyUtente(ref datiModifica);
+                            break;
+                    }
 
                         //operazione andata a buon fine
                     }// fine if Emanuela occasionale
                     string idCorr = "";
-                    #region Ci sono + di un corrispondente
-                    if (Parameter.ContainsKey("same_mail"))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    #region Ci sono + di un corrispondente
+                if (Parameter.ContainsKey("same_mail"))
+                {
+                    string codUpper = datiModifica.codRubrica.ToUpper();
+                    #region Non scelgo niente
+                    if (NewCorrespondent)
                     {
-                        string codUpper = datiModifica.codRubrica.ToUpper();
-                        #region Non scelgo niente
-                        if (NewCorrespondent)
+                        if (datiModifica.codRubrica == Parameter["codiceRubrica"] || codUpper.Contains("INTEROP"))
                         {
-                            if (codUpper.Contains("INTEROP"))
-                            {
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
-                                return;
-                            }
-                            if (codUpper.Contains("@"))
-                            {
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
-                                return;
-                            }
-                            #region Ho l'avviso 1
-                            if (Parameter["tipoAvviso"].Equals("avviso1"))
-                            {
-                                if (UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "M", out newIdCorr, out message))
-                                {
-                                    switch (message)
-                                    {
-                                        case "OK":
-                                            InsertComboMailsCorr(newIdCorr, ref message);
-                                            message = "";
-                                            break;
-                                        default:
-                                            message = "WarningAddressBookModifyKo";
-                                            typeMessage = "error";
-                                            break;
-                                    }
-
-                                    if (message != null && message != "")
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
-                                        return;
-                                    }
-
-                                    AddressBookManager.ResetCodRubCorrIterop(newIdCorr, datiModifica.codRubrica);
-                                    DocumentManager.UpdateDocArrivoFromInterop(Parameter["systemId"], newIdCorr);
-                                    if (newIdCorr != null)
-                                    {
-                                        NewIdCorr = newIdCorr;
-                                    }
-                                    else
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                        return;
-                                    }
-                                }
-                                else
-                                {
-                                    if (message != null && message != "")
-                                    {
-                                        message = "WarningAddressBookModifyKo";
-                                        typeMessage = "error";
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
-                                    }
-                                }
-                            }
-                            #endregion
-                            #region Ho l'avviso 2
-                            else if (Parameter["tipoAvviso"].Equals("avviso2"))
-                            {
-                                //creo l'oggetto canale
-                                DocsPaWR.Canale canale = new DocsPaWR.Canale();
-                                canale.systemId = this.dd_canpref.SelectedItem.Value;
-                                #region Sono Interop
-                                if (this.DocumentInWorking.interop.Equals("S"))
-                                {
-                                    //Creo il nuovo corrispondente e lo associ al documento
-                                    UnitaOrganizzativa uo = new UnitaOrganizzativa();
-                                    uo.tipoIE = Parameter["tipoIE"];
-                                    //uo.tipoCorrispondente = t; // utilizzando questo prende S e genera eccezione dopo.
-                                    uo.tipoCorrispondente = "U";
-                                    uo.codiceAmm = datiModifica.codiceAmm;
-                                    uo.codiceAOO = datiModifica.codiceAoo;
-                                    uo.email = datiModifica.email;
-                                    uo.codiceRubrica = datiModifica.codRubrica;
-                                    uo.canalePref = canale;
-                                    uo.descrizione = datiModifica.descCorr;
-                                    uo.oldDescrizione = Parameter["OldDescrizioneMitt"];
-                                    if (this.ddl_registri.SelectedValue != null)
-                                        uo.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-                                    else
-                                        uo.idRegistro = string.Empty;
-                                    uo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
-                                    uo.localita = datiModifica.localita;
-                                    if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
-                                            (txt_cap.Text != null && !txt_cap.Equals("")) ||
-                                            (txt_citta.Text != null && !txt_citta.Equals("")) ||
-                                            (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
-                                            (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
-                                            (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
-                                            (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
-                                            (txt_fax.Text != null && !txt_fax.Equals("")) ||
-                                            (txt_local.Text != null && !txt_local.Equals("")) ||
-                                            (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
-                                            (txt_note.Text != null && !txt_note.Equals("")) ||
-                                             txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
-                                    {
-                                        uo = (DocsPaWR.UnitaOrganizzativa)AddressBookManager.ValorizeInfoCorr(uo, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
-                                             , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), string.Empty, string.Empty, string.Empty, txt_partita_iva.Text.Trim(), "");
-                                        uo.dettagli = true;
-                                    }
-                                    uo.canalePref = canale;
-
-                                    Corrispondente newCorrispondente = UserManager.addressbookInsertCorrispondente(this, uo,
-                                                                                                                    null);
-                                    idCorr = newCorrispondente.systemId;
-                                    InsertComboMailsCorr(idCorr, ref message);
-                                    NewIdCorr = idCorr;
-                                }
-                                #endregion
-                                #region Non sono Interop
-                                else if (DocumentInWorking.interop.Equals("P") || DocumentInWorking.interop.Equals("E"))
-                                {
-                                    switch (corr_type)
-                                    {
-                                        case "U":
-
-                                            //Creo il nuovo corrispondente e lo associ al documento
-                                            UnitaOrganizzativa uo = new UnitaOrganizzativa();
-
-                                            uo.tipoIE = Parameter["tipoIE"];
-                                            uo.tipoCorrispondente = "U";
-                                            uo.codiceAmm = datiModifica.codiceAmm;
-                                            uo.codiceAOO = datiModifica.codiceAoo;
-                                            uo.email = datiModifica.email;
-                                            uo.codiceRubrica = datiModifica.codRubrica;
-                                            uo.canalePref = canale;
-                                            uo.descrizione = datiModifica.descCorr;
-                                            if (this.ddl_registri.SelectedValue != null)
-                                                uo.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-                                            else
-                                                uo.idRegistro = string.Empty;
-                                            uo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
-                                            uo.localita = datiModifica.localita;
-
-                                            if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
-                                            (txt_cap.Text != null && !txt_cap.Equals("")) ||
-                                            (txt_citta.Text != null && !txt_citta.Equals("")) ||
-                                            (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
-                                            (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
-                                            (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
-                                            (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
-                                            (txt_fax.Text != null && !txt_fax.Equals("")) ||
-                                            (txt_local.Text != null && !txt_local.Equals("")) ||
-                                            (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
-                                            (txt_note.Text != null && !txt_note.Equals("")) ||
-                                             txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
-                                            {
-                                                uo = (DocsPaWR.UnitaOrganizzativa)AddressBookManager.ValorizeInfoCorr(uo, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
-                                                    , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), string.Empty, string.Empty, string.Empty, txt_partita_iva.Text.Trim(), string.Empty);
-                                                uo.dettagli = true;
-                                            }
-                                            uo.canalePref = canale;
-
-                                            codUpper = datiModifica.codRubrica.ToUpper();
-                                            if (codUpper.Contains("INTEROP"))
-                                            {
-                                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
-                                                return;
-                                            }
-                                            if (codUpper.Contains("@"))
-                                            {
-                                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
-                                                return;
-                                            }
-
-                                            Corrispondente newCorrispondente = UserManager.addressbookInsertCorrispondente(this, uo,
-                                                                                                                            null);
-                                            idCorr = newCorrispondente.systemId;
-                                            InsertComboMailsCorr(idCorr, ref message);
-                                            if (idCorr != null)
-                                            {
-                                                NewIdCorr = idCorr;
-                                            }
-                                            else
-                                            {
-                                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                                return;
-                                            }
-
-                                            break;
-
-                                        case "R":
-
-                                            Corrispondente res = new Corrispondente();
-                                            DocsPaWR.Ruolo ruolo = new Ruolo();
-                                            ruolo.tipoCorrispondente = "R";
-                                            ruolo.codiceCorrispondente = datiModifica.codRubrica;
-                                            ruolo.codiceRubrica = datiModifica.codRubrica;
-                                            ruolo.descrizione = datiModifica.descCorr;
-                                            if (this.ddl_registri.SelectedValue != null)
-                                                ruolo.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-                                            else
-                                                ruolo.idRegistro = string.Empty;
-                                            ruolo.email = datiModifica.email;
-                                            ruolo.codiceAmm = datiModifica.codiceAmm;
-                                            ruolo.codiceAOO = datiModifica.codiceAoo;
-                                            ruolo.localita = datiModifica.localita;
-                                            ruolo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
-                                            UnitaOrganizzativa parent_uo = new UnitaOrganizzativa();
-                                            parent_uo.descrizione = "";
-                                            parent_uo.systemId = "0";
-
-                                            ruolo.canalePref = canale;
-                                            res = UserManager.addressbookInsertCorrispondente(this, ruolo, parent_uo);
-                                            idCorr = res.systemId;
-                                            InsertComboMailsCorr(idCorr, ref message);
-
-                                            if (idCorr != null)
-                                            {
-                                                NewIdCorr = idCorr;
-                                            }
-                                            else
-                                            {
-                                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                                return;
-                                            }
-                                            break;
-
-                                        case "P":
-                                            res = new Corrispondente();
-                                            Utente utente = new Utente();
-                                            utente.codiceCorrispondente = datiModifica.codRubrica;
-                                            utente.codiceRubrica = datiModifica.codRubrica;
-                                            utente.cognome = datiModifica.cognome;
-                                            utente.nome = datiModifica.nome;
-                                            utente.email = datiModifica.email;
-                                            utente.codiceAmm = datiModifica.codiceAmm;
-                                            utente.codiceAOO = datiModifica.codiceAoo;
-                                            utente.descrizione = datiModifica.descCorr;
-                                            utente.luogoDINascita = datiModifica.luogoNascita;
-                                            utente.dataNascita = datiModifica.dataNascita;
-                                            utente.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
-                                            utente.titolo = datiModifica.titolo;
-                                            if (this.ddl_registri.SelectedValue != null)
-                                                utente.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-                                            else
-                                                utente.idRegistro = string.Empty;
-                                            utente.tipoCorrispondente = datiModifica.tipoCorrispondente;
-                                            utente.canalePref = canale;
-
-                                            if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
-                                            (txt_cap.Text != null && !txt_cap.Equals("")) ||
-                                            (txt_citta.Text != null && !txt_citta.Equals("")) ||
-                                            (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
-                                            (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
-                                            (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
-                                            (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
-                                            (txt_fax.Text != null && !txt_fax.Equals("")) ||
-                                            (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
-                                            (txt_note.Text != null && !txt_note.Equals("")) ||
-                                                txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
-                                            {
-                                                utente.dettagli = true;
-
-                                                utente = (DocsPaWR.Utente)AddressBookManager.ValorizeInfoCorr(utente, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
-                                                    , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), ddl_titolo.SelectedValue, txt_luogoNascita.Text, txt_dataNascita.Text, txt_partita_iva.Text.Trim(), string.Empty);
-                                            }
-
-                                            res = UserManager.addressbookInsertCorrispondente(this, utente, null);
-                                            idCorr = res.systemId;
-                                            InsertComboMailsCorr(idCorr, ref message);
-
-                                            if (idCorr != null)
-                                            {
-                                                NewIdCorr = idCorr;
-                                            }
-                                            else
-                                            {
-                                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                                return;
-                                            }
-                                            break;
-                                    }
-                                }
-                                #endregion
-
-                            }
-                            #endregion
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
+                            return;
                         }
-                        #endregion
-                        #region Scelgo
-                        else
+                        if (codUpper.Contains("@"))
                         {
-                            NewIdCorr = SenderDetail.systemId;
-                            //return;
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
+                            return;
                         }
-                        #endregion
-                    }
-                    #endregion
-
-                    #region C'è zero o un solo corrispondente
-                    else
-                    {
-                        //Emanuela:gestione occasionale
-                        if (!((CustomButton)sender).Text.Equals(this.BtnSaveOccasionalAndRecord.Text))
+                        #region Ho l'avviso 1
+                        if (Parameter["tipoAvviso"].Equals("avviso1"))
                         {
-                            //creo l'oggetto canale
-                            Canale canale = new Canale();
-                            canale.systemId = this.dd_canpref.SelectedItem.Value;
-
-                            switch (corr_type)
-                            {
-                                case "U":
-                                    //Creo il nuovo corrispondente e lo associ al documento
-                                    UnitaOrganizzativa uo = new UnitaOrganizzativa();
-
-                                    uo.tipoIE = Parameter["tipoIE"];
-                                    //uo.tipoCorrispondente = t; // utilizzando questo prende S e genera eccezione dopo.
-                                    uo.tipoCorrispondente = "U";
-                                    uo.codiceAmm = datiModifica.codiceAmm;
-                                    uo.codiceAOO = datiModifica.codiceAoo;
-                                    uo.email = datiModifica.email;
-                                    uo.codiceRubrica = datiModifica.codRubrica;
-                                    uo.canalePref = canale;
-                                    uo.descrizione = datiModifica.descCorr;
-                                    uo.localita = datiModifica.localita;
-                                    uo.oldDescrizione = Parameter["OldDescrizioneMitt"];
-                                    if (this.ddl_registri.SelectedValue != null)
-                                        uo.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-                                    else
-                                        uo.idRegistro = string.Empty;
-                                    uo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
-
-                                    if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
-                                                 (txt_cap.Text != null && !txt_cap.Equals("")) ||
-                                                 (txt_citta.Text != null && !txt_citta.Equals("")) ||
-                                                 (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
-                                                 (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
-                                                 (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
-                                                 (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
-                                                 (txt_fax.Text != null && !txt_fax.Equals("")) ||
-                                                 (txt_local.Text != null && !txt_local.Equals("")) ||
-                                                 (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
-                                                 (txt_note.Text != null && !txt_note.Equals("")) ||
-                                                  txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
-                                    {
-                                        uo = (DocsPaWR.UnitaOrganizzativa)AddressBookManager.ValorizeInfoCorr(uo, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
-                                            , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), string.Empty, string.Empty, string.Empty, txt_partita_iva.Text.Trim(), string.Empty);
-                                        uo.dettagli = true;
-                                    }
-
-                                    string codUpper = datiModifica.codRubrica.ToUpper();
-
-                                    if (codUpper.Contains("INTEROP"))
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
-                                        return;
-                                    }
-                                    if (codUpper.Contains("@"))
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
-                                        return;
-                                    }
-
-                                    if (!Parameter["tipoAvviso"].Equals("2") && datiModifica.idRegistro.Equals(Parameter["IdRegistro"]))
-                                    {
-                                        // Se il codice è già presente in rubrica per lo specifico registro
-                                        // non si deve procedere
-                                        if (!AddressBookManager.IsCodRubricaPresente(datiModifica.codRubrica, corr_type, UserManager.GetInfoUser().idAmministrazione, datiModifica.idRegistro, datiModifica.inRubricaComune))
-                                        {
-                                            UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "M", out idCorr, out message);
-                                            switch (message)
-                                            {
-                                                case "OK":
-                                                    InsertComboMailsCorr(idCorr, ref message);
-                                                    message = "";
-                                                    break;
-                                                default:
-                                                    message = "WarningAddressBookModifyKo";
-                                                    typeMessage = "error";
-                                                    break;
-                                            }
-
-                                            if (message != null && message != "")
-                                            {
-                                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
-                                                return;
-                                            }
-
-                                            AddressBookManager.ResetCodRubCorrIterop(idCorr, datiModifica.codRubrica);
-                                            DocumentManager.UpdateDocArrivoFromInterop(Parameter["systemId"], idCorr);
-                                        }
-                                        else
-                                            idCorr = null;
-
-                                        if (idCorr != null)
-                                        {
-                                            NewIdCorr = idCorr;
-                                        }
-                                        else
-                                        {
-                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                            return;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Corrispondente newCorrispondente;
-
-                                        // Se ci si trova nel caso di inserimento di un nuovo corrispondente, si procede 
-                                        // con l'inserimento altrimenti viene utilizzato il corrispondente proposto
-                                        if (NewCorrespondent)
-                                            newCorrispondente = UserManager.addressbookInsertCorrispondente(this, uo, null);
-                                        else
-                                            newCorrispondente = AddressBookManager.getCorrispondenteByCodRubrica(uo.codiceRubrica, false);
-
-                                        idCorr = newCorrispondente.systemId;
-                                        InsertComboMailsCorr(idCorr, ref message);
-
-                                        if (idCorr != null)
-                                        {
-                                            NewIdCorr = idCorr;
-                                        }
-                                        else
-                                        {
-                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                            return;
-                                        }
-
-                                    }
-                                    break;
-
-                                case "R":
-                                    Corrispondente res = new Corrispondente();
-                                    Ruolo ruolo = new Ruolo();
-                                    ruolo.tipoCorrispondente = "R";
-                                    ruolo.codiceCorrispondente = datiModifica.codRubrica;
-                                    ruolo.codiceRubrica = datiModifica.codRubrica;
-                                    ruolo.descrizione = datiModifica.descCorr;
-                                    if (this.ddl_registri.SelectedValue != null)
-                                        ruolo.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-                                    else
-                                        ruolo.idRegistro = string.Empty; 
-                                    ruolo.email = datiModifica.email;
-                                    ruolo.codiceAmm = datiModifica.codiceAmm;
-                                    ruolo.codiceAOO = datiModifica.codiceAoo;
-                                    ruolo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
-                                    DocsPaWR.UnitaOrganizzativa parent_uo = new UnitaOrganizzativa();
-                                    parent_uo.descrizione = "";
-                                    parent_uo.systemId = "0";
-
-                                    ruolo.canalePref = canale;
-                                    //res = UserManager.addressbookInsertCorrispondente(this, ruolo, parent_uo);
-                                    //idCorr = res.systemId;
-                                    string codUpp = datiModifica.codRubrica.ToUpper();
-                                    if (!Parameter["tipoAvviso"].Equals("avviso2") && datiModifica.codRubrica == Parameter["codiceRubrica"])
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
-                                        return;
-                                    }
-                                    if (codUpp.Contains("INTEROP"))
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
-                                        return;
-                                    }
-                                    if (codUpp.Contains("@"))
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
-                                        return;
-                                    }
-
-                                    if (!Parameter["tipoAvviso"].Equals("avviso2") && datiModifica.idRegistro.Equals(Parameter["IdRegistro"]))
-                                    {
-                                        // Se il codice è già presente in rubrica per lo specifico registro
-                                        // non si deve procedere
-                                        if (!AddressBookManager.IsCodRubricaPresente(datiModifica.codRubrica, corr_type, UserManager.GetInfoUser().idAmministrazione, datiModifica.idRegistro, datiModifica.inRubricaComune))
-                                        {
-                                            UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "D", out idCorr, out message);
-                                            switch (message)
-                                            {
-                                                case "OK":
-                                                    MultiBoxManager.DeleteMailCorrispondenteEsterno(idCorr);
-                                                    message = "";
-                                                    break;
-                                                default:
-                                                    message = "WarningAddressBookModifyKo";
-                                                    typeMessage = "error";
-                                                    break;
-                                            }
-
-
-                                            if (message != null && message != "")
-                                            {
-                                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
-                                                return;
-                                            }
-                                            //ws.ResetCodRubCorrIterop(idCorr, datiModifica.codRubrica);
-                                            Corrispondente newCorrispondente = UserManager.addressbookInsertCorrispondente(this, ruolo, parent_uo);
-                                            idCorr = newCorrispondente.systemId;
-                                            InsertComboMailsCorr(idCorr, ref message);
-                                            DocumentManager.UpdateDocArrivoFromInterop(Parameter["systemId"], idCorr);
-                                        }
-                                        else
-                                        {
-                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                            return;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Corrispondente newCorrispondente;
-
-                                        // Se ci si trova nel caso di inserimento di un nuovo corrispondente, si procede 
-                                        // con l'inserimento altrimenti viene utilizzato il corrispondente proposto
-                                        if (NewCorrespondent)
-                                            newCorrispondente = UserManager.addressbookInsertCorrispondente(this, ruolo, parent_uo);
-                                        else
-                                            newCorrispondente = UserManager.getCorrispondentBySystemID(datiModifica.idCorrGlobali);
-
-                                        idCorr = newCorrispondente.systemId;
-                                        InsertComboMailsCorr(idCorr, ref message);
-                                    }
-
-                                    if (idCorr != null)
-                                    {
-                                        NewIdCorr = idCorr;
-                                    }
-                                    else
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                        return;
-                                    }
-                                    break;
-
-                                case "P":
-                                    res = new Corrispondente();
-                                    Utente utente = new Utente();
-                                    utente.codiceCorrispondente = datiModifica.codRubrica;
-                                    utente.codiceRubrica = datiModifica.codRubrica;
-                                    utente.cognome = datiModifica.cognome;
-                                    utente.nome = datiModifica.nome;
-                                    utente.email = datiModifica.email;
-                                    utente.codiceAmm = datiModifica.codiceAmm;
-                                    utente.codiceAOO = datiModifica.codiceAoo;
-                                    utente.descrizione = datiModifica.descCorr;
-                                    utente.luogoDINascita = datiModifica.luogoNascita;
-                                    utente.dataNascita = datiModifica.dataNascita;
-                                    utente.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
-                                    utente.titolo = datiModifica.titolo;
-                                    if (this.ddl_registri.SelectedValue != null)
-                                        utente.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-                                    else
-                                        utente.idRegistro = string.Empty;
-                                    utente.tipoCorrispondente = "P";
-                                    utente.canalePref = canale;
-
-                                    if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
-                                                (txt_cap.Text != null && !txt_cap.Equals("")) ||
-                                                (txt_citta.Text != null && !txt_citta.Equals("")) ||
-                                                (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
-                                                (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
-                                                (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
-                                                (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
-                                                (txt_fax.Text != null && !txt_fax.Equals("")) ||
-                                                (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
-                                                (txt_note.Text != null && !txt_note.Equals("")) ||
-                                                    txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
-                                    {
-                                        utente.dettagli = true;
-
-                                        utente = (DocsPaWR.Utente)AddressBookManager.ValorizeInfoCorr(utente, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
-                                            , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), ddl_titolo.SelectedValue, txt_luogoNascita.Text, txt_dataNascita.Text, txt_partita_iva.Text.Trim(), string.Empty);
-                                    }
-
-                                    if (datiModifica.codRubrica.Contains("INTEROP"))
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
-                                        return;
-                                    }
-
-                                    if (datiModifica.codRubrica.Contains("@"))
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
-                                        return;
-                                    }
-
-                                    if (!Parameter["tipoAvviso"].Equals("avviso2") && datiModifica.idRegistro.Equals(Parameter["IdRegistro"]))
-                                    {
-                                        // Se il codice è già presente in rubrica per lo specifico registro
-                                        // non si deve procedere
-                                        if (!AddressBookManager.IsCodRubricaPresente(datiModifica.codRubrica, corr_type, UserManager.GetInfoUser().idAmministrazione, datiModifica.idRegistro, datiModifica.inRubricaComune))
-                                        {
-                                            UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "M",
-                                                                                        out idCorr,
-                                                                                        out message);
-                                            switch (message)
-                                            {
-                                                case "OK":
-                                                    InsertComboMailsCorr(idCorr, ref message);
-                                                    message = "";
-                                                    break;
-                                                default:
-                                                    message = "WarningAddressBookModifyKo";
-                                                    typeMessage = "error";
-                                                    break;
-                                            }
-
-                                            if (message != null && message != "")
-                                            {
-                                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
-                                                return;
-                                            }
-                                            AddressBookManager.ResetCodRubCorrIterop(idCorr, datiModifica.codRubrica);
-                                            DocumentManager.UpdateDocArrivoFromInterop(Parameter["systemId"], idCorr);
-                                        }
-                                        else
-                                        {
-                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                            return;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Corrispondente newCorrispondente;
-
-                                        // Se ci si trova nel caso di inserimento di un nuovo corrispondente, si procede 
-                                        // con l'inserimento altrimenti viene utilizzato il corrispondente proposto
-                                        if (NewCorrespondent)
-                                            newCorrispondente = UserManager.addressbookInsertCorrispondente(this, utente, null);
-                                        else
-                                            newCorrispondente = UserManager.getCorrispondentBySystemID(datiModifica.idCorrGlobali);
-
-                                        idCorr = newCorrispondente.systemId;
-                                        InsertComboMailsCorr(idCorr, ref message);
-                                    }
-
-                                    if (idCorr != null)
-                                    {
-                                        NewIdCorr = idCorr;
-                                    }
-                                    else
-                                    {
-                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
-                                        return;
-                                    }
-                                    break;
-                            }
-                        }//fine if Emanuela occasionale
-                        #region Creazione corrispondente occasionale
-                        else //Se il corrispondente è di tipo occasionale
-                        {
-                            datiModifica.idCorrGlobali = Parameter["systemId"];
-                            datiModifica.codRubrica = this.txt_CodRubrica.Text.TrimStart(" ".ToCharArray()).TrimEnd(" ".ToCharArray());
-                            datiModifica.codiceAmm = this.txt_codAmm.Text;
-                            datiModifica.descCorr = this.txt_email.Text.TrimStart(" ".ToCharArray()).TrimEnd(" ".ToCharArray());
-                            datiModifica.tipoCorrispondente = "O";
-
-                            if (UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "M", out idCorr, out message))
+                            if (UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "M", out newIdCorr, out message))
                             {
                                 switch (message)
                                 {
                                     case "OK":
+                                        InsertComboMailsCorr(newIdCorr, ref message);
                                         message = "";
                                         break;
                                     default:
@@ -1258,20 +624,611 @@ namespace NttDataWA.Popup
                                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
                                     return;
                                 }
-                                string sysid_doc = DocumentInWorking.systemId;
-                                DocumentManager.UpdateDocArrivoFromInteropOccasionale(sysid_doc, idCorr);
+
+                                AddressBookManager.ResetCodRubCorrIterop(newIdCorr, datiModifica.codRubrica);
+                                DocumentManager.UpdateDocArrivoFromInterop(Parameter["systemId"], newIdCorr);
+                                if (newIdCorr != null)
+                                {
+                                    NewIdCorr = newIdCorr;
+                                }
+                                else
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                if (message != null && message != "")
+                                {
+                                    message = "WarningAddressBookModifyKo";
+                                    typeMessage = "error";
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
+                                }
+                            }
+                        }
+                        #endregion
+                        #region Ho l'avviso 2
+                        else if (Parameter["tipoAvviso"].Equals("avviso2"))
+                        {
+                            //creo l'oggetto canale
+                            DocsPaWR.Canale canale = new DocsPaWR.Canale();
+                            canale.systemId = this.dd_canpref.SelectedItem.Value;
+                            #region Sono Interop
+                            if (this.DocumentInWorking.interop.Equals("S"))
+                            {
+                                //Creo il nuovo corrispondente e lo associ al documento
+                                UnitaOrganizzativa uo = new UnitaOrganizzativa();
+                                uo.tipoIE = Parameter["tipoIE"];
+                                //uo.tipoCorrispondente = t; // utilizzando questo prende S e genera eccezione dopo.
+                                uo.tipoCorrispondente = "U";
+                                uo.codiceAmm = datiModifica.codiceAmm;
+                                uo.codiceAOO = datiModifica.codiceAoo;
+                                uo.email = datiModifica.email;
+                                uo.codiceRubrica = datiModifica.codRubrica;
+                                uo.canalePref = canale;
+                                uo.descrizione = datiModifica.descCorr;
+                                uo.oldDescrizione = Parameter["OldDescrizioneMitt"];
+                                uo.idRegistro = Parameter["IdRegistro"];
+                                uo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
+                                uo.localita = datiModifica.localita;
+                                if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
+                                        (txt_cap.Text != null && !txt_cap.Equals("")) ||
+                                        (txt_citta.Text != null && !txt_citta.Equals("")) ||
+                                        (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
+                                        (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
+                                        (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
+                                        (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
+                                        (txt_fax.Text != null && !txt_fax.Equals("")) ||
+                                        (txt_local.Text != null && !txt_local.Equals("")) ||
+                                        (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
+                                        (txt_note.Text != null && !txt_note.Equals("")) ||
+                                         txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
+                                {
+                                    uo = (DocsPaWR.UnitaOrganizzativa)AddressBookManager.ValorizeInfoCorr(uo, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
+                                         , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), string.Empty, string.Empty, string.Empty, txt_partita_iva.Text.Trim(), "");
+                                    uo.dettagli = true;
+                                }
+                                uo.canalePref = canale;
+
+                                Corrispondente newCorrispondente = UserManager.addressbookInsertCorrispondente(this, uo,
+                                                                                                                null);
+                                idCorr = newCorrispondente.systemId;
+                                InsertComboMailsCorr(idCorr, ref message);
+                                NewIdCorr = idCorr;
+                            }
+                            #endregion
+                            #region Non sono Interop
+                            else if (DocumentInWorking.interop.Equals("P") || DocumentInWorking.interop.Equals("E"))
+                            {
+                                switch (corr_type)
+                                {
+                                    case "U":
+
+                                        //Creo il nuovo corrispondente e lo associ al documento
+                                        UnitaOrganizzativa uo = new UnitaOrganizzativa();
+
+                                        uo.tipoIE = Parameter["tipoIE"];
+                                        uo.tipoCorrispondente = "U";
+                                        uo.codiceAmm = datiModifica.codiceAmm;
+                                        uo.codiceAOO = datiModifica.codiceAoo;
+                                        uo.email = datiModifica.email;
+                                        uo.codiceRubrica = datiModifica.codRubrica;
+                                        uo.canalePref = canale;
+                                        uo.descrizione = datiModifica.descCorr;
+                                        uo.idRegistro = Parameter["IdRegistro"];
+                                        uo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
+                                        uo.localita = datiModifica.localita;
+
+                                        if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
+                                        (txt_cap.Text != null && !txt_cap.Equals("")) ||
+                                        (txt_citta.Text != null && !txt_citta.Equals("")) ||
+                                        (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
+                                        (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
+                                        (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
+                                        (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
+                                        (txt_fax.Text != null && !txt_fax.Equals("")) ||
+                                        (txt_local.Text != null && !txt_local.Equals("")) ||
+                                        (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
+                                        (txt_note.Text != null && !txt_note.Equals("")) ||
+                                         txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
+                                        {
+                                            uo = (DocsPaWR.UnitaOrganizzativa)AddressBookManager.ValorizeInfoCorr(uo, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
+                                                , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), string.Empty, string.Empty, string.Empty, txt_partita_iva.Text.Trim(),string.Empty);
+                                            uo.dettagli = true;
+                                        }
+                                        uo.canalePref = canale;
+
+                                        codUpper = datiModifica.codRubrica.ToUpper();
+                                        if (datiModifica.codRubrica == Parameter["codiceRubrica"] || codUpper.Contains("INTEROP"))
+                                        {
+                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
+                                            return;
+                                        }
+                                        if (codUpper.Contains("@"))
+                                        {
+                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
+                                            return;
+                                        }
+
+                                        Corrispondente newCorrispondente = UserManager.addressbookInsertCorrispondente(this, uo,
+                                                                                                                        null);
+                                        idCorr = newCorrispondente.systemId;
+                                        InsertComboMailsCorr(idCorr, ref message);
+                                        if (idCorr != null)
+                                        {
+                                            NewIdCorr = idCorr;
+                                        }
+                                        else
+                                        {
+                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
+                                            return;
+                                        }
+
+                                        break;
+
+                                    case "R":
+
+                                        Corrispondente res = new Corrispondente();
+                                        DocsPaWR.Ruolo ruolo = new Ruolo();
+                                        ruolo.tipoCorrispondente = "R";
+                                        ruolo.codiceCorrispondente = datiModifica.codRubrica;
+                                        ruolo.codiceRubrica = datiModifica.codRubrica;
+                                        ruolo.descrizione = datiModifica.descCorr;
+                                        ruolo.idRegistro = Parameter["IdRegistro"];
+                                        ruolo.email = datiModifica.email;
+                                        ruolo.codiceAmm = datiModifica.codiceAmm;
+                                        ruolo.codiceAOO = datiModifica.codiceAoo;
+                                        ruolo.localita = datiModifica.localita;
+                                        ruolo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
+                                        UnitaOrganizzativa parent_uo = new UnitaOrganizzativa();
+                                        parent_uo.descrizione = "";
+                                        parent_uo.systemId = "0";
+
+                                        ruolo.canalePref = canale;
+                                        res = UserManager.addressbookInsertCorrispondente(this, ruolo, parent_uo);
+                                        idCorr = res.systemId;
+                                        InsertComboMailsCorr(idCorr, ref message);
+
+                                        if (idCorr != null)
+                                        {
+                                            NewIdCorr = idCorr;
+                                        }
+                                        else
+                                        {
+                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
+                                            return;
+                                        }
+                                        break;
+
+                                    case "P":
+                                        res = new Corrispondente();
+                                        Utente utente = new Utente();
+                                        utente.codiceCorrispondente = datiModifica.codRubrica;
+                                        utente.codiceRubrica = datiModifica.codRubrica;
+                                        utente.cognome = datiModifica.cognome;
+                                        utente.nome = datiModifica.nome;
+                                        utente.email = datiModifica.email;
+                                        utente.codiceAmm = datiModifica.codiceAmm;
+                                        utente.codiceAOO = datiModifica.codiceAoo;
+                                        utente.descrizione = datiModifica.descCorr;
+                                        utente.luogoDINascita = datiModifica.luogoNascita;
+                                        utente.dataNascita = datiModifica.dataNascita;
+                                        utente.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
+                                        utente.titolo = datiModifica.titolo;
+                                        utente.idRegistro = Parameter["IdRegistro"];
+                                        utente.tipoCorrispondente = datiModifica.tipoCorrispondente;
+                                        utente.canalePref = canale;
+
+                                        if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
+                                        (txt_cap.Text != null && !txt_cap.Equals("")) ||
+                                        (txt_citta.Text != null && !txt_citta.Equals("")) ||
+                                        (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
+                                        (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
+                                        (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
+                                        (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
+                                        (txt_fax.Text != null && !txt_fax.Equals("")) ||
+                                        (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
+                                        (txt_note.Text != null && !txt_note.Equals("")) ||
+                                            txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
+                                        {
+                                            utente.dettagli = true;
+
+                                            utente = (DocsPaWR.Utente)AddressBookManager.ValorizeInfoCorr(utente, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
+                                                , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), ddl_titolo.SelectedValue, txt_luogoNascita.Text, txt_dataNascita.Text, txt_partita_iva.Text.Trim(),string.Empty);
+                                        }
+
+                                        res = UserManager.addressbookInsertCorrispondente(this, utente, null);
+                                        idCorr = res.systemId;
+                                        InsertComboMailsCorr(idCorr, ref message);
+
+                                        if (idCorr != null)
+                                        {
+                                            NewIdCorr = idCorr;
+                                        }
+                                        else
+                                        {
+                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
+                                            return;
+                                        }
+                                        break;
+                                }
+                            }
+                            #endregion
+
+                        }
+                        #endregion
+                    }
+                    #endregion
+                    #region Scelgo
+                    else
+                    {
+                        NewIdCorr = SenderDetail.systemId;
+                        //return;
+                    }
+                    #endregion
+                }
+                #endregion
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            #region C'è zero o un solo corrispondente
+                else
+                {
+                    //Emanuela:gestione occasionale
+                    if (!((CustomButton)sender).Text.Equals(this.BtnSaveOccasionalAndRecord.Text))
+                    {
+                        //creo l'oggetto canale
+                        Canale canale = new Canale();
+                        canale.systemId = this.dd_canpref.SelectedItem.Value;
+
+                        switch (corr_type)
+                        {
+                            case "U":
+                                //Creo il nuovo corrispondente e lo associ al documento
+                                UnitaOrganizzativa uo = new UnitaOrganizzativa();
+
+                                uo.tipoIE = Parameter["tipoIE"];
+                                //uo.tipoCorrispondente = t; // utilizzando questo prende S e genera eccezione dopo.
+                                uo.tipoCorrispondente = "U";
+                                uo.codiceAmm = datiModifica.codiceAmm;
+                                uo.codiceAOO = datiModifica.codiceAoo;
+                                uo.email = datiModifica.email;
+                                uo.codiceRubrica = datiModifica.codRubrica;
+                                uo.canalePref = canale;
+                                uo.descrizione = datiModifica.descCorr;
+                                uo.localita = datiModifica.localita;
+                                uo.oldDescrizione = Parameter["OldDescrizioneMitt"];
+                                uo.idRegistro = Parameter["IdRegistro"];
+                                uo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
+
+                                if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
+                                             (txt_cap.Text != null && !txt_cap.Equals("")) ||
+                                             (txt_citta.Text != null && !txt_citta.Equals("")) ||
+                                             (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
+                                             (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
+                                             (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
+                                             (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
+                                             (txt_fax.Text != null && !txt_fax.Equals("")) ||
+                                             (txt_local.Text != null && !txt_local.Equals("")) ||
+                                             (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
+                                             (txt_note.Text != null && !txt_note.Equals("")) ||
+                                              txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
+                                {
+                                    uo = (DocsPaWR.UnitaOrganizzativa)AddressBookManager.ValorizeInfoCorr(uo, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
+                                        , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), string.Empty, string.Empty, string.Empty, txt_partita_iva.Text.Trim(),string.Empty);
+                                    uo.dettagli = true;
+                                }
+
+                                string codUpper = datiModifica.codRubrica.ToUpper();
+
+                                if (datiModifica.codRubrica == Parameter["codiceRubrica"] || codUpper.Contains("INTEROP"))
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
+                                    return;
+                                }
+                                if (codUpper.Contains("@"))
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
+                                    return;
+                                }
+
+                                if (!Parameter["tipoAvviso"].Equals("2"))
+                                {
+                                    // Se il codice è già presente in rubrica per lo specifico registro
+                                    // non si deve procedere
+                                    if (!AddressBookManager.IsCodRubricaPresente(datiModifica.codRubrica, corr_type, UserManager.GetInfoUser().idAmministrazione, SenderDetail.idRegistro, datiModifica.inRubricaComune))
+                                    {
+                                        UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "M", out idCorr, out message);
+                                        switch (message)
+                                        {
+                                            case "OK":
+                                                InsertComboMailsCorr(idCorr, ref message);
+                                                message = "";
+                                                break;
+                                            default:
+                                                message = "WarningAddressBookModifyKo";
+                                                typeMessage = "error";
+                                                break;
+                                        }
+
+                                        if (message != null && message != "")
+                                        {
+                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
+                                            return;
+                                        }
+
+                                        AddressBookManager.ResetCodRubCorrIterop(idCorr, datiModifica.codRubrica);
+                                        DocumentManager.UpdateDocArrivoFromInterop(Parameter["systemId"], idCorr);
+                                    }
+                                    else
+                                        idCorr = null;
+
+                                    if (idCorr != null)
+                                    {
+                                        NewIdCorr = idCorr;
+                                    }
+                                    else
+                                    {
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    Corrispondente newCorrispondente;
+
+                                    // Se ci si trova nel caso di inserimento di un nuovo corrispondente, si procede 
+                                    // con l'inserimento altrimenti viene utilizzato il corrispondente proposto
+                                    if (NewCorrespondent)
+                                        newCorrispondente = UserManager.addressbookInsertCorrispondente(this, uo, null);
+                                    else
+                                        newCorrispondente = AddressBookManager.getCorrispondenteByCodRubrica(uo.codiceRubrica, false);
+
+                                    idCorr = newCorrispondente.systemId;
+                                    InsertComboMailsCorr(idCorr, ref message);
+
+                                    if (idCorr != null)
+                                    {
+                                        NewIdCorr = idCorr;
+                                    }
+                                    else
+                                    {
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
+                                        return;
+                                    }
+
+                                }
+                                break;
+
+                            case "R":
+                                Corrispondente res = new Corrispondente();
+                                Ruolo ruolo = new Ruolo();
+                                ruolo.tipoCorrispondente = "R";
+                                ruolo.codiceCorrispondente = datiModifica.codRubrica;
+                                ruolo.codiceRubrica = datiModifica.codRubrica;
+                                ruolo.descrizione = datiModifica.descCorr;
+                                ruolo.idRegistro = Parameter["IdRegistro"];
+                                ruolo.email = datiModifica.email;
+                                ruolo.codiceAmm = datiModifica.codiceAmm;
+                                ruolo.codiceAOO = datiModifica.codiceAoo;
+                                ruolo.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
+                                DocsPaWR.UnitaOrganizzativa parent_uo = new UnitaOrganizzativa();
+                                parent_uo.descrizione = "";
+                                parent_uo.systemId = "0";
+
+                                ruolo.canalePref = canale;
+                                //res = UserManager.addressbookInsertCorrispondente(this, ruolo, parent_uo);
+                                //idCorr = res.systemId;
+                                string codUpp = datiModifica.codRubrica.ToUpper();
+                                if (!Parameter["tipoAvviso"].Equals("avviso2") && datiModifica.codRubrica == Parameter["codiceRubrica"])
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
+                                    return;
+                                }
+                                if (codUpp.Contains("INTEROP"))
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
+                                    return;
+                                }
+                                if (codUpp.Contains("@"))
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
+                                    return;
+                                }
+
+                                if (!Parameter["tipoAvviso"].Equals("avviso2"))
+                                {
+                                    UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "D", out idCorr, out message);
+                                    switch (message)
+                                    {
+                                        case "OK":
+                                            MultiBoxManager.DeleteMailCorrispondenteEsterno(idCorr);
+                                            message = "";
+                                            break;
+                                        default:
+                                            message = "WarningAddressBookModifyKo";
+                                            typeMessage = "error";
+                                            break;
+                                    }
+
+                                    if (message != null && message != "")
+                                    {
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
+                                        return;
+                                    }
+                                    //ws.ResetCodRubCorrIterop(idCorr, datiModifica.codRubrica);
+                                    Corrispondente newCorrispondente = UserManager.addressbookInsertCorrispondente(this, ruolo, parent_uo);
+                                    idCorr = newCorrispondente.systemId;
+                                    InsertComboMailsCorr(idCorr, ref message);
+                                    DocumentManager.UpdateDocArrivoFromInterop(Parameter["systemId"], idCorr);
+                                }
+                                else
+                                {
+                                    Corrispondente newCorrispondente;
+
+                                    // Se ci si trova nel caso di inserimento di un nuovo corrispondente, si procede 
+                                    // con l'inserimento altrimenti viene utilizzato il corrispondente proposto
+                                    if (NewCorrespondent)
+                                        newCorrispondente = UserManager.addressbookInsertCorrispondente(this, ruolo, parent_uo);
+                                    else
+                                        newCorrispondente = UserManager.getCorrispondentBySystemID(datiModifica.idCorrGlobali);
+
+                                    idCorr = newCorrispondente.systemId;
+                                    InsertComboMailsCorr(idCorr, ref message);
+                                }
+
                                 if (idCorr != null)
                                 {
                                     NewIdCorr = idCorr;
                                 }
                                 else
                                 {
-                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningAddressBookModifyKo', 'error', '');", true);
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
+                                    return;
                                 }
+                                break;
+
+                            case "P":
+                                res = new Corrispondente();
+                                Utente utente = new Utente();
+                                utente.codiceCorrispondente = datiModifica.codRubrica;
+                                utente.codiceRubrica = datiModifica.codRubrica;
+                                utente.cognome = datiModifica.cognome;
+                                utente.nome = datiModifica.nome;
+                                utente.email = datiModifica.email;
+                                utente.codiceAmm = datiModifica.codiceAmm;
+                                utente.codiceAOO = datiModifica.codiceAoo;
+                                utente.descrizione = datiModifica.descCorr;
+                                utente.luogoDINascita = datiModifica.luogoNascita;
+                                utente.dataNascita = datiModifica.dataNascita;
+                                utente.idAmministrazione = UserManager.GetInfoUser().idAmministrazione;
+                                utente.titolo = datiModifica.titolo;
+                                utente.idRegistro = Parameter["IdRegistro"];
+                                utente.tipoCorrispondente = "P";
+                                utente.canalePref = canale;
+
+                                if ((txt_indirizzo.Text != null && !txt_indirizzo.Equals("")) ||
+                                            (txt_cap.Text != null && !txt_cap.Equals("")) ||
+                                            (txt_citta.Text != null && !txt_citta.Equals("")) ||
+                                            (txt_provincia.Text != null && !txt_provincia.Equals("")) ||
+                                            (txt_nazione.Text != null && !txt_nazione.Equals("")) ||
+                                            (txt_telefono.Text != null && !txt_telefono.Equals("")) ||
+                                            (txt_telefono2 != null && !txt_telefono2.Equals("")) ||
+                                            (txt_fax.Text != null && !txt_fax.Equals("")) ||
+                                            (txt_codfisc.Text != null && !txt_codfisc.Equals("")) ||
+                                            (txt_note.Text != null && !txt_note.Equals("")) ||
+                                                txt_partita_iva.Text != null && !txt_partita_iva.Equals(""))
+                                {
+                                    utente.dettagli = true;
+
+                                    utente = (DocsPaWR.Utente)AddressBookManager.ValorizeInfoCorr(utente, txt_indirizzo.Text.Trim(), txt_citta.Text.Trim(), txt_cap.Text.Trim(), txt_provincia.Text.Trim(), txt_nazione.Text.Trim(), txt_telefono.Text.Trim(), txt_telefono2.Text.Trim(), txt_fax.Text.Trim()
+                                        , txt_codfisc.Text.Trim(), txt_note.Text.Trim(), txt_local.Text.Trim(), ddl_titolo.SelectedValue, txt_luogoNascita.Text, txt_dataNascita.Text, txt_partita_iva.Text.Trim(),string.Empty);
+                                }
+
+                                if (datiModifica.codRubrica.Contains("INTEROP"))
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningChangeCodAddressBook', 'warning', '');", true);
+                                    return;
+                                }
+
+                                if (datiModifica.codRubrica.Contains("@"))
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookNotContains@', 'warning', '');", true);
+                                    return;
+                                }
+
+                                if (!Parameter["tipoAvviso"].Equals("avviso2"))
+                                {
+                                    UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "M",
+                                                                                        out idCorr,
+                                                                                        out message);
+                                    switch (message)
+                                    {
+                                        case "OK":
+                                            InsertComboMailsCorr(idCorr, ref message);
+                                            message = "";
+                                            break;
+                                        default:
+                                            message = "WarningAddressBookModifyKo";
+                                            typeMessage = "error";
+                                            break;
+                                    }
+
+                                    if (message != null && message != "")
+                                    {
+                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
+                                        return;
+                                    }
+                                    AddressBookManager.ResetCodRubCorrIterop(idCorr, datiModifica.codRubrica);
+                                    DocumentManager.UpdateDocArrivoFromInterop(Parameter["systemId"], idCorr);
+                                }
+                                else
+                                {
+                                    Corrispondente newCorrispondente;
+
+                                    // Se ci si trova nel caso di inserimento di un nuovo corrispondente, si procede 
+                                    // con l'inserimento altrimenti viene utilizzato il corrispondente proposto
+                                    if (NewCorrespondent)
+                                        newCorrispondente = UserManager.addressbookInsertCorrispondente(this, utente, null);
+                                    else
+                                        newCorrispondente = UserManager.getCorrispondentBySystemID(datiModifica.idCorrGlobali);
+
+                                    idCorr = newCorrispondente.systemId;
+                                    InsertComboMailsCorr(idCorr, ref message);
+                                }
+
+                                if (idCorr != null)
+                                {
+                                    NewIdCorr = idCorr;
+                                }
+                                else
+                                {
+                                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningCodeAddressBookExisting', 'warning', '');", true);
+                                    return;
+                                }
+                                break;
+                        }
+                    }//fine if Emanuela occasionale
+                    #region Creazione corrispondente occasionale
+                    else //Se il corrispondente è di tipo occasionale
+                    {
+                        datiModifica.idCorrGlobali = Parameter["systemId"];
+                        datiModifica.codRubrica = this.txt_CodRubrica.Text.TrimStart(" ".ToCharArray()).TrimEnd(" ".ToCharArray());
+                        datiModifica.codiceAmm = this.txt_codAmm.Text;
+                        datiModifica.descCorr = this.txt_email.Text.TrimStart(" ".ToCharArray()).TrimEnd(" ".ToCharArray());
+                        datiModifica.tipoCorrispondente = "O";
+
+                        if (UserManager.DeleteModifyCorrispondenteEsterno(this, datiModifica, flagListe, "M", out idCorr, out message))
+                        {
+                            switch (message)
+                            {
+                                case "OK":
+                                    message = "";
+                                    break;
+                                default:
+                                    message = "WarningAddressBookModifyKo";
+                                    typeMessage = "error";
+                                    break;
+                            }
+
+                            if (message != null && message != "")
+                            {
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('" + message + "', '" + typeMessage + "', '');", true);
+                                return;
+                            }
+                            string sysid_doc = DocumentInWorking.systemId;
+                            DocumentManager.UpdateDocArrivoFromInteropOccasionale(sysid_doc, idCorr);
+                            if (idCorr != null)
+                            {
+                                NewIdCorr = idCorr;
+                            }
+                            else
+                            {
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "parent.ajaxDialogModal('WarningAddressBookModifyKo', 'error', '');", true);
                             }
                         }
-                        #endregion
-                        #endregion
+                    }
+                    #endregion
+                #endregion
                     }
                 }
 
@@ -1854,17 +1811,12 @@ namespace NttDataWA.Popup
                         {
                             this.lbl_registro.Text = this.GetLabel("CorrespondentDetailsRegistry");
                             this.lit_registro.Text = "TUTTI [RC]";
-                            this.ddl_registri.Visible = false;
-                            this.lit_registro.Visible = true;
                         }
                         else
                         {
-                            this.ddl_registri.Visible = true;
-                            this.lit_registro.Visible = false;
                             DocsPaWR.Registro regCorr = UserManager.getRegistroBySistemId(this, this.SenderDetail.idRegistro);
                             if (regCorr != null)
                             {
-                                LoadRegistries(regCorr.codRegistro);
                                 this.lit_registro.Text = regCorr.codRegistro;
                                 if (regCorr.chaRF == "0")
                                     this.lbl_registro.Text = this.GetLabel("CorrespondentDetailsRegistry");
@@ -2032,81 +1984,9 @@ namespace NttDataWA.Popup
             }
         }
 
-        private DocsPaWR.Registro[] getListaRegistri()
-        {
-            //prendo i registri/RF visibili al ruolo dell'utente
-            this.ddl_registri.Enabled = true;
-            //DocsPaWR.Registro[] userRegistri = UserManager.getListaRegistriWithRF(this, "", "");
-            DocsPaWR.Registro[] userRegistri = RegistryManager.GetRegAndRFListInSession();
-            return userRegistri;
-        }
+       
 
-
-        protected void LoadRegistries(string codiceRegistroSelezionato)
-        {
-            DocsPaWR.Registro[] userRegistri = this.getListaRegistri();
-            ddl_registri.Items.Clear();
-            if (userRegistri != null && userRegistri.Length > 0)
-            {
-                //Spaziatura per RF
-                string strText = "";
-                //int contatoreRegRF = 0;
-                for (short iff = 0; iff < 3; iff++)
-                {
-                    strText += " ";
-                }
-
-                //Aggiunta voce su tutti i registri o rf
-                if (UserManager.IsAuthorizedFunctions("DO_INS_CORR_TUTTI"))
-                {
-                    ListItem item = new ListItem();
-                    item.Text = "TUTTI";
-                    item.Value = "";
-                    this.ddl_registri.Items.Add(item);
-                    this.ddl_registri.SelectedIndex = this.ddl_registri.Items.IndexOf(this.ddl_registri.Items.FindByText("TUTTI"));
-                }
-
-                //Aggiunta registri o rf
-                for (int i = 0; i < userRegistri.Length; i++)
-                {
-                    if (!userRegistri[i].Sospeso)
-                    {
-                        if (userRegistri[i].chaRF == "1")
-                        {
-                            //RF
-                            if (UserManager.IsAuthorizedFunctions("DO_INS_CORR_RF"))
-                            {
-                                string testo = strText + userRegistri[i].codRegistro;
-                                ListItem item = new ListItem();
-                                item.Text = testo;
-                                item.Value = userRegistri[i].systemId + "_" + userRegistri[i].rfDisabled + "_" + userRegistri[i].idAOOCollegata;
-                                this.ddl_registri.Items.Add(item);
-                                if (codiceRegistroSelezionato.Equals(userRegistri[i].codRegistro))
-                                    this.ddl_registri.SelectedValue = item.Value;
-                            }
-                        }
-                        else
-                        {
-                            //Registro
-                            if ((UserManager.IsAuthorizedFunctions("DO_INS_CORR_REG") && !userRegistri[i].flag_pregresso))
-                            {
-                                string testo = userRegistri[i].codRegistro;
-                                ListItem item = new ListItem();
-                                item.Text = testo;
-                                item.Value = userRegistri[i].systemId + "_" + userRegistri[i].rfDisabled + "_" + userRegistri[i].idAOOCollegata;
-                                this.ddl_registri.Items.Add(item);
-                                if (codiceRegistroSelezionato.Equals(userRegistri[i].codRegistro))
-                                    this.ddl_registri.SelectedValue = item.Value;
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
-
-
-
+       
 
         protected string GetIdRb(Corrispondente c)
         {
@@ -2622,11 +2502,7 @@ namespace NttDataWA.Popup
             datiModifica.luogoNascita = string.Empty;
             datiModifica.dataNascita = string.Empty;
             datiModifica.titolo = string.Empty;
-            
-            if (this.ddl_registri.SelectedValue != null)
-                datiModifica.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-            else
-                datiModifica.idRegistro = string.Empty;
+            datiModifica.idRegistro = Parameter["IdRegistro"];
         }
 
         /// <summary>
@@ -2659,11 +2535,7 @@ namespace NttDataWA.Popup
             datiModifica.dataNascita = String.Empty;
             datiModifica.luogoNascita = String.Empty;
             datiModifica.titolo = String.Empty;
-
-            if (this.ddl_registri.SelectedValue != null)
-                datiModifica.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-            else
-                datiModifica.idRegistro = string.Empty;
+            datiModifica.idRegistro = Parameter["IdRegistro"];
         }
 
         /// <summary>
@@ -2701,11 +2573,7 @@ namespace NttDataWA.Popup
             datiModifica.luogoNascita = this.txt_luogoNascita.Text;
             datiModifica.dataNascita = this.txt_dataNascita.Text;
             datiModifica.tipoCorrispondente = "P";
-
-            if (this.ddl_registri.SelectedValue != null)
-                datiModifica.idRegistro = this.ddl_registri.SelectedValue.Split('_')[0];
-            else
-                datiModifica.idRegistro = string.Empty;
+            datiModifica.idRegistro = Parameter["IdRegistro"];
         }
 
         protected bool InsertComboMailsCorr(string idCorrispondente, ref string msg)

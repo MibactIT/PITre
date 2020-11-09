@@ -9,17 +9,7 @@
     <script src="../Scripts/chosen.jquery.min.js" type="text/javascript"></script>
     <link href="../Css/chosen.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
-        var fsoApp
-
-        function generateRendomExportFileName() {
-            var text = "_";
-            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-            for (var i = 0; i < 5; i++)
-                text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-            return text;
-        }
+        var fsoApp;
 
         function stampa(componentType) {
             switch(componentType){
@@ -77,19 +67,19 @@
 
 
                 if (typeFile == "PDF") {
-                    filePath = path + "\export" + generateRendomExportFileName() + ".pdf";
+                    filePath = path + "\export.pdf";
                     applName = "Adobe Acrobat";
                 }
                 else if (typeFile == "XLS") {
-                    filePath = path + "\export" + generateRendomExportFileName() + ".xls";
+                    filePath = path + "\export.xls";
                     applName = "Microsoft Excel";
                 }
                 else if (typeFile == "Model") {
-                    filePath = path + "\export" + generateRendomExportFileName() + ".xls";
+                    filePath = path + "\export.xls";
                     applName = "Microsoft Excel";
                 }
                 else if (typeFile == "ODS") {
-                    filePath = path + "\export" + generateRendomExportFileName() + ".ods";
+                    filePath = path + "\export.ods";
                     applName = "Open Office";
                 }
                 /*
@@ -153,19 +143,19 @@
 
                 getSpecialFolder(function (path, connection) {
                     if (typeFile == "PDF") {
-                        filePath = path + "\export" + generateRendomExportFileName() + ".pdf";
+                        filePath = path + "\export.pdf";
                         applName = "Adobe Acrobat";
                     }
                     else if (typeFile == "XLS") {
-                        filePath = path + "\export" + generateRendomExportFileName() + ".xls";
+                        filePath = path + "\export.xls";
                         applName = "Microsoft Excel";
                     }
                     else if (typeFile == "Model") {
-                        filePath = path + "\export" + generateRendomExportFileName() + ".xls";
+                        filePath = path + "\export.xls";
                         applName = "Microsoft Excel";
                     }
                     else if (typeFile == "ODS") {
-                        filePath = path + "\export" + generateRendomExportFileName() + ".ods";
+                        filePath = path + "\export.ods";
                         applName = "Open Office";
                     }
 
@@ -249,19 +239,19 @@
                 path = fso.GetSpecialFolder(2).Path;
 
                 if (typeFile == "PDF") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".pdf";
+                    filePath = path + "\\export.pdf";
                     applName = "Adobe Acrobat";
                 }
                 else if (typeFile == "XLS") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".xls";
+                    filePath = path + "\\export.xls";
                     applName = "Microsoft Excel";
                 }
                 else if (typeFile == "Model") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".xls";
+                    filePath = path + "\\export.xls";
                     applName = "Microsoft Excel";
                 }
                 else if (typeFile == "ODS") {
-                    filePath = path + "\\export" + generateRendomExportFileName() + ".ods";
+                    filePath = path + "\\export.ods";
                     applName = "Open Office";
                 }
              

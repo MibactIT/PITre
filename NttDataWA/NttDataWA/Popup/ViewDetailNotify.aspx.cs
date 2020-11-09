@@ -266,12 +266,15 @@ namespace NttDataWA.Popup
         /// </summary>
         private void BuildNotification()
         {
-            Trasmissione trasm = TrasmManager.GetTransmissionByIdTrasmSing(this.Page,
-                Notification.ID_SPECIALIZED_OBJECT,
-                Notification.DOMAINOBJECT.Equals(NotificationManager.ListDomainObject.DOCUMENT) ? "D" :
-                Notification.DOMAINOBJECT.Equals(NotificationManager.ListDomainObject.FOLDER) ? "F" : string.Empty,
-                Notification.ID_OBJECT);
-            Transmission = trasm;
+            if (Transmission == null)
+            {
+                Trasmissione trasm = TrasmManager.GetTransmissionByIdTrasmSing(this.Page,
+                    Notification.ID_SPECIALIZED_OBJECT,
+                    Notification.DOMAINOBJECT.Equals(NotificationManager.ListDomainObject.DOCUMENT) ? "D" :
+                    Notification.DOMAINOBJECT.Equals(NotificationManager.ListDomainObject.FOLDER) ? "F" : string.Empty,
+                    Notification.ID_OBJECT);
+                Transmission = trasm;
+            }
             if (Transmission != null)
             {
                 TrasmissioneSingola[] listTrasmSing = Transmission.trasmissioniSingole;
@@ -2417,9 +2420,6 @@ namespace NttDataWA.Popup
                             case 2:
                                 returnMsg += "WarningDocumentNoClassificatedSelect";
                                 retMes2 = fasc.descrizione;
-                                break;
-                            case 3:
-                                returnMsg += "WarningBloccoModificheDocumentoInLf";
                                 break;
                         }
 

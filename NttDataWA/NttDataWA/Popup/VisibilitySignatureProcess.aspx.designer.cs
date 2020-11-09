@@ -13,103 +13,13 @@ namespace NttDataWA.Popup {
     public partial class VisibilitySignatureProcess {
         
         /// <summary>
-        /// AddFilterVisibilitySignatureProcess control.
+        /// UpdPnlContainer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 AddFilterVisibilitySignatureProcess;
-        
-        /// <summary>
-        /// ExportDati control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 ExportDati;
-        
-        /// <summary>
-        /// PnlAggiungiVisibilita control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlAggiungiVisibilita;
-        
-        /// <summary>
-        /// LtlAssegnaVisibilita control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal LtlAssegnaVisibilita;
-        
-        /// <summary>
-        /// LtlTipoVisibilita control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal LtlTipoVisibilita;
-        
-        /// <summary>
-        /// RblTipoVisibilita control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList RblTipoVisibilita;
-        
-        /// <summary>
-        /// rb_proponente control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.ListItem rb_proponente;
-        
-        /// <summary>
-        /// rb_monitoratore control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.ListItem rb_monitoratore;
-        
-        /// <summary>
-        /// LitVisibilitySignatureProcessCorr control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal LitVisibilitySignatureProcessCorr;
-        
-        /// <summary>
-        /// UpdPnlAction control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdPnlAction;
-        
-        /// <summary>
-        /// BtnAddressBook control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton BtnAddressBook;
+        protected global::System.Web.UI.UpdatePanel UpdPnlContainer;
         
         /// <summary>
         /// UpdPnlCorr control.
@@ -121,13 +31,13 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.UpdatePanel UpdPnlCorr;
         
         /// <summary>
-        /// idRuoloTitolare control.
+        /// LitVisibilitySignatureProcessCorr control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField idRuoloTitolare;
+        protected global::System.Web.UI.WebControls.Literal LitVisibilitySignatureProcessCorr;
         
         /// <summary>
         /// TxtCodeCorr control.
@@ -175,6 +85,24 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.Button btnRecipient;
         
         /// <summary>
+        /// BtnAddressBook control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomImageButton BtnAddressBook;
+        
+        /// <summary>
+        /// BtnAddRole control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomImageButton BtnAddRole;
+        
+        /// <summary>
         /// UpnlGrid control.
         /// </summary>
         /// <remarks>
@@ -211,51 +139,6 @@ namespace NttDataWA.Popup {
         protected global::System.Web.UI.WebControls.HiddenField grid_pageindex;
         
         /// <summary>
-        /// UpPnlFilter control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPnlFilter;
-        
-        /// <summary>
-        /// IndexImgAddFilter control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton IndexImgAddFilter;
-        
-        /// <summary>
-        /// IndexImgRemoveFilter control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton IndexImgRemoveFilter;
-        
-        /// <summary>
-        /// UpPnlGridProcessRole control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPnlGridProcessRole;
-        
-        /// <summary>
-        /// plcGridProcessRole control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder plcGridProcessRole;
-        
-        /// <summary>
         /// UpPnlButtons control.
         /// </summary>
         /// <remarks>
@@ -263,24 +146,6 @@ namespace NttDataWA.Popup {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.UpdatePanel UpPnlButtons;
-        
-        /// <summary>
-        /// BtnAssegnaVisibilita control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton BtnAssegnaVisibilita;
-        
-        /// <summary>
-        /// BtnEsportaVisibilita control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton BtnEsportaVisibilita;
         
         /// <summary>
         /// BtnClose control.

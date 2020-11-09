@@ -144,12 +144,11 @@
      </fieldset> 
     </div>
 
+    <div class="row">
 
 
     <%--   ALTRI FILTRI--%>
         <asp:Panel ID="pnlAltriFiltri" runat="server" >
-            
-    <div class="row">
         <fieldset class="filterAddressbook"  style="width:99%;">
         <asp:UpdatePanel ID="upPnlData" runat="server" >
         <ContentTemplate>
@@ -196,12 +195,12 @@
             </ContentTemplate>
             </asp:UpdatePanel>
         </fieldset>
-            </div>
         </asp:Panel>
 
+    </div>
     <!-- Filtro Registro Casella mittente -->
+    <div class ="row">
     <asp:Panel ID="pnlRegistroCasella" runat="server">
-            <div class ="row">
     <fieldset class="filterAddressbook"  style="width:99%;">
     <asp:UpdatePanel ID="upPnlRegistroCasella" runat="server" UpdateMode="Conditional"><ContentTemplate>
     <div class="row">
@@ -217,9 +216,9 @@
                     </div>
                     </ContentTemplate></asp:UpdatePanel>
             </fieldset>
-                    </div>
     </asp:Panel>
     
+    </div>
 
    <%-- <div class="row"><br /></div>--%>
 

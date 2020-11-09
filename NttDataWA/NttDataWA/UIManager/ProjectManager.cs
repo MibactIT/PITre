@@ -424,6 +424,38 @@ namespace NttDataWA.UIManager
             }
         }
 
+        public static DocsPaWR.Folder[] getListaFolderDaCodiceFascicolo(Page page, string codFascicolo, string descrFolder, DocsPaWR.Registro reg, string insRic)
+        {
+            try
+            {
+                InfoUtente infoUtente = UserManager.GetInfoUser();
+
+                //bool enableUfficioRef = (ConfigSettings.getKey(ConfigSettings.KeysENUM.ENABLE_UFFICIO_REF) != null
+                //    && ConfigSettings.getKey(ConfigSettings.KeysENUM.ENABLE_UFFICIO_REF).Equals("1"));
+                bool enableUfficioRef = (Utils.InitConfigurationKeys.GetValue("0", DBKeys.ENABLE_UFFICIO_REF.ToString())) != null
+                    && Utils.InitConfigurationKeys.GetValue("0", DBKeys.ENABLE_UFFICIO_REF.ToString()).Equals("1");
+
+                bool enableProfilazione = false;
+                if (System.Configuration.ConfigurationManager.AppSettings["ProfilazioneDinamicaFasc"] != null && System.Configuration.ConfigurationManager.AppSettings["ProfilazioneDinamicaFasc"] == "1")
+                    enableProfilazione = true;
+
+                DocsPaWR.Folder[] result = docsPaWS.FascicolazioneGetListaFolderDaCodiceInsRic(infoUtente, codFascicolo, descrFolder, reg, enableUfficioRef, enableProfilazione, insRic);
+
+                if (result == null)
+                {
+                    //throw new Exception();
+                }
+
+                return result;
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+                return null;
+            }
+        }
+
+
         public static void setCodiceFascRapida(Page page, string codiceFascRapida)
         {
             try
@@ -718,6 +750,59 @@ namespace NttDataWA.UIManager
 
             }
         }
+
+
+
+        #region set - get folder in session 
+        /// <summary>
+        /// restituisce il sottofascicolo selezionato
+        /// </summary>
+        /// <returns></returns>
+        public static Folder getFolderInSession()
+        {
+            try
+            {
+                return (Folder)HttpContext.Current.Session["SottofascicoloSelezionato"];
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// setat il sottofascicolo selezionato
+        /// </summary>
+        /// <param name="fascicolo"></param>
+        public static void setFolderInSession(Folder folder)
+        {
+            try
+            {
+                HttpContext.Current.Session["SottofascicoloSelezionato"] = folder;
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+
+            }
+        }
+
+        /// <summary>
+        /// rimuove dalla sessione il  sottofascicolo selezionato
+        /// </summary>
+        public static void removeFolderInSession()
+        {
+            try
+            {
+                HttpContext.Current.Session.Remove("SottofascicoloSelezionato");
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+            }
+        }
+        #endregion
 
         //Laura 19 Marzo
         public static void setProjectInSessionForRicFasc(string codClassifica)
@@ -1429,6 +1514,7 @@ namespace NttDataWA.UIManager
             }
             return;
         }
+
 
         public static bool CanRemoveFascicolo(Page page, string project_Id, out string nFasc)
         {
@@ -2275,104 +2361,6 @@ namespace NttDataWA.UIManager
             return null;
         }
 		
-		public static bool InsertDescrizioneFascicolo(DocsPaWR.DescrizioneFascicolo descFasc, out ResultDescrizioniFascicolo resultInsertDescrizioniFascicolo)
-        {
-            resultInsertDescrizioniFascicolo = ResultDescrizioniFascicolo.OK;
-            try
-            {
-                return docsPaWS.InsertDescrizioneFascicolo(descFasc, UserManager.GetInfoUser(), out resultInsertDescrizioniFascicolo);
-            }
-            catch (System.Web.Services.Protocols.SoapException es)
-            {
-                UIManager.AdministrationManager.DiagnosticError(es);
-                return false;
-            }
-        }
-
-        public static List<DescrizioneFascicolo> GetListDescrizioniFascicolo(List<FiltroDescrizioniFascicolo> filters, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            numTotPage = 0;
-            nRec = 0;
-            return docsPaWS.GetListDescrizioniFascicolo(filters.ToArray(), UserManager.GetInfoUser(), numPage, pageSize, out numTotPage, out nRec).ToList();
-        }
-
-        public static bool AggiornaDescrizioneFascicolo(DescrizioneFascicolo descFasc, out ResultDescrizioniFascicolo resultUpdateDescrizioniFascicolo)
-        {
-            resultUpdateDescrizioniFascicolo = ResultDescrizioniFascicolo.OK;
-            try
-            {
-                return docsPaWS.AggiornaDescrizioneFascicolo(descFasc, UserManager.GetInfoUser(), out resultUpdateDescrizioniFascicolo);
-            }
-            catch (System.Web.Services.Protocols.SoapException es)
-            {
-                UIManager.AdministrationManager.DiagnosticError(es);
-                return false;
-            }
-        }
-
-        public static bool EliminaDescrizioneFascicolo(string systemId)
-        {
-            try
-            {
-                return docsPaWS.EliminaDescrizioneFascicolo(systemId, UserManager.GetInfoUser());
-            }
-            catch (System.Web.Services.Protocols.SoapException es)
-            {
-                UIManager.AdministrationManager.DiagnosticError(es);
-                return false;
-            }
-        }
-
-        public static DocsPaWR.StoricoProfilati[] getStoriaProfilatiFasc(DocsPaWR.Templates template, string idProject)
-        {
-            try
-            {
-                DocsPaWR.StoricoProfilati[] result = docsPaWS.FascicoloGetListaStoricoProfilati(template.SYSTEM_ID.ToString(), idProject);
-
-                if (result == null)
-                {
-                    throw new Exception();
-                }
-
-                return result;
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return null;
-            }
-        }
-
-        public static bool ExistsTrasmPendenteConWorkflowFascicolo(string idProject, string idRuoloInUO, string idPeople)
-        {
-            bool result = false;
-            InfoUtente infoUtente = UserManager.GetInfoUser();
-            try
-            {
-                return docsPaWS.ExistsTrasmPendenteConWorkflowFascicolo(idProject, idRuoloInUO, idPeople, infoUtente);
-            }
-            catch (Exception e)
-            {
-
-            }
-
-            return result;
-        }
-
-        public static bool ExistsTrasmPendenteSenzaWorkflowFascicolo(string idProject, string idRuoloInUO, string idPeople)
-        {
-            bool result = false;
-            InfoUtente infoUtente = UserManager.GetInfoUser();
-            try
-            {
-                return docsPaWS.ExistsTrasmPendenteSenzaWorkflowFascicolo(idProject, idRuoloInUO, idPeople, infoUtente);
-            }
-            catch (Exception e)
-            {
-
-            }
-
-            return result;
-        }
+		
     }
 }

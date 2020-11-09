@@ -34,7 +34,7 @@
                 return false;
             }
         }
-<%--        /*
+        /*
         // Firma digitale di più documenti
         function SignDocuments(docs, pdfConv) {
             var retValue = true;
@@ -46,7 +46,7 @@
             }
 
             return retValue;
-        }*/--%>
+        }*/
 
         
         // Firma digitale di più documenti

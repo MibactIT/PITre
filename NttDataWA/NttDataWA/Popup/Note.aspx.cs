@@ -175,9 +175,7 @@ namespace NttDataWA.Popup
                 bool result = true;
                 if (TypeCaller.Equals("D"))
                 {
-                    //elimino il controllo per documenti consolidati 
-                    //if ((this.DocumentInWorking!=null && this.DocumentInWorking.ConsolidationState!=null && this.DocumentInWorking.ConsolidationState.State == DocumentConsolidationStateEnum.Step2) || (!string.IsNullOrEmpty(this.DocumentInWorking.inCestino) && this.DocumentInWorking.inCestino == "1")) result = false;
-                    if (this.DocumentInWorking != null && !string.IsNullOrEmpty(this.DocumentInWorking.inCestino) && this.DocumentInWorking.inCestino == "1") result = false;
+                    if ((this.DocumentInWorking!=null && this.DocumentInWorking.ConsolidationState!=null && this.DocumentInWorking.ConsolidationState.State == DocumentConsolidationStateEnum.Step2) || (!string.IsNullOrEmpty(this.DocumentInWorking.inCestino) && this.DocumentInWorking.inCestino == "1")) result = false;
                 }
                 return result;
             }

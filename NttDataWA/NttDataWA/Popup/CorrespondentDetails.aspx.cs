@@ -865,7 +865,6 @@ namespace NttDataWA.Popup
                     this.txt_dtnasc.Text = corrDetails.BirthDay;
                     this.txt_codfisc.Text = corrDetails.TaxId;
                     this.txt_partita_iva.Text = corrDetails.CommercialId;
-                    this.txt_note.Text = corrDetails.Note;
                     //this.txt_codice_ipa.Text = corrDetails.IpaCode;
                 }
             }

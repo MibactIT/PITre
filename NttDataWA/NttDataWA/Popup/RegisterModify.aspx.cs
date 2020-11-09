@@ -83,7 +83,11 @@ namespace NttDataWA.Popup
                     register.Mail.PasswordSMTP = this.RegisterModifyNewPwTxt.Text;
                     casellaDaAggiornare.PwdMail = this.RegisterModifyNewPwTxt.Text;
                     casellaDaAggiornare.PwdSMTP = this.RegisterModifyNewPwTxt.Text;
-                    ValidationResultInfo result = GestManager.UpdateRegistro(register);
+                    ValidationResultInfo result = new ValidationResultInfo();
+                    if (casellaDaAggiornare.Principale.Equals("1"))
+                        result = GestManager.UpdateRegistro(register);
+                    else
+                        result.Value = true;
                     if (result.Value)
                     {
                         result = GestManager.UpdateMailRegistro(register.IDRegistro, new CasellaRegistro[] { casellaDaAggiornare });

@@ -70,18 +70,6 @@ namespace NttDataWA.Project
                 HttpContext.Current.Session["listToSign"] = value;
             }
         }
-
-        private DescrizioneFascicolo DescrizioneFascicoloSelezionata
-        {
-            get
-            {
-                return HttpContext.Current.Session["DescrizioneFascicoloSelezionata"] as DescrizioneFascicolo;
-            }
-            set
-            {
-                HttpContext.Current.Session["DescrizioneFascicoloSelezionata"] = value;
-            }
-        }
         #endregion
 
         #region caricamento della pagina
@@ -89,6 +77,12 @@ namespace NttDataWA.Project
 
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            //Reset titolario 
+            if (HttpContext.Current.Session["Titolario"] != null)
+            {
+                HttpContext.Current.Session["Titolario"] = null;
+            }
             //try {
             if (!IsPostBack)
             {
@@ -113,7 +107,7 @@ namespace NttDataWA.Project
                 //***************************************************************
                 //FINE
                 //***************************************************************
-
+                
                 //ABBATANGELI - Fascicolo cancellato da utente
                 if (UIManager.ProjectManager.getProjectInSession() != null && UIManager.ProjectManager.getProjectInSession().stato == "DELETED")
                 {
@@ -179,6 +173,7 @@ namespace NttDataWA.Project
                     this.projectBtnSave.Visible = false;
                     this.projectBtnSaveAndAcceptDocument.Visible = true;
                 }
+
             }
             else
             {
@@ -192,13 +187,11 @@ namespace NttDataWA.Project
                             break;
                     }
                 }
-
                 if (this.CustomProject)
                 {
                     this.PnlTypeDocument.Controls.Clear();
                     if (!string.IsNullOrEmpty(this.projectDdlTipologiafascicolo.SelectedValue))
                     {
-                        this.ProjectImgHistoryTipology.Visible = true;
                         if (this.TemplateProject == null || !this.TemplateProject.SYSTEM_ID.Equals(this.projectDdlTipologiafascicolo.SelectedValue))
                         {
                             if (UIManager.ProjectManager.getProjectInSession() != null && !string.IsNullOrEmpty(UIManager.ProjectManager.getProjectInSession().systemID) && UIManager.ProjectManager.getProjectInSession().template != null && UIManager.ProjectManager.getProjectInSession().template.SYSTEM_ID != null && UIManager.ProjectManager.getProjectInSession().template.SYSTEM_ID != 0)
@@ -295,40 +288,6 @@ namespace NttDataWA.Project
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "popupObject", "document.getElementById('ifrm_CreateNewDocument').contentWindow.closeObjectPopup();", true);
                 }
-
-                if (!string.IsNullOrEmpty(this.MassiveTransmissionAccept.ReturnValue))
-                {
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('MassiveTransmissionAccept','');", true);
-                    string accessRights = ProjectManager.GetAccessRightFascBySystemID(fascicolo.systemID);
-                    fascicolo.accessRights = accessRights;
-                    ProjectManager.setProjectInSession(fascicolo);
-                    this.ProjectBtnAccept.Visible = ProjectManager.ExistsTrasmPendenteConWorkflowFascicolo(fascicolo.systemID, UIManager.RoleManager.GetRoleInSession().systemId, UserManager.GetUserInSession().idPeople);
-                    switch ((HMdiritti)Enum.Parse(typeof(HMdiritti), fascicolo.accessRights))
-                    {
-                        case HMdiritti.HDdiritti_Waiting:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelWaiting", UserManager.GetUserLanguage());
-                            break;
-                        case HMdiritti.HMdiritti_Read:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelReadOnly", UserManager.GetUserLanguage());
-                            break;
-                        case HMdiritti.HMdiritti_Proprietario:
-                        case HMdiritti.HMdiritti_Write:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelRW", UserManager.GetUserLanguage());
-                            break;
-                    }
-                    if (!string.IsNullOrEmpty(fascicolo.accessRights) && Convert.ToInt32(fascicolo.accessRights) > Convert.ToInt32(HMdiritti.HMdiritti_Read))
-                    {
-                        this.projectBntChiudiFascicolo.Enabled = true;
-                        if(fascicolo.stato.Equals("C"))
-                            this.abilitazioneElementi(false, true);
-                        else
-                            this.abilitazioneElementi(true, false);
-                        EnableEditMode();
-                    }
-                    this.UpContainer.Update();
-                    this.UpDirittiFascicolo.Update();
-                    this.upPnlButtons.Update();
-                }
             }
 
             if (this.ShowGridPersonalization)
@@ -375,17 +334,6 @@ namespace NttDataWA.Project
 
                     return;
                 }
-            }
-            if(!string.IsNullOrEmpty(this.DescriptionProjectList.ReturnValue))
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('DescriptionProjectList','');", true);
-                if (this.DescrizioneFascicoloSelezionata != null)
-                {
-                    this.projectTxtDescrizione.Text = this.DescrizioneFascicoloSelezionata.Descrizione;
-                    this.DescrizioneFascicoloSelezionata = null;
-                    this.upnBtnTitolario.Update();
-                }
-                return;
             }
         }
 
@@ -805,8 +753,6 @@ namespace NttDataWA.Project
 
                 if (this.SearchDocumentDdlMassiveOperation.SelectedValue == "MASSIVEXPORTDOC")
                 {
-                    //Svuoto eventuali sessioni impostate in ricerche precedenti.
-                    Session["ricDoc.listaFiltri"] = null;
                     ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ExportDati", "ajaxModalPopupExportDati();", true);
                 }
 
@@ -962,7 +908,8 @@ namespace NttDataWA.Project
                 this.projectImgImportDocSocket.Enabled = true;
                 this.EnableEditMode();
                 this.PopulateProject();
-
+                this.projectBtnRedirect.Visible = (fascicolo.template != null && fascicolo.template.PROCEDIMENTALE == "1");
+                this.projectBtnRedirect.Enabled = !ProceedingsManager.CheckProcedimentoReindirizzato(fascicolo.systemID);
             }
             else
             {
@@ -980,6 +927,8 @@ namespace NttDataWA.Project
                 this.projectBtnAdlRole.Enabled = false;
                 this.projectBntChiudiFascicolo.Enabled = false;
                 this.projectBntCancellaFascicolo.Enabled = false;
+                this.projectBtnRedirect.Visible = false;
+		 
                 this.ShowGrid(GridManager.SelectedGrid, this.Result, this.RecordCount, this.SelectedPage, this.Labels.ToArray<EtichettaInfo>());
             }
 
@@ -1307,10 +1256,6 @@ namespace NttDataWA.Project
             {
                 this.ProjectCheckPublic.Visible = true;
             }
-            //if (UIManager.UserManager.IsAuthorizedFunctions("DO_DESCRIZIONI_FASC"))
-            //{
-            //    this.ProjectImgDescrizioni.Visible = true;
-            //}
         }
 
         private void LoadMassiveOperation()
@@ -1483,9 +1428,10 @@ namespace NttDataWA.Project
             this.projectBtnSaveAndAcceptDocument.Text = Utils.Languages.GetLabelFromCode("projectBtnSave", language);
             this.projectBtnSaveAndAcceptDocument.ToolTip = Utils.Languages.GetLabelFromCode("projectBtnSaveAndAcceptDocumentTooltip", language);
             this.projectBntChiudiFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntChiudiApriFascicolo", language);
-            this.projectBntCancellaFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntCancellaFascicolo", language);
+            this.projectBntCancellaFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntCancellaFascicolo", language);			   																							  
             this.projectBtnAdL.Text = Utils.Languages.GetLabelFromCode("DocumentBtnAdL", language);
             this.projectBtnAdlRole.Text = Utils.Languages.GetLabelFromCode("DocumentBtnAdLRole", language);
+            this.projectBtnRedirect.Text = Utils.Languages.GetLabelFromCode("projectBtnRedirect", language);
             this.projectImgRemoveFilter.ToolTip = Utils.Languages.GetLabelFromCode("projectImgRemoveFilter", language);
             this.projectImgAddDoc.ToolTip = Utils.Languages.GetLabelFromCode("projectImgAddDoc", language);
             this.projectImgAddDoc.AlternateText = Utils.Languages.GetLabelFromCode("projectImgAddDoc", language);
@@ -1578,17 +1524,11 @@ namespace NttDataWA.Project
             this.InfoSignatureProcessesStarted.Title = Utils.Languages.GetLabelFromCode("InfoSignatureProcessesStarted", language);
             this.projectImgNewDocument.ToolTip = Utils.Languages.GetLabelFromCode("ProjectNewDocument", language);
             this.CreateNewDocument.Title = Utils.Languages.GetLabelFromCode("ProjectCreateNewDocument", language);
+            this.RedirectProject.Title = Utils.Languages.GetLabelFromCode("ProjectRedirectProject", language);
             this.Object.Title = Utils.Languages.GetLabelFromCode("AddFilterObjectTitle", language);
             this.DetailsLFAutomaticMode.Title = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeTitle", language);
             this.MassiveReportDragAndDrop.Title = Utils.Languages.GetLabelFromCode("MassiveReportDragAndDropTitle", language);
             this.ProjectLitTransmRapid.Text = Utils.Languages.GetLabelFromCode("TransmissionLitRapidTransmission", language);
-            //this.ProjectImgDescrizioni.ToolTip = Utils.Languages.GetLabelFromCode("ProjectImgDescrizioni", language);
-            this.DescriptionProjectList.Title = Utils.Languages.GetLabelFromCode("DescriptionProjectListTitle", language);
-            this.ProjectImgHistoryTipology.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgHistoryTipology", language);
-            this.ProjectBtnAccept.Text = Utils.Languages.GetLabelFromCode("ProjectBtnAccept", language);
-            this.ProjectBtnView.Text = Utils.Languages.GetLabelFromCode("ProjectBtnView", language);
-            this.LblDiritti.Text = Utils.Languages.GetLabelFromCode("ProjectLblDiritti", language);
-            this.MassiveTransmissionAccept.Title = Utils.Languages.GetLabelFromCode("MassiveTransmissionAcceptTitle", language);
         }
 
         private string GetLabel(string id)
@@ -1727,6 +1667,16 @@ namespace NttDataWA.Project
                 this.SelectedRow = string.Empty;
                 this.SearchFilters = null;
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('CreateNewDocument','')", true);
+            }
+            if(!string.IsNullOrEmpty(this.RedirectProject.ReturnValue))
+            {
+                this.SelectedPage = 1;
+                this.UpContainerProjectTab.Update();
+                this.UpnlTabHeader.Update();
+                this.SelectedRow = string.Empty;
+                this.SearchFilters = null;
+                this.projectBtnRedirect.Enabled = !ProceedingsManager.CheckProcedimentoReindirizzato(UIManager.ProjectManager.getProjectInSession().systemID);
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('RedirectProject','')", true);
             }
 
             if (!string.IsNullOrEmpty(this.ImportDocumentApplet.ReturnValue))
@@ -2666,6 +2616,16 @@ namespace NttDataWA.Project
                         fascicolo.privato = "0";
                     }
 
+                    //Se la chiave è ad 1 il ruolo publico non è configurato correttamente
+                    if (this.ProjectCheckPublic.Checked && 
+                        !string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, DBKeys.ENABLE_FASCICOLO_PUBBLICO.ToString())) && 
+                        Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, DBKeys.ENABLE_FASCICOLO_PUBBLICO.ToString()).Equals("1"))
+                    {
+                        msg = "ErrorCreateProjectPubblico";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'warning');} else {parent.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'warning');}", true);
+                        return;
+                    }
+
                     fascicolo.pubblico = this.ProjectCheckPublic.Checked;
 
                     if (!string.IsNullOrEmpty(this.projectTxtdata.Text))
@@ -2676,6 +2636,7 @@ namespace NttDataWA.Project
                     {
                         fascicolo.dtaLF = string.Empty;
                     }
+
 
                     //PROFILAZIONE DINAMICA
                     if (!string.IsNullOrEmpty(this.projectDdlTipologiafascicolo.SelectedValue))
@@ -2870,6 +2831,8 @@ namespace NttDataWA.Project
                     ImgFolderRemove.Enabled = !fascicolo.HasStrutturaTemplate;
                     upnlStruttura.Update();
 
+
+                    
                     if (fascicolo != null && fascicolo.folderSelezionato.childs != null)
                     {
                         if (fascicolo.template.SYSTEM_ID == 0)
@@ -3089,12 +3052,14 @@ namespace NttDataWA.Project
                             this.projectBntChiudiFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntChiudiChiudiFascicolo", language);
                             //this.projectImgAddDoc.Enabled = true;
                             this.projectBntCancellaFascicolo.Enabled = false;
+																			 
                             break;
                         }
                     case "C":
                         {
                             this.projectBntChiudiFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntChiudiApriFascicolo", language);
                             this.projectBntCancellaFascicolo.Enabled = true;
+																			
                             this.abilitazioneElementi(false, true);
                             break;
                         }
@@ -3175,7 +3140,6 @@ namespace NttDataWA.Project
 
                 if (fascicolo.template != null && fascicolo.template.SYSTEM_ID != 0)
                 {
-                    this.ProjectImgHistoryTipology.Visible = true;
                     this.projectDdlTipologiafascicolo.Enabled = false;
                     ListItem item = new ListItem();
                     item.Value = fascicolo.template.SYSTEM_ID.ToString();
@@ -3215,25 +3179,6 @@ namespace NttDataWA.Project
                 ImgFolderAdd.Enabled = !fascicolo.HasStrutturaTemplate;
                 ImgFolderModify.Enabled = !fascicolo.HasStrutturaTemplate;
                 ImgFolderRemove.Enabled = !fascicolo.HasStrutturaTemplate;
-
-                this.ProjectBtnAccept.Visible = ProjectManager.ExistsTrasmPendenteConWorkflowFascicolo(fascicolo.systemID, UIManager.RoleManager.GetRoleInSession().systemId, UserManager.GetUserInSession().idPeople);
-                this.ProjectBtnView.Visible = ProjectManager.ExistsTrasmPendenteSenzaWorkflowFascicolo(fascicolo.systemID, UIManager.RoleManager.GetRoleInSession().systemId, UserManager.GetUserInSession().idPeople);
-                this.PnlDirittiFascicolo.Visible = true;
-                switch ((HMdiritti)Enum.Parse(typeof(HMdiritti), fascicolo.accessRights))
-                {
-                    case HMdiritti.HDdiritti_Waiting:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelWaiting", language);
-                        break;
-                    case HMdiritti.HMdiritti_Read:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelReadOnly", language);
-                        break;
-                    case HMdiritti.HMdiritti_Proprietario:
-                    case HMdiritti.HMdiritti_Write:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelRW", language);
-                        break;
-                }
-                this.UpDirittiFascicolo.Update();
-
             }
         }
 
@@ -3299,6 +3244,7 @@ namespace NttDataWA.Project
                 //abilitazione/disabilitazione componenti
                 this.projectBntChiudiFascicolo.Enabled = true;
                 this.projectBntCancellaFascicolo.Enabled = true;
+																
                 this.projectBtnAdL.Enabled = true;
                 this.projectBtnAdlRole.Enabled = true;
                 this.SearchDocumentDdlMassiveOperation.Enabled = true;
@@ -3323,11 +3269,14 @@ namespace NttDataWA.Project
                 //stato del fascicolo
                 switch (fascicolo.stato)
                 {
-                    case "A": this.projectBntChiudiFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntChiudiChiudiFascicolo", language);
+                    case "A": this.projectBntChiudiFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntChiudiChiudiFascicolo", language); 
                         this.projectBntCancellaFascicolo.Enabled = false;
                         break;
+																		 
+							  
                     case "C": this.projectBntChiudiFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntChiudiApriFascicolo", language);
                         this.projectBntCancellaFascicolo.Enabled = true;
+																		
                         this.projectBtnSave.Enabled = false;
                         this.SearchDocumentDdlMassiveOperation.Enabled = false;
                         this.projectBtnAdL.Enabled = false;
@@ -3352,22 +3301,6 @@ namespace NttDataWA.Project
                 ImgFolderAdd.Enabled = !fascicolo.HasStrutturaTemplate;
                 ImgFolderModify.Enabled = !fascicolo.HasStrutturaTemplate;
                 ImgFolderRemove.Enabled = !fascicolo.HasStrutturaTemplate;
-                
-                this.PnlDirittiFascicolo.Visible = true;
-                switch ((HMdiritti)Enum.Parse(typeof(HMdiritti), fascicolo.accessRights))
-                {
-                    case HMdiritti.HDdiritti_Waiting:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelWaiting", language);
-                        break;
-                    case HMdiritti.HMdiritti_Read:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelReadOnly", language);
-                        break;
-                    case HMdiritti.HMdiritti_Proprietario:
-                    case HMdiritti.HMdiritti_Write:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelRW", language);
-                        break;
-                }
-                this.UpDirittiFascicolo.Update();
             }
 
         }
@@ -3387,7 +3320,6 @@ namespace NttDataWA.Project
 
         //    return text;
         //}
-
         protected void projectBntCancellaFascicolo_Click(object sender, EventArgs e)
         {
             try
@@ -3396,7 +3328,7 @@ namespace NttDataWA.Project
                 Fascicolo fascicolo = UIManager.ProjectManager.getProjectInSession();
                 if (fascicolo.stato.Equals("C"))
                 {
-                    if (!ProjectManager.CanRemoveFascicoloPrincipale(this, fascicolo.systemID,out nDoc))
+                    if (!ProjectManager.CanRemoveFascicoloPrincipale(this, fascicolo.systemID, out nDoc))
                     {
                         string msg = "WarningProjectImpossibleDelete";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'warning', '', '" + utils.FormatJs(nDoc) + "');} else {parent.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'warning', '', '" + utils.FormatJs(nDoc) + "');}", true);
@@ -3469,6 +3401,7 @@ namespace NttDataWA.Project
                 UIManager.ProjectManager.setProjectInSession(fascicolo);
                 this.projectBntChiudiFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntChiudiApriFascicolo", UIManager.UserManager.GetUserLanguage());
                 this.projectBntCancellaFascicolo.Enabled = true;
+																
                 this.UpdateOpenCloseProject();
             }
             else
@@ -3497,15 +3430,15 @@ namespace NttDataWA.Project
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'info');} else {parent.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'info');}", true);
                 }
             }
-            else 
+            else
             {
                 msg = "WarningProjectDirittoMancantePerCancellazione";
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'warning');} else {parent.ajaxDialogModal('" + utils.FormatJs(msg) + "', 'warning');}", true);
             }
 
         }
-
-        /// <summary>
+																					 
+		/// <summary>
         /// consente l'apertura di un fascicolo
         /// </summary>
         private void apriFascicolo(Fascicolo fascicolo, InfoUtente infoutente)
@@ -3526,6 +3459,7 @@ namespace NttDataWA.Project
                 UIManager.ProjectManager.setProjectInSession(fascicolo);
                 projectBntChiudiFascicolo.Text = Utils.Languages.GetLabelFromCode("projectBntChiudiChiudiFascicolo", UIManager.UserManager.GetUserLanguage());
                 this.projectBntCancellaFascicolo.Enabled = false;
+
                 UpdateOpenCloseProject();
             }
 
@@ -3756,7 +3690,6 @@ namespace NttDataWA.Project
         private void abilitazioneElementi(bool attiva, bool close)
         {
             this.projectTxtDescrizione.ReadOnly = !attiva;
-            //this.ProjectImgDescrizioni.Enabled = attiva;
 
             this.projectDdlTipologiafascicolo.Enabled = attiva;
             this.projectTxtCodiceCollocazione.ReadOnly = !attiva;
@@ -5527,12 +5460,15 @@ namespace NttDataWA.Project
         //evento delle icone della griglia
         protected void ImageButton_Click(object sender, ImageClickEventArgs e)
         {
+            string desc = null;
             CustomImageButton btnIm = (CustomImageButton)sender;
             GridViewRow row = (GridViewRow)btnIm.Parent.Parent;
             int rowIndex = row.RowIndex;
             string idProfile = GrigliaResult.Rows[rowIndex]["IdProfile"].ToString();
             SchedaDocumento schedaDocumento = UIManager.DocumentManager.getDocumentDetails(this, idProfile, idProfile);
             Fascicolo fascicolo = UIManager.ProjectManager.getProjectInSession();
+
+
             InfoUtente infoUtente = UIManager.UserManager.GetInfoUser();
             bool search = false;
             string language = UIManager.UserManager.GetUserLanguage();
@@ -5761,6 +5697,12 @@ namespace NttDataWA.Project
                     {
                         CreaPredispostoInRisposta(schedaDocumento);
 
+                        if (!fascicolo.folderSelezionato.livello.Equals("0"))
+                        {
+                            desc = fascicolo.folderSelezionato.descrizione.Substring(fascicolo.folderSelezionato.descrizione.IndexOf('-') + 2);
+                            fascicolo.folderSelezionato.descrizione = desc;
+                        }
+                        
                         HttpContext.Current.Session["isZoom"] = null;
                         List<Navigation.NavigationObject> navigationList = Navigation.NavigationUtils.GetNavigationList();
                         Navigation.NavigationObject obj = navigationList.Last();
@@ -5906,7 +5848,7 @@ namespace NttDataWA.Project
 
             if (!string.IsNullOrEmpty(this.projectDdlTipologiafascicolo.SelectedValue))
             {
-                this.ProjectImgHistoryTipology.Visible = true;
+                //this.ProjectImgHistoryTipology.Visible = true;
                 if (this.CustomProject)
                 {
 
@@ -5992,7 +5934,7 @@ namespace NttDataWA.Project
             else
             {
                 this.TemplateProject = null;
-                this.ProjectImgHistoryTipology.Visible = false;
+                //this.ProjectImgHistoryTipology.Visible = false;
                 if (this.EnableStateDiagram)
                 {
                     this.DocumentDdlStateDiagram.ClearSelection();
@@ -6328,7 +6270,7 @@ namespace NttDataWA.Project
                 {
                     //blocco storico profilazione campi di testo 
                     //salvo il valore corrente del campo di testo in oldObjCustom.
-                    oldObjText.IDTemplate = this.TemplateProject.ID_TIPO_FASC;
+                    oldObjText.IDTemplate = this.TemplateProject.ID_TIPO_ATTO;
                     oldObjText.ID_Doc_Fasc = ProjectManager.getProjectInSession().systemID;
                     oldObjText.ID_Oggetto = oggettoCustom.SYSTEM_ID.ToString();
                     oldObjText.Valore = oggettoCustom.VALORE_DATABASE;
@@ -6799,7 +6741,7 @@ namespace NttDataWA.Project
                                 oggettoCustom.VALORI_SELEZIONATI[x] : "*#?" + oggettoCustom.VALORI_SELEZIONATI[x];
                     }
                     InfoUtente user = UserManager.GetInfoUser();
-                    casellaSelOldObj.IDTemplate = this.TemplateProject.ID_TIPO_FASC;
+                    casellaSelOldObj.IDTemplate = this.TemplateProject.ID_TIPO_ATTO;
                     casellaSelOldObj.ID_Doc_Fasc = ProjectManager.getProjectInSession().systemID;
                     casellaSelOldObj.ID_People = user.idPeople;
                     casellaSelOldObj.ID_Ruolo_In_UO = user.idCorrGlobali;
@@ -6936,7 +6878,7 @@ namespace NttDataWA.Project
                     InfoUtente user = UserManager.GetInfoUser();
                     menuOldObj.ID_People = user.idPeople;
                     menuOldObj.ID_Ruolo_In_UO = user.idCorrGlobali;
-                    menuOldObj.IDTemplate = this.TemplateProject.ID_TIPO_FASC;
+                    menuOldObj.IDTemplate = this.TemplateProject.ID_TIPO_ATTO;
                     Fascicolo fasc = ProjectManager.getProjectInSession();
                     menuOldObj.ID_Doc_Fasc = fasc.systemID;
                     this.TemplateProject.OLD_OGG_CUSTOM[index] = menuOldObj;
@@ -7079,7 +7021,7 @@ namespace NttDataWA.Project
                 {
                     //blocco storico profilazione del campo di selezione esclusiva 
                     //salvo il valore corrente del campo di selezione esclusiva in oldObjCustom.
-                    selezEsclOldObj.IDTemplate = this.TemplateProject.ID_TIPO_FASC;
+                    selezEsclOldObj.IDTemplate = this.TemplateProject.ID_TIPO_ATTO;
                     Fascicolo fasc = ProjectManager.getProjectInSession();
                     selezEsclOldObj.ID_Doc_Fasc = fasc.systemID;
                     selezEsclOldObj.ID_Oggetto = oggettoCustom.SYSTEM_ID.ToString();
@@ -7466,7 +7408,7 @@ namespace NttDataWA.Project
                 if (this.TemplateProject.OLD_OGG_CUSTOM[index] == null) //se true bisogna valorizzare OLD_OGG_CUSTOM[index] con i dati da inserire nello storico per questo campo
                 {
                     //blocco storico profilazione campo data
-                    dataOldOb.IDTemplate = this.TemplateProject.ID_TIPO_FASC;
+                    dataOldOb.IDTemplate = this.TemplateProject.ID_TIPO_ATTO;
                     Fascicolo fasc = ProjectManager.getProjectInSession();
                     dataOldOb.ID_Doc_Fasc = fasc.systemID;
                     dataOldOb.ID_Oggetto = oggettoCustom.SYSTEM_ID.ToString();
@@ -7665,15 +7607,12 @@ namespace NttDataWA.Project
                 if (this.TemplateProject.OLD_OGG_CUSTOM[index] == null) //se true bisogna valorizzare OLD_OGG_CUSTOM[index] con i dati da inserire nello storico per questo campo
                 {
                     //blocco storico profilazione campo corrispondente
-                    corrOldOb.IDTemplate = this.TemplateProject.ID_TIPO_FASC;
+                    corrOldOb.IDTemplate = this.TemplateProject.ID_TIPO_ATTO;
                     Fascicolo fasc = ProjectManager.getProjectInSession();
                     corrOldOb.ID_Doc_Fasc = fasc.systemID;
                     corrOldOb.Tipo_Ogg_Custom = oggettoCustom.TIPO.DESCRIZIONE_TIPO;
                     corrOldOb.ID_Oggetto = oggettoCustom.SYSTEM_ID.ToString();
-                    if (!string.IsNullOrEmpty(oggettoCustom.VALORE_DATABASE))
-                        corrOldOb.Valore = corrispondente.TxtCodeCorrespondentCustom + "<br/>" + "----------" + "<br/>" + corrispondente.TxtDescriptionCorrespondentCustom;
-                    else
-                        corrOldOb.Valore = "";
+                    corrOldOb.Valore = corrispondente.TxtCodeCorrespondentCustom + "<br/>" + "----------" + "<br/>" + corrispondente.TxtDescriptionCorrespondentCustom;
                     InfoUtente user = UserManager.GetInfoUser();
                     corrOldOb.ID_People = user.idPeople;
                     corrOldOb.ID_Ruolo_In_UO = user.idCorrGlobali;
@@ -9290,7 +9229,6 @@ namespace NttDataWA.Project
         {
             try
             {
-                this.SelectedPage = 1;
                 string folderId = this.treenode_sel.Value.Replace("node_", "").Replace("root_", "");
                 if (!string.IsNullOrEmpty(folderId) && folderId.IndexOf("doc") < 0)
                 {
@@ -9344,43 +9282,41 @@ namespace NttDataWA.Project
             {
                 link = (LinkDocFasc)this.PnlTypeDocument.FindControl(this.SearchProjectCustom.ReturnValue);
             }
-            if (link != null)
+
+            if (link.IsFascicolo)
             {
-                if (link.IsFascicolo)
+
+                Fascicolo fasc = ProjectManager.getFascicoloById(HttpContext.Current.Session["LinkCustom.return"].ToString());
+                if (fasc != null)
+                {
+                    link.hf_Id = fasc.systemID;
+                    link.txt_NomeObj = fasc.descrizione;
+                    link.txt_Maschera = fasc.codice + " " + CutValue(fasc.descrizione);
+                }
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('SearchProjectCustom','');", true);
+            }
+            else
+            {
+
+                InfoDocumento infoDoc = DocumentManager.GetInfoDocumento(HttpContext.Current.Session["LinkCustom.return"].ToString(), HttpContext.Current.Session["LinkCustom.return"].ToString(), this.Page);
+                if (infoDoc != null)
                 {
 
-                    Fascicolo fasc = ProjectManager.getFascicoloById(HttpContext.Current.Session["LinkCustom.return"].ToString());
-                    if (fasc != null)
+                    link.hf_Id = infoDoc.idProfile;
+                    link.txt_NomeObj = infoDoc.oggetto;
+                    //this.txt_NomeObj.Text = infoDoc.oggetto;
+
+                    if (!string.IsNullOrEmpty(infoDoc.segnatura))
                     {
-                        link.hf_Id = fasc.systemID;
-                        link.txt_NomeObj = fasc.descrizione;
-                        link.txt_Maschera = fasc.codice + " " + CutValue(fasc.descrizione);
+                        link.txt_Maschera = infoDoc.segnatura + " " + CutValue(infoDoc.oggetto);
+                        //this.txt_Maschera.Text = infoDoc.segnatura + " " + CutValue(infoDoc.oggetto);
                     }
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('SearchProjectCustom','');", true);
-                }
-                else
-                {
-
-                    InfoDocumento infoDoc = DocumentManager.GetInfoDocumento(HttpContext.Current.Session["LinkCustom.return"].ToString(), HttpContext.Current.Session["LinkCustom.return"].ToString(), this.Page);
-                    if (infoDoc != null)
+                    else
                     {
-
-                        link.hf_Id = infoDoc.idProfile;
-                        link.txt_NomeObj = infoDoc.oggetto;
-                        //this.txt_NomeObj.Text = infoDoc.oggetto;
-
-                        if (!string.IsNullOrEmpty(infoDoc.segnatura))
-                        {
-                            link.txt_Maschera = infoDoc.segnatura + " " + CutValue(infoDoc.oggetto);
-                            //this.txt_Maschera.Text = infoDoc.segnatura + " " + CutValue(infoDoc.oggetto);
-                        }
-                        else
-                        {
-                            link.txt_Maschera = infoDoc.idProfile + " " + CutValue(infoDoc.oggetto);
-                        }
+                        link.txt_Maschera = infoDoc.idProfile + " " + CutValue(infoDoc.oggetto);
                     }
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('OpenAddDocCustom','');", true);
                 }
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('OpenAddDocCustom','');", true);
             }
             //this.hf_SelectedObject.Value = "0";
 
@@ -10196,77 +10132,9 @@ namespace NttDataWA.Project
             return classificationRequired;
         }
 
-        protected void ProjectBtnAccept_Click(object sender, EventArgs e)
+        protected void projectBtnRedirect_Click(object sender, EventArgs e)
         {
-            try
-            {
-                bool result = TrasmManager.AcceptMassiveTrasmFasc(ProjectManager.getProjectInSession().systemID);
-                if(result)
-                {
-                    Fascicolo fascicolo = UIManager.ProjectManager.getProjectInSession();
-                    string accessRights = ProjectManager.GetAccessRightFascBySystemID(fascicolo.systemID);
-                    fascicolo.accessRights = accessRights;
-                    ProjectManager.setProjectInSession(fascicolo);
-                    this.ProjectBtnAccept.Visible = ProjectManager.ExistsTrasmPendenteConWorkflowFascicolo(fascicolo.systemID, UIManager.RoleManager.GetRoleInSession().systemId, UserManager.GetUserInSession().idPeople);
-                    switch ((HMdiritti)Enum.Parse(typeof(HMdiritti), fascicolo.accessRights))
-                    {
-                        case HMdiritti.HDdiritti_Waiting:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelWaiting", UserManager.GetUserLanguage());
-                            break;
-                        case HMdiritti.HMdiritti_Read:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelReadOnly", UserManager.GetUserLanguage());
-                            break;
-                        case HMdiritti.HMdiritti_Proprietario:
-                        case HMdiritti.HMdiritti_Write:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelRW", UserManager.GetUserLanguage());
-                            break;
-                    }
-                    if (!string.IsNullOrEmpty(fascicolo.accessRights) && Convert.ToInt32(fascicolo.accessRights) > Convert.ToInt32(HMdiritti.HMdiritti_Read))
-                    {
-                        this.projectBntChiudiFascicolo.Enabled = true;
-                        if (fascicolo.stato.Equals("C"))
-                            this.abilitazioneElementi(false, true);
-                        else
-                            this.abilitazioneElementi(true, false);
-                        EnableEditMode();
-                    }
-                    this.UpContainer.Update();
-                    this.UpDirittiFascicolo.Update();
-                    this.upPnlButtons.Update();
-                }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorDocumentAccept', 'warning', '');} else {parent.ajaxDialogModal('ErrorDocumentAccept', 'warning', '');}", true);
 
-                }
-            }
-            catch (Exception ex)
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorDocumentAccept', 'error', '');} else {parent.ajaxDialogModal('ErrorDocumentAccept', 'error', '');}", true);
-            }
         }
-
-        protected void ProjectBtnView_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Fascicolo fascicolo = UIManager.ProjectManager.getProjectInSession();
-                bool result = TrasmManager.ViewMassiveTrasmFasc(fascicolo.systemID);
-                if (result)
-                {
-                    this.ProjectBtnView.Visible = false;
-                    this.upPnlButtons.Update();
-                }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorDocumentView', 'warning', '');} else {parent.ajaxDialogModal('ErrorDocumentView', 'warning', '');}", true);
-                }
-            }
-            catch (Exception ex)
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorDocumentView', 'error', '');} else {parent.ajaxDialogModal('ErrorDocumentView', 'error', '');}", true);
-            }
-        }
-
     }
 }

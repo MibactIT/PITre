@@ -692,30 +692,6 @@ namespace NttDataWA.Management
             }
         }
 
-        protected void RegistersBtnRegisterModify_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string email = (this.GrdRegisters.SelectedRow.FindControl("DdlEmailRegister") as DropDownList).SelectedValue;
-                List<DocsPaWR.InfoCheckMailbox> listCheckMailbox = CheckMailboxManager.InfoCheckMailbox(new List<string>() { email });
-                if ((from checkMailBox in listCheckMailbox where checkMailBox.Concluded.Equals("0") select checkMailBox).Count() > 0)
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningRegisterModifyPass', 'warning', '');} else {parent.ajaxDialogModal('WarningRegisterModifyPass', 'warning', '');}", true);
-                    return;
-                }
-                else
-                {
-                    SelectedRegister.email = email;
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "viewPrintRegister", "ajaxModalPopupRegisterModify();", true);
-                }
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
         //Aggiorna lo stato del registro nella scheda del documento in sessione
         private void UpdateSelectedRecord()
         {
@@ -753,6 +729,30 @@ namespace NttDataWA.Management
             this.upPnlButtons.Update();
         }
 
+        protected void RegistersBtnRegisterModify_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string email = (this.GrdRegisters.SelectedRow.FindControl("DdlEmailRegister") as DropDownList).SelectedValue;
+                List<DocsPaWR.InfoCheckMailbox> listCheckMailbox = CheckMailboxManager.InfoCheckMailbox(new List<string>() { email });
+                if ((from checkMailBox in listCheckMailbox where checkMailBox.Concluded.Equals("0") select checkMailBox).Count() > 0)
+                {
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningRegisterModifyPass', 'warning', '');} else {parent.ajaxDialogModal('WarningRegisterModifyPass', 'warning', '');}", true);
+                    return;
+                }
+                else
+                {
+                    SelectedRegister.email = email;
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "viewPrintRegister", "ajaxModalPopupRegisterModify();", true);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+                return;
+            }
+        }
+
         #endregion
 
         #region Check Mailbox Management
@@ -761,6 +761,13 @@ namespace NttDataWA.Management
         {
             string email = (this.GrdRegisters.SelectedRow.FindControl("DdlEmailRegister") as DropDownList).SelectedValue;
             SelectedRegister.email = email; ;
+
+            if(CheckMailboxManager.CheckScaricoOtherRole(SelectedRegister.systemId, email))
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningSelectedRegisterScaricoOtherRole', 'warning', '');} else {parent.ajaxDialogModal('WarningSelectedRegisterScaricoOtherRole', 'warning', '');}", true);
+                return;
+            }
+
             CheckMailboxManager.CheckMailBoxDelegate checkMailBox = new CheckMailboxManager.CheckMailBoxDelegate(CheckMailboxManager.CheckMailBox);
             checkMailBox.BeginInvoke(Utils.utils.getHttpFullPath(), SelectedRegister, UserManager.GetUserInSession(), RoleManager.GetRoleInSession(), null, null);
             this.GrdRegisters.SelectedRow.FindControl("containerVerifyEmail").Visible = true;

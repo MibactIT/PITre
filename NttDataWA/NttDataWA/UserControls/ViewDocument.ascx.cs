@@ -10,12 +10,13 @@ using NttDataWA.UIManager;
 using NttDataWA.Utils;
 using NttDatalLibrary;
 using NttDataWA.Popup;
-
+using log4net;
 
 namespace NttDataWA.UserControls
 {
     public partial class ViewDocument : System.Web.UI.UserControl
     {
+        private ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Property
         /// <summary>
@@ -147,51 +148,6 @@ namespace NttDataWA.UserControls
                 if (HttpContext.Current.Session["printOnLastPage"] != null)
                     return (bool)HttpContext.Current.Session["printOnLastPage"];
                 else return false;
-            }
-        }
-
-        /// <summary>
-        ///  
-        /// </summary>
-        private int FromPagePreview
-        {
-            get
-            {
-                return HttpContext.Current.Session["fromPagePreview"] != null ? (int)HttpContext.Current.Session["fromPagePreview"] : 0;
-            }
-            set
-            {
-                HttpContext.Current.Session["fromPagePreview"] = value;
-            }
-        }
-
-        /// <summary>
-        ///  
-        /// </summary>
-        private int LastPagePreview
-        {
-            get
-            {
-                return HttpContext.Current.Session["lastPagePreview"] != null ? (int)HttpContext.Current.Session["lastPagePreview"] : 0;
-            }
-            set
-            {
-                HttpContext.Current.Session["lastPagePreview"] = value;
-            }
-        }
-
-        /// <summary>
-        ///  
-        /// </summary>
-        private int TotalPagePreview
-        {
-            get
-            {
-                return HttpContext.Current.Session["totalPagePreview"] != null ? (int)HttpContext.Current.Session["totalPagePreview"] : 0;
-            }
-            set
-            {
-                HttpContext.Current.Session["totalPagePreview"] = value;
             }
         }
 
@@ -611,8 +567,6 @@ namespace NttDataWA.UserControls
         private static string lock_InLibroFirma;
         private static string yes;
         private static string no;
-        private static string elettronicSignature;
-        private static string digitalSignature;
         #endregion
 
         #region Standard Method
@@ -634,7 +588,7 @@ namespace NttDataWA.UserControls
 
                 if (IsZoom || PageCaller == CALLER_SMISTAMENTO || CallFromSignDetails)
                 {
-                    if ((PageCaller != CALLER_SMISTAMENTO || CallFromSignDetails) && PageCaller != ESAMINA_UNO_A_UNO && FileManager.GetFileRequest() != null && !string.IsNullOrEmpty(FileManager.GetFileRequest().fileName) || PageCaller.ToUpper().Equals(CALLER_ATTACHMENT))
+                    if (PageCaller != CALLER_SMISTAMENTO && PageCaller != ESAMINA_UNO_A_UNO && FileManager.GetFileRequest() != null && !string.IsNullOrEmpty(FileManager.GetFileRequest().fileName) || PageCaller.ToUpper().Equals(CALLER_ATTACHMENT))
                     {
                         DisallowOpZoom = true;
                         EventHandler eventLinkViewFileDocument = new EventHandler(LinkViewFileDocument);
@@ -647,7 +601,7 @@ namespace NttDataWA.UserControls
                         InitializeContent();
                     }
 
-                    if (PageCaller == CALLER_SMISTAMENTO && !IsZoom && !CallFromSignDetails)
+                    if (PageCaller == CALLER_SMISTAMENTO && !IsZoom)
                     {
                         PlcVersions.Visible = false;
                         string valoreChiave = Utils.InitConfigurationKeys.GetValue("0", "FE_VISUAL_DOC_SMISTAMENTO");
@@ -699,21 +653,6 @@ namespace NttDataWA.UserControls
 
                 //CheckInOut.CheckInOutServices.InitializeContext();
                 return;
-            }
-            else if (Request.Form["__EVENTTARGET"] != null && Request.Form["__EVENTTARGET"].Equals("UpdPnlObject"))
-            {
-                if (Session["fileDoc"] != null && Session["personalFileSelected"] != null)
-                {
-                    //ABBATANGELI - Metodo alternativo per verificare la dimensione del file attuale.
-                    //string myfileDoc = UIManager.FileManager.getSelectedFile().fileSize;
-                    //int repositoryFileSize = (string.IsNullOrEmpty(myfileDoc) ? 0 : int.Parse(myfileDoc));
-
-                    int repositoryFileSize = ((NttDataWA.DocsPaWR.FileDocumento) Session["fileDoc"]).length;
-
-                    InitializeContent(repositoryFileSize);
-                    Session["personalFileSelected"] = null;
-                    return;
-                }
             }
 
 
@@ -897,15 +836,10 @@ namespace NttDataWA.UserControls
             btnModifyVersion.OnMouseOutImage = ResolveUrl("~/Images/Icons/edit_verion.png");
             btnModifyVersion.ImageUrlDisabled = ResolveUrl("~/Images/Icons/edit_verion_disabled.png");
 
-            if (PageCaller == CALLER_SMISTAMENTO && !IsZoom)
+            if ((PageCaller == CALLER_SMISTAMENTO && !IsZoom) || PageCaller == ESAMINA_UNO_A_UNO)
             {
                 contentDxSx.Attributes.Remove("class");
                 contentDxSx.Attributes.Add("class", "contentDxSxSmista");
-            }
-            if (PageCaller == ESAMINA_UNO_A_UNO)
-            {
-                contentDxSx.Attributes.Remove("class");
-                contentDxSx.Attributes.Add("class", "contentDxSxEsamina");
             }
         }
 
@@ -916,13 +850,11 @@ namespace NttDataWA.UserControls
             BottomButtons.Visible = false;
         }
 
-        public void InitializeContent(int alternativeFileSize = 0)
+        public void InitializeContent()
         {
             if (!string.IsNullOrEmpty(PageCaller))
             {
                 FileRequest fileDoc = UIManager.FileManager.getSelectedFile();
-                if (alternativeFileSize > 0) fileDoc.fileSize = alternativeFileSize.ToString();
-
                 SchedaDocumento selectedRecord = DocumentManager.getSelectedRecord();
 
                 if (!string.IsNullOrEmpty(SchedaDocSystemId) && (DocumentManager.IsNewDocument() || (selectedRecord != null && !selectedRecord.systemId.Equals(SchedaDocSystemId))))
@@ -967,10 +899,7 @@ namespace NttDataWA.UserControls
                                 }
                                 if (fileDoc.firmato == "1")
                                 {
-                                    string tipoFirma = signed;
-                                    if (!string.IsNullOrEmpty(fileDoc.tipoFirma))
-                                        tipoFirma = fileDoc.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                                    LitDocumentSignature.Text = tipoFirma;
+                                    LitDocumentSignature.Text = signed;
                                     ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                                     if (System.IO.Path.GetExtension(fileDoc.fileName).ToLower().Equals(".pdf"))
                                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
@@ -1213,10 +1142,7 @@ namespace NttDataWA.UserControls
                                 {
                                     if (attSel.firmato.Equals("1"))
                                     {
-                                        string tipoFirma = signed;
-                                        if (!string.IsNullOrEmpty(attSel.tipoFirma))
-                                            tipoFirma = attSel.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                                        LitDocumentSignature.Text = tipoFirma;
+                                        LitDocumentSignature.Text = signed;
                                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                                         if(System.IO.Path.GetExtension(attSel.fileName).ToLower().Equals(".pdf"))
                                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
@@ -1237,10 +1163,7 @@ namespace NttDataWA.UserControls
 
                                     if (!string.IsNullOrEmpty(fileReq.firmato) && fileReq.firmato.Equals("1"))
                                     {
-                                        string tipoFirma = signed;
-                                        if (!string.IsNullOrEmpty(fileReq.tipoFirma))
-                                            tipoFirma = fileReq.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                                        LitDocumentSignature.Text = tipoFirma;
+                                        LitDocumentSignature.Text = signed;
                                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                                         if (System.IO.Path.GetExtension(fileReq.fileName).ToLower().Equals(".pdf"))
                                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
@@ -1256,10 +1179,7 @@ namespace NttDataWA.UserControls
                             {
                                 if (!string.IsNullOrEmpty(attSel.firmato) && attSel.firmato.Equals("1"))
                                 {
-                                    string tipoFirma = signed;
-                                    if (!string.IsNullOrEmpty(attSel.tipoFirma))
-                                        tipoFirma = attSel.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                                    LitDocumentSignature.Text = tipoFirma;
+                                    LitDocumentSignature.Text = signed;
                                     ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                                     if (System.IO.Path.GetExtension(attSel.fileName).ToLower().Equals(".pdf"))
                                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
@@ -1402,7 +1322,7 @@ namespace NttDataWA.UserControls
                                 imgInfoVersionSelected.Visible = false;
                                 BottomButtons.Visible = false;
                                 ViewDocumentLinkFile.Attributes.Add("onchange", "disallowOp('Content2');");
-                                if (PageCaller.Equals(CALLER_SMISTAMENTO) && !CallFromSignDetails)
+                                if (PageCaller.Equals(CALLER_SMISTAMENTO))
                                     ((SmistamentoDocumenti)Page).RefreshZoom2();
 
 
@@ -1424,7 +1344,7 @@ namespace NttDataWA.UserControls
                                 BindDocumentAttached();
                                 LitDocumentSize.Visible = false;
                                 imgInfoVersionSelected.Visible = false;
-                                if (PageCaller.Equals(CALLER_SMISTAMENTO) && !CallFromSignDetails)
+                                if (PageCaller.Equals(CALLER_SMISTAMENTO))
                                     ((SmistamentoDocumenti)Page).RefreshZoom2();
 
                                 if (PageCaller == ESAMINA_UNO_A_UNO)
@@ -1445,7 +1365,7 @@ namespace NttDataWA.UserControls
                                 LitDocumentSize.Visible = false;
                                 imgInfoVersionSelected.Visible = false;
                                 BottomButtons.Visible = false;
-                                if (PageCaller.Equals(CALLER_SMISTAMENTO) && !CallFromSignDetails)
+                                if (PageCaller.Equals(CALLER_SMISTAMENTO))
                                     ((SmistamentoDocumenti)Page).RefreshZoom2();
 
                             }
@@ -1468,9 +1388,7 @@ namespace NttDataWA.UserControls
                             UpPnlDocumentNotAcquired.Visible = true;
                             UpPnlDocumentData.Visible = true;
                             UpPnlDocumentAcquired.Visible = false;
-                            GrdDocumentAttached.Visible = true;
-                            GridAttachNoUser.Visible = true;
-                            this.BindDocumentAttached();
+
                             //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
                             FindControl("divFrame").Visible = false;
                             ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
@@ -1485,8 +1403,6 @@ namespace NttDataWA.UserControls
                             UpPnlDocumentNotAcquired.Visible = true;
                             UpPnlDocumentAcquired.Visible = false;
                             UpPnlDocumentData.Visible = false;
-                            GrdDocumentAttached.Visible = false;
-                            GridAttachNoUser.Visible = false;
                             string language = UIManager.UserManager.GetUserLanguage();
                             ViewDocumentLinkFile.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLinkFile", language);
                             LitDocumentSize.Visible = false;
@@ -1495,7 +1411,8 @@ namespace NttDataWA.UserControls
                         ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
                         PlcVersions.Visible = false;
                         BottomButtons.Visible = false;
-                        //GrdDocumentAttached.Visible = false;
+                        GrdDocumentAttached.Visible = false;
+                        GridAttachNoUser.Visible = false;
                         break;
                     case STRUCTURE_INSTANCE:
                         if (!string.IsNullOrEmpty(fileDoc.fileSize) && Convert.ToInt32(fileDoc.fileSize) > 0)
@@ -1584,35 +1501,28 @@ namespace NttDataWA.UserControls
         protected void InitializeLanguage()
         {
             string language = UIManager.UserManager.GetUserLanguage();
-            //this.ViewFullDocPreview.Text = Utils.Languages.GetLabelFromCode("ViewFullDocPreview", language);
-            
-            //this.imgNextPreview.ToolTip = Utils.Languages.GetLabelFromCode("ViewNextPreview", language);
-            //this.imgPrevPreview.ToolTip = Utils.Languages.GetLabelFromCode("ViewPrevPreview", language);
-            this.ViewDocumentLblNoAcquired.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLblNoAcquired", language);
-            this.ViewDocumentLblAcquired.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLblAcquired", language);
-            this.ViewDocumentTxtVersions.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtVersions", language);
-            this.ViewDocumentTxtDate.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtDate", language);
-            this.ViewDocumentTxtDateAcquired.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtDate", language);
-            this.ViewDocumentTxtPapery.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtPapery", language);
-            this.ViewDocumentAuthorFile.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentAuthorFile", language);
-            this.ViewDocumentTxtNoteVersion.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtNoteVersion", language);
-            this.btnRemoveVersion.ToolTip = Utils.Languages.GetLabelFromCode("btnRemoveVersion", language);
-            this.btnRemoveVersion.AlternateText = Utils.Languages.GetLabelFromCode("btnRemoveVersion", language);
-            this.btnAddVersion.ToolTip = Utils.Languages.GetLabelFromCode("btnAddVersion", language);
-            this.btnAddVersion.AlternateText = Utils.Languages.GetLabelFromCode("btnAddVersion", language);
-            this.btnModifyVersion.ToolTip = Utils.Languages.GetLabelFromCode("btnModifyVersion", language);
-            this.btnModifyVersion.AlternateText = Utils.Languages.GetLabelFromCode("btnModifyVersion", language);
-            this.ViewDocumentCreatore.InnerHtml = Utils.Languages.GetLabelFromCode("ViewDocumentCreatore", language);
+            ViewDocumentLblNoAcquired.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLblNoAcquired", language);
+            ViewDocumentLblAcquired.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLblAcquired", language);
+            ViewDocumentTxtVersions.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtVersions", language);
+            ViewDocumentTxtDate.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtDate", language);
+            ViewDocumentTxtDateAcquired.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtDate", language);
+            ViewDocumentTxtPapery.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtPapery", language);
+            ViewDocumentAuthorFile.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentAuthorFile", language);
+            ViewDocumentTxtNoteVersion.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentTxtNoteVersion", language);
+            btnRemoveVersion.ToolTip = Utils.Languages.GetLabelFromCode("btnRemoveVersion", language);
+            btnRemoveVersion.AlternateText = Utils.Languages.GetLabelFromCode("btnRemoveVersion", language);
+            btnAddVersion.ToolTip = Utils.Languages.GetLabelFromCode("btnAddVersion", language);
+            btnAddVersion.AlternateText = Utils.Languages.GetLabelFromCode("btnAddVersion", language);
+            btnModifyVersion.ToolTip = Utils.Languages.GetLabelFromCode("btnModifyVersion", language);
+            btnModifyVersion.AlternateText = Utils.Languages.GetLabelFromCode("btnModifyVersion", language);
+            ViewDocumentCreatore.InnerHtml = Utils.Languages.GetLabelFromCode("ViewDocumentCreatore", language);
             yes = Utils.Languages.GetLabelFromCode("yes", language);
             no = Utils.Languages.GetLabelFromCode("no", language);
             signed = Utils.Languages.GetLabelFromCode("signed", language);
             str_locked = Utils.Languages.GetLabelFromCode("locked", language);
             lock_InLibroFirma = Utils.Languages.GetLabelFromCode("lock_InLibroFirma", language);
-            elettronicSignature = Utils.Languages.GetLabelFromCode("ElettronicSignature", language);
-            digitalSignature = Utils.Languages.GetLabelFromCode("DigitalSignature", language);
-            this.DocumentImgIdentityCard.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgIdentityCardTooltip", language);
+            DocumentImgIdentityCard.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgIdentityCardTooltip", language);
 
-            
         }
 
         #endregion
@@ -1652,17 +1562,7 @@ namespace NttDataWA.UserControls
             return (fileSize > 0);
         }
 
-        protected bool IsElementoSelezionatoInLf(DocsPaWR.FileRequest fileRequest)
-        {
-            bool result = false;
 
-            if(this.PageCaller == ESAMINA_UNO_A_UNO)
-            {
-                result = fileRequest.docNumber.Equals(LibroFirmaManager.DocumentoSelezionatoPerFirma());
-            }
-
-            return result;
-        }
 
         #region Buttons
 
@@ -1810,17 +1710,7 @@ namespace NttDataWA.UserControls
             if (fileReq != null && fileReq.inLibroFirma)
             {
                 ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_START_SIGNATURE_PROCESS);
-                if (fileReq.firmato.Equals("1"))
-                {
-                    string tipoFirma = signed;
-                    if (!string.IsNullOrEmpty(fileReq.tipoFirma))
-                        tipoFirma = fileReq.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                    LitDocumentSignature.Text = tipoFirma + " - " + lock_InLibroFirma;
-                }
-                else
-                {
-                    LitDocumentSignature.Text = lock_InLibroFirma;
-                }
+                LitDocumentSignature.Text = fileReq.firmato.Equals("1") ? signed + " - " + lock_InLibroFirma : lock_InLibroFirma;
                 if (!LibroFirmaManager.IsTitolare(fileReq.docNumber, UserManager.GetInfoUser()))
                 {
                     ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_LIBROFIRMA_LOCK);
@@ -1851,7 +1741,7 @@ namespace NttDataWA.UserControls
                 bool isLastVersion = true;
                 if (DocumentManager.ListDocVersions != null && DocumentManager.ListDocVersions.Count() > 0)
                 {
-                    string version = (from document in DocumentManager.ListDocVersions select Convert.ToInt32(document.version)).Max().ToString();
+                    string version = (from document in DocumentManager.ListDocVersions select document.version).Max();
                     if (!string.IsNullOrEmpty(version) && !string.IsNullOrEmpty(DocumentManager.getSelectedNumberVersion()) && !DocumentManager.getSelectedNumberVersion().Equals("0"))
                         isLastVersion = DocumentManager.getSelectedNumberVersion().Equals(version);
                 }
@@ -2053,10 +1943,7 @@ namespace NttDataWA.UserControls
                         }
                         if (fileReq.firmato == "1")
                         {
-                            string tipoFirma = signed;
-                            if (!string.IsNullOrEmpty(fileReq.tipoFirma))
-                                tipoFirma = fileReq.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                            LitDocumentSignature.Text = tipoFirma;
+                            LitDocumentSignature.Text = signed;
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                             if (System.IO.Path.GetExtension(fileReq.fileName).ToLower().Equals(".pdf"))
                                 ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
@@ -2389,77 +2276,99 @@ namespace NttDataWA.UserControls
         public void ShowDocumentAcquired(bool autoPreview, bool closeZoom = false)
         {
             SchedaDocumento tabDocument = DocumentManager.getSelectedRecord();
-            UpPnlDocumentNotAcquired.Visible = true;
-            UpPnlDocumentAcquired.Visible = false;
-            UpPnlDocumentData.Visible = false;
-            GrdDocumentAttached.Visible = false;
-            GridAttachNoUser.Visible = false;
-            string idAmm = UserManager.GetInfoUser().idAmministrazione;
-            FileRequest attach = null;
-            if (!closeZoom || DocumentManager.IsNewDocument())
+            if (PageCaller != ESAMINA_UNO_A_UNO)
             {
-                attach = (DocumentManager.getSelectedAttachId() != null) ?
-                    FileManager.GetFileRequest(DocumentManager.getSelectedAttachId()) :
-                        FileManager.GetFileRequest();
-            }
-            else
-            {
-                attach = (from v in DocumentManager.ListDocVersions where v.version.Equals(DocumentManager.getSelectedNumberVersion()) select v).FirstOrDefault();
-            }
-            if (attach != null)
-            {
-                bool isLastVersion = false;
-                double size = 0;
-                if (!string.IsNullOrEmpty(attach.fileSize))
-                    size = (double)int.Parse(attach.fileSize) / 1024;
-
-                if (size > 0)
+                UpPnlDocumentNotAcquired.Visible = true;
+                UpPnlDocumentAcquired.Visible = false;
+                UpPnlDocumentData.Visible = false;
+                GrdDocumentAttached.Visible = false;
+                GridAttachNoUser.Visible = false;
+                string idAmm = UserManager.GetInfoUser().idAmministrazione;
+                FileRequest attach = null;
+                if (!closeZoom || DocumentManager.IsNewDocument())
                 {
-                    FileRequest fileReq = new FileRequest();
-                    FindControl("divFrame").Visible = true;
-                    UpPnlDocumentNotAcquired.Visible = false;
-                    if (!DocumentManager.IsNewDocument())
+                    attach = (DocumentManager.getSelectedAttachId() != null) ?
+                        FileManager.GetFileRequest(DocumentManager.getSelectedAttachId()) :
+                            FileManager.GetFileRequest();
+                }
+                else
+                {
+                    attach = (from v in DocumentManager.ListDocVersions where v.version.Equals(DocumentManager.getSelectedNumberVersion()) select v).FirstOrDefault();
+                }
+                if (attach != null)
+                {
+                    bool isLastVersion = false;
+                    double size = 0;
+                    if (!string.IsNullOrEmpty(attach.fileSize))
+                        size = (double)int.Parse(attach.fileSize) / 1024;
+
+                    if (size > 0)
                     {
-                        DocumentManager.ListDocVersions = DocumentManager.getDocumentListVersions(Page, attach.docNumber, attach.docNumber).documenti;
-                        fileReq = (from v in DocumentManager.ListDocVersions where v.version.Equals(attach.version) select v).FirstOrDefault();
-                        //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:block";
-                        /* se attiva autopreview
-                            * 1-  aggiorna la grid view con gli allegati;
-                            * 2- aggiorna le versioni associate all'allegato/documento principale correntemente selezionato
-                            * 3- visualizza l'ultima versione associata al doc principale/ allegato selezionato
-                            * */
-                        if (autoPreview)
+                        FileRequest fileReq = new FileRequest();
+                        FindControl("divFrame").Visible = true;
+                        UpPnlDocumentNotAcquired.Visible = false;
+                        if (!DocumentManager.IsNewDocument())
                         {
-                            UpPnlDocumentData.Visible = true;
-                            GrdDocumentAttached.Visible = true;
-                            if (!IsZoom || (PageCaller != CALLER_SMISTAMENTO))
-                                GridAttachNoUser.Visible = true;
-                            BottomButtons.Visible = true;
-                            if (!closeZoom)
+                            DocumentManager.ListDocVersions = DocumentManager.getDocumentListVersions(Page, attach.docNumber, attach.docNumber).documenti;
+                            fileReq = (from v in DocumentManager.ListDocVersions where v.version.Equals(attach.version) select v).FirstOrDefault();
+                            //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:block";
+                            /* se attiva autopreview
+                             * 1-  aggiorna la grid view con gli allegati;
+                             * 2- aggiorna le versioni associate all'allegato/documento principale correntemente selezionato
+                             * 3- visualizza l'ultima versione associata al doc principale/ allegato selezionato
+                             * */
+                            if (autoPreview)
                             {
-                                DocumentManager.setSelectedNumberVersion("0");
-                                BindVersions(attach.versionId);
-                            }
-                            else
-                            {
-                                string versionId = string.Empty;
-                                if (DocumentManager.getSelectedAttachId() != null) //nel caso di allegato prendo il versionid dell'ultima versione
+                                UpPnlDocumentData.Visible = true;
+                                GrdDocumentAttached.Visible = true;
+                                if (!IsZoom || (PageCaller != CALLER_SMISTAMENTO))
+                                    GridAttachNoUser.Visible = true;
+                                BottomButtons.Visible = true;
+                                if (!closeZoom)
                                 {
-                                    versionId = DocumentManager.getSelectedAttachId();
+                                    DocumentManager.setSelectedNumberVersion("0");
+                                    BindVersions(attach.versionId);
                                 }
                                 else
                                 {
-                                    versionId = (from v in DocumentManager.ListDocVersions where v.version.Equals(DocumentManager.getSelectedNumberVersion()) select v.versionId).FirstOrDefault();
+                                    string versionId = string.Empty;
+                                    if (DocumentManager.getSelectedAttachId() != null) //nel caso di allegato prendo il versionid dell'ultima versione
+                                    {
+                                        versionId = DocumentManager.getSelectedAttachId();
+                                    }
+                                    else
+                                    {
+                                        versionId = (from v in DocumentManager.ListDocVersions where v.version.Equals(DocumentManager.getSelectedNumberVersion()) select v.versionId).FirstOrDefault();
+                                    }
+                                    BindVersions(versionId);
                                 }
-                                BindVersions(versionId);
+                                BindDocumentAttached();
+                                SchedaDocumento doc = DocumentManager.getSelectedRecord();
+                                //La segnatura è visibile solo se siamo nel caso di ultima versione di documento
+                                string version = (from document in DocumentManager.ListDocVersions select document.version).Max();
+                                isLastVersion = DocumentManager.getSelectedNumberVersion().Equals(version);
+                                SaveFileDocument(attach);
+                                frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
                             }
-                            BindDocumentAttached();
-                            SchedaDocumento doc = DocumentManager.getSelectedRecord();
-                            //La segnatura è visibile solo se siamo nel caso di ultima versione di documento
-                            string version = (from document in DocumentManager.ListDocVersions select document.version).Max();
-                            isLastVersion = DocumentManager.getSelectedNumberVersion().Equals(version);
-                            SaveFileDocument(attach);
-                            frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
+                            else
+                            {
+                                UpPnlDocumentAcquired.Visible = true;
+                                ViewDocumentLinkFile.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLinkFile", UIManager.UserManager.GetUserLanguage()) + " V" + attach.version;
+                                ViewDocumentImageDocumentAcquired.Src = GetVersionImage(attach, true);
+                                //Aggiungo questa parte di codice per visualizzare sempre il pannello delle versioni in basso
+                                UpPnlDocumentData.Visible = true;
+                                //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
+                                FindControl("divFrame").Visible = false;
+                                DocumentManager.setSelectedNumberVersion(attach.version);
+                                //BindVersions(attach.version);
+                                //UpPnlDocumentData.Visible = false;
+                                //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:block";
+                                GrdDocumentAttached.Visible = false;
+                                GridAttachNoUser.Visible = false;
+
+                                string version = (from document in DocumentManager.ListDocVersions select document.version).Max();
+                                isLastVersion = DocumentManager.getSelectedNumberVersion().Equals(version);
+                            }
                         }
                         else
                         {
@@ -2476,185 +2385,197 @@ namespace NttDataWA.UserControls
                             //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:block";
                             GrdDocumentAttached.Visible = false;
                             GridAttachNoUser.Visible = false;
+                        }
+                        if ((DocumentButtons)Parent.FindControl("DocumentButtons") != null)
+                        {
+                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_ALL);
+                            DocumentImgIdentityCard.Enabled = true;
+                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_UPLOADFILE);
+                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).SetButtonImageTimestamp();
+                            if ((PageCaller.Equals(CALLER_ATTACHMENT) && !IsAcquired(FileManager.GetFileRequest(VersionIdAttachSelected))) || ((PageCaller.Equals(CALLER_DOCUMENT) || PageCaller.Equals(CALLER_CLASSIFICATIONS)) && !IsAcquired(FileManager.GetFileRequest())))
+                            {
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ZOOM);
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_VIEWFILE);
+                            }
+                            if (DisableSignature(attach) || !isLastVersion)
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_POSITIONSIGNATURE);
+                            if (IsVisibleButtonIdentityCard(fileReq))
+                            {
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.V_IDENTITYCARD);
+                                DocumentImgIdentityCard.Visible = true;
+                            }
+                            else
+                            {
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.NOTV_IDENTITYCARD);
+                                DocumentImgIdentityCard.Visible = false;
+                            }
+                            if (fileReq.firmato == "1")
+                            {
+                                LitDocumentSignature.Text = signed;
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
+                                if (System.IO.Path.GetExtension(fileReq.fileName).ToLower().Equals(".pdf"))
+                                    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
+                            }
+                            else
+                            {
+                                LitDocumentSignature.Text = "";
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_SIGNED);
+                            }
+                            if (DocumentManager.IsNewDocument())
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).DisableButtonImageSign();
 
-                            string version = (from document in DocumentManager.ListDocVersions select document.version).Max();
-                            isLastVersion = DocumentManager.getSelectedNumberVersion().Equals(version);
+                    
+                            // per demo emea
+                          //  if (!FileManager.getEstensioneIntoSignedFile(fileReq.fileName).ToLowerInvariant().Equals(PDF))
+                            //    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ELECTRONIC_SIGN);
+
+                            //disabilito i pulsanti firma.
+                            if (!autoPreview)
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).DisableButtonImageSign();
                         }
                     }
                     else
                     {
-                        if (autoPreview)
+                        //Abbatangeli - In test...
+                        BottomButtons.Visible = false;
+                        //Fine
+
+                        if (!DocumentManager.IsNewDocument() && DocumentManager.getDocumentListVersions(Page, attach.docNumber, attach.docNumber).documenti.Length > 1)
                         {
                             UpPnlDocumentData.Visible = true;
+                            UpPnlDocumentAcquired.Visible = false;
                             GrdDocumentAttached.Visible = true;
-                            if (!IsZoom || (PageCaller != CALLER_SMISTAMENTO))
-                                GridAttachNoUser.Visible = true;
-                            BottomButtons.Visible = true;
-                            if (!closeZoom)
-                            {
-                                DocumentManager.setSelectedNumberVersion("0");
-                                BindVersions(attach.versionId);
-                            }
-                            else
-                            {
-                                string versionId = string.Empty;
-                                if (DocumentManager.getSelectedAttachId() != null) //nel caso di allegato prendo il versionid dell'ultima versione
-                                {
-                                    versionId = DocumentManager.getSelectedAttachId();
-                                }
-                                else
-                                {
-                                    versionId = (from v in DocumentManager.ListDocVersions where v.version.Equals(DocumentManager.getSelectedNumberVersion()) select v.versionId).FirstOrDefault();
-                                }
-                                BindVersions(versionId);
-                            }
+                            GridAttachNoUser.Visible = true;
+                            BindVersions(attach.versionId);
                             BindDocumentAttached();
-                            SchedaDocumento doc = DocumentManager.getSelectedRecord();
-                            SaveFileDocument(attach);
-                            frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
-                        }
-                        else
-                        {
-                            UpPnlDocumentAcquired.Visible = true;
-                            ViewDocumentLinkFile.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLinkFile", UIManager.UserManager.GetUserLanguage()) + " V" + attach.version;
-                            ViewDocumentImageDocumentAcquired.Src = GetVersionImage(attach, true);
-                            //Aggiungo questa parte di codice per visualizzare sempre il pannello delle versioni in basso
-                            UpPnlDocumentData.Visible = true;
                             //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
                             FindControl("divFrame").Visible = false;
-                            DocumentManager.setSelectedNumberVersion(attach.version);
-                            //BindVersions(attach.version);
-                            //UpPnlDocumentData.Visible = false;
-                            //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:block";
-                            GrdDocumentAttached.Visible = false;
-                            GridAttachNoUser.Visible = false;
-                        }
-                    }
-                    if ((DocumentButtons)Parent.FindControl("DocumentButtons") != null)
-                    {
-                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_ALL);
-                        DocumentImgIdentityCard.Enabled = true;
-                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_UPLOADFILE);
-                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).SetButtonImageTimestamp();
-                        if ((PageCaller.Equals(CALLER_ATTACHMENT) && !IsAcquired(FileManager.GetFileRequest(VersionIdAttachSelected))) || ((PageCaller.Equals(CALLER_DOCUMENT) || PageCaller.Equals(CALLER_CLASSIFICATIONS)) && !IsAcquired(FileManager.GetFileRequest())))
-                        {
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ZOOM);
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_VIEWFILE);
-                        }
-                        if (DisableSignature(attach) || !isLastVersion)
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_POSITIONSIGNATURE);
-                        if (IsVisibleButtonIdentityCard(fileReq))
-                        {
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.V_IDENTITYCARD);
-                            DocumentImgIdentityCard.Visible = true;
                         }
                         else
                         {
+                            UpPnlDocumentNotAcquired.Visible = true;
+                            UpPnlDocumentAcquired.Visible = false;
+                        }
+                        if ((DocumentButtons)Parent.FindControl("DocumentButtons") != null)
+                        {
+                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ALL);
+                            //se il documento non è in uno stato finale oppure è in stato finale
+                            //ma è stato effetuato lo sblocco stato per il ruolo corrente 
+                            //allora abilito il pulsante di acquisiz.
+                            if (!DiagrammiManager.IsDocumentInFinalState() ||
+                                Convert.ToInt32(DocumentManager.GetAccessRightDocByDocument(
+                                DocumentManager.getSelectedRecord(), UserManager.GetInfoUser())) > 45)
+                            {
+                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_UPLOADFILE);
+                            }
+                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).SetButtonImageTimestamp();
+                            LitDocumentSignature.Text = string.Empty;
+                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_SIGNED);
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.NOTV_IDENTITYCARD);
                             DocumentImgIdentityCard.Visible = false;
                         }
-                        if (fileReq.firmato == "1")
-                        {
-                            string tipoFirma = signed;
-                            if (!string.IsNullOrEmpty(fileReq.tipoFirma))
-                                tipoFirma = fileReq.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                            LitDocumentSignature.Text = tipoFirma;
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
-                            if (System.IO.Path.GetExtension(fileReq.fileName).ToLower().Equals(".pdf"))
-                                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
-                        }
-                        else
-                        {
-                            LitDocumentSignature.Text = "";
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_SIGNED);
-                        }
-                        if (DocumentManager.IsNewDocument())
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).DisableButtonImageSign();
-
-                    
-                        // per demo emea
-                        //  if (!FileManager.getEstensioneIntoSignedFile(fileReq.fileName).ToLowerInvariant().Equals(PDF))
-                        //    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ELECTRONIC_SIGN);
-
-                        //disabilito i pulsanti firma.
-                        if (!autoPreview)
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).DisableButtonImageSign();
                     }
                 }
+                UpPnlContentDxSx.Update();
+                UpPnlContentDxDx.Update();
+                UpBottomButtons.Update();
+                BuildStringAuthorFile(attach);
+                UpdateInfoFileAquired.Update();
+                if (!IsZoom && PageCaller != CALLER_SMISTAMENTO)
+                    ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframe();", true);
                 else
                 {
-                    //Abbatangeli - In test...
-                    BottomButtons.Visible = false;
-                    //Fine
-
-                    if (!DocumentManager.IsNewDocument() && DocumentManager.getDocumentListVersions(Page, attach.docNumber, attach.docNumber).documenti.Length > 1)
+                    if (PageCaller == CALLER_SMISTAMENTO && !IsZoom)
                     {
-                        UpPnlDocumentData.Visible = true;
-                        UpPnlDocumentAcquired.Visible = false;
-                        GrdDocumentAttached.Visible = true;
-                        GridAttachNoUser.Visible = true;
-                        BindVersions(attach.versionId);
-                        BindDocumentAttached();
-                        //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
-                        FindControl("divFrame").Visible = false;
+                        ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
                     }
                     else
                     {
-                        UpPnlDocumentNotAcquired.Visible = true;
-                        UpPnlDocumentAcquired.Visible = false;
-                    }
-                    if ((DocumentButtons)Parent.FindControl("DocumentButtons") != null)
-                    {
-                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ALL);
-                        //se il documento non è in uno stato finale oppure è in stato finale
-                        //ma è stato effetuato lo sblocco stato per il ruolo corrente 
-                        //allora abilito il pulsante di acquisiz.
-                        if (!DiagrammiManager.IsDocumentInFinalState() ||
-                            Convert.ToInt32(DocumentManager.GetAccessRightDocByDocument(
-                            DocumentManager.getSelectedRecord(), UserManager.GetInfoUser())) > 45)
-                        {
-                            ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_UPLOADFILE);
-                        }
-                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).SetButtonImageTimestamp();
-                        LitDocumentSignature.Text = string.Empty;
-                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_SIGNED);
-                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.NOTV_IDENTITYCARD);
-                        DocumentImgIdentityCard.Visible = false;
+                        ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewer();", true);
                     }
                 }
+                ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
+                if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null)
+                {
+                    ButtonsManager();
+
+                    if (EnabledLibroFirma)
+                        ButtonsManagerLibroFirma();
+                }
             }
-            UpPnlContentDxSx.Update();
-            UpPnlContentDxDx.Update();
-            UpBottomButtons.Update();
-            BuildStringAuthorFile(attach);
-            UpdateInfoFileAquired.Update();
-            if (!IsZoom && PageCaller != CALLER_SMISTAMENTO && this.PageCaller != ESAMINA_UNO_A_UNO)
-                ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframe();", true);
             else
             {
-                if ((PageCaller == CALLER_SMISTAMENTO || this.PageCaller == ESAMINA_UNO_A_UNO) && !IsZoom && !CallFromSignDetails)
+                UpPnlDocumentNotAcquired.Visible = true;
+                UpPnlDocumentAcquired.Visible = false;
+                UpPnlDocumentData.Visible = false;
+                GrdDocumentAttached.Visible = false;
+                GridAttachNoUser.Visible = false;
+                PlcVersions.Visible = false;
+                FileRequest fileReq = tabDocument.documenti[0];
+                if (fileReq != null)
                 {
+                    double size = 0;
+                    if (!string.IsNullOrEmpty(fileReq.fileSize))
+                        size = (double)int.Parse(fileReq.fileSize) / 1024;
+
+                    if (size > 0)
+                    {
+                        if (autoPreview)
+                        {
+                            UpPnlContentDxDx.Attributes.Add("style", "display:none");
+                            UpPnlDocumentData.Visible = true;
+                            UpPnlDocumentAcquired.Visible = false;
+                            UpPnlDocumentNotAcquired.Visible = false;
+                            BottomButtons.Visible = false;
+                            GrdDocumentAttached.Attributes.Add("style", "display:none"); ;
+                            GridAttachNoUser.Attributes.Add("style", "display:none");
+                            PlcVersions.Visible = false;
+                            (FindControl("divNumberVersion") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
+                            FindControl("divFrame").Visible = true;
+                            SaveFileDocument(fileReq);
+                            frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
+                            ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
+                            ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
+                            UpBottomButtons.Update();
+                            UpPnlContentDxSx.Update();
+                            UpPnlContentDxDx.Update();
+                        }
+                        else
+                        {
+                            UpPnlDocumentNotAcquired.Visible = false;
+                            UpPnlDocumentAcquired.Visible = true;
+                            ViewDocumentLinkFile.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLinkFile", UIManager.UserManager.GetUserLanguage()) + " V" + fileReq.version;
+                            ViewDocumentImageDocumentAcquired.Src = GetVersionImage(fileReq, true);
+                            FindControl("divFrame").Visible = false;
+                            DocumentManager.setSelectedNumberVersion(fileReq.version);
+                        }
+                    }
+                    else
+                    {
+                        //Fine
+
+                        if (!DocumentManager.IsNewDocument() && DocumentManager.getDocumentListVersions(Page, fileReq.docNumber, fileReq.docNumber).documenti.Length > 1)
+                        {
+                            UpPnlDocumentData.Visible = true;
+                            UpPnlDocumentAcquired.Visible = false;
+                            GrdDocumentAttached.Visible = false;
+                            GridAttachNoUser.Visible = false;
+                            //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
+                            FindControl("divFrame").Visible = false;
+                        }
+                        else
+                        {
+                            UpPnlDocumentNotAcquired.Visible = true;
+                            UpPnlDocumentAcquired.Visible = false;
+                        }
+                    }
                     ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
+                    ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
+                    (FindControl("divNumberVersion") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
+                    UpPnlContentDxSx.Update();
+                    UpPnlContentDxDx.Update();
+                    UpBottomButtons.Update();
                 }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewer();", true);
-                }
-            }
-            ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
-            if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null)
-            {
-                ButtonsManager();
-
-                if (EnabledLibroFirma)
-                    ButtonsManagerLibroFirma();
-            }
-
-            if (this.PageCaller == ESAMINA_UNO_A_UNO)
-            {
-                EsaminaLibroFirma page = this.Page as EsaminaLibroFirma;
-                page.EnabledButtonEsamina(IsElementoSelezionatoInLf(attach));
-                this.PlcVersions.Visible = false;
             }
         }
 
@@ -2706,10 +2627,7 @@ namespace NttDataWA.UserControls
                 {
                     if (fileDoc.firmato == "1")
                     {
-                        string tipoFirma = signed;
-                        if (!string.IsNullOrEmpty(fileDoc.tipoFirma))
-                            tipoFirma = fileDoc.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                        LitDocumentSignature.Text = tipoFirma;
+                        LitDocumentSignature.Text = signed;
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                         if (System.IO.Path.GetExtension(fileDoc.fileName).ToLower().Equals(".pdf"))
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
@@ -2741,17 +2659,7 @@ namespace NttDataWA.UserControls
                 }
                 else
                 {
-                    if(fileDoc.firmato.Equals("1"))
-                    {
-                        string tipoFirma = signed;
-                        if (!string.IsNullOrEmpty(fileDoc.tipoFirma))
-                            tipoFirma = fileDoc.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                        LitDocumentSignature.Text = tipoFirma + " - " + lock_InLibroFirma;
-                    }
-                    else
-                    {
-                        LitDocumentSignature.Text = lock_InLibroFirma;
-                    }
+                    LitDocumentSignature.Text = fileDoc.firmato.Equals("1") ? signed + " - " + lock_InLibroFirma : lock_InLibroFirma;
                 }
                 ButtonsManager();
 
@@ -2820,10 +2728,7 @@ namespace NttDataWA.UserControls
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                         if (System.IO.Path.GetExtension(fileDoc.fileName).ToLower().Equals(".pdf"))
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
-                        string tipoFirma = signed;
-                        if (!string.IsNullOrEmpty(fileDoc.tipoFirma))
-                            tipoFirma = fileDoc.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                        LitDocumentSignature.Text = tipoFirma;
+                        LitDocumentSignature.Text = signed;
                     }
                 }
                 ViewDocumentLinkFile.Text = Utils.Languages.GetLabelFromCode("ViewDocumentLinkFile", UIManager.UserManager.GetUserLanguage()) + " V" + fileDoc.version;
@@ -2940,10 +2845,7 @@ namespace NttDataWA.UserControls
 
                 if (fileReq.firmato == "1")
                 {
-                    string tipoFirma = signed;
-                    if (!string.IsNullOrEmpty(fileReq.tipoFirma))
-                        tipoFirma = fileReq.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                    LitDocumentSignature.Text = tipoFirma;
+                    LitDocumentSignature.Text = signed;
                     ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                     if (System.IO.Path.GetExtension(fileReq.fileName).ToLower().Equals(".pdf"))
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
@@ -2973,22 +2875,15 @@ namespace NttDataWA.UserControls
         /// <param name="e"></param>
         public void LinkViewFileDocument(object sender, EventArgs e)
         {
-            //PDZ 
-            //Estratto il metodo perchè lo devo richiamare per l'anteprima dei PDF
-            this.ViewFileDoc();
-        }
-        //PDZ
-        //fromPageForPreview parametro che indica nel caso di previewPDF la pagina da cui deve partire la prossima anteprima
-        //lastPageForPreview parametro che indica nel caso di previewPDF la pagina da cui deve partire la precedente anteprima
-        private void ViewFileDoc(bool isPreview = true, int fromPageForPreview = 0, int lastPageForPreview = 0)
-        {
             FileRequest file = null;
             SchedaDocumento sch = DocumentManager.getSelectedRecord();
-                if (!string.IsNullOrEmpty(this.PageCaller) && this.PageCaller == CALLER_SMISTAMENTO && !this.IsZoom && !CallFromSignDetails)
+            if (PageCaller != ESAMINA_UNO_A_UNO)
+            {
+                if (!string.IsNullOrEmpty(PageCaller) && PageCaller == CALLER_SMISTAMENTO && !IsZoom)
                 {
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "reallowOp();", true);
+                    ScriptManager.RegisterStartupScript(Page, GetType(), "function", "reallowOp();", true);
                 }
-                if (this.PageCaller.ToUpper().Equals(CALLER_ATTACHMENT) || UIManager.DocumentManager.getSelectedAttachId() != null)
+                if (PageCaller.ToUpper().Equals(CALLER_ATTACHMENT))
                 {
                     //Quando sono nel tab allegati e seleziono Visualizza file reimposto il SelectedAttachId uguale a quello selezionato nella griglia di destra.
                     //if(IsZoom)
@@ -3000,34 +2895,32 @@ namespace NttDataWA.UserControls
                 {
                     //Aggiungo la riga seguente per far si che nel tab documenti, quando clicco sul bottone visualizza
                     //quando ho selezionato un allegato, mi ritorna al documento principale  
-                    if(this.PageCaller != ESAMINA_UNO_A_UNO)
-                        DocumentManager.RemoveSelectedAttachId();
+                    DocumentManager.RemoveSelectedAttachId();
                     file = UIManager.FileManager.getSelectedFile();
                 }
-                //(this.FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:block";
-                this.FindControl("divFrame").Visible = true;
-                SaveFileDocument(file, false, isPreview, fromPageForPreview, lastPageForPreview);
-
-                this.frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
-                this.UpPnlDocumentData.Visible = true;
+                //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:block";
+                FindControl("divFrame").Visible = true;
+                SaveFileDocument(file);
+                frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
+                UpPnlDocumentData.Visible = true;
                 //Se lo user control è richiamato tramite il bottone "Zoom" disabilito
-                if (IsZoom || this.PageCaller == CALLER_SMISTAMENTO)
+                if (IsZoom || PageCaller == CALLER_SMISTAMENTO)
                 {
-                    (this.FindControl("divNumberVersion") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
+                    (FindControl("divNumberVersion") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
                 }
 
-                if ((this.PageCaller == CALLER_SMISTAMENTO && !IsZoom && !CallFromSignDetails))
+                if ((PageCaller == CALLER_SMISTAMENTO && !IsZoom))
                 {
-                    ((SmistamentoDocumenti)this.Page).RefreshZoom();
+                    ((SmistamentoDocumenti)Page).RefreshZoom();
                 }
-                this.GrdDocumentAttached.Visible = true;
-                if (!IsZoom || this.PageCaller != CALLER_SMISTAMENTO)
-                    this.GridAttachNoUser.Visible = true;
+                GrdDocumentAttached.Visible = true;
+                if (!IsZoom || PageCaller != CALLER_SMISTAMENTO)
+                    GridAttachNoUser.Visible = true;
                 else
-                    this.GridAttachNoUser.Visible = false;
-                this.UpPnlDocumentAcquired.Visible = false;
-                this.UpPnlDocumentNotAcquired.Visible = false;
-                this.BottomButtons.Visible = true;
+                    GridAttachNoUser.Visible = false;
+                UpPnlDocumentAcquired.Visible = false;
+                UpPnlDocumentNotAcquired.Visible = false;
+                BottomButtons.Visible = true;
                 if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null)
                 {
                     bool bool_locked = false;
@@ -3048,20 +2941,17 @@ namespace NttDataWA.UserControls
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_ALL);
                         if (file.firmato == "1")
                         {
-                            string tipoFirma = signed;
-                            if (!string.IsNullOrEmpty(file.tipoFirma))
-                                tipoFirma = file.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                            LitDocumentSignature.Text = tipoFirma;
+                            LitDocumentSignature.Text = signed;
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                             if (System.IO.Path.GetExtension(file.fileName).ToLower().Equals(".pdf"))
                                 ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
                         }
                         else
                         {
-                            this.LitDocumentSignature.Text = "";
+                            LitDocumentSignature.Text = "";
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_SIGNED);
                         }
-                        this.DocumentImgIdentityCard.Enabled = true;
+                        DocumentImgIdentityCard.Enabled = true;
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_UPLOADFILE);
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).SetButtonImageTimestamp();
                         if (DisableSignature(file))
@@ -3069,12 +2959,12 @@ namespace NttDataWA.UserControls
                         if (IsVisibleButtonIdentityCard(file))
                         {
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.V_IDENTITYCARD);
-                            this.DocumentImgIdentityCard.Visible = true;
+                            DocumentImgIdentityCard.Visible = true;
                         }
                         else
                         {
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.NOTV_IDENTITYCARD);
-                            this.DocumentImgIdentityCard.Visible = false;
+                            DocumentImgIdentityCard.Visible = false;
                         }
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_UNLOCKED);
                     }
@@ -3083,34 +2973,33 @@ namespace NttDataWA.UserControls
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_CHECKOUT);
                     }
                 }
-                this.UpdatePanelPreview.Update();
-                this.UpBottomButtons.Update();
-                this.UpPnlContentDxSx.Update();
-                this.UpPnlContentDxDx.Update();
-                if (!IsZoom && this.PageCaller != CALLER_SMISTAMENTO && this.PageCaller != ESAMINA_UNO_A_UNO)
-                    if (!this.CallFromSignDetails)
-                        ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "resizeFrame", "resizeIframe();", true);
+                UpBottomButtons.Update();
+                UpPnlContentDxSx.Update();
+                UpPnlContentDxDx.Update();
+                if (!IsZoom && PageCaller != CALLER_SMISTAMENTO)
+                    if (!CallFromSignDetails)
+                        ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframe();", true);
                     else
-                        ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "resizeFrame", "resizeIframeViewerSign();", true);
+                        ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSign();", true);
                 else
                 {
-                    if (this.PageCaller == CALLER_SMISTAMENTO && !IsZoom)
+                    if (PageCaller == CALLER_SMISTAMENTO && !IsZoom)
                     {
-                        ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
+                        ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
                     }
                     else
                     {
-                        ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "resizeFrame", "resizeIframeViewer();", true);
+                        ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewer();", true);
                     }
                 }
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "tipsy", "tooltipTipsy();", true);
+                ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
                 DocumentManager.setSelectedNumberVersion("0");
-                this.BindVersions(file.versionId);
-                this.BindDocumentAttached();
+                BindVersions(file.versionId);
+                BindDocumentAttached();
                 if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null)
                 {
                     ButtonsManager();
-                    if (this.EnabledLibroFirma)
+                    if (EnabledLibroFirma)
                         ButtonsManagerLibroFirma();
                 }
 
@@ -3121,201 +3010,33 @@ namespace NttDataWA.UserControls
                     string extensionFile = (file.fileName.Split('.').Length > 1) ? (file.fileName.Split('.'))[file.fileName.Split('.').Length - 1] : string.Empty;
                     if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null && !verifyExtensionForSign(extensionFile))
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).DisableButtonImageSign();
-                    //if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null && !FileManager.getEstensioneIntoSignedFile(file.fileName).ToLowerInvariant().Equals(PDF))
-                    //    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ELECTRONIC_SIGN);
                 }
-            if (this.PageCaller == ESAMINA_UNO_A_UNO)
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "reallowOp();", true);
-                //this.GridAttachNoUser.Visible = false;
-                this.PlcVersions.Visible = false;
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "tipsy", "tooltipTipsy();", true);
-                this.UpdatePanelPreview.Update();
-                this.UpBottomButtons.Update();
-                this.UpPnlContentDxSx.Update();
-                this.UpPnlContentDxDx.Update();
             }
-
-            //Se Anteprima abilitata e pdf, nascondo il pulsante visualizza documento
-            if (IsPreview(file) && isPreview)
-            {                      
-                ((GrdDocumentAttached.Rows[GrdDocumentAttached.SelectedIndex] as GridViewRow).FindControl("btnVisualizza") as CustomImageButton).Visible = false;
+            else
+            {
+                file = sch.documenti[0];
+                if (file != null)
+                {
+                    UpPnlContentDxDx.Attributes.Add("style", "display:none");
+                    UpPnlDocumentData.Visible = true;
+                    UpPnlDocumentAcquired.Visible = false;
+                    UpPnlDocumentNotAcquired.Visible = false;
+                    BottomButtons.Visible = false;
+                    GrdDocumentAttached.Attributes.Add("style", "display:none"); ;
+                    GridAttachNoUser.Attributes.Add("style", "display:none");
+                    PlcVersions.Visible = false;
+                    (FindControl("divNumberVersion") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
+                    FindControl("divFrame").Visible = true;
+                    SaveFileDocument(file);
+                    frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
+                    ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
+                    ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
+                    UpBottomButtons.Update();
+                    UpPnlContentDxSx.Update();
+                    UpPnlContentDxDx.Update();
+                }
             }
         }
-
-        /// <summary>
-        /// handles the click on document/attachment to display
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        //public void LinkViewFileDocument(object sender, EventArgs e)
-        //{
-        //    FileRequest file = null;
-        //    SchedaDocumento sch = DocumentManager.getSelectedRecord();
-        //    if (PageCaller != ESAMINA_UNO_A_UNO)
-        //    {
-        //        if (!string.IsNullOrEmpty(PageCaller) && PageCaller == CALLER_SMISTAMENTO && !IsZoom && !CallFromSignDetails)
-        //        {
-        //            ScriptManager.RegisterStartupScript(Page, GetType(), "function", "reallowOp();", true);
-        //        }
-        //        if (PageCaller.ToUpper().Equals(CALLER_ATTACHMENT))
-        //        {
-        //            //Quando sono nel tab allegati e seleziono Visualizza file reimposto il SelectedAttachId uguale a quello selezionato nella griglia di destra.
-        //            //if(IsZoom)
-        //            DocumentManager.setSelectedAttachId(VersionIdAttachSelected);
-        //            file = FileManager.GetSelectedAttachment();
-        //        }
-
-        //        if (file == null)
-        //        {
-        //            //Aggiungo la riga seguente per far si che nel tab documenti, quando clicco sul bottone visualizza
-        //            //quando ho selezionato un allegato, mi ritorna al documento principale  
-        //            DocumentManager.RemoveSelectedAttachId();
-        //            file = UIManager.FileManager.getSelectedFile();
-        //        }
-        //        //(FindControl("divFrame") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:block";
-        //        FindControl("divFrame").Visible = true;
-        //        SaveFileDocument(file);
-        //        frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
-        //        UpPnlDocumentData.Visible = true;
-        //        //Se lo user control è richiamato tramite il bottone "Zoom" disabilito
-        //        if (IsZoom || PageCaller == CALLER_SMISTAMENTO)
-        //        {
-        //            (FindControl("divNumberVersion") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
-        //        }
-
-        //        if ((PageCaller == CALLER_SMISTAMENTO && !IsZoom && !CallFromSignDetails))
-        //        {
-        //            ((SmistamentoDocumenti)Page).RefreshZoom();
-        //        }
-        //        GrdDocumentAttached.Visible = true;
-        //        if (!IsZoom || PageCaller != CALLER_SMISTAMENTO)
-        //            GridAttachNoUser.Visible = true;
-        //        else
-        //            GridAttachNoUser.Visible = false;
-        //        UpPnlDocumentAcquired.Visible = false;
-        //        UpPnlDocumentNotAcquired.Visible = false;
-        //        BottomButtons.Visible = true;
-        //        if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null)
-        //        {
-        //            bool bool_locked = false;
-
-        //            if (UIManager.DocumentManager.getSelectedAttachId() == null)
-        //            {
-        //                SchedaDocumento selectedRecord = DocumentManager.getSelectedRecord();
-        //                bool_locked = (selectedRecord != null ? (selectedRecord.checkOutStatus != null && !string.IsNullOrEmpty(selectedRecord.checkOutStatus.ID)) : false);
-        //            }
-        //            else
-        //            {
-        //                bool_locked = (DocumentManager.GetSelectedAttachment() != null ? (DocumentManager.GetCheckOutDocumentStatus(DocumentManager.GetSelectedAttachment().docNumber) != null) : false);
-        //            }
-
-        //            if (!bool_locked)
-        //            {
-        //                DocumentButtons documentButtons = (DocumentButtons)Parent.FindControl("DocumentButtons");
-        //                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_ALL);
-        //                if (file.firmato == "1")
-        //                {
-        //                    string tipoFirma = signed;
-        //                    if (!string.IsNullOrEmpty(file.tipoFirma))
-        //                        tipoFirma = file.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-        //                    LitDocumentSignature.Text = tipoFirma;
-        //                    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
-        //                    if (System.IO.Path.GetExtension(file.fileName).ToLower().Equals(".pdf"))
-        //                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
-        //                }
-        //                else
-        //                {
-        //                    LitDocumentSignature.Text = "";
-        //                    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_SIGNED);
-        //                }
-        //                DocumentImgIdentityCard.Enabled = true;
-        //                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_UPLOADFILE);
-        //                ((DocumentButtons)Parent.FindControl("DocumentButtons")).SetButtonImageTimestamp();
-        //                if (DisableSignature(file))
-        //                    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_POSITIONSIGNATURE);
-        //                if (IsVisibleButtonIdentityCard(file))
-        //                {
-        //                    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.V_IDENTITYCARD);
-        //                    DocumentImgIdentityCard.Visible = true;
-        //                }
-        //                else
-        //                {
-        //                    ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.NOTV_IDENTITYCARD);
-        //                    DocumentImgIdentityCard.Visible = false;
-        //                }
-        //                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_UNLOCKED);
-        //            }
-        //            else
-        //            {
-        //                ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_CHECKOUT);
-        //            }
-        //        }
-        //        UpBottomButtons.Update();
-        //        UpPnlContentDxSx.Update();
-        //        UpPnlContentDxDx.Update();
-        //        if (!IsZoom && PageCaller != CALLER_SMISTAMENTO)
-        //            if (!CallFromSignDetails)
-        //                ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframe();", true);
-        //            else
-        //                ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSign();", true);
-        //        else
-        //        {
-        //            if (PageCaller == CALLER_SMISTAMENTO && !IsZoom && !CallFromSignDetails)
-        //            {
-        //                ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
-        //            }
-        //            else
-        //            {
-        //                ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewer();", true);
-        //            }
-        //        }
-        //        ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
-        //        DocumentManager.setSelectedNumberVersion("0");
-        //        BindVersions(file.versionId);
-        //        BindDocumentAttached();
-        //        if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null)
-        //        {
-        //            ButtonsManager();
-        //            if (EnabledLibroFirma)
-        //                ButtonsManagerLibroFirma();
-        //        }
-
-        //        //skizzo
-        //        //documento visualizzato, abilito i pulsanti per la firma.
-        //        if (file != null && !string.IsNullOrEmpty(file.fileSize) && Convert.ToUInt32(file.fileSize) > 0)
-        //        {
-        //            string extensionFile = (file.fileName.Split('.').Length > 1) ? (file.fileName.Split('.'))[file.fileName.Split('.').Length - 1] : string.Empty;
-        //            if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null && !verifyExtensionForSign(extensionFile))
-        //                ((DocumentButtons)Parent.FindControl("DocumentButtons")).DisableButtonImageSign();
-        //        }
-        //    }
-        //    else
-        //    {
-        //        file = sch.documenti[0];
-        //        if (file != null)
-        //        {
-        //            UpPnlContentDxDx.Attributes.Add("style", "display:none");
-        //            UpPnlDocumentData.Visible = true;
-        //            UpPnlDocumentAcquired.Visible = false;
-        //            UpPnlDocumentNotAcquired.Visible = false;
-        //            BottomButtons.Visible = false;
-        //            GrdDocumentAttached.Attributes.Add("style", "display:none"); ;
-        //            GridAttachNoUser.Attributes.Add("style", "display:none");
-        //            PlcVersions.Visible = false;
-        //            (FindControl("divNumberVersion") as System.Web.UI.HtmlControls.HtmlGenericControl).Attributes["style"] = "display:none";
-        //            FindControl("divFrame").Visible = true;
-        //            SaveFileDocument(file);
-        //            frame.Attributes["src"] = "../Document/AttachmentViewer.aspx";
-        //            ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
-        //            ScriptManager.RegisterStartupScript(Page, GetType(), "tipsy", "tooltipTipsy();", true);
-        //            UpBottomButtons.Update();
-        //            UpPnlContentDxSx.Update();
-        //            UpPnlContentDxDx.Update();
-        //        }
-        //    }
-        //}
 
         /// <summary>
         /// Resetta e nasconde le informazioni sulla pulsantiera BottomButtons
@@ -3340,7 +3061,7 @@ namespace NttDataWA.UserControls
         /// <param name="fileReq"></param>
         /// <param name="isShowPrintableVersion"></param>
         /// <returns></returns>
-        private void SaveFileDocument(FileRequest fileReq, bool isShowPrintableVersion = false, bool isPreview = true, int fromPage = 0, int lastPage = 0)
+        private void SaveFileDocument(FileRequest fileReq, bool isShowPrintableVersion = false)
         {
             SchedaDocumento documentTab = DocumentManager.getSelectedRecord();
             if (DocToSign == null)
@@ -3350,29 +3071,17 @@ namespace NttDataWA.UserControls
                 {
                     if (IsPdf(fileReq) || IsVisibleSignature())
                     {
-                        
-                        if (IsPreview(fileReq) && isPreview)
-                        {
-                            FileDoc = DocumentAnteprima(fileReq, fromPage, lastPage);
-                        }
-                        else
-                        {
-                            PlaceHolderPreview.Visible = false;
-                            this.UpdatePanelPreview.Update();
-                            //Abbatangeli - Segnatura permanente
-                            FileDoc = DocumentWithSignature(fileReq);
-                            //FileDoc = FileManager.getInstance(documentTab.systemId).GetFile(this.Page, fileReq, ShowDocumentAsPdfFormat);
-                        }
+                        FileDoc = DocumentWithSignature(fileReq);
                     }
                     else
                     {
                         if (fileReq.fileName.EndsWith("." + EML))
                         {
-                            FileDoc = FileManager.getInstance(documentTab.systemId).GetFileAsEML(this.Page, fileReq);
+                            FileDoc = FileManager.getInstance(documentTab.systemId).GetFileAsEML(Page, fileReq);
                         }
                         else
                         {
-                            FileDoc = FileManager.getInstance(documentTab.systemId).GetFile(this.Page, fileReq, ShowDocumentAsPdfFormat);
+                            FileDoc = FileManager.getInstance(documentTab.systemId).GetFile(Page, fileReq, ShowDocumentAsPdfFormat);
                         }
                     }
                 }
@@ -3380,11 +3089,11 @@ namespace NttDataWA.UserControls
                 {
                     if (fileReq.fileName.EndsWith("." + EML))
                     {
-                        FileDoc = FileManager.getInstance(documentTab.systemId).GetFileAsEML(this.Page, fileReq);
+                        FileDoc = FileManager.getInstance(documentTab.systemId).GetFileAsEML(Page, fileReq);
                     }
                     else
                     {
-                        FileDoc = FileManager.getInstance(documentTab.systemId).GetFile(this.Page, fileReq, ShowDocumentAsPdfFormat);
+                        FileDoc = FileManager.getInstance(documentTab.systemId).GetFile(Page, fileReq, ShowDocumentAsPdfFormat);
                     }
                 }
             }
@@ -3392,45 +3101,6 @@ namespace NttDataWA.UserControls
             {
                 FileDoc = DocToSign;
             }
-
-            //SchedaDocumento documentTab = DocumentManager.getSelectedRecord();
-            //if (DocToSign == null)
-            //{
-            //    //if required viewing with signature
-            //    if (DocumentManager.getSelectedRecord() != null && !DocumentManager.IsNewDocument() && !DisableSignature(fileReq) && !isShowPrintableVersion)
-            //    {
-            //        if (IsPdf(fileReq) || IsVisibleSignature())
-            //        {
-            //            FileDoc = DocumentWithSignature(fileReq);
-            //        }
-            //        else
-            //        {
-            //            if (fileReq.fileName.EndsWith("." + EML))
-            //            {
-            //                FileDoc = FileManager.getInstance(documentTab.systemId).GetFileAsEML(Page, fileReq);
-            //            }
-            //            else
-            //            {
-            //                FileDoc = FileManager.getInstance(documentTab.systemId).GetFile(Page, fileReq, ShowDocumentAsPdfFormat);
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        if (fileReq.fileName.EndsWith("." + EML))
-            //        {
-            //            FileDoc = FileManager.getInstance(documentTab.systemId).GetFileAsEML(Page, fileReq);
-            //        }
-            //        else
-            //        {
-            //            FileDoc = FileManager.getInstance(documentTab.systemId).GetFile(Page, fileReq, ShowDocumentAsPdfFormat);
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    FileDoc = DocToSign;
-            //}
         }
 
         /// <summary>
@@ -3510,82 +3180,6 @@ namespace NttDataWA.UserControls
             return theDoc;
         }
 
-        /// <summary>
-        /// Returns the document / attachment with signature in the case of pdf file
-        /// </summary>
-        /// <param name="fileReq"></param>
-        /// <returns></returns>
-        private FileDocumentoAnteprima DocumentAnteprima(FileRequest fileReq, int fromPage, int lastPage)
-        {
-            SchedaDocumento sch = null;
-            if (FileManager.GetSelectedAttachment() == null)
-                sch = DocumentManager.getSelectedRecord();
-            else if (DocumentManager.getSelectedRecord().documentoPrincipale == null)
-            {
-                sch = DocumentManager.getDocumentListVersions(this.Page, fileReq.docNumber, fileReq.docNumber);
-            }
-            Response.Expires = -1;
-            DocsPaWR.InfoUtente infoUser = UserManager.GetInfoUser();
-            DocsPaWR.labelPdf label = new DocsPaWR.labelPdf();
-            //load data in the object Label
-            label.position = PositionSignature;
-            label.tipoLabel = TypeLabel;
-            label.label_rotation = RotationSignature;
-            label.sel_font = CharacterSignature;
-            label.sel_color = ColorSignature;
-            label.orientamento = OrientationSignature;
-            if (fileReq.firmato == "1" || NoTimbro)
-                label.notimbro = NoTimbro;
-            if (PrintOnFirstPage || PrintOnLastPage)
-            {
-                label.digitalSignInfo = new labelPdfDigitalSignInfo();
-                label.digitalSignInfo.printOnFirstPage = PrintOnFirstPage;
-                label.digitalSignInfo.printOnLastPage = PrintOnLastPage;
-                if (fileReq.firmato == "1" || NoTimbro)
-                    label.digitalSignInfo.printFormatSign = FormatSignature;
-            }
-            DocsPaWR.SchedaDocumento schedaCorrente = NttDataWA.UIManager.DocumentManager.getSelectedRecord();
-            FileDocumentoAnteprima theDocA = null;
-            if (IsPdf(fileReq))
-            {
-                try
-                {
-                    theDocA = FileManager.getInstance(sch.systemId).getPdfPreviewFile(this.Page, fileReq, fromPage, lastPage, sch, label);
-                    if (theDocA != null)
-                    {
-
-                        if (!string.IsNullOrEmpty(NttDataWA.Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, "FE_PREVIEW_PDF_UP_DOWN")) &&
-                            NttDataWA.Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, "FE_PREVIEW_PDF_UP_DOWN").Equals("1"))
-                        {
-                            //this.ViewNextPreview.Enabled = (theDocA.lastPg != theDocA.totalPg);
-                            //this.ViewPrevPreview.Enabled = (theDocA.firstPg > 1);
-                            //this.ViewNextPreview.Visible = true;
-                            //this.ViewPrevPreview.Visible = true;
-                            this.imgNextPreview.Enabled = (theDocA.lastPg != theDocA.totalPg);
-                            this.imgPrevPreview.Enabled = (theDocA.firstPg > 1);
-                            this.imgNextPreview.Visible = true;
-                            this.imgPrevPreview.Visible = true;
-                        }
-
-                        //this.ViewFullDocPreview.Visible = UserManager.IsAuthorizedFunctions("PREVIEW_FULL_DOWNLOAD");
-
-                        string language = UIManager.UserManager.GetUserLanguage();
-                        this.ViewDocumentPreview.InnerText = Utils.Languages.GetLabelFromCode("ViewDocumentPreview", language) + " " + Utils.Languages.GetLabelFromCode("AttachmentsPage", language) + " " + theDocA.firstPg + "/" + theDocA.lastPg + " " +
-                                         Utils.Languages.GetLabelFromCode("LblPaginationOfDx", language) + " " + theDocA.totalPg;
-
-                        FromPagePreview = theDocA.firstPg;
-                        LastPagePreview = theDocA.lastPg;
-                        this.PlaceHolderPreview.Visible = true;
-                        this.UpdatePanelPreview.Update();
-                    }
-                }
-                catch (Exception ex) { }
-            }
-            //if (theDoc != null && theDoc.LabelPdf.default_position.Equals("pos_pers"))
-            //    theDoc.LabelPdf.default_position = theDoc.LabelPdf.positions[4].PosX + "-" + theDoc.LabelPdf.positions[4].PosY;
-
-            return theDocA;
-        }
         #endregion
 
         #region management version
@@ -3630,41 +3224,6 @@ namespace NttDataWA.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void btnFullDoc_Click(object sender, EventArgs e)
-        {
-            FileDoc = null;
-            ViewFileDoc(false);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected void btnPrev_Click(object sender, EventArgs e)
-        {
-            int fromPage = FromPagePreview;
-            int lastPage = LastPagePreview;
-            ViewFileDoc(true, 0, fromPage - 1);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected void btnSucc_Click(object sender, EventArgs e)
-        {
-            int fromPage = FromPagePreview;
-            int lastPage = LastPagePreview;
-            ViewFileDoc(true, lastPage + 1);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         protected void btnVersion_Click(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(Page, GetType(), "function", "<script>reallowOp();</script>", false);
@@ -3672,10 +3231,6 @@ namespace NttDataWA.UserControls
             DocumentManager.setSelectedNumberVersion(((Button)sender).ToolTip);
             string versionId = string.Empty, version = string.Empty;
             bool isLastVersion = false;
-
-            //ABBATANGELI - nel caso non ci siano file, evita errore Versione precedentemente fossilizzata in memoria
-            FileDoc = null;
-
             if (DocumentManager.getSelectedAttachId() != null) //nel caso di allegato prendo il versionid dell'ultima versione
             {
                 versionId = DocumentManager.getSelectedAttachId();
@@ -3739,10 +3294,7 @@ namespace NttDataWA.UserControls
                     //Controllo firma
                     if (fileReq.firmato == "1")
                     {
-                        string tipoFirma = signed;
-                        if (!string.IsNullOrEmpty(fileReq.tipoFirma))
-                            tipoFirma = fileReq.tipoFirma.Equals(NttDataWA.Utils.TipoFirma.ELETTORNICA) ? elettronicSignature : digitalSignature;
-                        LitDocumentSignature.Text = tipoFirma;
+                        LitDocumentSignature.Text = signed;
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.SIGNED);
                         if (System.IO.Path.GetExtension(fileReq.fileName).ToLower().Equals(".pdf"))
                             ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_COSIGNED);
@@ -3752,10 +3304,6 @@ namespace NttDataWA.UserControls
                         LitDocumentSignature.Text = string.Empty;
                         ((DocumentButtons)Parent.FindControl("DocumentButtons")).RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_SIGNED);
                     }
-
-                    string extensionFile = (fileReq.fileName.Split('.').Length > 1) ? (fileReq.fileName.Split('.'))[fileReq.fileName.Split('.').Length - 1] : string.Empty;
-                    if (((DocumentButtons)Parent.FindControl("DocumentButtons")) != null && !verifyExtensionForSign(extensionFile))
-                        ((DocumentButtons)Parent.FindControl("DocumentButtons")).DisableButtonImageSign();
                 }
             }
             else
@@ -3809,19 +3357,14 @@ namespace NttDataWA.UserControls
             GrdDocumentAttached.Visible = true;
             if (!IsZoom || PageCaller != CALLER_SMISTAMENTO || PageCaller != ESAMINA_UNO_A_UNO)
                 GridAttachNoUser.Visible = true;
-
-            if (IsPreview(fileReq))
-                this.UpdatePanelPreview.Update();
-
             UpPnlContentDxSx.Update();
             UpPnlContentDxDx.Update();
             UpBottomButtons.Update();
-            
             if (!IsZoom && PageCaller != CALLER_SMISTAMENTO && PageCaller != ESAMINA_UNO_A_UNO)
                 ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframe();", true);
             else
             {
-                if ((PageCaller == CALLER_SMISTAMENTO && !IsZoom && !CallFromSignDetails) || PageCaller == ESAMINA_UNO_A_UNO)
+                if ((PageCaller == CALLER_SMISTAMENTO && !IsZoom) || PageCaller == ESAMINA_UNO_A_UNO)
                 {
                     ScriptManager.RegisterStartupScript(Page, GetType(), "resizeFrame", "resizeIframeViewerSmistamento();", true);
                 }
@@ -4179,21 +3722,10 @@ namespace NttDataWA.UserControls
             string link = string.Empty;
             if (fileRequest.versionId != null)
             {
-                int maxDimFileSign = 0;
-                string msgDesc = "WarningStartProcessSignatureMaxDimFile";
-                if (UserManager.IsAuthorizedFunctions("DOWNLOAD_BIG_FILE") || CheckMaxFileSize(out maxDimFileSign))
-                {
-                    link = ResolveUrl("~/Document/AttachmentViewer.aspx?versionDownload=") + fileRequest.versionId;
-                }
-                else
-                {
-                    string maxSiz = Convert.ToString(Math.Round((double)maxDimFileSign / 1048576, 3));
-                    link = "javascript:parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + maxSiz + "');";
-                }
+                link = ResolveUrl("~/Document/AttachmentViewer.aspx?versionDownload=") + fileRequest.versionId;
             }
             return link;
         }
-
 
         /// <summary>
         /// 
@@ -4268,7 +3800,7 @@ namespace NttDataWA.UserControls
                     list.AddRange((from att in DocumentManager.getSelectedRecord().allegati where att.TypeAttachment == 1 select att).ToArray());
 
                     // MEV Visualizzazione allegati sistemi esterni su smistamento
-                    if (PageCaller.Equals(CALLER_SMISTAMENTO) && !CallFromSignDetails)
+                    if (PageCaller.Equals(CALLER_SMISTAMENTO))
                     {
                         list.AddRange((from att in DocumentManager.getSelectedRecord().allegati where att.TypeAttachment == 4 select att).ToArray());
                     }
@@ -4656,17 +4188,6 @@ namespace NttDataWA.UserControls
             }
         }
 
-        protected void AddVersion_Click(object sender, EventArgs e)
-        {
-            SchedaDocumento schedaDoc = DocumentManager.getSelectedRecord();
-            if (DocumentManager.IsDocumentoInLibroFirma(schedaDoc) && LibroFirmaManager.IsAttivoBloccoModificheDocumentoInLibroFirma())
-            {
-                ScriptManager.RegisterStartupScript(Page, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');} else {parent.parent.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');}", true);
-                return;
-            }
-            ScriptManager.RegisterStartupScript(Page, this.GetType(), "AddVersion", "ajaxModalPopupVersionAdd();", true);
-        }
-
         /// <summary>
         /// Restituisce il numero di allegati della tipologia selezionata(is,pec,esterni)
         /// </summary>
@@ -4690,32 +4211,6 @@ namespace NttDataWA.UserControls
             return count.ToString();
         }
 
-        /// <summary>
-        /// Restituisce true se sarà visualizzato il file in anteprime
-        /// </summary>
-        /// <param name="fileRequest"></param>
-        /// <returns></returns>
-        private bool IsPreview(FileRequest file)
-        {
-            bool retVal = false;
-            bool isPdf = FileManager.getEstensioneIntoSignedFile(file.fileName).ToLowerInvariant().Equals(PDF);
-
-            if (isPdf)
-            {
-                int fileSizeLimit = 5 * 1024 * 1024;
-                int fileSize = int.Parse(file.fileSize);
-
-                if (!string.IsNullOrEmpty(NttDataWA.Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, "FE_PREVIEW_MB_LIMIT")) && Int32.Parse(NttDataWA.Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, "FE_PREVIEW_MB_LIMIT")) > 0)
-                {
-                    fileSizeLimit = 1024 * 1024 * Int32.Parse(NttDataWA.Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, "FE_PREVIEW_MB_LIMIT"));
-
-                    if (fileSize > fileSizeLimit)
-                        retVal = true;
-                }
-            }
-
-            return retVal;
-        }
 
         /// <summary>
         /// Disabilita la segnatura se il file non è di tipo pdf, ha impressa la segnatura e se è un allegato non di tipo utente
@@ -4899,44 +4394,6 @@ namespace NttDataWA.UserControls
                         //script = "$(\"input[value='" + TYPE_EXT + "']:radio\").attr('checked', 'checked');__doPostBack('panelAllegati','');return false;";
                         break;
 
-                }
-            }
-        }
-
-        private bool CheckMaxFileSize(out int maxDimFileSign)
-        {
-            DocsPaWR.FileRequest fileReq = null;
-            if (FileManager.GetSelectedAttachment() == null)
-            {
-                fileReq = UIManager.FileManager.getSelectedFile();
-            }
-            else
-            {
-                fileReq = FileManager.GetSelectedAttachment();
-            }
-            maxDimFileSign = 0;
-            if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString())) &&
-               !Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()).Equals("0"))
-                maxDimFileSign = Convert.ToInt32(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()));
-            if (maxDimFileSign > 0 && Convert.ToInt32(fileReq.fileSize) > maxDimFileSign)
-            {
-                return false;
-            }
-            else
-                return true;
-        }
-
-        protected void btnVersioneStampabile_Click(object sender, EventArgs e)
-        {
-            int maxDimFileSign = 0;
-            
-            if (!UserManager.IsAuthorizedFunctions("DOWNLOAD_BIG_FILE"))
-            {
-                if (CheckMaxFileSize(out maxDimFileSign))
-                {
-                    string maxSize = Convert.ToString(Math.Round((double)maxDimFileSign / 1048576, 3));
-                    string msgDesc = "WarningStartProcessSignatureMaxDimFile";
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + maxSize + "');} else {parent.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + maxSize + "');}", true);
                 }
             }
         }

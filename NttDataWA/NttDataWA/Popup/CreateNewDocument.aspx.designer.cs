@@ -13,6 +13,33 @@ namespace NttDataWA.Popup {
     public partial class CreateNewDocument {
         
         /// <summary>
+        /// PnlTypology control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel PnlTypology;
+        
+        /// <summary>
+        /// CreateNewDocumentTypology control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal CreateNewDocumentTypology;
+        
+        /// <summary>
+        /// ddlTypology control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlTypology;
+        
+        /// <summary>
         /// PnlObject control.
         /// </summary>
         /// <remarks>

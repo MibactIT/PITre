@@ -58,15 +58,6 @@ namespace NttDataWA.ImportDati {
         protected global::System.Web.UI.UpdatePanel box_upload;
         
         /// <summary>
-        /// BtnUploadHidden control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button BtnUploadHidden;
-        
-        /// <summary>
         /// lnkTemplate control.
         /// </summary>
         /// <remarks>
@@ -74,15 +65,6 @@ namespace NttDataWA.ImportDati {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HyperLink lnkTemplate;
-        
-        /// <summary>
-        /// fileUpload control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputFile fileUpload;
         
         /// <summary>
         /// lblFilename control.
@@ -94,6 +76,15 @@ namespace NttDataWA.ImportDati {
         protected global::System.Web.UI.WebControls.Literal lblFilename;
         
         /// <summary>
+        /// fileUpload control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputFile fileUpload;
+        
+        /// <summary>
         /// lnkDownload control.
         /// </summary>
         /// <remarks>
@@ -103,13 +94,13 @@ namespace NttDataWA.ImportDati {
         protected global::System.Web.UI.HtmlControls.HtmlAnchor lnkDownload;
         
         /// <summary>
-        /// boxUploadDocumenti control.
+        /// BtnUploadHidden control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl boxUploadDocumenti;
+        protected global::System.Web.UI.WebControls.Button BtnUploadHidden;
         
         /// <summary>
         /// upReport control.

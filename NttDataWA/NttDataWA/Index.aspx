@@ -9,16 +9,6 @@
     <link href="Css/chosen.css" rel="stylesheet" type="text/css" />
     <script src="Scripts/chosen.jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript">
-        function generateRendomExportFileName() {
-            var text = "_";
-            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-            for (var i = 0; i < 5; i++)
-                text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-            return text;
-        }
-
         function changeBgImage(image, id, image2, id2) {
             var element = document.getElementById(id);
             element.style.backgroundImage = "url(" + image + ")";
@@ -35,18 +25,6 @@
                     if(jqXHR && (jqXHR.status === 500 )){ 
                         ajaxModalPopupVerificaConnettoreSocket();
                     }
-                    //try {
-                    //    // oggeto settato in VerificaConnettoreSocket.aspx
-                    //    if (data.check === "error") {
-                    //        ajaxModalPopupVerificaConnettoreSocket();
-                    //    }
-                    //    // console.log("ajacCall: " + JSON.stringify(data));
-                    //} catch (error) {
-                    //    console.error(error);
-                    //}
-                    //if(jqXHR && (jqXHR.status === 500 )){ 
-                    //    ajaxModalPopupVerificaConnettoreSocket();
-                    //}
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     if(jqXHR && (jqXHR.status === 500 )){ 

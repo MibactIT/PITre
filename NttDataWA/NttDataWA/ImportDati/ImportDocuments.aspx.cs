@@ -90,9 +90,7 @@ namespace NttDataWA.ImportDati
             if (!IsPostBack)
             {
                 this.InitializePage();
-                // Session.Add("InfoUserForUploadDocument", UIManager.UserManager.GetInfoUser());
             }
-
 
             this.RefreshScript();
         }
@@ -281,8 +279,6 @@ namespace NttDataWA.ImportDati
                 this.plcArrive.Visible = false;
                 this.plcLiAttachments.Visible = false;
                 this.plcAttachments.Visible = false;
-
-                this.boxUploadDocumenti.Visible = false;
             }
         }
 
@@ -578,62 +574,6 @@ namespace NttDataWA.ImportDati
         }
 
         #endregion
-
-
-        #region Importazione dei documenti lato client
-
-        protected void _btnImport_Click(object sender, EventArgs e)
-        {
-            string filepath;
-            HttpFileCollection uploadedFiles;
-            HttpPostedFile userPostedFile;
-            bool result = true;
-            bool fileCaricati = false;
-            InfoUtente infoUtente;
-            try
-            {
-                filepath = Server.MapPath("\\Upload");
-                uploadedFiles = Request.Files;
-
-
-                //Span1.Text = string.Empty;
-                infoUtente = UIManager.UserManager.GetInfoUser();
-                for (int i = 0; i < uploadedFiles.Count; i++)
-                {
-                    userPostedFile = uploadedFiles[i];
-                    if(userPostedFile == null) { continue; }
-                    if(String.IsNullOrWhiteSpace(userPostedFile.FileName) || userPostedFile.FileName.Equals("formatPdfExport.xml")) { continue; }
-                    result = ImportDocumentManager.UploadFileOnServer(userPostedFile.InputStream, userPostedFile.FileName, infoUtente);
-                    if (!result)
-                    {
-                        throw new Exception("Errore nell'upload del file");
-                    }
-                    fileCaricati = true;
-                }
-                if (fileCaricati)
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "ajaxDialogModal('ErrorCustom', 'info', '', '" + "Files caricati con successo" + "');", true);
-                }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "ajaxDialogModal('ErrorCustom', 'info', '', '" + "Nessun file selezionato" + "');", true);
-                }
-
-            }
-            catch (Exception)
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "ajaxDialogModal('ErrorCustom', 'error', '', '" + "Errore upload dei file al server" + "');", true);
-            }
-        }
-
-        protected void _btnImportAttachments_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        #endregion
-
-
 
     }
 }

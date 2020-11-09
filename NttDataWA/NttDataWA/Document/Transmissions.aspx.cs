@@ -4396,7 +4396,7 @@ namespace NttDataWA.Document
                     // checks on transm selected
                     if (this.SelectedRowIndex >= 0)
                     {
-                        if ((trasm != null && trasm.systemId != null) && (trasm.dataInvio == null || trasm.dataInvio == "") && trasm.ruolo.idGruppo.Equals(RoleManager.GetRoleInSession().idGruppo))
+                        if ((trasm != null && trasm.systemId != null) && (trasm.dataInvio == null || trasm.dataInvio == ""))
                         {
                             this.TransmissionsBtnModify.Enabled = true; // modify is enabled only if not yet transmitted
                             this.TransmissionsBtnTransmit.Enabled = true; // transmission is enabled only if not yet transmitted
@@ -4556,8 +4556,6 @@ namespace NttDataWA.Document
                 DocsPaWR.AddressbookQueryCorrispondenteAutorizzato qca = new DocsPaWR.AddressbookQueryCorrispondenteAutorizzato();
                 qca.ragione = trasmissioneSingola.ragione;
                 qca.ruolo = UserManager.GetSelectedRole();
-                qca.queryCorrispondente = new AddressbookQueryCorrispondente();
-                qca.queryCorrispondente.fineValidita = true;
 
                 //DocsPaWR.Ruolo[] ruoli = UserManager.getListaRuoliInUO(this, theUo, UserManager.getInfoUtente());
                 DocsPaWR.Ruolo[] ruoli = UserManager.getRuoliRiferimentoAutorizzati(this, qca, theUo);

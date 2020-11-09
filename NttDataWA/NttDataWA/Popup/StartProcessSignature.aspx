@@ -3,61 +3,67 @@
 
 <%@ Register Assembly="NttDatalLibrary" Namespace="NttDatalLibrary" TagPrefix="cc1" %>
 <%@ Register Src="~/UserControls/ajaxpopup2.ascx" TagPrefix="uc" TagName="ajaxpopup2" %>
-<%@ Register Src="~/UserControls/CorrespondentCustom.ascx" TagPrefix="uc7" TagName="Correspondent" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="uc1" %>
 <%@ Register Src="~/UserControls/Calendar.ascx" TagPrefix="uc6" TagName="Calendar" %>
 <asp:Content ID="ContentPlaceHolderHeader" ContentPlaceHolderID="head" runat="server">
     <script src="../Scripts/chosen.jquery.min.js" type="text/javascript"></script>
     <link href="../Css/chosen.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
-        .container {
+        .container
+        {
             position: fixed;
             top: 1px;
             left: 0px;
             bottom: 71px;
             right: 0px;
+            overflow: auto;
             background: #ffffff;
             text-align: left;
             padding: 10px;
         }
-
-        .containerTreeView {
+        .containerTreeView
+        {
             clear: both;
             min-height: 18px;
             text-align: left;
             vertical-align: top;
-            max-height: 250px;
+            max-height: 150px;
             max-width: 100%;
             overflow: auto;
         }
-
-        .TreeSignatureProcess {
-            padding: 0;
+        .TreeSignatureProcess
+        {
+            padding: 0;       
             margin: 0 0 10px 0;
             color: #0f64a1;
         }
-
-            .TreeSignatureProcess img {
-                width: 20px;
-                height: 20px;
-            }
-
-        .TreeSignatureProcess_node a:link, .TreeSignatureProcess_node a:visited, .TreeSignatureProcess_node a:hover {
+        
+        
+        .TreeSignatureProcess img
+        {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .TreeSignatureProcess_node a:link, .TreeSignatureProcess_node a:visited, .TreeSignatureProcess_node a:hover
+        {
             padding: 0 5px;
         }
-
-        .TreeSignatureProcess_selected {
+        
+        .TreeSignatureProcess_selected
+        {
             background-color: #477FAF;
             color: #fff;
         }
-
-            .TreeSignatureProcess_selected a:link, .TreeSignatureProcess_selected a:visited, .TreeSignatureProcess_selected a:hover {
-                padding: 0 5px;
-                background-color: transparent;
-                color: #fff;
-            }
-
-        .txt_textarea {
+        
+        .TreeSignatureProcess_selected a:link, .TreeSignatureProcess_selected a:visited, .TreeSignatureProcess_selected a:hover
+        {
+            padding: 0 5px;
+            background-color: transparent;
+            color: #fff;
+        }
+        .txt_textarea
+        {
             width: 100%;
             border: 1px solid #cccccc;
             line-height: 18px;
@@ -71,8 +77,9 @@
             -webkit-border-radius: 5px; /* safari, chrome */
             -o-border-radius: 5px; /* opera */
         }
-
-        .txt_textarea_disabled {
+        
+        .txt_textarea_disabled
+        {
             width: 100%;
             border: 1px solid #cccccc;
             line-height: 18px;
@@ -87,172 +94,80 @@
             -webkit-border-radius: 5px; /* safari, chrome */
             -o-border-radius: 5px; /* opera */
         }
-
-        .disabled {
-            color: #848484;
-            text-decoration: line-through;
-        }
-
-        #contentStep fieldset.azure {
-            border: 1px solid #3399cc;
-        }
-
-        #contentStep {
-            padding: 10px;
-        }
-
-        #contentSx {
-            float: left;
-            width: 45%;
-            overflow: auto;
-            height: 100%;
-        }
-
-        #contentDx {
-            float: right;
-            width: 55%;
-            height:95%;
-        }
-
-        #centerContentAddressbook {
-            border: 1px solid #2e82bc;
-            background-color: #edf4f8;
-            float: left;
-            width: 98%;
-            height: 95%;
-            overflow:auto;
-            padding: 10px;
-        }
-
-        #centerContentAddressbook p {
-            margin: 0px;
-            padding: 0px;
-            font-size: 1em;
-            padding-top: 5px;
-            padding-bottom: 5px;
-            color: black;
-        }
-
-        .col-right-no-margin {
-            float: right;
-            margin: 0px;
-            padding: 0px;
-            text-align: right;
-        }
-        .legend
+        .disabled
         {
-            padding: 0px 5px 0px 5px;           
-        }
-
-        .legend img
-        {
-            padding-left:5px;
+           color: #848484;
+           text-decoration: line-through;
         }
     </style>
-    <script type="text/javascript">
-        function closeAddressBookPopup() {
-            $('#btnAddressBookPostback').click();
-        }
-    </script>
 </asp:Content>
-<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolderContent"
+<asp:Content ID="ContentPlaceHolderContent" ContentPlaceHolderID="ContentPlaceHolderContent"
     runat="server">
-    <uc:ajaxpopup2 Id="AddressBook" runat="server" Url="../popup/AddressBook.aspx" PermitClose="false"
-        PermitScroll="false" IsFullScreen="true" CloseFunction="function (event, ui)  {$('#btnAddressBookPostback').click();}" />
     <div class="container">
-        <div id="centerContentAddressbook">
-            <asp:UpdatePanel ID="UpDettaglioProcessi" runat="server" UpdateMode="Conditional" ClientIDMode="Static">
+        <div class="row">
+            <asp:PlaceHolder ID="plcNoSignatureProcess" runat="server" Visible="false">
+                <asp:Label ID="lblNoVisibleSignatureProcess" runat="server"> </asp:Label>
+            </asp:PlaceHolder>
+            <asp:UpdatePanel runat="server" ID="upPnlSignatureProcesses" UpdateMode="Conditional"
+                ClientIDMode="Static">
                 <ContentTemplate>
-                    <asp:Panel ID="PnlDettaglioProcessi" runat="server" CssClass="row">
-                        <div id="contentSx">
-                            <div class="row">
-                                <asp:PlaceHolder ID="plcNoSignatureProcess" runat="server" Visible="false">
-                                    <asp:Label ID="lblNoVisibleSignatureProcess" runat="server"> </asp:Label>
-                                </asp:PlaceHolder>
-                                <asp:UpdatePanel runat="server" ID="upPnlSignatureProcesses" UpdateMode="Conditional"
-                                    ClientIDMode="Static">
-                                    <ContentTemplate>
-                                        <asp:PlaceHolder ID="plcSignatureProcesses" runat="server">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <span class="weight">
-                                                        <asp:Literal ID="lblStartProcessSignature" runat="server" /></span>
-                                                </div>
-                                            </div>
-                                            <asp:Panel ID="PnlTreeViewProcessoFirma" runat="server">
-                                                <div class="containerTreeView">
-                                                    <asp:UpdatePanel runat="server" ID="UpdatePanelTreeView" UpdateMode="Conditional"
-                                                        ClientIDMode="Static">
-                                                        <ContentTemplate>
-                                                            <asp:TreeView ID="TreeProcessSignature" runat="server" ShowLines="true" NodeStyle-CssClass="TreeSignatureProcess_node"
-                                                                SelectedNodeStyle-CssClass="TreeSignatureProcess_selected" OnSelectedNodeChanged="TreeSignatureProcess_SelectedNodeChanged"
-                                                                OnTreeNodeCollapsed="TreeSignatureProcess_Collapsed" OnTreeNodeExpanded="TreeSignatureProcess_Collapsed" 
-                                                                CssClass="TreeSignatureProcess" />
-                                                        </ContentTemplate>
-                                                    </asp:UpdatePanel>
-                                                </div>
-                                            </asp:Panel>
-                                            <div class="row">
-                                                <asp:PlaceHolder ID="PlcNote" runat="server">
-                                                    <div class="row">
-                                                        <span class="weight">
-                                                            <asp:Literal ID="ltlNote" runat="server"></asp:Literal>
-                                                        </span>
-                                                    </div>
-                                                    <div style="width: 90%;">
-                                                        <div>
-                                                            <cc1:CustomTextArea ID="txtNotes" runat="server" CssClass="txt_textarea" CssClassReadOnly="txt_textarea_disabled"
-                                                                ClientIDMode="Static" TextMode="MultiLine">
-                                                            </cc1:CustomTextArea>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-right-no-margin">
-                                                                <span class="charactersAvailable">
-                                                                    <asp:Literal ID="ltrNotes" runat="server" ClientIDMode="Static"></asp:Literal>
-                                                                    <span id="txtNotes_chars" clientidmode="Static" runat="server"></span></span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </asp:PlaceHolder>
-                                            </div>
-                                            <asp:UpdatePanel ID="UpPnlNotificationOption" runat="server" UpdateMode="Conditional">
-                                                <ContentTemplate>
-                                                    <asp:PlaceHolder ID="PlcNotificationOption" runat="server">
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                <span class="weight">
-                                                                    <asp:Literal ID="ltlNotificationOption" runat="server"></asp:Literal>
-                                                                </span>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col">
-                                                                    <asp:CheckBoxList ID="cbxNotificationOption" runat="server" RepeatDirection="Vertical">
-                                                                    </asp:CheckBoxList>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </asp:PlaceHolder>
-                                                </ContentTemplate>
-                                            </asp:UpdatePanel>
-                                        </asp:PlaceHolder>
-                                    </ContentTemplate>
-                                </asp:UpdatePanel>
+                    <asp:PlaceHolder ID="plcSignatureProcesses" runat="server">
+                        <div class="row">
+                            <div class="col">
+                                <span class="weight">
+                                    <asp:Literal ID="lblStartProcessSignature" runat="server" /></span>
                             </div>
                         </div>
-                        <div id="contentDx">
-                            <asp:UpdatePanel ID="UpPnlDettaglioPassi" runat="server" UpdateMode="Conditional">
+                        <div class="containerTreeView">
+                            <asp:UpdatePanel runat="server" ID="UpdatePanelTreeView" UpdateMode="Conditional"
+                                ClientIDMode="Static">
                                 <ContentTemplate>
-                                    <asp:Panel ID="PnlPassi" runat="server" Visible="false">
-                                        <fieldset>
-                                            <div id="contentStep">
-                                                <asp:PlaceHolder ID="PnlDettaglioPassi" runat="server"></asp:PlaceHolder>
-                                            </div>
-                                        </fieldset>
-                                    </asp:Panel>
+                                    <asp:TreeView ID="TreeProcessSignature" runat="server" ShowLines="true" NodeStyle-CssClass="TreeSignatureProcess_node"
+                                        SelectedNodeStyle-CssClass="TreeSignatureProcess_selected" OnSelectedNodeChanged="TreeSignatureProcess_SelectedNodeChanged"
+                                        OnTreeNodeCollapsed="TreeSignatureProcess_Collapsed" OnTreeNodeExpanded="TreeSignatureProcess_Collapsed"
+                                        CssClass="TreeSignatureProcess" />
                                 </ContentTemplate>
                             </asp:UpdatePanel>
                         </div>
-                    </asp:Panel>
+                        <asp:PlaceHolder ID="PlcNote" runat="server">
+                            <div class="row">
+                                <span class="weight">
+                                    <asp:Literal ID="ltlNote" runat="server"></asp:Literal>
+                                </span>
+                            </div>
+                            <div style="width: 90%;">
+                                <div>
+                                    <cc1:CustomTextArea ID="txtNotes" runat="server" CssClass="txt_textarea" CssClassReadOnly="txt_textarea_disabled"
+                                        ClientIDMode="Static" TextMode="MultiLine">
+                                    </cc1:CustomTextArea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-right-no-margin">
+                                        <span class="charactersAvailable">
+                                            <asp:Literal ID="ltrNotes" runat="server" ClientIDMode="Static"></asp:Literal>
+                                            <span id="txtNotes_chars" clientidmode="Static" runat="server"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </asp:PlaceHolder>
+                        <asp:PlaceHolder ID="PlcNotificationOption" runat="server">
+                            <div class="row">
+                                <div class="col">
+                                    <span class="weight">
+                                        <asp:Literal ID="ltlNotificationOption" runat="server"></asp:Literal>
+                                    </span>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <asp:CheckBoxList ID="cbxNotificationOption" runat="server" RepeatDirection="Vertical">
+                                            <asp:ListItem Value="CP" runat="server" ID="cbxNotificationOptionOptCP"></asp:ListItem>
+                                            <asp:ListItem Value="IP" runat="server" ID="cbxNotificationOptionOptIP" Selected="true"></asp:ListItem>
+                                        </asp:CheckBoxList>
+                                    </div>
+                                </div>
+                            </div>
+                        </asp:PlaceHolder>
+                    </asp:PlaceHolder>
                 </ContentTemplate>
             </asp:UpdatePanel>
             <asp:UpdatePanel ID="upReport" runat="server" UpdateMode="Conditional" ClientIDMode="Static">
@@ -294,8 +209,11 @@
             <cc1:CustomButton ID="BtnReport" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
                 Visible="false" OnMouseOver="btnHover" ClientIDMode="Static" OnClick="BtnReport_Click"
                 OnClientClick="disallowOp('ContentPlaceHolderContent');" />
-            <asp:Button ID="btnAddressBookPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
-                OnClick="btnAddressBookPostback_Click" OnClientClick="disallowOp('ContentPlaceHolderContent')" />
         </ContentTemplate>
     </asp:UpdatePanel>
+    <script type="text/javascript">        $(".chzn-select-deselect").chosen({ allow_single_deselect:
+true, no_results_text: "Nessun risultato trovato"
+        }); $(".chzn-select").chosen({
+            no_results_text: "Nessun risultato trovato"
+        }); </script>
 </asp:Content>

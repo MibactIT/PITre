@@ -10,11 +10,6 @@
 <head>
     <title>
         <%=this.DialogTitle %></title>
-    <meta http-equiv="cache-control" content="max-age=0" />
-    <meta http-equiv="cache-control" content="no-cache" />
-    <meta http-equiv="expires" content="0" />
-    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
-    <meta http-equiv="pragma" content="no-cache" />
     <meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
     <meta content="C#" name="CODE_LANGUAGE">
     <meta content="JavaScript" name="vs_defaultClientScript">
@@ -72,14 +67,13 @@
                 // come parametro creaFileUrlSD
                 SelezionaTipoSalvataggio("creaFileUrlSD");    
                 
-             if (frmSaveDialog.rbFileZip.checked) {
-                SelezionaTipoSalvataggio('zip');
-            }   
+                
         }
         
         // Questa funzione si occupa di abilitare/disabilitare i controlli in base
         // al tipo di salvataggio richiesto
         function SelezionaTipoSalvataggio(tipo) {
+
             switch(tipo)
             {
                 case "clipboard":   // Copia del link a immagine del documento su clipboard
@@ -89,17 +83,13 @@
     	            frmSaveDialog.rbClipboard.checked = true;
     	            frmSaveDialog.rbSalvaUrl.checked = false;
     	            frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
-                    frmSaveDialog.rbFileZip.checked = false;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = false;
     	            
     	            document.getElementById("txtFolderPath").disabled = true;
     	            document.getElementById("btnBrowseForFolder").disabled = true;
     	            document.getElementById("txtFileName").disabled = true;
     	            estensioneURL.style.display = "none";
-                    estensione.style.display = "block";
-                    estensioneZip.style.display = "none";
-
-                    //setSessionValue("DownloadZipPackageDocument", "0");
+    	            estensione.style.display = "block";
     	            
     	            break;
     	            
@@ -110,17 +100,13 @@
     	            frmSaveDialog.rbClipboard.checked = false;
     	            frmSaveDialog.rbSalvaUrl.checked = false;
     	            frmSaveDialog.rbClipboardSD.checked = true;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
-                    frmSaveDialog.rbFileZip.checked = false;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = false;
     	            
     	            document.getElementById("txtFolderPath").disabled = true;
     	            document.getElementById("btnBrowseForFolder").disabled = true;
     	            document.getElementById("txtFileName").disabled = true;
     	            estensioneURL.style.display = "none";
-                    estensione.style.display = "block";
-                    estensioneZip.style.display = "none";
-
-                    //setSessionValue("DownloadZipPackageDocument", "0");
+    	            estensione.style.display = "block";
     	            
     	            break;
     	            
@@ -131,17 +117,14 @@
 	                frmSaveDialog.rbClipboard.checked = false;
 	                frmSaveDialog.rbSalvaUrl.checked = true;
 	                frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
-                    frmSaveDialog.rbFileZip.checked = false;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = false;
 	                
     	            document.getElementById("txtFolderPath").disabled = false;
     	            document.getElementById("btnBrowseForFolder").disabled = false;
     	            document.getElementById("txtFileName").disabled = false;
     	            estensione.style.display = "none";
-                    estensioneURL.style.display = "block";
-                    estensioneZip.style.display = "none";
-
-                    //setSessionValue("DownloadZipPackageDocument", "0");
+    	            estensioneURL.style.display = "block";
+    	            
     	            break;
     	            
     	        case "creaFileUrlSD": // Salvataggio  del link alla scheda documento su filesystem
@@ -151,37 +134,15 @@
 	                frmSaveDialog.rbClipboard.checked = false;
 	                frmSaveDialog.rbSalvaUrl.checked = false;
 	                frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = true;
-                    frmSaveDialog.rbFileZip.checked = false;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = true;
 	                
     	            document.getElementById("txtFolderPath").disabled = false;
     	            document.getElementById("btnBrowseForFolder").disabled = false;
     	            document.getElementById("txtFileName").disabled = false;
     	            estensione.style.display = "none";
-                    estensioneURL.style.display = "block";
-                    estensioneZip.style.display = "none";
-
-                   //setSessionValue("DownloadZipPackageDocument", "0");
-
-                    break;
-
-                case "zip":
-                    frmSaveDialog.rbFileSystem.checked = false;
-	                frmSaveDialog.rbClipboard.checked = false;
-	                frmSaveDialog.rbSalvaUrl.checked = false;
-	                frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
-                    frmSaveDialog.rbFileZip.checked = true;
-
-                    document.getElementById("txtFolderPath").disabled = false;
-    	            document.getElementById("btnBrowseForFolder").disabled = false;
-    	            document.getElementById("txtFileName").disabled = false;
-    	            estensioneURL.style.display = "none";
-                    estensione.style.display = "none";
-                    estensioneZip.style.display = "block";
-
-                    //setSessionValue("DownloadZipPackageDocument", "1"); // imposta variabile di sessione per evitare porcate nel codice !
-                    break;
+    	            estensioneURL.style.display = "block";
+    	            
+    	            break;
     	            
     	        default:    // Salvataggio del documento su filesystem
     	            // Selezione del radio button salva su file system e deselezionamento
@@ -190,8 +151,7 @@
 	                frmSaveDialog.rbClipboard.checked = false;
 	                frmSaveDialog.rbSalvaUrl.checked = false;
 	                frmSaveDialog.rbClipboardSD.checked = false;
-                    frmSaveDialog.rbSalvaUrlSD.checked = false;
-                    frmSaveDialog.rbFileZip.checked = false;
+    	            frmSaveDialog.rbSalvaUrlSD.checked = false;
 	                // Abilito la text box del path
     	            document.getElementById("txtFolderPath").disabled = false;
     	            // Abilito il bottone del browse for folder
@@ -201,57 +161,13 @@
     	            // Nascondo la div estensioneURL
     	            estensioneURL.style.display = "none";
     	            // Visualizzo la div estensione
-                    estensione.style.display = "block";
-                    
-                    estensioneZip.style.display = "none";
-
-                    //setSessionValue("DownloadZipPackageDocument", "0");
+    	            estensione.style.display = "block";
     	            
     	            break;
 
     	    }
 	        
-        }
-
-        
-
-        // ajax function that looks a bit like jQuery $.ajax
-        // minimal code for what I need; not dummy proof, no error handling ...
-        // feel free to extend this
-        //var http_request = new XMLHttpRequest();
-        //function ajax(options) {
-        //  http_request.open(options.type || 'GET', options.url, true);
-        //  http_request.send(options.data || null);
-        //  http_request.onreadystatechange = function() {
-        //    if (http_request.readyState == 4) {
-        //      if (http_request.status == 200) {
-        //        var type = options.dataType || '';
-        //        switch (type.toLowerCase()) {
-        //          default: 
-        //            // options.success(http_request.responseText);
-        //            break;
-        //          case 'json': 
-        //            // options.success(JSON.parse(http_request.responseText));
-        //            break;
-        //        }
-        //      }
-        //    }
-        //  }
-        //}
-
-        //function setSessionValue(key, value) {
-        //    console.log("set value in session from js");
-        //    ajax({
-        //        type: "POST",
-        //        url: "../handler/SessionHandler.ashx",
-        //        data: { sessionKey: key, sessionValue: value },
-        //        // DO NOT SET CONTENT TYPE to json
-        //        // contentType: "application/json; charset=utf-8", 
-        //        // DataType needs to stay, otherwise the response object
-        //        // will be treated as a single string
-        //        dataType: "json"
-        //    });
-        //}
+	    }
 	    
 	    // Funzione per il salvataggio su filesystem del link al documento
 	    function CreateLinkFile() {
@@ -265,8 +181,8 @@
 	        var linkSD ="<%= this.LinkSD %>";
 	        
 	        // L'oggetto per accedere al filesystem client
-            var fso = FsoWrapper_CreateFsoObject();
-            //alert(linkSD);
+	        var fso = FsoWrapper_CreateFsoObject();
+	        
 	        // Creo un file in path
 	        var stream=fso.OpenTextFile(path,2,true);
 	        stream.WriteLine("[InternetShortcut]");
@@ -349,12 +265,7 @@
 			{
 			    alert(ex.message.toString());
 			}
-        }
-
-        function CreateZipFile() {
-            // Creazione FIle zip
-            // Alessandro Aiello 03/05/2019
-        }
+		}
 		
 		// Creazione oggetto activex con gestione errore
 		function CreateObject(objectType)
@@ -434,8 +345,7 @@
 				    retValue=false;
 				}
 			}
-
-            
+			
 			if (!retValue)
 			{
 				// Visualizzazione messaggio di errore
@@ -455,67 +365,32 @@
 				{
 					retValue = false;
 		    	}
-            }
+			}
+			
 			return retValue;
 		}
 
 		// Chiusura pagina 						
 		function ClosePage(retValue)
-        {
+		{	
 			if (retValue)
-            {
-
+			{	
 			    // Se è stato richiesto il salvataggio su clipboard...
-                if (frmSaveDialog.rbClipboard.checked || frmSaveDialog.rbClipboardSD.checked) {
-                    var link = "<%= this.Link %>";
-                    var linkSD = "<%= this.LinkSD %>";
-
-                    // ...scrivo nel campo nascosto txtLink, il link 
-                    // da copiare negli appunti...
-                    frmSaveDialog.txtLink.value = frmSaveDialog.rbClipboard.checked ? link : linkSD;
-                    // ...copio il testo negli appunti
+			    if(frmSaveDialog.rbClipboard.checked || frmSaveDialog.rbClipboardSD.checked) {
+			        var link = "<%= this.Link %>";
+			        var linkSD = "<%= this.LinkSD %>";
+			        
+			        // ...scrivo nel campo nascosto txtLink, il link 
+			        // da copiare negli appunti...
+			        frmSaveDialog.txtLink.value = frmSaveDialog.rbClipboard.checked ? link : linkSD;
+			        // ...copio il testo negli appunti
+                    Copied = frmSaveDialog.txtLink.createTextRange();
+                    Copied.execCommand("Copy");
                     
-                   
-                    
-
-                    //* ALESSANDRO AIELLO 10-06-2019
-                    //* INIZIO
-                    var ua = window.navigator.userAgent;
-                    var msie = ua.indexOf("MSIE ");
-                    if (msie > 0 && msie < 9) // If Internet Explorer, return version number
-                    {
-                        Copied = frmSaveDialog.txtLink.createTextRange();
-                        Copied.execCommand("Copy");
-                    }
-                    else  // If another browser, return 0
-                    {
-                        var aux = document.createElement("div");
-                        aux.setAttribute("contentEditable", true);
-                        aux.innerHTML = frmSaveDialog.txtLink.value;
-                        document.body.appendChild(aux);
-                        window.getSelection().selectAllChildren(aux);
-                        document.execCommand("copy");
-                        document.body.removeChild(aux);
-                    }
-
-                    //* FINE
-
-
                     alert("Testo copiato negli appunti");
                     window.close();
-
-                } else if (frmSaveDialog.rbFileZip.checked) {
-                    //console.log("Creo ZIP");
-                    if (Validate()) {
-                       //CreateZipFile();
-                        PersistClientData();
-            				
-			            // Validazione dati effettuata
-			            window.returnValue=GetSelectedFilePath();
-                            
-                        window.close();
-                    }
-                } else   {
+                    
+                } else {
                     // Se è stato richiesto il salvataggio di un file con il link...
                     if(frmSaveDialog.rbSalvaUrl.checked || frmSaveDialog.rbSalvaUrlSD.checked) {
                         // ...richiedo validazione dati e salvataggio file
@@ -582,7 +457,7 @@
                 fileName = frmSaveDialog.txtFileName.value + "<%=this.GetP7mFileExtensions()%>";
             else
                 fileName = frmSaveDialog.txtFileName.value + "." + GetFileExtension();            
-            //console.log("File Name: " + fileName);
+        
             return fileName;
         }
 
@@ -590,13 +465,12 @@
 		function GetFileExtension()
 		{
 			var fileType="";
-            if (frmSaveDialog.rbFileZip.checked === true) {
-                fileType = "zip";
-            } else if (document.getElementById("cboFileTypes") != null)
+
+			if (document.getElementById("cboFileTypes")!=null)
 				fileType=document.getElementById("cboFileTypes").value;
 			else if (document.getElementById("lblFileType")!=null)
-                fileType = document.getElementById("lblFileType").innerHTML;
-            //console.log("File Extension: " + fileType);
+				fileType=document.getElementById("lblFileType").innerHTML;
+				
 			return fileType;
 		}			
 					
@@ -642,10 +516,6 @@
                         <input id="rbFileSystem" type="radio" runat="server" checked="true" />Salva documento su file system
                     </div>
                     <br />
-                    <div onclick="javascript:SelezionaTipoSalvataggio('zip')">
-                        <input id="rbFileZip" type="radio" runat="server" />Salva documento e allegati (.zip) su file system
-                    </div>
-                    <br />
                     <div onclick="javascript:SelezionaTipoSalvataggio('clipboard')">
                         <input id="rbClipboard" type="radio" runat="server" />Copia link a immagine documento su clipboard</div>
                     <br />
@@ -684,12 +554,8 @@
                 &nbsp;<asp:TextBox ID="txtFileName" runat="server" CssClass="testo_grigio" Width="98%"></asp:TextBox>
             </td>
             <td width="130">
-                <div id="estensioneZip" style="display: none; width: 50%;">
-                        <p class="titolo_scheda">.zip</p>
-                    </div>
                 <div id="estensione">
                     .<asp:Label ID="lblFileType" runat="server" CssClass="titolo_scheda" Width="50%"></asp:Label>
-                    
                     <asp:DropDownList ID="cboFileTypes" runat="server" CssClass="testo_grigio" Width="50%">
                     </asp:DropDownList>
                 </div>

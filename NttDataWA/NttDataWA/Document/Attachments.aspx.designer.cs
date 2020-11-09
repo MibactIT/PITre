@@ -22,15 +22,6 @@ namespace NttDataWA.Document {
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 UplodadFile;
         
         /// <summary>
-        /// RepositoryView control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 RepositoryView;
-        
-        /// <summary>
         /// Signature control.
         /// </summary>
         /// <remarks>
@@ -74,15 +65,6 @@ namespace NttDataWA.Document {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 AttachmentsAdd;
-        
-        /// <summary>
-        /// AttachmentsUpload control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 AttachmentsUpload;
         
         /// <summary>
         /// AttachmentsModify control.
@@ -686,14 +668,5 @@ namespace NttDataWA.Document {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::NttDatalLibrary.CustomButton AttachmentsBtnAnnulla;
-        
-        /// <summary>
-        /// AttachmentsBtnUploadAllegati control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton AttachmentsBtnUploadAllegati;
     }
 }

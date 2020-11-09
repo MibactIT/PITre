@@ -387,8 +387,6 @@
         <ContentTemplate>
             <cc1:CustomButton ID="LibroFirmaFirmaSelezionati" runat="server" CssClass="btnEnable"
                 CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClientClick="return ajaxModalPopupSignatureSelectedItems();" />
-            <cc1:CustomButton ID="LibroFirmaFirmaSelezionatiAdl" runat="server" CssClass="btnEnable"
-                CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClick="LibroFirmaFirmaSelezionatiAdl_Click" />
             <cc1:CustomButton ID="LibroFirmaRespingiSelezionati" runat="server" CssClass="btnEnable"
                 CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClick="LibroFirmaRespingiSelezionati_Click" />
             <cc1:CustomButton ID="LibroFirmaEliminaSelezionati" runat="server" CssClass="btnEnable"

@@ -102,7 +102,7 @@
         </div>
         <asp:UpdatePanel ID="upPanelFrame" runat="server" UpdateMode="Conditional" ClientIDMode="Static">
             <ContentTemplate>
-                <iframe runat="server" clientidmode="Static" id="reportContent" style="width: 0px; height: 0px;" frameborder="0" marginheight="0" marginwidth="0"/>
+                <iframe runat="server" clientidmode="Static" id="reportContent_" style="width: 0px; height: 0px;" frameborder="0" marginheight="0" marginwidth="0"/>
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>

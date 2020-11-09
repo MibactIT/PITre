@@ -25,45 +25,6 @@
         </asp:Panel>
     </ContentTemplate>
 </asp:UpdatePanel>
-<asp:UpdatePanel ID="UpdatePanelPreview" runat="server" UpdateMode="Conditional" ClientIDMode="Static">
-                <ContentTemplate>  
-                    <asp:PlaceHolder ID="PlaceHolderPreview" runat="server" Visible="false">
-                        
-                            <div class="row2" style="margin: 0;  width: 83%;">
-                                <fieldset style="padding-right:0px;">
-                                <!--div class="col2" style=" width: 28%; padding-bottom:3px;">
-                                    
-                                    <%--<asp:HiddenField runat="server" ID="HiddenFieldFromPage" ClientIDMode="Static" />
-                                    <asp:HiddenField runat="server" ID="HiddenFieldLastPage" ClientIDMode="Static" />--%>
-                                </div-->
-                                <div class="col2" style=" width: 100%; padding-bottom:3px;">
-                                   
-                                            <ul>
-                                                <li style="float: left; margin: 1px; width: 30%;">
-                                                    <cc1:CustomImageButton runat="server" ID="imgPrevPreview" ImageUrl="../Images/Preview/PreviousPdf.png"
-                                                        OnMouseOutImage="../Images/Preview/PreviousPdf.png" OnMouseOverImage="../Images/Preview/PreviousPdf_hover.png"
-                                                        CssClass="clickable" ImageUrlDisabled="../Images/Preview/PreviousPdf_disabled.png" Visible="false"
-                                                        OnClick="btnPrev_Click" />
-                                                    <%--<asp:Literal ID="repDocumentVersions_sep"
-                                                            runat="server"> |</asp:Literal>--%>
-                                                </li>
-                                                <li style="float: left; margin: 1px;">
-                                                    <span id="ViewDocumentPreview" class="weight" style="float: left; margin: 1px;" runat="server"></span>
-                                                </li>
-                                                <li style="float: right; margin: 1px; width: 30%;">
-                                                    <cc1:CustomImageButton runat="server" ID="imgNextPreview" ImageUrl="../Images/Preview/NextPdf.png"
-                                                        OnMouseOutImage="../Images/Preview/NextPdf.png" OnMouseOverImage="../Images/Preview/NextPdf_hover.png"
-                                                        CssClass="clickable" ImageUrlDisabled="../Images/Preview/NextPdf_disabled.png" Visible="false"
-                                                        OnClick="btnSucc_Click" />
-                                                </li>
-                                            </ul>
-                                </div>
-                                </fieldset>
-                            </div>
-                        
-                    </asp:PlaceHolder>
-                  </ContentTemplate>
-            </asp:UpdatePanel>
 <asp:UpdatePanel runat="server" ID="UpPnlContentDxSx" UpdateMode="Conditional">
     <ContentTemplate>
         <div id="contentDxSx" runat="server" clientidmode="Static" class="contentDxSx">
@@ -124,7 +85,7 @@
                             <div id="divNumberVersion" runat="server">
                                 <div id="divButtonVersion" runat="server" class="col-right-no-margin1">
                                     <cc1:CustomImageButton ID="btnAddVersion" runat="server" CssClass="clickableLeft"
-                                         OnClick="AddVersion_Click" />
+                                        OnClientClick="return ajaxModalPopupVersionAdd();" />
                                     <cc1:CustomImageButton ID="btnModifyVersion" runat="server" CssClass="clickableLeft"
                                         OnClientClick="__doPostBack('UpBottomButtons', 'POPUP_MODIFY_VERSION');return ajaxModalPopupModifyVersion();" />
                                     <cc1:CustomImageButton ID="btnRemoveVersion" runat="server" OnClientClick=" __doPostBack('UpBottomButtons', 'CONFIRM_REMOVE_VERSION'); return false;"
@@ -180,7 +141,7 @@
     </ContentTemplate>
 </asp:UpdatePanel>
 <asp:UpdatePanel runat="server" ID="UpPnlContentDxDx" UpdateMode="Conditional" ClientIDMode="Static"
-    style="float: right; padding-left:5px;">
+    style="float: right;">
     <ContentTemplate>
         <asp:Literal ID="debug" runat="server" />
         <asp:GridView ID="GrdDocumentAttached" runat="server" AutoGenerateColumns="false"
@@ -188,15 +149,9 @@
             Visible="false">
             <SelectedRowStyle CssClass="selectedrowAttachment" VerticalAlign="Bottom" />
             <Columns>
-                <asp:TemplateField ItemStyle-VerticalAlign="Middle" ItemStyle-HorizontalAlign="Center">
-                    <ItemTemplate>
-                        <asp:Image ID="btnImageSelected" runat="server" ImageUrl="../Images/Icons/item_selected.png" ImageAlign="Middle"
-                            Visible="<%#IsElementoSelezionatoInLf((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>"/>
-                    </ItemTemplate>
-                </asp:TemplateField>
                 <asp:TemplateField>
                     <ItemTemplate>
-                        <cc1:CustomImageButton ID="btnVisualizza" name="btnVisualizza" runat="server" Enabled="<%#IsAcquired((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>"
+                        <cc1:CustomImageButton ID="btnVisualizza" runat="server" Enabled="<%#IsAcquired((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>"
                             ImageUrl="<%#GetVersionImage((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>"
                             CssClass="clickable-no-ie" CommandName="ShowVersion" ImageAlign="Middle" ToolTip="<%# GetLabelTooltip((NttDataWA.DocsPaWR.FileRequest) Container.DataItem) %>"
                             OnMouseOutImage="<%#GetVersionImage((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>"
@@ -213,7 +168,7 @@
                 </asp:TemplateField>
                 <asp:TemplateField>
                     <ItemTemplate>
-                        <asp:HyperLink ID="btnVersioneStampabile" NavigateUrl="<%#GetLinkVersionID((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>" Visible="<%#IsAcquired((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>" CssClass="clickableLeft-no-ie download" ToolTip="<%#GetTooltipPrintableVersion()%>" runat="server" ImageUrl="~/Images/Icons/print_label.png" OnClientClick="alert('cass');"></asp:HyperLink>
+                        <asp:HyperLink ID="btnVersioneStampabile" NavigateUrl="<%#GetLinkVersionID((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>" Visible="<%#IsAcquired((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>" CssClass="clickableLeft-no-ie download" ToolTip="<%#GetTooltipPrintableVersion()%>" runat="server" ImageUrl="~/Images/Icons/print_label.png"></asp:HyperLink>
 
                         <%-- <cc1:CustomImageButton ID="btnVersioneStampabile" runat="server" Visible="<%#IsAcquired((NttDataWA.DocsPaWR.FileRequest) Container.DataItem)%>"
                             ImageUrl="~/Images/Icons/print_label.png" ImageAlign="Middle" ToolTip="<%#GetTooltipPrintableVersion()%>"

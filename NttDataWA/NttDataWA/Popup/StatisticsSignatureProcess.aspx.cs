@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using NttDataWA.UIManager;
 using NttDataWA.DocsPaWR;
 using NttDatalLibrary;
-using NttDataWA.Utils;
 
 namespace NttDataWA.Popup
 {
@@ -69,113 +67,9 @@ namespace NttDataWA.Popup
 
         }
 
-        private List<FiltroIstanzeProcessoFirma> FiltersInstanceProcessesStatistics
-        {
-            get
-            {
-                return (List<FiltroIstanzeProcessoFirma>)HttpContext.Current.Session["FiltersInstanceProcessesStatistics"];
-            }
-            set
-            {
-                HttpContext.Current.Session["FiltersInstanceProcessesStatistics"] = value;
-            }
-        }
-
-        private string SelectedRow
-        {
-            get
-            {
-                string result = string.Empty;
-                if (HttpContext.Current.Session["selectedRowStatistics"] != null)
-                {
-                    result = HttpContext.Current.Session["selectedRowStatistics"] as String;
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["selectedRowStatistics"] = value;
-            }
-        }
-
-        private int RecordCount
-        {
-            get
-            {
-                int toReturn = 0;
-                if (HttpContext.Current.Session["recordCountStatistics"] != null) Int32.TryParse(HttpContext.Current.Session["recordCountStatistics"].ToString(), out toReturn);
-                return toReturn;
-            }
-            set
-            {
-                HttpContext.Current.Session["recordCountStatistics"] = value;
-            }
-        }
-
-        private int SelectedPage
-        {
-            get
-            {
-                int toReturn = 1;
-                if (HttpContext.Current.Session["selectedPageStatistics"] != null) Int32.TryParse(HttpContext.Current.Session["selectedPageStatistics"].ToString(), out toReturn);
-                if (toReturn < 1) toReturn = 1;
-
-                return toReturn;
-            }
-            set
-            {
-                HttpContext.Current.Session["selectedPageStatistics"] = value;
-            }
-        }
-
-        /// <summary>
-        /// Numero di pagine restituiti dalla ricerca
-        /// </summary>
-        public int PageCount
-        {
-            get
-            {
-                int toReturn = 1;
-                if (HttpContext.Current.Session["PageCountStatistics"] != null)
-                {
-                    Int32.TryParse(
-                        HttpContext.Current.Session["PageCountStatistics"].ToString(),
-                        out toReturn);
-                }
-                return toReturn;
-            }
-            set
-            {
-                HttpContext.Current.Session["PageCountStatistics"] = value;
-            }
-        }
-
-        private Corrispondente Proponente
-        {
-            get
-            {
-                if (HttpContext.Current.Session["ProponenteStatistics"] != null)
-                {
-                    return HttpContext.Current.Session["ProponenteStatistics"] as Corrispondente;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            set
-            {
-                HttpContext.Current.Session["ProponenteStatistics"] = value;
-            }
-        }
         #endregion
 
         #region Standard method
-
-        #region Const
-        private const string PANEL_GRID_INDEXES = "upPnlGridIndexes";
-        #endregion
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!this.IsPostBack)
@@ -184,35 +78,14 @@ namespace NttDataWA.Popup
                 this.InitializeLanguage();
                 this.InitializaPage();
             }
-            else
-            {
-                if (this.Request.Form["__EVENTTARGET"] != null && this.Request.Form["__EVENTTARGET"].Equals(PANEL_GRID_INDEXES))
-                {
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
-                    this.SelectedRow = string.Empty;
-                    if (!string.IsNullOrEmpty(this.grid_pageindex.Value))
-                    {
-                        this.SelectedPage = int.Parse(this.grid_pageindex.Value);
-                    }
-                    int numTotPage = 0;
-                    int nRec = 0;
-                    DataSet istanzeProcessi = null;
-                    this.ListaIstanzaProcessiFirmaFiltered = LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(this.FiltersInstanceProcessesStatistics, this.SelectedPage, gridViewResult.PageSize, out numTotPage, out nRec, out istanzeProcessi);
-                    this.RecordCount = nRec;
-                    this.PageCount = (int)Math.Round(((double)nRec / (double)gridViewResult.PageSize) + 0.49);
-                    GridViewResult_Bind();
-                    this.UpPnlGridView.Update();
-                }
-            }
             SetAjaxAddressBook();
             RefreshScript();
         }
 
         private void ClearSession()
         {
-            HttpContext.Current.Session.Remove("FiltersInstanceProcessesStatistics");
+            HttpContext.Current.Session.Remove("ListaIstanzaProcessiFirma");
             HttpContext.Current.Session.Remove("ListaIstanzaProcessiFirmaFiltered");
-            HttpContext.Current.Session.Remove("ProponenteStatistics");
         }
 
         private void InitializaPage()
@@ -229,17 +102,12 @@ namespace NttDataWA.Popup
             this.txt_finedataInterruptionDate.Visible = false;
             this.LtlAInterruptionDate.Visible = false;
 
-            this.SelectedPage = 0;
-            this.Search();
-
-            // this.ListaIstanzaProcessiFirma = LibroFirmaManager.GetIstanzaProcessoDiFirmaByIdProcesso(IdProcesso);
-            /*
+            this.ListaIstanzaProcessiFirma = LibroFirmaManager.GetIstanzaProcessoDiFirmaByIdProcesso(IdProcesso);
             this.ListaIstanzaProcessiFirmaFiltered = new List<IstanzaProcessoDiFirma>();
             this.ListaIstanzaProcessiFirmaFiltered.AddRange(this.ListaIstanzaProcessiFirma);
             GridViewResult_Bind();
-            */
 
-            if (this.ListaIstanzaProcessiFirmaFiltered != null && this.ListaIstanzaProcessiFirmaFiltered.Count > 0)
+            if (this.ListaIstanzaProcessiFirma != null && this.ListaIstanzaProcessiFirma.Count > 0)
             {
                 this.StatisticsSignatureProcessAddFilter.Enabled = true;
             }
@@ -326,12 +194,9 @@ namespace NttDataWA.Popup
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "<script>reallowOp();</script>", false);
             try
             {
-                /*
                 this.AddFilter();
                 this.gridViewResult.PageIndex = 0;
-                GridViewResult_Bind();*/
-                this.SelectedPage = 0;
-                this.Search();
+                GridViewResult_Bind();
                 this.StatisticsSignatureProcessRemoveFilter.Enabled = true;
                 this.UpPnlGridView.Update();
                 this.UpPnlButtons.Update();
@@ -349,13 +214,9 @@ namespace NttDataWA.Popup
             try
             {
                 ClearFilter();
-                /*
                 this.ListaIstanzaProcessiFirmaFiltered.Clear();
                 this.ListaIstanzaProcessiFirmaFiltered.AddRange(this.ListaIstanzaProcessiFirma);
                 GridViewResult_Bind();
-                */
-                this.SelectedPage = 0;
-                this.Search();
                 this.StatisticsSignatureProcessRemoveFilter.Enabled = false;
                 this.UpPnlGridView.Update();
                 this.UpPnlButtons.Update();
@@ -707,7 +568,6 @@ namespace NttDataWA.Popup
             this.txtCodiceProponente.Text = string.Empty;
             this.txtDescrizioneProponente.Text = string.Empty;
             this.idProponente.Value = string.Empty;
-            this.Proponente = null;
 
             this.opCLOSED.Selected = true;
             this.opIN_EXEC.Selected = true;
@@ -746,7 +606,6 @@ namespace NttDataWA.Popup
                                 this.txtCodiceProponente.Text = string.Empty;
                                 this.txtDescrizioneProponente.Text = string.Empty;
                                 this.idProponente.Value = string.Empty;
-                                this.Proponente = null;
                                 this.UpdPnlProponente.Update();
                                 break;
                         }
@@ -762,7 +621,6 @@ namespace NttDataWA.Popup
                                 this.txtCodiceProponente.Text = corr.codiceRubrica;
                                 this.txtDescrizioneProponente.Text = corr.descrizione;
                                 this.idProponente.Value = corr.systemId;
-                                this.Proponente = corr;
                                 this.UpdPnlProponente.Update();
                                 break;
                         }
@@ -776,7 +634,6 @@ namespace NttDataWA.Popup
                             this.txtCodiceProponente.Text = string.Empty;
                             this.txtDescrizioneProponente.Text = string.Empty;
                             this.idProponente.Value = string.Empty;
-                            this.Proponente = null;
                             this.UpdPnlProponente.Update();
                             break;
                     }
@@ -862,7 +719,6 @@ namespace NttDataWA.Popup
                                 this.txtCodiceProponente.Text = tempCorrSingle.codiceRubrica;
                                 this.txtDescrizioneProponente.Text = tempCorrSingle.descrizione;
                                 this.idProponente.Value = tempCorrSingle.systemId;
-                                this.Proponente = tempCorrSingle;
                                 this.UpdPnlProponente.Update();
                             }
                         }
@@ -886,73 +742,6 @@ namespace NttDataWA.Popup
         {
             this.gridViewResult.DataSource = this.ListaIstanzaProcessiFirmaFiltered;
             this.gridViewResult.DataBind();
-            this.BuildGridNavigator();
-        }
-
-        protected void BuildGridNavigator()
-        {
-            try
-            {
-                this.plcNavigator.Controls.Clear();
-
-                int countPage = this.PageCount;
-                if (countPage > 1)
-                {
-                    Panel panel = new Panel();
-                    panel.EnableViewState = true;
-                    panel.CssClass = "recordNavigator";
-
-                    int startFrom = 1;
-                    if (this.SelectedPage > 6) startFrom = this.SelectedPage - 5;
-
-                    int endTo = 10;
-                    if (this.SelectedPage > 6) endTo = this.SelectedPage + 5;
-                    if (endTo > countPage) endTo = countPage;
-
-                    if (startFrom > 1)
-                    {
-                        LinkButton btn = new LinkButton();
-                        btn.EnableViewState = true;
-                        btn.Text = "...";
-                        btn.Attributes["onclick"] = " $('#grid_pageindex').val(" + (startFrom - 1) + "); disallowOp('Content2'); __doPostBack('upPnlGridIndexes', ''); return false;";
-                        panel.Controls.Add(btn);
-                    }
-
-                    for (int i = startFrom; i <= endTo; i++)
-                    {
-                        if (i == this.SelectedPage)
-                        {
-                            Literal lit = new Literal();
-                            lit.Text = "<span>" + i.ToString() + "</span>";
-                            panel.Controls.Add(lit);
-                        }
-                        else
-                        {
-                            LinkButton btn = new LinkButton();
-                            btn.EnableViewState = true;
-                            btn.Text = i.ToString();
-                            btn.Attributes["onclick"] = " $('#grid_pageindex').val($(this).text()); disallowOp('Content2'); __doPostBack('upPnlGridIndexes', ''); return false;";
-                            panel.Controls.Add(btn);
-                        }
-                    }
-
-                    if (endTo < countPage)
-                    {
-                        LinkButton btn = new LinkButton();
-                        btn.EnableViewState = true;
-                        btn.Text = "...";
-                        btn.Attributes["onclick"] = " $('#grid_pageindex').val(" + endTo + "); disallowOp('Content2'); __doPostBack('upPnlGridIndexes', ''); return false;";
-                        panel.Controls.Add(btn);
-                    }
-
-                    this.plcNavigator.Controls.Add(panel);
-                }
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
         }
 
         protected void gridViewResult_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -973,6 +762,21 @@ namespace NttDataWA.Popup
         protected void gridViewResult_RowCommand(Object sender, GridViewCommandEventArgs e)
         {
 
+        }
+
+        protected void gridViewResult_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            try
+            {
+                this.gridViewResult.PageIndex = e.NewPageIndex;
+                GridViewResult_Bind();
+                this.UpPnlGridView.Update();
+            }
+            catch (System.Exception ex)
+            {
+                UIManager.AdministrationManager.DiagnosticError(ex);
+                return;
+            }
         }
 
         protected string GetProponent(IstanzaProcessoDiFirma istanza)
@@ -1002,420 +806,7 @@ namespace NttDataWA.Popup
 
         protected string GetState(IstanzaProcessoDiFirma istanza)
         {
-            string result = string.Empty;
-            if (!istanza.statoProcesso.Equals(TipoStatoProcesso.CLOSED) && !istanza.statoProcesso.Equals(TipoStatoProcesso.CLOSED_WITH_CUT) && istanza.istanzePassoDiFirma != null && istanza.istanzePassoDiFirma.Length > 0)
-            {
-                string currentStep = Utils.Languages.GetLabelFromCode("MonitoringProcesseNumStep", UIManager.UserManager.GetUserLanguage()) + " " + istanza.istanzePassoDiFirma[0].numeroSequenza.ToString();
-                result = Utils.Languages.GetLabelFromCode(istanza.statoProcesso.ToString(), UIManager.UserManager.GetUserLanguage()) + " (" + currentStep + ")";
-            }
-            else
-            {
-                result = Utils.Languages.GetLabelFromCode(istanza.statoProcesso.ToString(), UIManager.UserManager.GetUserLanguage());
-            }
-            return result;
-        }
-
-        private void Search()
-        {
-            try
-            {
-                this.SelectedRow = null;
-                bool result = BindFilters();
-                if (result)
-                {
-                    int numPage = 1;
-                    int numTotPage = 0;
-                    int nRec = 0;
-                    DataSet istanzeProcessi = null;
-                    this.ListaIstanzaProcessiFirmaFiltered = LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(FiltersInstanceProcessesStatistics, numPage, gridViewResult.PageSize, out numTotPage, out nRec, out istanzeProcessi);
-                    this.RecordCount = nRec;
-                    this.PageCount = (int)Math.Round(((double)nRec / (double)gridViewResult.PageSize) + 0.49);
-
-                    GridViewResult_Bind();
-                    this.UpPnlGridView.Update();
-
-                }
-                else
-                    return;
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-
-        private bool BindFilters()
-        {
-            List<FiltroIstanzeProcessoFirma> filters = new List<FiltroIstanzeProcessoFirma>();
-            FiltroIstanzeProcessoFirma filter;
-
-            #region ID_PROCESSO
-            
-            filter = new FiltroIstanzeProcessoFirma();
-            filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.ID_PROCESSO.ToString();
-            filter.Valore = IdProcesso;
-            filters.Add(filter);
-
-            #endregion;
-            
-            #region PROPONENTE
-
-            if (this.Proponente != null && !string.IsNullOrEmpty(this.Proponente.systemId))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                if (this.Proponente.tipoCorrispondente.Equals("P"))
-                {
-                    filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.ID_UTENTE_PROPONENTE.ToString();
-                }
-                else if (this.Proponente.tipoCorrispondente.Equals("R"))
-                {
-                    filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.ID_RUOLO_PROPONENTE.ToString();
-                }
-                filter.Valore = this.Proponente.systemId;
-                filters.Add(filter);
-            }
-
-            #endregion
-
-            #region DATA DI AVVIO
-
-            if (this.ddl_StartDate.SelectedIndex == 2)
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_TODAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 3)
-            {
-                // siamo nel caso di Settimana corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_SC.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 4)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_MC.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 5)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_YESTERDAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 6)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_LAST_SEVEN_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 7)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_LAST_THIRTY_ONE_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_StartDate.SelectedIndex == 0)
-
-                if (this.ddl_StartDate.SelectedIndex == 0)
-                {
-                    if (!this.txt_initStartDate.Text.Equals(""))
-                    {
-                        filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                        filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_IL.ToString();
-                        filter.Valore = this.txt_initStartDate.Text;
-                        filters.Add(filter);
-                    }
-                }
-
-            if (this.ddl_StartDate.SelectedIndex == 1)
-            {
-                if (!string.IsNullOrEmpty(txt_initStartDate.Text) &&
-                   !string.IsNullOrEmpty(txt_finedataStartDate.Text) &&
-                   utils.verificaIntervalloDate(txt_initStartDate.Text, txt_finedataStartDate.Text))
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorSearchProjectFilterDateCreateInterval', 'warning', '');} else {parent.ajaxDialogModal('ErrorSearchProjectFilterDateCreateInterval', 'warning', '');};", true);
-                    return false;
-                }
-                if (!this.txt_initStartDate.Text.Equals(""))
-                {
-
-                    filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                    filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_SUCCESSIVA_AL.ToString();
-                    filter.Valore = this.txt_initStartDate.Text;
-                    filters.Add(filter);
-                }
-                if (!this.txt_finedataStartDate.Text.Equals(""))
-                {
-
-                    filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                    filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_AVVIO_PRECEDENTE_IL.ToString();
-                    filter.Valore = this.txt_finedataStartDate.Text;
-                    filters.Add(filter);
-                }
-            }
-
-            #endregion
-
-            #region NOTE DI AVVIO
-
-            if (!string.IsNullOrEmpty(this.txtNotesSturtup.Text))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.NOTE_AVVIO.ToString();
-                filter.Valore = utils.DO_AdattaString(this.txtNotesSturtup.Text);
-                filters.Add(filter);
-            }
-
-            #endregion
-
-            #region DATA CONCLUSIONE
-
-            if (this.ddl_CompletitionDate.SelectedIndex == 2)
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_TODAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_CompletitionDate.SelectedIndex == 3)
-            {
-                // siamo nel caso di Settimana corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_SC.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_CompletitionDate.SelectedIndex == 4)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_MC.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_CompletitionDate.SelectedIndex == 5)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_YESTERDAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_CompletitionDate.SelectedIndex == 6)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_LAST_SEVEN_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_CompletitionDate.SelectedIndex == 7)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_LAST_THIRTY_ONE_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_CompletitionDate.SelectedIndex == 0)
-
-                if (this.ddl_CompletitionDate.SelectedIndex == 0)
-                {
-                    if (!this.txt_initCompletitionDate.Text.Equals(""))
-                    {
-                        filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                        filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_IL.ToString();
-                        filter.Valore = this.txt_initCompletitionDate.Text;
-                        filters.Add(filter);
-                    }
-                }
-
-            if (this.ddl_CompletitionDate.SelectedIndex == 1)
-            {
-                if (!string.IsNullOrEmpty(txt_initCompletitionDate.Text) &&
-                   !string.IsNullOrEmpty(txt_finedataCompletitionDate.Text) &&
-                   utils.verificaIntervalloDate(txt_initCompletitionDate.Text, txt_finedataCompletitionDate.Text))
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorSearchProjectFilterDateCreateInterval', 'warning', '');} else {parent.ajaxDialogModal('ErrorSearchProjectFilterDateCreateInterval', 'warning', '');};", true);
-                    return false;
-                }
-                if (!this.txt_initCompletitionDate.Text.Equals(""))
-                {
-
-                    filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                    filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_SUCCESSIVA_AL.ToString();
-                    filter.Valore = this.txt_initCompletitionDate.Text;
-                    filters.Add(filter);
-                }
-                if (!this.txt_finedataCompletitionDate.Text.Equals(""))
-                {
-
-                    filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                    filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_CONCLUSIONE_PRECEDENTE_IL.ToString();
-                    filter.Valore = this.txt_finedataCompletitionDate.Text;
-                    filters.Add(filter);
-                }
-            }
-
-            #endregion
-
-            #region DATA INTERRUZIONE
-
-            if (this.ddl_InterruptionDate.SelectedIndex == 2)
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_TODAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 3)
-            {
-                // siamo nel caso di Settimana corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_SC.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 4)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_MC.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 5)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_YESTERDAY.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 6)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_LAST_SEVEN_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 7)
-            {
-                // siamo nel caso di Mese corrente
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_LAST_THIRTY_ONE_DAYS.ToString();
-                filter.Valore = "1";
-                filters.Add(filter);
-            }
-            if (this.ddl_InterruptionDate.SelectedIndex == 0)
-
-                if (this.ddl_InterruptionDate.SelectedIndex == 0)
-                {
-                    if (!this.txt_initInterruptionDate.Text.Equals(""))
-                    {
-                        filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                        filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_IL.ToString();
-                        filter.Valore = this.txt_initInterruptionDate.Text;
-                        filters.Add(filter);
-                    }
-                }
-
-            if (this.ddl_InterruptionDate.SelectedIndex == 1)
-            {
-                if (!string.IsNullOrEmpty(txt_initInterruptionDate.Text) &&
-                   !string.IsNullOrEmpty(txt_finedataInterruptionDate.Text) &&
-                   utils.verificaIntervalloDate(txt_initInterruptionDate.Text, txt_finedataInterruptionDate.Text))
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorSearchProjectFilterDateCreateInterval', 'warning', '');} else {parent.ajaxDialogModal('ErrorSearchProjectFilterDateCreateInterval', 'warning', '');};", true);
-                    return false;
-                }
-                if (!this.txt_initInterruptionDate.Text.Equals(""))
-                {
-
-                    filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                    filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_SUCCESSIVA_AL.ToString();
-                    filter.Valore = this.txt_initInterruptionDate.Text;
-                    filters.Add(filter);
-                }
-                if (!this.txt_finedataInterruptionDate.Text.Equals(""))
-                {
-
-                    filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                    filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.DATA_INTERRUZIONE_PRECEDENTE_IL.ToString();
-                    filter.Valore = this.txt_finedataInterruptionDate.Text;
-                    filters.Add(filter);
-                }
-            }
-
-            #endregion
-
-            #region MOTIVO INTERRUZIONE
-
-            if (!string.IsNullOrEmpty(this.txtNotesInterruption.Text))
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.NOTE_RESPINGIMENTO.ToString();
-                filter.Valore = utils.DO_AdattaString(this.txtNotesInterruption.Text);
-                filters.Add(filter);
-            }
-
-            #endregion
-
-            #region STATO
-
-            if (this.cbxState.Items.FindByValue("IN_EXEC") != null)
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.STATO_IN_ESECUZIONE.ToString();
-                if (this.cbxState.Items.FindByValue("IN_EXEC").Selected)
-                    filter.Valore = "true";
-                else
-                    filter.Valore = "false";
-                filters.Add(filter);
-            }
-
-            if (this.cbxState.Items.FindByValue("STOPPED") != null)
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.STATO_INTERROTTO.ToString();
-                if (this.cbxState.Items.FindByValue("STOPPED").Selected)
-                    filter.Valore = "true";
-                else
-                    filter.Valore = "false";
-                filters.Add(filter);
-            }
-
-            if (this.cbxState.Items.FindByValue("CLOSED") != null)
-            {
-                filter = new DocsPaWR.FiltroIstanzeProcessoFirma();
-                filter.Argomento = DocsPaWR.FiltriElementoLibroFirma.STATO_CONCLUSO.ToString();
-                if (this.cbxState.Items.FindByValue("CLOSED").Selected)
-                    filter.Valore = "true";
-                else
-                    filter.Valore = "false";
-                filters.Add(filter);
-            }
-
-            #endregion
-
-            this.FiltersInstanceProcessesStatistics = filters;
-
-            return true;
+            return Utils.Languages.GetLabelFromCode(istanza.statoProcesso.ToString(), UIManager.UserManager.GetUserLanguage());
         }
         #endregion
     }

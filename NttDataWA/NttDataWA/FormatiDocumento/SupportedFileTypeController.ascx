@@ -200,16 +200,10 @@
                     }
                 }
             }
-
-
-            if (!formatValid) {
-                if ("ZIP" == fileExtension.toUpperCase()) {
-                    formatValid = true;
-                    formatValidForType = true;
-                } else {
-                    alert("Formato documento '" + fileExtension + "' non supportato.\nPer il supporto di questo formato rivolgersi all'amministratore di sistema.");
-                }
-            } else if (!formatValidForType)
+            
+            if (!formatValid)
+                alert("Formato documento '" + fileExtension + "' non supportato.\nPer il supporto di questo formato rivolgersi all'amministratore di sistema.");
+            else if (!formatValidForType)
             {
                 var msg="Formato '" + fileExtension + "' non valido per ";
                 if (tipoDocumento == "P")
@@ -224,6 +218,7 @@
             formatValid = true;
             formatValidForType = true;
         }
+        
         return (formatValid && formatValidForType);
     }
     

@@ -42,11 +42,11 @@
     }
 
     function SaveFileVersion(defaultFilePath, fileType, showSaveDialog, showErrorMessage, showFile, showWaitingPage) {
-        var _log = "LOG ";
+
         var retValue = false;
 
         var filePath = defaultFilePath;
-        //console.log("1 - FilePath: " + filePath);
+
         if (showSaveDialog)
             filePath = ShowSaveDialogBox(defaultFilePath, fileType, "Copia locale", "1");
 
@@ -57,41 +57,35 @@
                     ApreAttendi(msgSaveFileVersion);
 
                 var encodedFilePath = EncodeHtml(filePath);
-                //console.log("2 - Encoded FilePath: " + encodedFilePath);
-                //console.log("3 - URL: " + "<%=SaveFilePageUrl%>?filePath=" + encodedFilePath);
+
                 var http = CreateObject("MSXML2.XMLHTTP");
                 http.Open("POST", "<%=SaveFilePageUrl%>?filePath=" + encodedFilePath, false);
                 http.send();
 
-                if (http.status != 200 && http.statusText != null && http.statusText != "") {
-                    //console.log("4 - Status: " + http.status);
+                if (http.status != 200 &&
+        		    http.statusText != null && http.statusText != "") {
                     // Si è verificato un errore, reperimento del messaggio
                     throw http.statusText;
                 }
                 else {
-                    //console.log("4 - Status: " + http.status);
                     var content = http.responseBody;
                     retValue = (content != null);
-                    //console.log("5 - Ret Value: " + retValue);
+
                     if (retValue) {
                         try {
                             // Salvataggio del file in locale
                             AdoStreamWrapper_SaveBinaryData(filePath, content);
                         }
                         catch (ex) {
-                            //console.log("5 - ERROR: " + ex);
                             throw "Impossibile salvare il file '" + filePath + "'.";
                         }
 
                         retValue = true;
                     }
 
-                    if (retValue && showFile) {
-                        //console.log("7 - Visualizza File: ");
-                        // Visualizzazione del file
+                    if (retValue && showFile)
+                    // Visualizzazione del file
                         ShowFileDocument(filePath);
-                    }
-                    
                 }
             }
             catch (ex) {
@@ -582,7 +576,7 @@
         // Se devo visualizzare le opzioni di salvataggio...
         if (visualizzaOpzioni == "1") {
             // ...l'altezza della finestra
-            height = "450px";
+            height = "350px";
         }
 
         var retValue = window.showModalDialog("<%=CheckInOutFolderUrl%>CheckInOutSaveDialog.aspx?visOpt=" + visualizzaOpzioni + "&fileName=" + defaultFilePath + "&fileType=" + fileType + "&title=" + title,

@@ -139,7 +139,7 @@
             font-size:0.8em;
             background-image: url(../Images/Icons/collapsed.png);
             background-repeat: no-repeat;
-            background-position: 0px;
+            background-position: 10px 10px;
             background-color: transparent;
             color:#044c7f;
             text-decoration:underline;
@@ -156,7 +156,7 @@
         }
         .expand a.open:link, .expand a.open:visited
         {
-            /*background: url(../Images/Icons/expanded.png) no-repeat 10px 10px;*/
+            background: url(../Images/Icons/expanded.png) no-repeat 10px 10px;
         }
 
         .noexpand
@@ -320,7 +320,6 @@
                     <asp:Literal ID="lbl_registro" runat="server" /></div>
                 <div class="col-no-margin">
                     <asp:Literal ID="lit_registro" runat="server" />
-                    <asp:DropDownList ID="ddl_registri" runat="server" AutoPostBack="true" CssClass="chzn-select-deselect" width="300px"  />
                 </div>
             </div>
         </asp:PlaceHolder>

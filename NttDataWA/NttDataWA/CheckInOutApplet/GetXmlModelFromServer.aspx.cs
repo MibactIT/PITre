@@ -43,28 +43,9 @@ namespace NttDataWA.CheckInOutApplet
             modelReq.userInfo.idPeople = UserManager.GetInfoUser().idPeople;
             modelReq.userInfo.urlWA = UserManager.GetInfoUser().urlWA;
 
-            modelReq.userInfo.urlWA = UserManager.GetInfoUser().urlWA;
-
-            if (!string.IsNullOrEmpty(WebServiceUrl))
-                ws.Url = WebServiceUrl;
-
             string modelres = ws.GetDocumentModelAsXml(modelReq);
 
-
             Response.Write(modelres);
-        }
-
-        protected string WebServiceUrl
-        {
-            get
-            {
-                string webServiceUrl = Utils.InitConfigurationKeys.GetValue("0", "BE_WEBSERVICE_URL");
-
-                if (string.IsNullOrEmpty(webServiceUrl))
-                    webServiceUrl = NttDataWA.Properties.Settings.Default.NttDataWA_DocsPaWR_DocsPaWebService;
-
-                return webServiceUrl;
-            }
         }
     }
 }

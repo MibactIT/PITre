@@ -47,15 +47,13 @@ namespace NttDataWA.Utils
 
         private HttpResponse Response { get; set; }
 
-        private bool ChangeSignature { get; set; }
-
         #endregion
 
 
 
         #region Constructor
 
-        public PDFDownloadHandler(string contentType, string fileName, bool changeSignature, DateTime modificationDate, long fileLength, Byte[] content, HttpRequest request, HttpResponse response)
+        public PDFDownloadHandler(string contentType, string fileName, DateTime modificationDate, long fileLength, Byte[] content, HttpRequest request, HttpResponse response)
         {
             if (String.IsNullOrEmpty(contentType))
                 throw new ArgumentNullException("contentType");
@@ -65,7 +63,6 @@ namespace NttDataWA.Utils
             ContentType = contentType;
             FileName = fileName;
             FileLength = fileLength;
-            ChangeSignature = changeSignature;
             FileModificationDate = modificationDate;
             //Modification date for header values comparisons purposes
             HttpModificationDate = modificationDate.ToUniversalTime();
@@ -344,10 +341,11 @@ namespace NttDataWA.Utils
             GetRanges(Request);
 
             //If all validations are successful
-            if (ChangeSignature || Validate(Request, Response))
+            if (Validate(Request, Response))
             {
                 //Set common headers
                 //Response.Buffer = false;
+
                 Response.AddHeader("Last-Modified", FileModificationDate.ToString("r"));
                 Response.AddHeader("ETag", String.Format("\"{0}\"", EntityTag));
                 //Response.Cache.SetCacheability(HttpCacheability.Public); //required for etag output

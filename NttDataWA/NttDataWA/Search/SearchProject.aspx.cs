@@ -7748,6 +7748,7 @@ namespace NttDataWA.Search
                 this.plcTitolario.Visible = false;
                 this.UpPnlTitolario.Update();
             }
+            UIManager.ClassificationSchemeManager.SetTitolarioInSession(UIManager.ClassificationSchemeManager.getTitolario(ddlTitolario.SelectedValue));
         }
 
         protected void SetAjaxAddressBook()
@@ -8628,6 +8629,11 @@ namespace NttDataWA.Search
         }
 
         #endregion
+
+        protected void DdlTitolario_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UIManager.ClassificationSchemeManager.SetTitolarioInSession(UIManager.ClassificationSchemeManager.getTitolario(ddlTitolario.SelectedValue));
+        }
 
     }
 }

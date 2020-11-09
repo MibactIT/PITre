@@ -40,24 +40,6 @@ namespace NttDataWA.Management {
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 StatisticsSignatureProcess;
         
         /// <summary>
-        /// AddFilterSignatureProcesses control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 AddFilterSignatureProcesses;
-        
-        /// <summary>
-        /// AddNewProcess control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 AddNewProcess;
-        
-        /// <summary>
         /// ManagementSignatureProcesses control.
         /// </summary>
         /// <remarks>
@@ -146,42 +128,6 @@ namespace NttDataWA.Management {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl containerStandard2;
-        
-        /// <summary>
-        /// pnlFilter control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlFilter;
-        
-        /// <summary>
-        /// UpPnlBAction control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPnlBAction;
-        
-        /// <summary>
-        /// IndexImgAddFilter control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton IndexImgAddFilter;
-        
-        /// <summary>
-        /// IndexImgRemoveFilter control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton IndexImgRemoveFilter;
         
         /// <summary>
         /// upPnlTreeSignatureProcess control.
@@ -571,15 +517,6 @@ namespace NttDataWA.Management {
         protected global::System.Web.UI.WebControls.DropDownList DdlTypeEvent;
         
         /// <summary>
-        /// cbx_automatico control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox cbx_automatico;
-        
-        /// <summary>
         /// UpdPnlRoleOrTypeRole control.
         /// </summary>
         /// <remarks>
@@ -688,13 +625,13 @@ namespace NttDataWA.Management {
         protected global::System.Web.UI.WebControls.Literal LitSignatureProcessesRole;
         
         /// <summary>
-        /// DocumentImgSenderAddressBook control.
+        /// TxtCodeRole control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::NttDatalLibrary.CustomImageButton DocumentImgSenderAddressBook;
+        protected global::NttDatalLibrary.CustomTextArea TxtCodeRole;
         
         /// <summary>
         /// idRuolo control.
@@ -704,15 +641,6 @@ namespace NttDataWA.Management {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField idRuolo;
-        
-        /// <summary>
-        /// TxtCodeRole control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomTextArea TxtCodeRole;
         
         /// <summary>
         /// TxtDescriptionRole control.
@@ -740,6 +668,15 @@ namespace NttDataWA.Management {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnRecipient;
+        
+        /// <summary>
+        /// DocumentImgSenderAddressBook control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomImageButton DocumentImgSenderAddressBook;
         
         /// <summary>
         /// UpdPnlUtenteCoinvolto control.
@@ -776,105 +713,6 @@ namespace NttDataWA.Management {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlUtenteCoinvolto;
-        
-        /// <summary>
-        /// UpPnlCampiPassoAutomatco control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPnlCampiPassoAutomatco;
-        
-        /// <summary>
-        /// PnlCampiPassoAutomatco control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlCampiPassoAutomatco;
-        
-        /// <summary>
-        /// ltlRegistroAOO control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltlRegistroAOO;
-        
-        /// <summary>
-        /// DdlRegistroAOO control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DdlRegistroAOO;
-        
-        /// <summary>
-        /// UpPnlRegistroRF control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPnlRegistroRF;
-        
-        /// <summary>
-        /// ltlRegistroRF control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltlRegistroRF;
-        
-        /// <summary>
-        /// DdlRegistroRF control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DdlRegistroRF;
-        
-        /// <summary>
-        /// UpPnlElencoCaselle control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpPnlElencoCaselle;
-        
-        /// <summary>
-        /// PnlElencoCaselle control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlElencoCaselle;
-        
-        /// <summary>
-        /// ltlElencoCaselle control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltlElencoCaselle;
-        
-        /// <summary>
-        /// DdlElencoCaselle control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DdlElencoCaselle;
         
         /// <summary>
         /// UpdPnlNotes control.
@@ -1037,14 +875,5 @@ namespace NttDataWA.Management {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::NttDatalLibrary.CustomButton SignatureProcessesBtnRemove;
-        
-        /// <summary>
-        /// SignatureProcessesBtnDuplica control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton SignatureProcessesBtnDuplica;
     }
 }

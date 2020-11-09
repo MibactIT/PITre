@@ -84,30 +84,16 @@ namespace NttDataWA.Popup
 
             // Generazione della scheda
             MassiveOperationReport report = new MassiveOperationReport();
-            //Se per uno dei documenti selezionati è attivo un processo di firma, blocco l'operazione di inoltro
-            bool inLibroFirma = false;
             try
             {
-                foreach (MassiveOperationTarget temp in selectedItem)
+                document = this.GenerateDocumentScheda(selectedItem, out error);
+                if (document != null)
                 {
-                    if(LibroFirmaManager.IsDocOrAllInLibroFirma(temp.Id))
-                    {
-                        report.AddReportRow("-", MassiveOperationReport.MassiveOperationResultEnum.KO, "Il documento non è stato creato poichè per uno dei documenti selezionati, o suoi allegati, è attivo un processo di firma");
-                        inLibroFirma = true;
-                        break;
-                    }
+                    report.AddReportRow("-", MassiveOperationReport.MassiveOperationResultEnum.OK, "Il documento è stato creato correttamente");
                 }
-                if (!inLibroFirma)
+                else
                 {
-                    document = this.GenerateDocumentScheda(selectedItem, out error);
-                    if (document != null)
-                    {
-                        report.AddReportRow("-", MassiveOperationReport.MassiveOperationResultEnum.OK, "Il documento è stato creato correttamente");
-                    }
-                    else
-                    {
-                        report.AddReportRow("-", MassiveOperationReport.MassiveOperationResultEnum.KO, "Il documento non è stato creato");
-                    }
+                    report.AddReportRow("-", MassiveOperationReport.MassiveOperationResultEnum.KO, "Il documento non è stato creato");
                 }
             }
             catch (Exception ex)

@@ -39,7 +39,9 @@
     function SaveFileVersion(defaultFilePath, fileType, showSaveDialog, showErrorMessage, showFile, showWaitingPage) {
         //alert('SaveFileVersion');
         var retValue = false;
+
         var filePath = defaultFilePath;
+
         if (showSaveDialog) {
             //filePath = ShowSaveDialogBox(defaultFilePath, fileType, "Copia locale", "1");
             //var popupobj = document.getElementById("SaveDialog");
@@ -55,6 +57,7 @@
                     ApreAttendi(msgSaveFileVersion);
 
                 var encodedFilePath = EncodeHtml(filePath);
+
                 //var http = CreateObject("MSXML2.XMLHTTP");
                 //http.Open("POST", "<%=SaveFilePageUrl%>?filePath=" + encodedFilePath, false);
                 //http.send();
@@ -88,6 +91,7 @@
                 else {
                     //var content = http.responseBody;
                     retValue = (content != null);
+
                     if (retValue) {
                         try {
                             // Salvataggio del file in locale

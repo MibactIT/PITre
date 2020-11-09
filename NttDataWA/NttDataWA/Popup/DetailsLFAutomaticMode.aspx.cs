@@ -118,6 +118,8 @@ namespace NttDataWA.Popup
             this.LtlAvviatoIl.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeLtlAvviatoIl", language);
             this.DetailsLFAutomaticModeInterruption.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeInterruption", language);
             this.LtlNoteAvvio.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeLtlNoteAvvio", language);
+            this.cbxNotificationOptionOptCP.Text = Utils.Languages.GetLabelFromCode("StartProcessSignaturecbxNotificationOptionOptCP", language);
+            this.cbxNotificationOptionOptIP.Text = Utils.Languages.GetLabelFromCode("StartProcessSignaturecbxNotificationOptionOptIP", language);
             this.ltlNotificationOption.Text = Utils.Languages.GetLabelFromCode("StartProcessSignatureltlNotificationOption", language);
             this.DetailsLFAutomaticModeModify.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeModify", language);
             this.InExecuteLinkList.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeInExecuteLinkList", language);
@@ -128,12 +130,14 @@ namespace NttDataWA.Popup
 
         private void EnableContentProponent(IstanzaProcessoDiFirma istanzaProcessoDiFirma)
         {
-            if (istanzaProcessoDiFirma.RuoloProponente.idGruppo.Equals(RoleManager.GetRoleInSession().idGruppo))
+            if (istanzaProcessoDiFirma.UtenteProponente.idPeople.Equals(UserManager.GetUserInSession().idPeople) &&
+                istanzaProcessoDiFirma.RuoloProponente.idGruppo.Equals(RoleManager.GetRoleInSession().idGruppo))
             {
                 this.DetailsLFAutomaticModeInterruption.Visible = true;
                 this.DetailsLFAutomaticModeModify.Visible = true;
                 this.pnlProponente.Attributes.Add("style", "display:block");
-                this.BuildOpzioniNotifiche(istanzaProcessoDiFirma);
+                this.cbxNotificationOptionOptCP.Selected = istanzaProcessoDiFirma.Notifica_concluso;
+                this.cbxNotificationOptionOptIP.Selected = istanzaProcessoDiFirma.Notifica_interrotto;
             }
             else
             {
@@ -288,7 +292,8 @@ namespace NttDataWA.Popup
                         root.ToolTip = istanzaProcessoDiFirma.Descrizione;
                         foreach (IstanzaPassoDiFirma passo in istanzaProcessoDiFirma.istanzePassoDiFirma)
                         {
-                            this.AddChildrenElements(passo, ref root, istanzaProcessoDiFirma);
+                            bool isInterrupted = istanzaProcessoDiFirma.statoProcesso == TipoStatoProcesso.STOPPED;
+                            this.AddChildrenElements(passo, ref root, true, isInterrupted, istanzaProcessoDiFirma.ChaInterroDa) ;
                         }
                         root.Collapse();
                         this.TreeSignatureProcess.Nodes.Add(root);
@@ -315,11 +320,9 @@ namespace NttDataWA.Popup
                     root.Value = istanzaProcessoDiFirma.idIstanzaProcesso;
                     root.ToolTip = istanzaProcessoDiFirma.Descrizione;
                     root.SelectAction = TreeNodeSelectAction.None;
-                    //if(!string.IsNullOrEmpty(istanzaProcessoDiFirma.Errore))
-                    //    root.ImageUrl = "../Images/Icons/task_in_corso.png";
                     foreach (IstanzaPassoDiFirma passo in istanzaProcessoDiFirma.istanzePassoDiFirma)
                     {
-                        this.AddChildrenElements(passo, ref root, istanzaProcessoDiFirma);
+                        this.AddChildrenElements(passo, ref root, false, false, '0');
                     }
 
                     this.TreeSignatureProcess.Nodes.Add(root);
@@ -335,12 +338,8 @@ namespace NttDataWA.Popup
         }
 
 
-        private TreeNode AddChildrenElements(IstanzaPassoDiFirma p, ref TreeNode root, IstanzaProcessoDiFirma istanzaProcessoDiFirma)
+        private TreeNode AddChildrenElements(IstanzaPassoDiFirma p, ref TreeNode root, bool isConcluted, bool isInterrupted, char interrottoDa)
         {
-            bool isInterrupted = istanzaProcessoDiFirma.statoProcesso == TipoStatoProcesso.STOPPED;
-            char interrottoDa = istanzaProcessoDiFirma.ChaInterroDa;
-            bool isConcluted = !string.IsNullOrEmpty(istanzaProcessoDiFirma.dataChiusura);
-
             TreeNode nodeChild = new TreeNode();
             string text;
             nodeChild.ImageUrl = p.statoPasso.Equals(TipoStatoPasso.CUT) ? LibroFirmaManager.GetIconEventTypeDisabled(p) : LibroFirmaManager.GetIconEventType(p);
@@ -371,40 +370,19 @@ namespace NttDataWA.Popup
                 nodeChildDateExecution.SelectAction = TreeNodeSelectAction.None;
                 nodeChild.ChildNodes.Add(nodeChildDateExecution);
             }
-            if(!string.IsNullOrEmpty(p.Errore))
-            {
-                TreeNode nodeChildNote = new TreeNode();
-                text = FormatError(p.Errore);
-                nodeChildNote.Text = text;
-                nodeChildNote.ToolTip = text;
-                nodeChildNote.SelectAction = TreeNodeSelectAction.None;
-                nodeChildNote.ImageUrl = "../Images/Icons/task_in_corso.png";
-                nodeChild.ChildNodes.Add(nodeChildNote);
-            }
 
             root.ChildNodes.Add(nodeChild);
             if (p.statoPasso.Equals(TipoStatoPasso.LOOK) && !isConcluted)
             {
                 nodeChild.Select();
             }
-            
-            if (p.statoPasso.Equals(TipoStatoPasso.LOOK)  && isInterrupted && interrottoDa != '0')
+            if(p.statoPasso.Equals(TipoStatoPasso.LOOK)  && isInterrupted && interrottoDa != '0')
             {
                 TreeNode nodeChildDateExecution = new TreeNode();
                 switch(interrottoDa)
                 {
                     case PROPONENTE:
-                        string descUtenteInterruzione;
-                        if (string.IsNullOrEmpty(istanzaProcessoDiFirma.DescUtenteDelegatoInterruzione))
-                        {
-                            descUtenteInterruzione = istanzaProcessoDiFirma.DescUtenteInterruzione;
-                        }
-                        else
-                        {
-                            descUtenteInterruzione = istanzaProcessoDiFirma.DescUtenteDelegatoInterruzione + " (" + Utils.Languages.GetLabelFromCode("TransmissionDelegatedBy", UserManager.GetUserLanguage()).ToUpper() + " " + istanzaProcessoDiFirma.DescUtenteInterruzione + ")";
-                        }
-                        //nodeChildDateExecution.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeInterruptedByProponente", UserManager.GetUserLanguage());
-                        nodeChildDateExecution.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeInterruptedByProponenteId", UserManager.GetUserLanguage()).Replace("@@", descUtenteInterruzione);
+                        nodeChildDateExecution.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeInterruptedByProponente", UserManager.GetUserLanguage());
                         break;
                     case AMMINISTRATORE:
                         nodeChildDateExecution.Text = Utils.Languages.GetLabelFromCode("DetailsLFAutomaticModeInterruptedByAmministrazione", UserManager.GetUserLanguage());
@@ -417,15 +395,6 @@ namespace NttDataWA.Popup
                 nodeChild.ChildNodes.Add(nodeChildDateExecution);
             }
             return nodeChild;
-        }
-
-        private string FormatError(string error)
-        {
-            string retValue = string.Empty;
-
-            retValue = error.Replace("#DESTINATARIO#", "<br /><b>").Replace("#DESCRIZIONE#", "</b>");
-
-            return retValue;
         }
 
         protected void TreeSignatureProcess_SelectedNodeChanged(object sender, EventArgs e)
@@ -586,16 +555,8 @@ namespace NttDataWA.Popup
             IstanzaProcessoDiFirma istanza = (from i in ListaIstanzaProcessoDiFirma
                                               where string.IsNullOrEmpty(i.dataChiusura)
                                               select i).FirstOrDefault();
-            OpzioniNotifica opzioniNotifiche = new OpzioniNotifica();
-            opzioniNotifiche.Notifica_concluso = this.cbxNotificationOption.Items.FindByValue("cbxNotificationOptionOptCP").Selected;
-            opzioniNotifiche.Notifica_interrotto = this.cbxNotificationOption.Items.FindByValue("cbxNotificationOptionOptIP").Selected;
-
-            ListItem cbxErrore = this.cbxNotificationOption.Items.FindByValue("cbxNotificationOptionOptErrorePassoAutomaticoP");
-            opzioniNotifiche.NotificaErrore = cbxErrore != null && cbxErrore.Selected;
-
-            ListItem cbxDestNonInterop = this.cbxNotificationOption.Items.FindByValue("cbxNotificationOptionOptDestNonInterop");
-            opzioniNotifiche.NotificaPresenzaDestNonInterop = cbxDestNonInterop != null && cbxDestNonInterop.Selected;
-            istanza.Notifiche = opzioniNotifiche;
+            istanza.Notifica_concluso = this.cbxNotificationOptionOptCP.Selected;
+            istanza.Notifica_interrotto = this.cbxNotificationOptionOptIP.Selected;
 
             if (LibroFirmaManager.UpdateIstanzaProcessoDiFirma(istanza))
             {
@@ -619,44 +580,6 @@ namespace NttDataWA.Popup
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return;
-            }
-        }
-
-        private void BuildOpzioniNotifiche(IstanzaProcessoDiFirma istanza)
-        {
-            string language = UserManager.GetUserLanguage();
-            bool isPresentePassoSpedizione = false;
-            bool isPresentePassoAutomatico = false;
-
-            this.cbxNotificationOption.Items.Clear();
-
-            ListItem checkConclusione = new ListItem(Utils.Languages.GetLabelFromCode("StartProcessSignaturecbxNotificationOptionOptCP", language), "cbxNotificationOptionOptCP");
-            checkConclusione.Selected = istanza.Notifiche.Notifica_concluso;
-            this.cbxNotificationOption.Items.Add(checkConclusione);
-
-            ListItem checkInterruzione = new ListItem(Utils.Languages.GetLabelFromCode("StartProcessSignaturecbxNotificationOptionOptIP", language), "cbxNotificationOptionOptIP");
-            checkInterruzione.Selected = istanza.Notifiche.Notifica_interrotto;
-            this.cbxNotificationOption.Items.Add(checkInterruzione);
-
-            isPresentePassoAutomatico = (from p in istanza.istanzePassoDiFirma where p.IsAutomatico select p).FirstOrDefault() != null;
-            if (isPresentePassoAutomatico)
-            {
-                ListItem checkErrore = new ListItem(Utils.Languages.GetLabelFromCode("cbxNotificationOptionOptErrorePassoAutomaticoP", language), "cbxNotificationOptionOptErrorePassoAutomaticoP");
-                checkErrore.Selected = istanza.Notifiche.NotificaErrore;
-                this.cbxNotificationOption.Items.Add(checkErrore);
-
-                //Se la chiave di notifica obbligatoria di presenza di destinatari non interoperanti è obbligatoria, non mostro il check di scelta
-                string attiva = Utils.InitConfigurationKeys.GetValue(UserManager.GetInfoUser().idAmministrazione, Utils.DBKeys.NOTIFICA_DEST_NO_INTEROP_OBB.ToString());
-                if (string.IsNullOrEmpty(attiva) || !attiva.Equals("1"))
-                {
-                    isPresentePassoSpedizione = (from p in istanza.istanzePassoDiFirma where p.Evento.CodiceAzione.Equals(Azione.DOCUMENTOSPEDISCI.ToString()) select p).FirstOrDefault() != null;
-                    if (isPresentePassoSpedizione)
-                    {
-                        ListItem checkDestNonInterop = new ListItem(Utils.Languages.GetLabelFromCode("cbxNotificationOptionOptDestNonInterop", language), "cbxNotificationOptionOptDestNonInterop");
-                        checkDestNonInterop.Selected = istanza.Notifiche.NotificaPresenzaDestNonInterop;
-                        this.cbxNotificationOption.Items.Add(checkDestNonInterop);
-                    }
-                }
             }
         }
 

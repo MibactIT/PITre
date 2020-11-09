@@ -31,9 +31,11 @@
             var docs = "<%=this.GetSelectedDocumentsJSON()%>";
             if (docs != null && docs != "") {
                 return this.SignDocuments(docs.split("|"));
+                reallowOp();
             }
             else {
                 alert('Nessun documento selezionato per la firma');
+                reallowOp();
                 return false;
             }
         }

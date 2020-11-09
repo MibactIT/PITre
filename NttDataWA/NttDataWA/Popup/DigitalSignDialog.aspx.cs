@@ -138,17 +138,6 @@ namespace NttDataWA.Popup
                 else
                 {
                     this.chkPades.Visible = true;
-
-                    //Se il documento è in libro firma non posso scegliere il tipo firma, ma di pende dal passo.
-                    if (fileReq.inLibroFirma)
-                    {
-                        this.chkPades.Enabled = false;
-                        string typeSignature = LibroFirmaManager.GetTypeSignatureToBeEntered(fileReq);
-                        if (typeSignature.Equals(LibroFirmaManager.TypeEvent.SIGN_PADES))
-                        {
-                            this.chkPades.Checked = true;
-                        }
-                    }
                 }
 
                 //
@@ -163,17 +152,6 @@ namespace NttDataWA.Popup
             }
             else
             {
-                //Se il documento è in libro firma non posso scegliere il tipo firma, ma di pende dal passo.
-                if (fileReq.inLibroFirma)
-                {
-                    this.chkPades.Enabled = false;
-                    string typeSignature = LibroFirmaManager.GetTypeSignatureToBeEntered(fileReq);
-                    if (typeSignature.Equals(LibroFirmaManager.TypeEvent.SIGN_PADES))
-                    {
-                        this.chkPades.Checked = true;
-                    }
-                }
-
                 this.chkConverti.Attributes.Add("onClick", "OnClickConvertPDF();");
             }
 

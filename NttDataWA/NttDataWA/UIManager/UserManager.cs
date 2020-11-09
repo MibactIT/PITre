@@ -430,23 +430,6 @@ namespace NttDataWA.UIManager
             }
         }
 
-        public static bool IsRoleAuthorizedFunctions(string tipologia, DocsPaWR.Ruolo ruolo)
-        {
-            try
-            {
-                if (ruolo == null)
-                    return false;
-                String tipologiaUpper = tipologia.ToUpper();
-                return (from function in ruolo.funzioni where function.codice.ToUpper().Equals(tipologiaUpper) select function.systemId).Count() > 0 ? true : false;
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return false;
-            }
-        }
-
-
         public static bool isFiltroAooEnabled()
         {
             bool result = false;
@@ -1363,7 +1346,7 @@ namespace NttDataWA.UIManager
         public static string getComponentType(string userAgent) // HttpBrowserCapabilities brObject)           
         {
             try
-            { 
+            {
                 string retval = Constans.TYPE_ACTIVEX;
 
                 DocsPaWR.DocsPaWebService ws = NttDataWA.Utils.ProxyManager.GetWS();
@@ -2173,24 +2156,6 @@ namespace NttDataWA.UIManager
         public static string GetIdRuoloRespConservazione()
         {
             return docsPaWS.GetIdRuoloRespConservazione(UserManager.GetInfoUser().idAmministrazione);
-        }
-
-        /// <summary>
-        ///LIBRO FIRMA
-        ///Utente automatico ulizzato per i passi automatici di Libro Firma
-        /// </summary>
-        /// <returns></returns>
-        public static DocsPaWR.Utente GetUtenteAutomatico()
-        {
-            try
-            {
-                return docsPaWS.GetUtenteAutomatico(UserManager.GetInfoUser().idAmministrazione);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return null;
-            }
         }
     }
 }

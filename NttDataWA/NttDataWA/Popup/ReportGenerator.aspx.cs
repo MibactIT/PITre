@@ -269,7 +269,7 @@ namespace NttDataWA.Popup
                 {
                     FileDocPrintReport = temp;
 
-                    this.reportContent.Attributes["src"] = "../Popup/ReportContent.aspx";
+                    this.reportContent_.Attributes["src"] = "../Popup/ReportContent.aspx";
                     this.upPanelFrame.Update();
                 }
             }

@@ -116,7 +116,7 @@
 </asp:Content>
 <asp:Content ID="ContentPlaceHolderContent" ContentPlaceHolderID="ContentPlaceHolderContent"
     runat="server">
-    <uc:ajaxpopup2 Id="UplodadFile" runat="server" Title="Acquisisci un documento" Url="../popup/UploadFile.aspx?idDoc=<%=GetIdDocumento()%>"
+    <uc:ajaxpopup2 Id="UplodadFile" runat="server" Title="Acquisisci un documento" Url="../popup/UploadFile.aspx"
         Width="600" Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpDocumentButtons', '');}" />
     <uc:ajaxpopup2 Id="RepositoryView" runat="server" Url="../Repository/RepositoryView.aspx" Width="850"
         Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', '');}" />
@@ -165,11 +165,9 @@
     <uc:ajaxpopup2 Id="PrintLabel" runat="server" Url="../popup/PrintLabel.aspx"
         PermitClose="false" PermitScroll="false" Width="300" Height="2" CloseFunction="function (event, ui) { __doPostBack('UpDocumentButtons', '');}" />
     <uc:ajaxpopup2 Id="StartProcessSignature" runat="server" Url="../popup/StartProcessSignature.aspx"
-        Width="1200" Height="800" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpDocumentButtons', '');}" />
+        Width="600" Height="500" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpDocumentButtons', '');}" />
     <uc:ajaxpopup2 Id="DetailsLFAutomaticMode" runat="server" Url="../popup/DetailsLFAutomaticMode.aspx"
         Width="750" Height="500" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpDocumentButtons', 'SignatureProcessConcluted');}" />
-    <uc:ajaxpopup2 Id="DigitalVisureSelector" runat="server" Title="Approva documento" Url="../popup/DigitalVisure.aspx"
-        Width="600" Height="300" PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui) {__doPostBack('UpDocumentButtons', '');}" />
     <div id="containerTop">
         <asp:UpdatePanel ID="UpUserControlHeaderDocument" runat="server" UpdateMode="Conditional">
             <ContentTemplate>

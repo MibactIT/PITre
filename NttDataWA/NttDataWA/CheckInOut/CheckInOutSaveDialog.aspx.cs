@@ -416,15 +416,10 @@ namespace NttDataWA.CheckInOut
 
             //string fileName = fileInfo.fileName;
             //string fileName = doc.nomeOriginale != null ? doc.nomeOriginale : string.Empty;
+            string fileName = doc.nomeOriginale;
+            if (string.IsNullOrEmpty(fileName))
+                fileName = doc.name;
 
-            //INC000001126833 APSS: problema con riproponi su documenti tipizzati con modelli
-            string fileName = string.Empty;
-            if (doc != null)
-            {
-                fileName = doc.nomeOriginale;
-                if (string.IsNullOrEmpty(fileName))
-                    fileName = doc.name;
-            }
             if (Path.GetExtension(fileName).ToUpperInvariant() == ".P7M")
             {
                 while (!string.IsNullOrEmpty(Path.GetExtension(fileName)))

@@ -140,7 +140,6 @@ namespace NttDataWA.MasterPages
                 case "GESTIONEMODELLITRASM.ASPX":
                 case "DISTRIBUTIONLIST.ASPX":
                 case "SIGNATUREPROCESSES.ASPX":
-                case "MONITORINGPROCESSES.ASPX":
                 case "SUMMERIES.ASPX":
                 case "PRINTS.ASPX":
                 case "NOTES.ASPX":
@@ -482,11 +481,8 @@ namespace NttDataWA.MasterPages
                                     {
                                         if (string.IsNullOrEmpty(actualPage.IdObject) || string.IsNullOrEmpty(objectPage.IdObject) || !objectPage.IdObject.Equals(actualPage.IdObject))
                                         {
-                                            if (objectPage.CodePage != Navigation.NavigationUtils.NamePage.DOCUMENT_CLASSIFICATION.ToString())
-                                            {
-                                                navigationList.Add(actualPage);
-                                                Navigation.NavigationUtils.SetNavigationList(navigationList);
-                                            }
+                                            navigationList.Add(actualPage);
+                                            Navigation.NavigationUtils.SetNavigationList(navigationList);
                                         }
                                     }
                                 }
@@ -1333,6 +1329,21 @@ namespace NttDataWA.MasterPages
                 LiMenuSearchScarti.Visible = false;
             }
 
+            #region  Visualizzazione Archivio EsPI
+            if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue("0", DBKeys.FE_ESPIVIEWER_PATH.ToString())))
+            {
+                string espiScript = "window.open('" + Utils.InitConfigurationKeys.GetValue("0", DBKeys.FE_ESPIVIEWER_PATH.ToString()) + "', '_blank')";
+                LinkMenuSearchArchivioESPI.Attributes.Add("onclick", espiScript);
+            }
+
+            if (!UIManager.UserManager.IsAuthorizedFunctions("ARCHIVIO_ESPI"))
+            {
+                //Disabilita il sottomenu Archivio EsPI del menu Ricerca
+                LiMenuSearchlArchivioESPI.Visible = false;
+            }
+            
+            #endregion
+
             if (!UIManager.UserManager.IsAuthorizedFunctions("DO_DEP_GES_VER") &&
                 !UIManager.UserManager.IsAuthorizedFunctions("DO_DEP_VER_APP") &&
                 !UIManager.UserManager.IsAuthorizedFunctions("DO_DEP_VER_ESE"))
@@ -1385,14 +1396,6 @@ namespace NttDataWA.MasterPages
             if (!UIManager.UserManager.IsAuthorizedFunctions("IMPORTA_FATTURE"))
             {
                 LiMenuImportInvoice.Visible = false;
-            }
-            if (!UIManager.UserManager.IsAuthorizedFunctions("DO_ENABLE_BIGFILE"))
-            {
-                LiMenuClientBigfile.Visible = false;
-            }
-            if(!UIManager.UserManager.IsAuthorizedFunctions("DO_REGISTRO_ACCESSI_EXPORT") && !UIManager.UserManager.IsAuthorizedFunctions("DO_REGISTRO_ACCESSI_PUBLISH"))
-            {
-                LiMenuReportAccessi.Visible = false;
             }
 
             //se è attiva la chiave litedocument non mostro i seguenti menu
@@ -1608,7 +1611,7 @@ namespace NttDataWA.MasterPages
             {
                 LitLastDocumentsView.Visible = true;
             }
-            if(!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue("0", DBKeys.BE_ENABLE_PORTALE_PROCEDIMENTI.ToString()))
+            if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue("0", DBKeys.BE_ENABLE_PORTALE_PROCEDIMENTI.ToString()))
                 && Utils.InitConfigurationKeys.GetValue("0", DBKeys.BE_ENABLE_PORTALE_PROCEDIMENTI.ToString()).Equals("1"))
             {
                 LiMenuProceedings.Visible = true;
@@ -1694,10 +1697,6 @@ namespace NttDataWA.MasterPages
                 {
                     SchedaDocumento doc = UIManager.DocumentManager.getDocumentDetails(Page, obj.IdObject, obj.IdObject);
                     UIManager.DocumentManager.setSelectedRecord(doc);
-                    if (doc != null && doc.documenti != null)
-                    {
-                        FileManager.setSelectedFile(doc.documenti[0]);
-                    }
                 }
             }
 
@@ -2724,10 +2723,7 @@ namespace NttDataWA.MasterPages
             BaseMasterLblMonitoringProcesses.Text = Utils.Languages.GetLabelFromCode("BaseMasterLblMonitoringProcesses", language);
             BaseMasterLblLastDocumentsView.Text = Utils.Languages.GetLabelFromCode("BaseMasterLblLastDocumentsView", language);
             BaseMasterLblProceedings.Text = Utils.Languages.GetLabelFromCode("BaseMasterLblProceedings", language);
-            BaseMasterLblReportAccessi.Text = Utils.Languages.GetLabelFromCode("BaseMasterLblReportAccessi", language);
             banner = UIManager.AdministrationManager.GetBanner(UserManager.GetInfoUser().idAmministrazione);
-            this.BaseMasterLblClientBigfile.Text = Utils.Languages.GetLabelFromCode("BaseMasterLblClientBigfile", language);
-            this.ClientBigfile.Title = Utils.Languages.GetLabelFromCode("BaseMasterLblClientBigfile", language);
 
             if (!string.IsNullOrEmpty(banner))
             {
@@ -2832,6 +2828,7 @@ namespace NttDataWA.MasterPages
             BaseMasterScarto.Text = Utils.Languages.GetLabelFromCode("BaseMasterScarto", language);
             BaseMasterLblSearchVersamenti.Text = Utils.Languages.GetLabelFromCode("BaseMasterLblSearchVersamenti", language);
             BaseMasterLblSearchScarti.Text = Utils.Languages.GetLabelFromCode("BaseMasterLblSearchScarti", language);
+            BaseMasterLblArchivioESPI.Text = Utils.Languages.GetLabelFromCode("BaseMasterLblArchivioESPI", language);
             //*****************************************
             //*****************************************
         }
@@ -2847,7 +2844,7 @@ namespace NttDataWA.MasterPages
             {
                 link = "~/Css/Right/Layout.css";
             }
-            //CssLayout.Attributes.Add("href", link);
+            CssLayout.Attributes.Add("href", link);
         }
 
         protected void SetProjectPage()
@@ -3050,6 +3047,13 @@ namespace NttDataWA.MasterPages
             {
                 HttpContext.Current.Session["ListTransmissionNavigation"] = value;
             }
+        }
+
+        public void CheckSession()
+        {
+            string url = AdministrationManager.CheckSession();
+            if(!string.IsNullOrEmpty(url))
+                System.Web.HttpContext.Current.Response.Write("<script>window.open('" + url + "','_top')</script>");
         }
     }
 }

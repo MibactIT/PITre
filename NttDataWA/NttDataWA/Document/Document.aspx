@@ -336,12 +336,6 @@
                 }
             }
         }
-
-        function UpdateTooltipTxtProtocolSender() {
-            document.getElementById("<%=TxtProtocolSender.ClientID%>").setAttribute('title','');
-            var text = document.getElementById("<%=TxtProtocolSender.ClientID%>").value;
-            document.getElementById("<%=TxtProtocolSender.ClientID%>").setAttribute('title',text);
-        }
     </script>
     <script src="../Scripts/chosen.jquery.min.js" type="text/javascript"></script>
     <link href="../Css/chosen.css" rel="stylesheet" type="text/css" />
@@ -352,13 +346,16 @@
         PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui)  {$('#btnSenderPostback').click();}" />
     <uc:ajaxpopup2 Id="Object" runat="server" Url="../Popup/Object.aspx" IsFullScreen="false"
         PermitClose="false" PermitScroll="true" Width="800" Height="1000" CloseFunction="function (event, ui) {__doPostBack('UpdPnlObject', '');}" />
-        
-    <uc:ajaxpopup2 Id="UplodadFile" runat="server" Url="" Width="600"
+    <uc:ajaxpopup2 Id="UplodadFile" runat="server" Url="../popup/UploadFile.aspx" Width="600"
         Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', '');}" />
     <uc:ajaxpopup2 Id="RepositoryView" runat="server" Url="../Repository/RepositoryView.aspx" Width="850"
         Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', '');}" />
     <uc:ajaxpopup2 Id="Signature" runat="server" Url="../popup/Signature.aspx" PermitClose="false"
         PermitScroll="false" Width="1000" Height="1200" CloseFunction="function (event, ui) {__doPostBack('UpDocumentButtons', '');}" />
+
+    <uc:ajaxpopup2 Id="SignaturePermanenteConfig" runat="server" Url="../popup/SignaturePermanenteConfig.aspx" PermitClose="false" 
+        PermitScroll="false" Width="700" Height="700" CloseFunction="function (event, ui) {__doPostBack('UpDocumentButtons', '');}" />
+
     <uc:ajaxpopup2 Id="SignatureA4" runat="server" Url="../popup/Signature.aspx?printSignatureA4=true"
         PermitClose="false" PermitScroll="false" Width="1000" Height="1200" CloseFunction="function (event, ui) {__doPostBack('UpDocumentButtons', '');}" />
     <uc:ajaxpopup2 Id="DocumentViewer" runat="server" Url="../popup/DocumentViewer.aspx"
@@ -487,7 +484,7 @@
     <uc:ajaxpopup2 Id="HSMSignature" runat="server" Url="../popup/HSM_Signature.aspx" IsFullScreen="false"
         PermitClose="false" PermitScroll="true" Width="700" Height="400" CloseFunction="function (event, ui) {__doPostBack('UpdPnlObject', '');}" />
     <uc:ajaxpopup2 Id="StartProcessSignature" runat="server" Url="../popup/StartProcessSignature.aspx"
-        Width="1200" Height="800" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', 'CloseStartProcessSignature');}" />
+        Width="600" Height="600" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', '');}" />
     <uc:ajaxpopup2 Id="DetailsLFAutomaticMode" runat="server" Url="../popup/DetailsLFAutomaticMode.aspx"
         Width="750" Height="500" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', 'SignatureProcessConcluted');}" />
      <uc:ajaxpopup2 Id="MassiveReportDragAndDrop" runat="server" Url="../popup/MassiveReportDragAndDrop.aspx"
@@ -498,12 +495,6 @@
        Width="1200" Height="500" PermitClose="true" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', '');}" />
     <uc:ajaxpopup2 Id="AddressBookFromPopup" runat="server" Url="../Popup/AddressBook.aspx" PermitClose="false"
         PermitScroll="false" IsFullScreen="true" CloseFunction="function (event, ui){__doPostBack('UpdPnlObject', 'closePopupAddressBook');}" />
-    <uc:ajaxpopup2 Id="InvoicePreview" runat="server" Url="../popup/InvoicePreview.aspx"
-        ForceDontClose="true" PermitClose="false" PermitScroll="false" IsFullScreen="false" Width="500" Height="800"
-        CloseFunction="function (event, ui) {__doPostBack('UpdPnlObject', '');}" />
-    <uc:ajaxpopup2 Id="MassiveTransmissionAccept" runat="server" Url="../popup/MassiveTransmissionAccept.aspx?type=d"
-        ForceDontClose="true" PermitClose="false" PermitScroll="false" IsFullScreen="false" Width="1000" Height="900"
-        CloseFunction="function (event, ui) {__doPostBack('UpdPnlObject', '');}" />
     <div id="containerTop">
         <asp:UpdatePanel ID="UpUserControlHeaderDocument" runat="server" UpdateMode="Conditional">
             <ContentTemplate>
@@ -574,45 +565,28 @@
                                             </div>
                                         </ContentTemplate>
                                     </asp:UpdatePanel>
-                                </div>
-                                <div  class="row">
-                                    <div class="col">
-                                        <div id="colBottom4">
-                                            <asp:UpdatePanel runat="server" ID="UpDirittiDocumento" UpdateMode="Conditional">
-                                                <ContentTemplate>
-                                                    <asp:Panel ID="PnlDirittiDocumento" Visible="false" runat="server">
-                                                        <span class="weight">
-                                                            <asp:Label ID="LblDiritti" runat="server"></asp:Label></span>
-                                                        <asp:Label ID="LblTipoDiritto" runat="server"></asp:Label>
-                                                    </asp:Panel>
-                                                </ContentTemplate>
-                                            </asp:UpdatePanel>
-                                        </div>
-                                    </div>
-                                    <div  class="col2-right-no-margin-right">
-                                        <div class="col3-right">
-                                            <asp:UpdatePanel runat="server" ID="UpDocumentPrivate" UpdateMode="Conditional">
-                                                <ContentTemplate>
-                                                    <asp:PlaceHolder runat="server" ID="PnlCheckUser">
-                                                        <div class="col2-right">
-                                                            <span id="DisabledDocumentChekUser" runat="server">
-                                                                <asp:CheckBox ID="DocumentChekUser" runat="server" onclick="swapUserPrivateCheckboxs(this.id)"
-                                                                    CssClass="clickableLeftN" />
-                                                            </span>
-                                                        </div>
-                                                    </asp:PlaceHolder>
+                                    <div class="col3-right">
+                                        <asp:UpdatePanel runat="server" ID="UpDocumentPrivate" UpdateMode="Conditional">
+                                            <ContentTemplate>
+                                                <asp:PlaceHolder runat="server" ID="PnlCheckUser">
                                                     <div class="col2-right">
-                                                        <span id="DisabledDocumentCheckPrivate" runat="server">
-                                                            <asp:CheckBox ID="DocumentCheckPrivate" runat="server" onclick="swapUserPrivateCheckboxs(this.id)"
+                                                        <span id="DisabledDocumentChekUser" runat="server">
+                                                            <asp:CheckBox ID="DocumentChekUser" runat="server" onclick="swapUserPrivateCheckboxs(this.id)"
                                                                 CssClass="clickableLeftN" />
                                                         </span>
                                                     </div>
-                                                    <asp:HiddenField runat="server" ID="HiddenISPrivate" ClientIDMode="Static" />
-                                                </ContentTemplate>
-                                            </asp:UpdatePanel>
-                                        </div>
-                                        </div>
+                                                </asp:PlaceHolder>
+                                                <div class="col2-right">
+                                                    <span id="DisabledDocumentCheckPrivate" runat="server">
+                                                        <asp:CheckBox ID="DocumentCheckPrivate" runat="server" onclick="swapUserPrivateCheckboxs(this.id)"
+                                                            CssClass="clickableLeftN" />
+                                                    </span>
+                                                </div>
+                                                <asp:HiddenField runat="server" ID="HiddenISPrivate" ClientIDMode="Static" />
+                                            </ContentTemplate>
+                                        </asp:UpdatePanel>
                                     </div>
+                                </div>
                             </div>
                             <div class="row">
                                 <asp:UpdatePanel runat="server" ID="UpPnlDataDocument" UpdateMode="Conditional">
@@ -1077,8 +1051,8 @@
                                                 </div>
                                                 <div class="boxDataDocument">
                                                     <div class="boxDoubleDocumentSx">
-                                                        <cc1:CustomTextArea ID="TxtProtocolSender" runat="server" CssClass="txt_textdata clickable" 
-                                                            CssClassReadOnly="txt_textdata_disabled" Width="90%" onchange="UpdateTooltipTxtProtocolSender()">
+                                                        <cc1:CustomTextArea ID="TxtProtocolSender" runat="server" CssClass="txt_textdata"
+                                                            CssClassReadOnly="txt_textdata_disabled">
                                                         </cc1:CustomTextArea>
                                                     </div>
                                                     <div class="boxDoubleDocumentDx">
@@ -1552,6 +1526,10 @@
                 CssClassDisabled="btnDisable" OnMouseOver="btnHover" OnClick="DocumentBtnCreateDocument_Click" />
             <cc1:CustomButton ID="DocumentBntRecord" runat="server" CssClass="btnEnable defaultAction" CssClassDisabled="btnDisable"
                 OnMouseOver="btnHover" OnClick="DocumentBntRecord_Click" OnClientClick="return verifica();" />
+            
+            <cc1:CustomButton ID="DocumentBtnApponiSegnaturaPermanente" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
+                OnMouseOver="btnHover" OnClick="DocumentBtnApponiSegnaturaPermanente_Click"/>
+
             <cc1:CustomButton ID="DocumentBtnRepeat" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
                 OnMouseOver="btnHover" OnClick="DocumentBtnRepeat_Click" />
             <cc1:CustomButton ID="DocumentBtnForward" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
@@ -1574,12 +1552,6 @@
                 OnMouseOver="btnHover" OnClick="DocumentBtnUndo_Click" />
             <cc1:CustomButton ID="DocumentBtnConsolid" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
                 OnMouseOver="btnHover" OnClick="DocumentBtnConsolid_Click" />
-            <%--<cc1:CustomButton ID="DocumentBtnAccept" runat="server" CssClass="btnEnable" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover" OnClientClick="return ajaxModalPopupMassiveTransmissionAccept();" Visible ="false" />--%>
-            <cc1:CustomButton ID="DocumentBtnAccept" runat="server" CssClass="btnEnable1" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover1" OnClick="DocumentBtnAccept_Click" Visible ="false" />
-            <cc1:CustomButton ID="DocumentBtnView" runat="server" CssClass="btnEnable1" CssClassDisabled="btnDisable"
-                OnMouseOver="btnHover1" OnClick="DocumentBtnView_Click" Visible="false" />
             <asp:Button ID="btnSenderPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
                 OnClick="btnSenderPostback_Click" />
             <asp:Button ID="BtnVerifyPreviousViewer" runat="server" CssClass="hidden" ClientIDMode="Static"
@@ -1590,8 +1562,6 @@
                 OnClick="btnLinkCustom_Click" />
             <asp:Button ID="btnReportSpedizioniPostback" runat="server" CssClass="hidden" ClientIDMode="Static"
                 OnClick="btnReportSpedizioniPostback_Click" />
-            <asp:Button ID="btnChangeTabNewDocument" runat="server" CssClass="hidden" ClientIDMode="Static"
-                OnClick="btnChangeTabNewDocument_Click" />
             <asp:HiddenField runat="server" ID="HiddenControlRepeatCopyDocuments" ClientIDMode="Static" />
             <asp:HiddenField runat="server" ID="HiddenControlRepeatCopyDocuments2" />
         </ContentTemplate>

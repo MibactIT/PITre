@@ -16,7 +16,7 @@ namespace NttDataWA.UIManager
         public string PageID;
         private HttpResponse response = null;
         private FileDocumento fileDoc = null;
-        private FileDocumentoAnteprima fileDocA = null;
+        //private FileDocumentoAnteprima fileDocA = null;
         private static Hashtable fileManager;
         private static DocsPaWR.DocsPaWebService docsPaWS = ProxyManager.GetWS();
         #endregion
@@ -709,21 +709,15 @@ namespace NttDataWA.UIManager
         /// <param name="refresh"></param>
         public static void setMassSignature(FileRequest fileRequest, bool cosign, bool pades, string idDocument = null)
         {
-            DocsPaWR.MassSignature tempMass = new MassSignature();
-            DocsPaWR.MassSignature massSignature = null;
-            tempMass.fileRequest = fileRequest;
-            tempMass.cosign = cosign;
-            tempMass.signPades = pades;
             try
             {
-                massSignature = docsPaWS.getSha256(tempMass, UserManager.GetInfoUser());
-            }
-            catch(Exception e)
-            {
-                throw new ApplicationException("Errore dutante il calcolo dell'impronta del file");
-            }
-            try
-            {           
+                DocsPaWR.MassSignature tempMass = new MassSignature();
+                tempMass.fileRequest = fileRequest;
+                tempMass.cosign = cosign;
+                tempMass.signPades = pades;
+                
+                DocsPaWR.MassSignature massSignature = docsPaWS.getSha256(tempMass, UserManager.GetInfoUser());
+
                 if (string.IsNullOrEmpty(idDocument))
                     FileManager.SetSessionValue("FileManager.massSignature", massSignature);
                 else
@@ -909,43 +903,6 @@ namespace NttDataWA.UIManager
             }
 
             return fileDoc;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="sch"></param>
-        /// <param name="position"></param>
-        /// <param name="fileRequest"></param>
-        /// <returns></returns>
-        public FileDocumentoAnteprima getPdfPreviewFile(Page page, FileRequest fileRequest, int firstPg, int lastPg, DocsPaWR.SchedaDocumento sch, labelPdf label)
-        {
-            try
-            {
-                string errore = string.Empty;
-
-                response = page.Response;
-
-                if (fileRequest == null && fileDocA != null)
-                {
-                    return fileDocA;
-                }
-
-                if (fileRequest != null)
-                {
-                    InfoUtente infoUtente = UserManager.GetInfoUser();
-                    fileDocA = docsPaWS.DocumentoGetAnteprimaFilePdf(fileRequest, firstPg, lastPg, sch, label, infoUtente, out errore);
-                    //fileDocA = docsPaWS.DocumentoGetAnteprimaFilePdf(fileRequest, infoUtente, out errore);
-                }
-
-                return fileDocA;
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return null;
-            }
         }
 
         /// <summary>
@@ -1403,8 +1360,7 @@ namespace NttDataWA.UIManager
                         FileManager.GetFileRequest(DocumentManager.getSelectedAttachId()) :
                             FileManager.GetFileRequest();
 
-                //if (!docsPaWS.PutFileFromUploadManager(ref fileReq, fileDoc, fileName, fileDescription, infoUtente))//, out errorMessage))
-                if (!docsPaWS.PutFileFromUploadManagerLight(ref fileReq, fileDoc, fileDescription, infoUtente))
+                if (!docsPaWS.PutFileFromUploadManager(ref fileReq, fileDoc, fileName, fileDescription, infoUtente))//, out errorMessage))
                 {
                     if (errorMessage != string.Empty)
                     {
@@ -1420,44 +1376,6 @@ namespace NttDataWA.UIManager
             catch (System.Exception ex)
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
-                return null;
-            }
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Funzione di cancellazione file personali nel repository personale.
-        /// </summary>
-        /// <param name="page">La pagina richiedente</param>
-        /// <param name="fileDoc">File selezionato</param>
-        /// <param name="fileName">Nome file su system</param>
-        /// <param name="fileDescription">Identificativo univoco</param>
-        public static string DeletePersonalFile(Page page, FileDocumento fileDoc, string fileName, string fileDescription)
-        {
-            // Variabile di appoggio utilizzata per onctenere il documento convertito in PDF
-            // a seguito di una richiesta di converisone sincrona lato server
-            FileDocumento convSyncResult = null;
-
-            InfoUtente infoUtente = UserManager.GetInfoUser();
-
-            string errorMessage = string.Empty;
-            try
-            {
-                if (!docsPaWS.DeletePersonalFile(fileDoc, fileDescription, infoUtente))
-                {
-                    if (errorMessage != string.Empty)
-                    {
-                        return errorMessage;
-                    }
-                    else
-                        return "ErrorDeletedDocument";
-                }
-                setSelectedFile(null);
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                setSelectedFile(null);
                 return null;
             }
             return string.Empty;
@@ -1492,9 +1410,8 @@ namespace NttDataWA.UIManager
                     fileReq.fileName = System.IO.Path.GetFileName(fileDoc.fullName);
                     fileReq.fileSize = fileDoc.length.ToString();
                     fileReq.firmato = "";
-                    bool isPdf = System.IO.Path.GetExtension(fileDoc.fullName).ToLower().EndsWith("pdf");
                     // Se è stata richiesta la conversione PDF lato server sincrona...
-                    if (conversionePdfServer && conversionePdfServerSincrona && !isPdf)
+                    if (conversionePdfServer && conversionePdfServerSincrona)
                         // ...la prima versione del documento è direttamente il file convertito in PDF
                         // Richedo quindi la conversione in pdf del content dell'oggetto FileDocumento
                         convSyncResult = docsPaWS.GeneratePDFInSyncMod(fileDoc);
@@ -1524,7 +1441,7 @@ namespace NttDataWA.UIManager
                     aggiornaFileRequest(page, fileReq);
 
                     //Se abilitata la conversione lato server (asincrona) chiamo il webmethod che mette in coda il file da convertire
-                    if (conversionePdfServer && !conversionePdfServerSincrona && !isPdf)
+                    if (conversionePdfServer && !conversionePdfServerSincrona)
                     {
                         bool isAllegato = (fileReq.GetType() == typeof(DocsPaWR.Allegato));
 
@@ -1550,7 +1467,7 @@ namespace NttDataWA.UIManager
 
                     // Se è stata richiesta la conversione lato server ma questa non è andata
                     // a buon fine...
-                    if (conversionePdfServer && conversionePdfServerSincrona && convSyncResult == null && !isPdf)
+                    if (conversionePdfServer && conversionePdfServerSincrona && convSyncResult == null)
                     {
                         errorMessage = "ErrorConversionePdf";
                         return errorMessage;
@@ -1817,6 +1734,7 @@ namespace NttDataWA.UIManager
             try
             {
                 SchedaDocumento tabDocument = DocumentManager.getSelectedRecord();
+
                 //Sono nel caso di acquisisci prima di salvare
                 if (string.IsNullOrEmpty(newFileReq.docNumber))
                 {
@@ -1827,6 +1745,8 @@ namespace NttDataWA.UIManager
                     }
                     return;
                 }
+
+
                 if (newFileReq.docNumber.Equals(tabDocument.docNumber))
                 {
                     FileManager.setSelectedFile(newFileReq);
@@ -2285,19 +2205,6 @@ namespace NttDataWA.UIManager
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return false;
-            }
-        }
-
-        public static int TolatFileSizeDocument(string idDocumento)
-        {
-            try
-            {
-                return docsPaWS.TotalFileSizeDocument(idDocumento);
-            }
-            catch (Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return 0;
             }
         }
         #endregion

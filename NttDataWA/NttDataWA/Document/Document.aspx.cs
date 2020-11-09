@@ -9,7 +9,6 @@ using NttDataWA.DocsPaWR;
 using NttDataWA.Utils;
 using NttDataWA.UIManager;
 using System.Collections;
-using System.Configuration;
 using NttDatalLibrary;
 using System.Text;
 using System.Globalization;
@@ -22,6 +21,7 @@ namespace NttDataWA.Document
 {
     public partial class Document : System.Web.UI.Page
     {
+        private ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private const string NOTPROTOCOL = "N";
         private const string ATTACHMENT = "ALL";
@@ -36,7 +36,6 @@ namespace NttDataWA.Document
         private const string POPUP_DRAG_AND_DROP = "POPUP_DRAG_AND_DROP";
         private const string UP_DOCUMENT_BUTTONS = "upPnlButtons";
         private const string CLOSE_POPUP_ADDRESS_BOOK = "closePopupAddressBook";
-        private const string CLOSE_START_PROCESS_SIGNATURE = "CloseStartProcessSignature";
 
         private string idProfile = string.Empty;
         private string docNumber = string.Empty;
@@ -44,6 +43,8 @@ namespace NttDataWA.Document
         protected DocsPaWR.FiltroRicerca[][] ListaFiltri;
         protected DocsPaWR.FiltroRicerca[] fVList;
         protected DocsPaWR.FiltroRicerca fV1;
+
+        private bool? _errorRequirePopUp;
 
         /// <summary>
         /// Id del Task a cui associare il contributo
@@ -207,12 +208,26 @@ namespace NttDataWA.Document
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            this._logger.Info("START");
+
+            DettaglioSegnatura _dettaglioSegnatura = null;
+
+            string typeDoc = string.Empty;
+
             //Se ACL rimossa, allora visualizzo un messaggio di warning all'utente per poi reindirizzarlo alla HOME.
             if (!DocumentManager.IsNewDocument() && DocumentManager.CheckRevocationAcl())
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "function RedirectHome(){$(location).attr('href','" + this.ResolveUrl("~/Index.aspx") + "');} if (parent.fra_main) {parent.fra_main.ajaxDialogModal('RevocationAcl', 'warning', '','',null,null,'RedirectHome()')} else {parent.parent.ajaxDialogModal('RevocationAcl', 'warning', '','',null,null,'RedirectHome()');}", true);
                 return;
             }
+            this._logger.DebugFormat("Is postback: '{0}'", IsPostBack.ToString());
+
+            //Reset titolario 
+            if (HttpContext.Current.Session["Titolario"] != null)
+            {
+                HttpContext.Current.Session["Titolario"] = null;
+            }
+
 
             if (!IsPostBack)
             {
@@ -230,6 +245,8 @@ namespace NttDataWA.Document
                 {
                     this.Task = null;
                 }
+
+
                 Page.Form.DefaultFocus = this.DocumentBntRecord.ClientID;
 
                 this.TypeDocument = Page.Request["t"];
@@ -240,18 +257,20 @@ namespace NttDataWA.Document
 
                 if (!string.IsNullOrEmpty(this.TypeDocument))
                 {
+                    this._logger.Debug("Creao nuovo");
                     this.DocumentInWorking = UIManager.DocumentManager.NewSchedaDocumento();
                     this.IsForwarded = false;
 
-                    HttpContext.Current.Session["Answer.DocumentWIP"] = null;         
+                    HttpContext.Current.Session["Answer.DocumentWIP"] = null;
 
                     UIManager.DocumentManager.setSelectedRecord(this.DocumentInWorking);
 
-                    switch (this.TypeDocument.ToUpper())
+                    typeDoc = this.TypeDocument.ToUpper();
+
+                    switch (typeDoc)
                     {
                         case "A":
                             this.RblTypeProtocol.SelectedValue = "A";
-                            this.DocumentInWorking.tipoProto = "A";
                             this.RblTypeProtocol.Items[0].Attributes.Add("class", "orange");
                             this.container.Attributes.Add("class", "borderOrange");
                             this.containerDocumentTabDxBorder.Attributes.Add("class", "containerDocumentTabOrangeDxBorder");
@@ -319,7 +338,6 @@ namespace NttDataWA.Document
 
                         case "P":
                             this.senderpopup.Title = Utils.Languages.GetLabelFromCode("TitleSenderPopup", language);
-                            this.DocumentInWorking.tipoProto = "P";
                             this.DocumentBtnPrepared.Visible = false;
                             this.DocumentBtnRemove.Visible = false;
                             this.DocumentBtnUndo.Enabled = false;
@@ -350,16 +368,7 @@ namespace NttDataWA.Document
                             this.HeaderDocument.TypeDocument = "P";
                             this.PnlCheckUser.Visible = false;
                             this.DocumentBtnConsolid.Enabled = false;
-                            this.DocumentBtnPrint.Enabled = false;
-                            if (this.EnableForward)
-                            {
-                                this.DocumentBtnForward.Visible = true;
-                            }
-                            else
-                            {
-                                this.DocumentBtnForward.Visible = false;
-                            }
-                            this.DocumentBtnForward.Enabled = false;
+                            this.DocumentBtnForward.Visible = false;
                             this.HeaderDocument.TypeRecord = "P";
                             this.rbIn.Text = DocumentManager.GetDescriptionLabel("A");
 
@@ -397,7 +406,6 @@ namespace NttDataWA.Document
                             break;
 
                         case "I":
-                            this.DocumentInWorking.tipoProto = "P";
                             this.senderpopup.Title = Utils.Languages.GetLabelFromCode("TitleTrasmitPopup", language);
                             this.DocumentBtnPrepared.Visible = false;
                             this.DocumentBtnRemove.Visible = false;
@@ -410,16 +418,7 @@ namespace NttDataWA.Document
                             this.DocumentBtnTransmit.Visible = false;
                             this.PnlRecipients.Visible = false;
                             this.PnlCheckUser.Visible = false;
-                            this.DocumentBtnPrint.Enabled = false;
-                            if (this.EnableForward)
-                            {
-                                this.DocumentBtnForward.Visible = true;
-                            }
-                            else
-                            {
-                                this.DocumentBtnForward.Visible = false;
-                            }
-                            this.DocumentBtnForward.Enabled = false;
+                            this.DocumentBtnForward.Visible = false;
                             this.DocumentImgPrintEnvelopesRecipients.Enabled = false;
                             this.RblTypeProtocol.SelectedValue = "I";
                             this.RblTypeProtocol.Items[2].Attributes.Add("class", "blue");
@@ -475,7 +474,7 @@ namespace NttDataWA.Document
                             break;
 
                         case NOTPROTOCOL:
-                            this.DocumentInWorking.tipoProto = "G";
+                            this._logger.Debug("caricato un Non Protocollato");
                             this.RblTypeProtocol.Visible = false;
 
                             this.PnlRegistry.Visible = false;
@@ -598,6 +597,43 @@ namespace NttDataWA.Document
                     //FINE
                     //***************************************************************
 
+                    // ***** Alessandro Aiello 25/10/2018
+                    // Segnatura Permanente
+                    // ***** Inizio
+                    if (this.DocumentInWorking != null)
+                    {
+                        this._logger.Debug("@@SEGNATURA");
+
+                        #region SEGNATURA PERMANENTE
+
+                        _dettaglioSegnatura = this.DocumentInWorking.DettaglioSegnatura;
+
+
+
+                        if (_dettaglioSegnatura == null)
+                        {
+                            _dettaglioSegnatura = UIManager.DocumentManager.GetDettaglioSegnaturaDocumento(this.DocumentInWorking.systemId);
+                            if(_dettaglioSegnatura == null)
+                            {
+                                this._logger.Debug("Calcolo segnatura");
+                                // nel caso di documenti creati prima della modifica alla creazione dei documenti, nella quale viene generato e salvato nel
+                                // Database il dettaglio della segnatura automaticamente, viene calcolata.
+                                _dettaglioSegnatura = UIManager.DocumentManager.CalcolaDettaglioSegnatura(this.DocumentInWorking);
+                            }
+                            this.DocumentInWorking.DettaglioSegnatura = _dettaglioSegnatura;
+                        }
+
+                        // la gestione della visibilità dei controlli e in fondo al Page_Load
+
+
+                        #endregion
+
+
+                    }
+
+                    // ***** Fine
+
+
                     if (this.DocumentInWorking != null && ((!string.IsNullOrEmpty(this.DocumentInWorking.systemId) && !string.IsNullOrEmpty(this.DocumentInWorking.accessRights) && Convert.ToInt32(this.DocumentInWorking.accessRights) >= Convert.ToInt32(HMdiritti.HMdiritti_Write)) || this.IsForwarded))
                     {
                         this.EnableEdit = true;
@@ -644,7 +680,7 @@ namespace NttDataWA.Document
                         //}
 
 
-                        string typeDoc = (this.DocumentInWorking.documentoPrincipale != null &&
+                        typeDoc = (this.DocumentInWorking.documentoPrincipale != null &&
                             !string.IsNullOrEmpty(this.DocumentInWorking.documentoPrincipale.docNumber)) ? ATTACHMENT : this.DocumentInWorking.tipoProto.ToUpper();
                         {
 
@@ -665,46 +701,6 @@ namespace NttDataWA.Document
                         {
                             docAlreadySent_opt = TrasmManager.DocumentAlreadyTransmitted_Opt(this.DocumentInWorking.systemId);
                         }
-
-                        //Il bottone  accetta nel tab profilo sarà visibili solo se sono presenti trasmissioni pendenti con workflow a ruolo
-                        if (this.DocumentInWorking != null && !string.IsNullOrEmpty(this.DocumentInWorking.systemId))
-                        {
-                            this.DocumentBtnAccept.Visible = DocumentManager.ExistsTrasmPendenteConWorkflowDocumento(this.DocumentInWorking.docNumber, this.Role.systemId, this.InfoUser.idPeople);
-                            bool inTodoList = DocumentManager.ExistsTrasmPendenteSenzaWorkflowDocumento(this.DocumentInWorking.docNumber, this.Role.systemId, this.InfoUser.idPeople);
-                            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings[WebConfigKeys.SET_DATA_VISTA_GRD.ToString()])
-                                && ConfigurationManager.AppSettings[WebConfigKeys.SET_DATA_VISTA_GRD.ToString()] == "2")
-                            {
-                                this.DocumentBtnView.Visible = inTodoList;
-                            }
-                            if (inTodoList && SimplifiedInteroperabilityManager.IsDocumentReceivedWithIS(this.DocumentInWorking.docNumber))
-                            {
-                                bool value = (this.DocumentInWorking.protocollo != null && !String.IsNullOrEmpty(this.DocumentInWorking.protocollo.segnatura)) || (this.DocumentInWorking.tipoProto == "G");
-                                this.DocumentBtnView.Visible = value;
-                            }
-
-                            this.PnlDirittiDocumento.Visible = true;
-                            switch ((HMdiritti)Enum.Parse(typeof(HMdiritti), this.DocumentInWorking.accessRights))
-                            {
-                                case HMdiritti.HDdiritti_Waiting:
-                                    this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelWaiting", language);
-                                    break;
-                                case HMdiritti.HMdiritti_Read:
-                                    this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelReadOnly", language);
-                                    break;
-                                case HMdiritti.HMdiritti_Proprietario:
-                                case HMdiritti.HMdiritti_Write:
-                                    this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelRW", language);
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            this.DocumentBtnAccept.Visible = false;
-                            this.DocumentBtnView.Visible = false;
-                            this.PnlDirittiDocumento.Visible = false;
-                        }
-
-
                         switch (typeDoc)
                         {
                             case "A":
@@ -791,11 +787,6 @@ namespace NttDataWA.Document
                                                     this.DocumentImgSenderInt.Visible = true;
                                                     NotOpenK1K2 = true;
                                                     break;
-                                                case "-2": //Caso in cui è necessario selezionare un corrispondente valido
-                                                    this.DocumentImgSenderWarning.Visible = true;
-                                                    this.DocumentImgSenderWarning.AlternateText = Utils.Languages.GetLabelFromCode("DocumentImgSenderWarningToolTipSelectSender", UIManager.UserManager.GetUserLanguage());
-                                                    this.DocumentImgSenderWarning.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgSenderWarningToolTipSelectSender", UIManager.UserManager.GetUserLanguage());
-                                                    break;
                                                 default:
                                                     this.DocumentImgSenderWarning.Visible = true;
                                                     this.DocumentImgSenderWarning.AlternateText = Utils.Languages.GetLabelFromCode("DocumentImgSenderWarningToolTipMoreSender", UIManager.UserManager.GetUserLanguage());
@@ -830,22 +821,7 @@ namespace NttDataWA.Document
                                 this.HeaderDocument.TypeDocument = "P";
                                 this.PnlCheckUser.Visible = false;
                                 this.DocumentBtnCreateDocument.Visible = false;
-                                if (this.EnableForward)
-                                {
-                                    this.DocumentBtnForward.Visible = true;
-                                }
-                                else
-                                {
-                                    this.DocumentBtnForward.Visible = false;
-                                }
-                                if (this.DocumentInWorking != null && !string.IsNullOrEmpty(this.DocumentInWorking.systemId))
-                                {
-                                    this.DocumentBtnForward.Enabled = true;
-                                }
-                                else
-                                {
-                                    this.DocumentBtnForward.Enabled = false;
-                                }
+                                this.DocumentBtnForward.Visible = false;
                                 this.DocumentBtnConsolid.Enabled = false;
                                 if (this.IsForwarded)
                                 {
@@ -909,22 +885,7 @@ namespace NttDataWA.Document
                                 this.HeaderDocument.TypeDocument = "I";
                                 this.PnlCheckUser.Visible = false;
                                 this.DocumentBtnCreateDocument.Visible = false;
-                                if (this.EnableForward)
-                                {
-                                    this.DocumentBtnForward.Visible = true;
-                                }
-                                else
-                                {
-                                    this.DocumentBtnForward.Visible = false;
-                                }
-                                if (this.DocumentInWorking != null && !string.IsNullOrEmpty(this.DocumentInWorking.systemId))
-                                {
-                                    this.DocumentBtnForward.Enabled = true;
-                                }
-                                else
-                                {
-                                    this.DocumentBtnForward.Enabled = false;
-                                }
+                                this.DocumentBtnForward.Visible = false;
                                 this.DocumentBtnConsolid.Enabled = false;
                                 this.HeaderDocument.TypeRecord = "I";
                                 this.rbIn.Text = DocumentManager.GetDescriptionLabel("A");
@@ -1008,14 +969,6 @@ namespace NttDataWA.Document
                                 else
                                 {
                                     this.DocumentBtnForward.Visible = false;
-                                }
-                                if (this.DocumentInWorking != null && !string.IsNullOrEmpty(this.DocumentInWorking.systemId))
-                                {
-                                    this.DocumentBtnForward.Enabled = true;
-                                }
-                                else
-                                {
-                                    this.DocumentBtnForward.Enabled = false;
                                 }
                                 this.HeaderDocument.TypeDocument = NOTPROTOCOL;
                                 this.HeaderDocument.TypeRecord = "G";
@@ -1236,9 +1189,59 @@ namespace NttDataWA.Document
                     this.TxtCodeProject_OnTextChanged(null, null);
                     TxtObject.Focus();
                 }
+
+
+                // *******
+                // Alessandro Aiello
+                // INIZIO Gestione controlli
+
+                if (_dettaglioSegnatura != null)
+                {
+                    if (_dettaglioSegnatura.DettaglioSegnaturaRepertorio != null)
+                    {
+                        this.DocumentBtnPrepared.Visible = false;
+                    }
+
+                    if ("1".Equals(_dettaglioSegnatura.Segnato))
+                    {
+                        this._attivaPulsanteApponiSegnaturaPermanente(false);
+
+                        //ABBATANGELI - MiBACT - Visuaizzaione del tasto in caso applichiamo segnatura non protocollato
+                        this.DocumentBtnPrepared.Enabled = (typeDoc.Equals("G") || typeDoc.Equals("R") || typeDoc.Equals("C") || typeDoc.Equals("NOTPROTOCOL")) ? true : false;
+
+                        this.DocumentDdlTypeDocument.Enabled = false;  // Disattivo Tipizzazione
+                    }
+                    else if ("1".Equals(_dettaglioSegnatura.IsPermanenteProtocollo) || "1".Equals(_dettaglioSegnatura.IsPermanenteRepertorio))
+                    {
+                        this._logger.Debug("Protocollo o repertorio");
+                        this._logger.Debug(">> Inposto pulsante permanente");
+                        this._attivaPulsanteApponiSegnaturaPermanente("0".Equals(_dettaglioSegnatura.Segnato));
+                        // this.SignaturePermanenteConfig.Title = Utils.Languages.GetLabelFromCode("TitleSignaturePermanentePopup", language);
+                        this._logger.Debug("Segnato: " + _dettaglioSegnatura.Segnato);
+                        if ("0".Equals(_dettaglioSegnatura.Segnato))
+                        {
+                            this.DocumentBtnPrepared.Visible = true;
+                        }
+                        else
+                        {
+                            this.DocumentBtnPrepared.Visible = false;
+                        }
+                    }
+
+                    /*
+                    if(this.DocumentInWorking.documentoPrincipale != null)
+                    {
+                        this._attivaPulsanteApponiSegnaturaPermanente(false, false);
+                    }*/
+
+                    this.verificaValoriAttivazionePermanente();
+
+                }
+                // ******** FINE
             }
             else
             {
+
                 if (this.CustomDocuments)
                 {
                     this.PnlTypeDocument.Controls.Clear();
@@ -1347,19 +1350,37 @@ namespace NttDataWA.Document
                         //SearchProject.Url = "../popup/SearchProject.aspx?caller=profilo";
                     }
             }
-
-            string urlUploadFile = "../popup/UploadFile.aspx?idDoc=0";
-            if (DocumentManager.getSelectedRecord() != null && DocumentManager.getSelectedRecord().docNumber != null)
-                urlUploadFile = "../popup/UploadFile.aspx?idDoc=" + DocumentManager.getSelectedRecord().docNumber;
-
-            this.UplodadFile.Url = urlUploadFile;
-
             this.RefreshScript();
             //CustomImageButton buttonViewFile = (CustomImageButton)this.DocumentButtons.FindControl("DocumentImgViewFile");
             //buttonViewFile.Click += this.ViewDocument.LinkViewFileDocument;
             this.InitDragAndDropReport();
         }
 
+        private void verificaValoriAttivazionePermanente()
+        {
+            if (this.DocumentInWorking.documenti[0] != null && this.DocumentBtnApponiSegnaturaPermanente.Visible)
+            {
+                if (System.IO.Path.GetExtension(this.DocumentInWorking.documenti[0].fileName).ToLower().Equals(".pdf"))
+                {
+                    this._attivaPulsanteApponiSegnaturaPermanente(this.DocumentInWorking.documenti[0].fileSize != "0");
+                }
+                else 
+                {
+                    if (this.DocumentBtnApponiSegnaturaPermanente.Visible)
+                        this._attivaPulsanteApponiSegnaturaPermanente(false, true);
+                }
+
+                this.UpDocumentButtons.Update();
+            }
+        }
+
+        private void _attivaPulsanteApponiSegnaturaPermanente(bool isEbabled = true, bool isVisible = true)
+        {
+            this._logger.Info("START");
+            this.DocumentBtnApponiSegnaturaPermanente.Enabled = isEbabled;
+            this.DocumentBtnApponiSegnaturaPermanente.Visible = isVisible;
+            this._logger.Info("END");
+        }
 
 
         private void getLabelFascPrim()
@@ -1580,17 +1601,9 @@ namespace NttDataWA.Document
                         this.DocumentBtnForward.Enabled = false;
                     }
                 }
-                if (this.DocumentInWorking.documenti[0].inLibroFirma)
-                    DisableFunctionLibroFirma();
             }
         }
 
-        internal void DisableConvertPdf()
-        {
-            this.DisableCheckInOut(false);
-            this.UpContainer.Update();
-            this.UpDocumentButtons.Update();
-        }
         private void DisableCheckInOut(bool enable)
         {
             this.EnableEdit = enable;
@@ -1798,7 +1811,10 @@ namespace NttDataWA.Document
             {
                 this.DocumentDdlTypeDocument.Enabled = false;
             }
-
+            if ("1".Equals(this.DocumentInWorking.DettaglioSegnatura?.Segnato))
+            {
+                this.DocumentDdlTypeDocument.Enabled = false;
+            }
             this.DocumentDdlStateDiagram.Enabled = enable;
             this.DocumentStateDiagramDataValue.ReadOnly = !enable;
 
@@ -1927,19 +1943,16 @@ namespace NttDataWA.Document
             {
                 this.DocumentImgDeleteKeyword.Visible = false;
             }
-            //DO_DOC_PREDISPONI: nuova micro per l'abilitazione del pulsante predisponi anche se spente DO_PRO_PREDISPONI e DO_PROT_PROTOCOLLA
-            if (!UIManager.UserManager.IsAuthorizedFunctions("DO_DOC_PREDISPONI"))
+
+            if (!UIManager.UserManager.IsAuthorizedFunctions("DO_PRO_PREDISPONI"))
             {
-                if (!UIManager.UserManager.IsAuthorizedFunctions("DO_PRO_PREDISPONI"))
+                this.DocumentBtnPrepared.Visible = false;
+            }
+            else
+            {
+                if (!UIManager.UserManager.IsAuthorizedFunctions("DO_PROT_PROTOCOLLA"))
                 {
                     this.DocumentBtnPrepared.Visible = false;
-                }
-                else
-                {
-                    if (!UIManager.UserManager.IsAuthorizedFunctions("DO_PROT_PROTOCOLLA"))
-                    {
-                        this.DocumentBtnPrepared.Visible = false;
-                    }
                 }
             }
 
@@ -2285,7 +2298,7 @@ namespace NttDataWA.Document
         private void ControlRemovedDocument()
         {
             this.RemovedDocument = false;
-            if (this.DocumentInWorking.tipoProto.ToUpper().Equals("G") || 
+            if (this.DocumentInWorking.tipoProto.ToUpper().Equals("G") ||
                 (this.DocumentInWorking.protocollo != null && string.IsNullOrEmpty(DocumentInWorking.protocollo.segnatura)))
             {
                 if (this.DocumentInWorking != null && this.DocumentInWorking.inCestino != null && this.DocumentInWorking.inCestino == "1")
@@ -2298,6 +2311,7 @@ namespace NttDataWA.Document
 
         protected void ReadRetValueFromPopup()
         {
+            this._errorRequirePopUp = null;
             if (!string.IsNullOrEmpty(this.FlussoAutomatico.ReturnValue))
             {
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('FlussoAutomatico','');", true);
@@ -2315,33 +2329,12 @@ namespace NttDataWA.Document
                     this.DocumentButtons.RefreshButtons(DocumentButtons.TypeRefresh.D_UPLOADFILE);
                     this.ViewDocument.RefreshAcquiredDocument();
                     ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('RepositoryView','');", true);
-                    HttpContext.Current.Session["UploadFileAlreadyOpened" + Session.SessionID] = null;
                 }
                 else
                 {
                     ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('RepositoryView','');", true);
-                    HttpContext.Current.Session["UploadFileAlreadyOpened" + Session.SessionID] = null;
                 }
             }
-
-            // Alessandro Aiello 05/04/2019
-            // Gestione Upload MAssivo
-            // ***** INIZIO
-            if (!string.IsNullOrEmpty(this.UplodadFile.ReturnValue) && this.UplodadFile.ReturnValue == "UploadMassivoOk")
-            {
-                SchedaDocumento doc = DocumentManager.getSelectedRecord();
-                if (String.IsNullOrWhiteSpace(doc.docNumber))
-                {
-                    // Documento non ancora salvato
-                }
-                else
-                {
-
-                    Response.Redirect("Document.aspx");
-                }
-            }
-
-            // ***** FINE
 
             if ((!string.IsNullOrEmpty(this.UplodadFile.ReturnValue)) || (!string.IsNullOrEmpty(this.ActiveXScann.ReturnValue)))
             {
@@ -2352,6 +2345,9 @@ namespace NttDataWA.Document
                     DocumentManager.setSelectedRecord(doc);
 
                     this.DocumentButtons.RefreshButtons(DocumentButtons.TypeRefresh.D_UPLOADFILE);
+
+                    this.verificaValoriAttivazionePermanente();
+
                     this.ViewDocument.RefreshAcquiredDocument();
                     ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('UplodadFile','');", true);
                     ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('ActiveXScann','');", true);
@@ -2428,52 +2424,25 @@ namespace NttDataWA.Document
 
                 if (this.Request.Form["__EVENTARGUMENT"] != null && this.Request.Form["__EVENTARGUMENT"].Equals(SIGNATURE_PROCESS_CONCLUTED))
                 {
+
                     this.ViewDocument.UpdateProcessLFInAction();
-                    if (this.EnableStateDiagram && this.DocumentInWorking.tipologiaAtto != null)
-                    {
-                        DiagrammaStato diagramma = DiagrammiManager.getDgByIdTipoDoc(this.DocumentInWorking.tipologiaAtto.systemId, this.InfoUser.idAmministrazione);
-
-                        if (diagramma != null)
-                        {
-                            EnableDdlStateDiagram();
-                        }
-                    }
                 }
-                if (this.Request.Form["__EVENTARGUMENT"] != null && this.Request.Form["__EVENTARGUMENT"].Equals(CLOSE_START_PROCESS_SIGNATURE))
+            }
+
+            if (!string.IsNullOrEmpty(this.StartProcessSignature.ReturnValue))
+            {
+                if (UIManager.DocumentManager.getSelectedAttachId() != null)
                 {
-                    if (!string.IsNullOrEmpty(this.StartProcessSignature.ReturnValue))
-                    {
-                        if (UIManager.DocumentManager.getSelectedAttachId() != null)
-                        {
-                            FileManager.GetFileRequest(UIManager.DocumentManager.getSelectedAttachId()).inLibroFirma = true;
-                        }
-                        else
-                        {
-                            FileManager.GetFileRequest().inLibroFirma = true;
-                        }
-
-                        this.ViewDocument.UpdateProcessLFInAction();
-                        this.DocumentTabs.RefreshLayoutTab();
-
-                        if (CambiaStatoDocumento)
-                        {
-                            this.DocumentInWorking = DocumentManager.getSelectedRecord();
-                            this.DocumentDdlStateDiagram.SelectedIndex = -1;
-                            this.LoadDiagramAndState();
-                            DisableFunctionLibroFirma();
-                        }
-                        if (this.DocumentInWorking.tipoProto.ToUpper() == "I")
-                        {
-                            bool docAlreadyTrasm = TrasmManager.DocumentAlreadyTransmitted_Opt(this.DocumentInWorking.systemId);
-                            this.setSendOrResendButtonText(UserManager.GetUserLanguage(), docAlreadyTrasm);
-                            this.UpDocumentButtons.Update();
-                        }
-                        ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('StartProcessSignature','');", true);
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('SuccessStartProcessSignature', 'check', '');} else {parent.ajaxDialogModal('SuccessStartProcessSignature', 'check', '');}", true);
-                    }
-                    HttpContext.Current.Session.Remove("CambiaStatoDocumento");
-                    HttpContext.Current.Session.Remove("IdStatoSelezionatoDocumento");
+                    FileManager.GetFileRequest(UIManager.DocumentManager.getSelectedAttachId()).inLibroFirma = true;
                 }
+                else
+                {
+                    FileManager.GetFileRequest().inLibroFirma = true;
+                }
+                this.ViewDocument.UpdateProcessLFInAction();
+                this.DocumentTabs.RefreshLayoutTab();
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('StartProcessSignature','');", true);
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('SuccessStartProcessSignature', 'check', '');} else {parent.ajaxDialogModal('SuccessStartProcessSignature', 'check', '');}", true);
             }
 
             if (!string.IsNullOrEmpty(this.DigitalSignSelector.ReturnValue))
@@ -2510,7 +2479,6 @@ namespace NttDataWA.Document
                 if (UIManager.DocumentManager.getSelectedAttachId() != null)
                 {
                     fileReq = FileManager.GetFileRequest(UIManager.DocumentManager.getSelectedAttachId());
-                    //fileReq = FileManager.GetSelectedAttachment();
                 }
                 else
                 {
@@ -2630,10 +2598,15 @@ namespace NttDataWA.Document
                 }
             }
 
-            if (!string.IsNullOrEmpty(this.Signature.ReturnValue))
+            if ("REFRESH".Equals(this.Signature?.ReturnValue) || "up".Equals(this.Signature?.ReturnValue))
             {
                 this.ViewDocument.ShowDocumentAcquired(true);
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('Signature','');", true);
+                //string script = "$('<a href='document.aspx'></a>')[0].click()";
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "testReturn", "$(function(){ $('<a href='document.aspx'></a>')[0].click(); });", true);
+
+                //////// 
+
             }
 
             if (!string.IsNullOrEmpty(this.DocumentViewer.ReturnValue))
@@ -2641,14 +2614,10 @@ namespace NttDataWA.Document
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('DocumentViewer','');", true);
             }
 
-            if (!string.IsNullOrEmpty(this.InvoicePreview.ReturnValue))
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('InvoicePreview','');", true);
-            }
-
             if (!string.IsNullOrEmpty(this.VersionAdd.ReturnValue))
             {
                 this.ViewDocument.ShowChangeVersions();
+                this.verificaValoriAttivazionePermanente();
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('VersionAdd','');", true);
                 return;
             }
@@ -2681,6 +2650,7 @@ namespace NttDataWA.Document
                     return;
                 }
                 this.ViewDocument.ShowChangeVersions();
+                this.verificaValoriAttivazionePermanente();
                 return;
             }
 
@@ -3143,17 +3113,7 @@ namespace NttDataWA.Document
                     this.UpPnlTypeDocument.Update();
                     //ho messo il documento in stato finale dunque modifico anche l'accessRigths
                     DocumentManager.RightsDocumentChanges(HMdiritti.HMdiritti_Read, this.DocumentInWorking.systemId);
-                    this.Template = this.DocumentInWorking.template;
                     this.PopulateProfiledDocument();
-                    this.UpPnlTypeDocument.Update();
-
-                    //Effettuo la trasmissione rapida
-                    ////metodo per la trasmissione rapida (templ & Modelli)
-                    List<string> errors = new List<string>();
-                    this.execTrasmRapida(ref errors);
-
-                    this.DocumentDdlTransmissionsModel.SelectedValue = string.Empty;
-                    this.UpPnlTransmissionsModel.Update();
                 }
             }
 
@@ -3367,36 +3327,13 @@ namespace NttDataWA.Document
                     return;
                 }
             }
-            if(!string.IsNullOrEmpty(this.MassiveTransmissionAccept.ReturnValue))
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('MassiveTransmissionAccept','');", true);
-                this.DocumentBtnAccept.Visible = DocumentManager.ExistsTrasmPendenteConWorkflowDocumento(this.DocumentInWorking.docNumber, this.Role.systemId, this.InfoUser.idPeople);
-                string accessRight = DocumentManager.getAccessRightDocBySystemID(this.DocumentInWorking.docNumber, this.InfoUser);
-                this.DocumentInWorking.accessRights = accessRight;
-                DocumentManager.setSelectedRecord(this.DocumentInWorking);
-                switch ((HMdiritti)Enum.Parse(typeof(HMdiritti), accessRight))
-                {
-                    case HMdiritti.HDdiritti_Waiting:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelWaiting", UserManager.GetUserLanguage());
-                        break;
-                    case HMdiritti.HMdiritti_Read:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelReadOnly", UserManager.GetUserLanguage());
-                        break;
-                    case HMdiritti.HMdiritti_Proprietario:
-                    case HMdiritti.HMdiritti_Write:
-                        this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelRW", UserManager.GetUserLanguage());
-                        break;
-                }
-                if (!string.IsNullOrEmpty(DocumentInWorking.accessRights) && Convert.ToInt32(DocumentInWorking.accessRights) > Convert.ToInt32(HMdiritti.HMdiritti_Read))
-                    DisableCheckInOut(true);
-                this.ViewDocument.InitializeContent();
-                this.UpContainer.Update();
-                this.UpDocumentButtons.Update();
-                this.UpDirittiDocumento.Update();
-            }
-
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "resizeFrame", "resizeIframe();", true);
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "resizeFrame", "resizeIframe();", true);
             ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "function", "reallowOp();", true);
+
+            if ((!this._errorRequirePopUp ?? false))
+            {
+                Response.Redirect("Document.aspx");
+            }
         }
 
         private void LoadTemplateDocument()
@@ -3556,7 +3493,6 @@ namespace NttDataWA.Document
             HeaderDocument.FlagCopyInArchive = "0";
             HttpContext.Current.Session["Answer.DocumentWIP"] = null;
             HttpContext.Current.Session.Remove("IsCosolidato");
-            HttpContext.Current.Session.Remove("CambiaStatoDocumento");
             //Fine
         }
 
@@ -3804,7 +3740,6 @@ namespace NttDataWA.Document
                     if (this.DocumentInWorking.protocollo != null && ((ProtocolloEntrata)this.DocumentInWorking.protocollo) != null)
                     {
                         this.TxtProtocolSender.Text = ((ProtocolloEntrata)this.DocumentInWorking.protocollo).descrizioneProtocolloMittente;
-                        this.TxtProtocolSender.ToolTip = ((ProtocolloEntrata)this.DocumentInWorking.protocollo).descrizioneProtocolloMittente;
                         if (this.DocumentInWorking.interop == "S" || this.DocumentInWorking.interop == "I")
                         {
                             this.TxtProtocolSender.ReadOnly = true;
@@ -4134,7 +4069,7 @@ namespace NttDataWA.Document
                     {
                         this.DocumentChekUser.Checked = true;
                     }
-                    if (this.EnableForward && !string.IsNullOrEmpty(this.DocumentInWorking.systemId))
+                    if (this.EnableForward)
                     {
                         this.DocumentBtnForward.Enabled = true;
                     }
@@ -4228,8 +4163,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                         canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
                                         canaleRef = "(" + canaleOrig.typeId + ")  ";
                                     }
@@ -4264,8 +4198,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.tipoCanale.ToUpper().Equals("MAIL") ||
                                         canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4278,8 +4211,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                         canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4376,8 +4308,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.tipoCanale.ToUpper().Equals("MAIL") ||
                                         canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4390,8 +4321,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                         canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4493,8 +4423,7 @@ namespace NttDataWA.Document
                             {
                                 if (canaleOrig.tipoCanale.ToUpper().Equals("MAIL") ||
                                     canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                    canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    canaleOrig.tipoCanale.ToUpper().Equals("LETTERA"))
+                                    canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
 
                                     formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4507,8 +4436,7 @@ namespace NttDataWA.Document
                             {
                                 if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                     canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                    canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                    canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
 
                                     formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4524,8 +4452,7 @@ namespace NttDataWA.Document
                             {
                                 if (destinatario.canalePref.typeId.ToUpper().Equals("MAIL") ||
                                     destinatario.canalePref.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                    destinatario.canalePref.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    destinatario.canalePref.typeId.ToUpper().Equals("LETTERA"))
+                                    destinatario.canalePref.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
                                     formatDestinatario.AppendFormat("({0})  {1}", destinatario.canalePref.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
                                 }
@@ -4626,8 +4553,7 @@ namespace NttDataWA.Document
                             {
                                 if (canaleOrig.tipoCanale.ToUpper().Equals("MAIL") ||
                                     canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                    canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    canaleOrig.tipoCanale.ToUpper().Equals("LETTERA"))
+                                    canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
 
                                     formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4640,8 +4566,7 @@ namespace NttDataWA.Document
                             {
                                 if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                     canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                    canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                    canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
 
                                     formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4657,8 +4582,7 @@ namespace NttDataWA.Document
                             {
                                 if (destinatario.canalePref.typeId.ToUpper().Equals("MAIL") ||
                                     destinatario.canalePref.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                    destinatario.canalePref.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    destinatario.canalePref.typeId.ToUpper().Equals("LETTERA"))
+                                    destinatario.canalePref.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
                                     formatDestinatario.AppendFormat("({0})  {1}", destinatario.canalePref.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
                                 }
@@ -4670,8 +4594,7 @@ namespace NttDataWA.Document
                             {
                                 if (destinatario.canalePref.tipoCanale.ToUpper().Equals("MAIL") ||
                                     destinatario.canalePref.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                    destinatario.canalePref.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    destinatario.canalePref.tipoCanale.ToUpper().Equals("LETTERA"))
+                                    destinatario.canalePref.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
                                     formatDestinatario.AppendFormat("({0})  {1}", destinatario.canalePref.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
                                 }
@@ -4780,8 +4703,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.tipoCanale.ToUpper().Equals("MAIL") ||
                                         canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4794,8 +4716,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                         canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4897,8 +4818,7 @@ namespace NttDataWA.Document
                             {
                                 if (canaleOrig.tipoCanale.ToUpper().Equals("MAIL") ||
                                     canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                    canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    canaleOrig.tipoCanale.ToUpper().Equals("LETTERA"))
+                                    canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
 
                                     formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -4911,8 +4831,7 @@ namespace NttDataWA.Document
                             {
                                 if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                     canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                    canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                    canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
 
                                     formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -5012,8 +4931,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.tipoCanale.ToUpper().Equals("MAIL") ||
                                         canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -5026,8 +4944,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                         canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -5124,8 +5041,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.tipoCanale.ToUpper().Equals("MAIL") ||
                                         canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.tipoCanale.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.tipoCanale.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.tipoCanale, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -5138,8 +5054,7 @@ namespace NttDataWA.Document
                                 {
                                     if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                         canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                        canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                        canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                     {
 
                                         formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(destinatario));
@@ -5220,6 +5135,10 @@ namespace NttDataWA.Document
             }
 
             this.SetAdminConfiguration();
+
+            // inizializzo il pulsante "permanente" settandolo su invisibile ed inattivo
+            this._logger.Debug(">> Inposto pulsante permanente");
+            this._attivaPulsanteApponiSegnaturaPermanente(false, false);
         }
 
         private void DisplayMailIcons()
@@ -5588,9 +5507,11 @@ namespace NttDataWA.Document
             string language = UIManager.UserManager.GetUserLanguage();
             this.Object.Title = Utils.Languages.GetLabelFromCode("TitleObjectPopup", language);
             this.Signature.Title = Utils.Languages.GetLabelFromCode("TitleSignaturePopup", language);
+
+            this.SignaturePermanenteConfig.Title = Utils.Languages.GetLabelFromCode("TitleSignaturePermanentePopup", language);
+
             this.SignatureA4.Title = Utils.Languages.GetLabelFromCode("PopupSignatureA4", language);
             this.DocumentViewer.Title = Utils.Languages.GetLabelFromCode("TitleDocumentViewerPopup", language);
-            this.InvoicePreview.Title = Utils.Languages.GetLabelFromCode("InvoicePreviewTitle", language);
             this.OpenTitolario.Title = Utils.Languages.GetLabelFromCode("TitleClassificationScheme", language);
             this.ModifyVersion.Title = Utils.Languages.GetLabelFromCode("TitleModifyVersion", language);
             this.VersionAdd.Title = Utils.Languages.GetLabelFromCode("TitleVersionAdd", language);
@@ -5693,6 +5614,7 @@ namespace NttDataWA.Document
             this.DocumentLitTimeOfArrival.Text = Utils.Languages.GetLabelFromCode("DocumentLitTimeOfArrival", language);
             this.DocumentDdlTransmissionsModel.Attributes.Add("data-placeholder", Utils.Languages.GetLabelFromCode("DocumentDdlTransmissionsModel", language));
             this.DocumentBtnCreateDocument.Text = Utils.Languages.GetLabelFromCode("DocumentBtnCreateDocument", language);
+            this.DocumentBtnApponiSegnaturaPermanente.Text = Utils.Languages.GetLabelFromCode("DocumentBtnApponiSegnaturaPermanente", language);
             this.DocumentBtnSave.Text = Utils.Languages.GetLabelFromCode("DocumentBtnSave", language);
             this.DocumentBntRecord.Text = Utils.Languages.GetLabelFromCode("DocumentBntRecord", language);
             this.DocumentBtnRepeat.Text = Utils.Languages.GetLabelFromCode("DocumentBtnRepeat", language);
@@ -5801,10 +5723,6 @@ namespace NttDataWA.Document
             this.NewProject.Title = Utils.Languages.GetLabelFromCode("DocumentImgNewProjectToolTip", language);
             this.FlussoAutomatico.Title = Utils.Languages.GetLabelFromCode("FlussoAutomaticoTitle", language);
             this.DocumentImgFlussoProcedurale.ToolTip = Utils.Languages.GetLabelFromCode("FlussoAutomaticoTitle", language); 
-            this.DocumentBtnAccept.Text = Utils.Languages.GetLabelFromCode("DocumentBtnAccept", language);
-            this.LblDiritti.Text = Utils.Languages.GetLabelFromCode("DocumentLblDiritti", language);
-            this.MassiveTransmissionAccept.Title = Utils.Languages.GetLabelFromCode("MassiveTransmissionAcceptTitle", language);
-            this.DocumentBtnView.Text = Utils.Languages.GetLabelFromCode("DocumentBtnView", language);
         }
 
         /// <summary>
@@ -6648,7 +6566,7 @@ namespace NttDataWA.Document
             {
                 if (!string.IsNullOrEmpty(this.TxtCodeProject.Text) && this.Project != null && this.Project.tipo != "G" && string.IsNullOrEmpty(this.HiddenControlPrivateClass.Value) && string.IsNullOrEmpty(this.HiddenControlPrivateClass.Value))
                 {
-                    msg = "WarningDocumentPrivateClassification";
+                    msg = "WarningDocumentPrivateTransmission";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "if (parent.fra_main) {parent.fra_main.ajaxConfirmModal('" + msg + "', 'HiddenControlPrivateClass', '');} else {parent.ajaxConfirmModal('" + msg + "', 'HiddenControlPrivateClass', '');}", true);
                     this.UpPnlTransmissionsModel.Update();
                     result = false;
@@ -6668,9 +6586,9 @@ namespace NttDataWA.Document
         /// <summary>
         /// 
         /// </summary>
-        private void protocollaDoc()
+        private bool protocollaDoc()
         {
-
+            this._logger.Info("START");
             SchedaDocumento newDoc = this.DocumentInWorking;
 
             if (this.DocumentCheckPrivate.Checked && !this.ControlPrivateDocumentWarning())
@@ -6681,21 +6599,21 @@ namespace NttDataWA.Document
                     this.Template = this.PopulateTemplate();
                 }
                 this.HiddenControlPrivateTypeOperation.Value = "RECORD";
-                return;
+                return false;
             }
 
             //Verifico se si stà fascicolando all'interno di un fascicolo pubblico
             if (!ControlPublicFolderWarning())
             {
                 this.HiddenPublicFolderTypeOperation.Value = "RECORD";
-                return;
+                return false;
             }
             else
             {
                 this.HiddenPublicFolder.Value = string.Empty;
             }
 
-            if (this.DocumentCheckPrivate.Checked || this.DocumentChekUser.Checked)
+            if (this.DocumentCheckPrivate.Checked)
             {
                 this.ResetControlPrivateDocumentWarning();
             }
@@ -6722,7 +6640,7 @@ namespace NttDataWA.Document
                         string msgDesc = "WarningDocumentRequestfields";
 
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
 
                     string customMessaget = string.Empty;
@@ -6739,23 +6657,10 @@ namespace NttDataWA.Document
                         {
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + messag.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + messag.Replace("'", @"\'") + "', 'warning', '" + messag.Replace("'", @"\'") + "');}", true);
                         }
-                        return;
+                        return false;
                     }
                     //FINE PROFILAZIONE DINAMICA  	
 
-                }
-
-                if (DocumentManager.IsDocumentoInLibroFirma(newDoc))
-                {
-                    //Se una delle azione non corrisponde al passo di firma in attesa, blocco il salvataggio del documento.
-                    if (!LibroFirmaManager.CheckAzioneAttesaPassoFirma(newDoc))
-                    {
-                        newDoc.template = null;
-                        newDoc.tipologiaAtto = null;
-                        newDoc.daAggiornareTipoAtto = false;
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningDocumentInLfAzioneNonAtessa', 'warning');} else {parent.parent.ajaxDialogModal('WarningDocumentInLfAzioneNonAtessa', 'warning');}", true);
-                        return;
-                    }
                 }
 
                 Fascicolo m_fascicoloSelezionato = this.Project;
@@ -6793,7 +6698,7 @@ namespace NttDataWA.Document
                     //string msg = "La descrizione non coincide con quella del fascicolo.";
                     string msgDesc = "WarningDocumentDescrFasc";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    return;
+                    return false;
                 }
 
                 //Per protocolli e predisposti in ingresso, controllo se al mezzo di spedizione del documento corrisponde un mittente
@@ -6808,7 +6713,7 @@ namespace NttDataWA.Document
                             string msgDesc = "WarningDocumentSenderInterop";
 
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            return;
+                            return false;
                         }
                     }
 
@@ -6820,7 +6725,7 @@ namespace NttDataWA.Document
                             string msgDesc = "WarningDocumentSenderMail";
 
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            return;
+                            return false;
                         }
                     }
 
@@ -6832,7 +6737,7 @@ namespace NttDataWA.Document
                             string msgDesc = "WarningDocumentSenderInteroperabilityPitre";
 
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -6850,7 +6755,7 @@ namespace NttDataWA.Document
                             string msgDesc = "WarningDocumentRequestProject";
 
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            return;
+                            return false;
                         }
                     }
                     else
@@ -6859,7 +6764,7 @@ namespace NttDataWA.Document
                         {
                             string msgDesc = "WarningDocumentRequestProject";
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            return;
+                            return false;
                         }
                     }
 
@@ -6870,7 +6775,7 @@ namespace NttDataWA.Document
                         {
                             string msgDesc = "WarningDocumentProjectClosed";
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -6884,13 +6789,13 @@ namespace NttDataWA.Document
                     {
                         string msgDesc = this.Project.isFascicolazioneConsentita ? "WarningDocumentNoDocumentInsert" : "WarningDocumentNoDocumentInsertClassification";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                     if (this.Project.tipo.Equals("P") && !this.Project.isFascicolazioneConsentita)
                     {
                         string msgDesc = "WarningDocumentNoDocumentInsertFolder";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                 }
                 //fine modifiche EPanici
@@ -6902,13 +6807,13 @@ namespace NttDataWA.Document
                     {
                         string msgDesc = this.Project.isFascicolazioneConsentita ? "WarningDocumentNoDocumentInsert" : "WarningDocumentNoDocumentInsertClassification";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                     if (this.Project.tipo.Equals("P") && !this.Project.isFascicolazioneConsentita)
                     {
                         string msgDesc = "WarningDocumentNoDocumentInsertFolder";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                 }
 
@@ -6920,7 +6825,7 @@ namespace NttDataWA.Document
                 if (!string.IsNullOrEmpty(msg))
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'error');} else {parent.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'error');}", true);
-                    return;
+                    return false;
                 }
 
                 //if (wws.isEnableRiferimentiMittente() && rbl_InOut_P.SelectedItem.Value == "In")
@@ -6932,7 +6837,7 @@ namespace NttDataWA.Document
                 if (!VerificaRispostaDocumento(ref descrMsg))
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + descrMsg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + descrMsg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    return;
+                    return false;
                 }
 
                 msg = CheckFields("P");
@@ -6945,21 +6850,21 @@ namespace NttDataWA.Document
                     {
                         msg = "WarningDocumentCheckRecipients";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                 }
 
                 if (!string.IsNullOrEmpty(msg))
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    return;
+                    return false;
                 }
 
                 if (this.Registry.Sospeso)
                 {
                     string msgDesc = "WarningDocumentRegistryPause";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    return;
+                    return false;
                 }
 
                 if (!this.IsRoleInternalEnabled())
@@ -6968,7 +6873,7 @@ namespace NttDataWA.Document
                     {
                         string msgDesc = "WarningDocumentUserNotAbility";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                 }
 
@@ -6978,7 +6883,7 @@ namespace NttDataWA.Document
                     {
                         string msgDesc = "WarningDocumentUserNotAbilityIn";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                 }
 
@@ -6988,7 +6893,7 @@ namespace NttDataWA.Document
                     {
                         string msgDesc = "WarningDocumentUserNotAbilityOut";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                 }
 
@@ -7073,12 +6978,13 @@ namespace NttDataWA.Document
 
             }
 
-            // logger.Info("END");
+            this._logger.Info("END");
+            return true;
         }
 
-        private void protocollaOk(SchedaDocumento newDoc)
+        private bool protocollaOk(SchedaDocumento newDoc)
         {
-            //  logger.Info("BEGIN");
+            this._logger.Info("START");
             //prima di effettuare la protocollazione se il documento è personale deve essere
             //trasformato in privato
             if (newDoc.personale == "1")
@@ -7096,7 +7002,7 @@ namespace NttDataWA.Document
             //    //    isEnableUffRef = true;
 
             bool continueRecord = this.VerifyPopupControlDocument(newDoc);
-
+            this._errorRequirePopUp = !continueRecord;
             if (continueRecord)
             {
                 newDoc = this.SetValuePopupControlDocument(newDoc);
@@ -7107,6 +7013,8 @@ namespace NttDataWA.Document
 
                 this.IsForwarded = false;
             }
+            this._logger.Info("END");
+            return true;
         }
 
         private SchedaDocumento SetValuePopupControlDocument(SchedaDocumento newDoc)
@@ -7405,7 +7313,7 @@ namespace NttDataWA.Document
 
                     if (newDoc.interop == "S" && !check.Equals("0"))
                     {
-                        if (((from r in datas.Tables[0].AsEnumerable() where r.Field<decimal>("SYSTEM_ID").ToString().Equals(mitt.systemId) select r).Count()) < 1)
+                        if (((from r in datas.Tables[0].AsEnumerable() where r.Field<Int32>("SYSTEM_ID").ToString().Equals(mitt.systemId) select r).Count()) < 1)
                             check = "0";
                     }
 
@@ -8468,14 +8376,14 @@ namespace NttDataWA.Document
         /// <summary>
         /// 
         /// </summary>
-        private void protocolla(SchedaDocumento newDoc)
+        private bool protocolla(SchedaDocumento newDoc)
         {
+            this._logger.Info("START");
             //try
             //{
             string result = "Operazione avvenuta con successo.\\n\\n";
             bool daAggiornareTipoAtto = (this.DocumentDdlTypeDocument.Enabled && !string.IsNullOrEmpty(this.DocumentDdlTypeDocument.SelectedValue) || newDoc.daAggiornareTipoAtto);
             DocsPaWR.ResultProtocollazione risultatoProtocollazione = DocsPaWR.ResultProtocollazione.OK;
-            bool repositoryContext = this.DocumentInWorking.repositoryContext != null;
             string systemID = newDoc.systemId;
             string resFunz = string.Empty;
             //if (systemID != null)
@@ -8488,7 +8396,7 @@ namespace NttDataWA.Document
             if (!string.IsNullOrEmpty(msg))
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'error');} else {parent.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'error');}", true);
-                return;
+                return false;
             }
 
             //if (!DocumentManager.getBlockQuickProt(this))
@@ -8583,14 +8491,11 @@ namespace NttDataWA.Document
                     case DocsPaWR.ResultProtocollazione.ERRORE_DURANTE_LA_FASCICOLAZIONE:
                         message = "ErrorChildProjects";
                         break;
-                    case DocsPaWR.ResultProtocollazione.DOCUMENTO_IN_LIBRO_FIRMA_PASSO_NON_ATTESO:
-                        message = "WarningDocumentInLfAzioneNonAtessa";
-                        break;
                 }
 
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + message.Replace("'", "\\'") + "', 'error');} else {parent.ajaxDialogModal('" + message.Replace("'", "\\'") + "', 'error');}", true);
-
-                return;
+                this._logger.Info("END");
+                return false;
 
             }
             ////Per sviluppo estensione delle funzionalità di fascicolazione e trasmissione rapida
@@ -8608,6 +8513,10 @@ namespace NttDataWA.Document
             if (risultatoProtocollazione == DocsPaWR.ResultProtocollazione.OK)
             {
                 NttDataWA.MasterPages.Base master = this.Master as NttDataWA.MasterPages.Base;
+                //this._logger.Debug(">> Inposto pulsante permanente");
+                //this._attivaPulsanteApponiSegnaturaPermanente("0".Equals(newDoc.DettaglioSegnatura.Segnato));
+
+
                 master.InitializeLastDocumentsView();
                 //UpdatePanel pnl = master.FindControl("UpnlLastDocumentView") as UpdatePanel;
                 //pnl.Update();
@@ -8723,7 +8632,7 @@ namespace NttDataWA.Document
                             {
                                 string msgDesc = "WarningDocumentFinaleStatBLocked";
                                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", "\\'") + "', 'warning');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", "\\'") + "', 'warning');}", true);
-                                return;
+                                return false;
                             }
                             statoFinale = true;
                         }
@@ -8733,7 +8642,7 @@ namespace NttDataWA.Document
                             string msgConfirm = "WarningDocumentConfirmAutomaticState";
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "if (parent.fra_main) {parent.fra_main.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenAutomaticState', '');} else {parent.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenAutomaticState', '');}", true);
                             this.UpConfirmStateDiagram.Update();
-                            return;
+                            return false;
                         }
 
                         if (statoFinale)
@@ -8742,17 +8651,7 @@ namespace NttDataWA.Document
                             string msgConfirm = "WarningDocumentConfirmFinalState";
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "if (parent.fra_main) {parent.fra_main.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenFinalState', '');} else {parent.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenFinalState', '');}", true);
                             this.UpConfirmStateDiagram.Update();
-                            return;
-                        }
-                        if (CheckAvvioModelloFirma())
-                        {
-                            Stato stato = (from s in StateDiagram.STATI where s.SYSTEM_ID.ToString() == this.DocumentDdlStateDiagram.SelectedValue select s).FirstOrDefault();
-                            this.IdProcessoDaAvviare = stato.ID_PROCESSO_FIRMA;
-                            this.CambiaStatoDocumento = true;
-                            this.IdStatoSelezionatoDocumento = stato.SYSTEM_ID.ToString();
-                            newDoc.template = this.Template;
-                            UIManager.DocumentManager.setSelectedRecord(newDoc);
-                            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupStartProcessSignature", "ajaxModalPopupStartProcessSignature();", true);
+                            return false;
                         }
                         else
                         {
@@ -8763,7 +8662,7 @@ namespace NttDataWA.Document
                             if (newDoc.ConsolidationState != null && !newDoc.ConsolidationState.State.Equals(DocumentConsolidationStateEnum.None))
                                 this.IsCosolidato = true;
                             Stato state = (from s in StateDiagram.STATI where s.SYSTEM_ID.ToString() == this.DocumentDdlStateDiagram.SelectedValue select s).FirstOrDefault();
-                            if (state.CONVERSIONE_PDF || !string.IsNullOrEmpty(state.ID_PROCESSO_FIRMA))
+                            if (state.CONVERSIONE_PDF)
                                 this.IsCosolidato = true;   //FACCIO IL REDIRECT SULLA PAGINA PER AGGIORNARE NEL CASO DI CONVERSIONE PDF
                             string idTemplate = this.Template.SYSTEM_ID.ToString();
 
@@ -8835,7 +8734,7 @@ namespace NttDataWA.Document
             {
                 UIManager.DocumentManager.setSelectedRecord(newDoc);
                 this.DocumentInWorking = newDoc;
-                if (this.DocumentInWorking.tipoProto.ToUpper() == "A" || this.DocumentInWorking.tipoProto.ToUpper() == "P" || this.DocumentInWorking.tipoProto.ToUpper() == "I") this.DocumentBtnForward.Enabled = true;
+                if (this.DocumentInWorking.tipoProto.ToUpper() == "A") this.DocumentBtnForward.Enabled = true;
                 FileManager.getInstance(Session.SessionID).setFile(newDoc.documenti[0]);
 
                 if (predisposto && ((System.Web.UI.HtmlControls.HtmlGenericControl)this.ViewDocument.FindControl("divFrame")) != null)
@@ -8844,18 +8743,6 @@ namespace NttDataWA.Document
                     ((UpdatePanel)this.ViewDocument.FindControl("UpBottomButtons")).Update();
                     ((UpdatePanel)this.ViewDocument.FindControl("UpPnlContentDxSx")).Update();
                     ((UpdatePanel)this.ViewDocument.FindControl("UpPnlContentDxDx")).Update();
-                }
-
-                bool inTodoList = DocumentManager.ExistsTrasmPendenteSenzaWorkflowDocumento(this.DocumentInWorking.docNumber, this.Role.systemId, this.InfoUser.idPeople);
-                if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings[WebConfigKeys.SET_DATA_VISTA_GRD.ToString()])
-                     && ConfigurationManager.AppSettings[WebConfigKeys.SET_DATA_VISTA_GRD.ToString()] == "2")
-                {
-                    this.DocumentBtnView.Visible = inTodoList;
-                }
-                if (inTodoList && SimplifiedInteroperabilityManager.IsDocumentReceivedWithIS(this.DocumentInWorking.docNumber))
-                {
-                    bool value = (this.DocumentInWorking.protocollo != null && !String.IsNullOrEmpty(this.DocumentInWorking.protocollo.segnatura)) || (this.DocumentInWorking.tipoProto == "G");
-                    this.DocumentBtnView.Visible = value;
                 }
 
                 this.UpdateDataCreationDocument();
@@ -8872,10 +8759,6 @@ namespace NttDataWA.Document
                 {
                     this.DocumentButtons.RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ALL);
                     this.DocumentButtons.RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_UPLOADFILE);
-                }
-                else if(repositoryContext)
-                {
-                    this.ViewDocument.RefreshAcquiredDocument();
                 }
                 this.UpContainerDocumentTab.Update();
                 this.UpPnlRegistry.Update();
@@ -8910,6 +8793,8 @@ namespace NttDataWA.Document
 
             //    ErrorManager.OpenErrorPage(this, ex, "protocollazione");
             //}
+
+            return true;
         }
 
         private bool controllaStatoFinale()
@@ -9143,17 +9028,7 @@ namespace NttDataWA.Document
                             msg = "WarningDocumentInsertDest";
                             return msg;
                         }
-                        
-                        //controllo sull'inserimento del mittente
-                        if ((string.IsNullOrEmpty(TxtCodeSender.Text) || string.IsNullOrEmpty(this.TxtCodeSender.Text.Trim())) || (string.IsNullOrEmpty(this.TxtDescriptionSender.Text) || string.IsNullOrEmpty(this.TxtDescriptionSender.Text.Trim())))
-                        {
-                            if (string.IsNullOrEmpty(this.TxtDescriptionSender.Text.Trim()) || string.IsNullOrEmpty(this.TxtDescriptionSender.Text))
-                            {
-                                //msg = "Inserire il valore: mittente";
-                                msg = "WarningDocumentInsertMitt";
-                                return msg;
-                            }
-                        }
+
                         break;
                     case "I":
                         //protocollo interno - controllo sul mittente obbligatorio
@@ -9330,6 +9205,8 @@ namespace NttDataWA.Document
 
         protected void DocumentBntRecord_Click(object sender, EventArgs e)
         {
+            this._logger.Info("START");
+            bool _result = true;
             try
             {
                 // Se il documento è stato trasmesso per IS ed è stato inviato come privato, viene mostrato un
@@ -9347,26 +9224,38 @@ namespace NttDataWA.Document
                     string errorMessage = string.Empty;
                     if (string.IsNullOrEmpty(this.DocumentInWorking.systemId))
                     {
-                        this.protocollaDoc();
+                        _result = this.protocollaDoc();
                     }
                     else
                     {
-                        this.protocollaDoc();
+                        _result = this.protocollaDoc();
                     }
                 }
                 this.DisabledDocumentChekUser.Attributes.Remove("class");
                 this.DisabledDocumentCheckPrivate.Attributes.Remove("class");
                 this.DisabledDocumentChekUser.Attributes.Add("class", "check_disabled");
                 this.DisabledDocumentCheckPrivate.Attributes.Add("class", "check_disabled");
+
+                // Alessandro Aiello 04/02/2019
+                // nel caso di modifiche  (fascicolo o tipologia) resetto la segnatura così da ricalcolarla
+                this.DocumentInWorking.DettaglioSegnatura = null;
             }
             catch (System.Exception ex)
             {
+                this._logger.Error(ex.Message, ex);
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return;
             }
+
             if (IsCosolidato)
             {
                 HttpContext.Current.Session.Remove("IsCosolidato");
+                
+            }
+
+            this._logger.Info("END");
+            if (_result && (!this._errorRequirePopUp ?? true ))
+            {
                 Response.Redirect("Document.aspx");
             }
         }
@@ -9756,22 +9645,6 @@ namespace NttDataWA.Document
 
             this.UpPnlProject.Update();
 
-            this.PnlDirittiDocumento.Visible = true;
-            switch ((HMdiritti)Enum.Parse(typeof(HMdiritti), this.DocumentInWorking.accessRights))
-            {
-                case HMdiritti.HDdiritti_Waiting:
-                    this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelWaiting", UIManager.UserManager.GetUserLanguage());
-                    break;
-                case HMdiritti.HMdiritti_Read:
-                    this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelReadOnly", UIManager.UserManager.GetUserLanguage());
-                    break;
-                case HMdiritti.HMdiritti_Proprietario:
-                case HMdiritti.HMdiritti_Write:
-                    this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelRW", UIManager.UserManager.GetUserLanguage());
-                    break;
-            }
-            this.UpDirittiDocumento.Update();
-
             if (this.DocumentInWorking.protocollo != null)
             {
                 if (!string.IsNullOrEmpty(this.DocumentInWorking.protocollo.dataProtocollazione))
@@ -9868,7 +9741,6 @@ namespace NttDataWA.Document
                 this.DocumentImgAnswerWithProtocol.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgAnswerWithDocument", language);
                 this.DocumentImgAnswerWithDocument.AlternateText = Utils.Languages.GetLabelFromCode("DocumentImgAnswerWithProtocol", language);
                 this.DocumentImgAnswerWithDocument.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgAnswerWithProtocol", language);
-
             }
 
             if (this.DocumentInWorking.template != null)
@@ -10338,7 +10210,7 @@ namespace NttDataWA.Document
                                 }
                                 else
                                 {
-                                    lsCorr = UIManager.AddressBookManager.getCorrispondentiByCodRF(addressCode);
+                                    lsCorr = UIManager.AddressBookManager.getCorrispondentiByCodRFIdAmm(addressCode, idAmm);
                                     if (lsCorr.Count != 0)
                                     {
                                         corr = new DocsPaWR.Corrispondente();
@@ -10577,7 +10449,7 @@ namespace NttDataWA.Document
             if (!AddressBookManager.esisteCorrispondente(listaDestCC, corr))
             {
                 DocsPaWR.Corrispondente[] listaDest = this.ListRecipients.ToArray<Corrispondente>();
-                if (corr != null && !AddressBookManager.esisteCorrispondente(listaDest, corr))
+                if (!AddressBookManager.esisteCorrispondente(listaDest, corr))
                 {
                     ListItem item = new ListItem();
                     this.ListRecipients = AddressBookManager.AddCorrespondet(this.ListRecipients, this.ListRecipientsCC, corr);
@@ -10635,8 +10507,7 @@ namespace NttDataWA.Document
                             {
                                 if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                                     canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                                    canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                                    canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                                    canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                                 {
 
                                     formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(corr));
@@ -11140,7 +11011,7 @@ namespace NttDataWA.Document
                 string codiceFascicolo = TxtCodeProject.Text.Substring(0, posSep);
                 string descrFolder = TxtCodeProject.Text.Substring(posSep + separatore.Length);
 
-                listaFolder = ProjectManager.getListaFolderDaCodiceFascicolo(this, codiceFascicolo, descrFolder, registro);
+                listaFolder = ProjectManager.getListaFolderDaCodiceFascicolo(this, codiceFascicolo, descrFolder, registro, "I");
                 if (listaFolder != null && listaFolder.Length > 0)
                 {
                     //calcolo fascicolazionerapida
@@ -11225,7 +11096,6 @@ namespace NttDataWA.Document
                             if (this.EnableStateDiagram)
                             {
                                 this.DocumentDdlStateDiagram.ClearSelection();
-                                //this.DocumentDdlStateDiagram.Items.Clear();
                                 //Verifico se esiste un diagramma di stato associato al tipo di documento
                                 this.StateDiagram = DiagrammiManager.getDgByIdTipoDoc(this.DocumentDdlTypeDocument.SelectedItem.Value, this.InfoUser.idAmministrazione);
                                 if (this.StateDiagram != null)
@@ -11286,8 +11156,6 @@ namespace NttDataWA.Document
                                         {
                                             string stringaXml = Encoding.UTF8.GetString(x1doc.content);
 
-                                            //stringaXml = Encoding.Unicode.GetString(x1doc.content);
-
                                             stringaXml = stringaXml.Trim();
                                             System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
                                             if (stringaXml.Contains("xml version=\"1.1\""))
@@ -11312,8 +11180,8 @@ namespace NttDataWA.Document
 
                                             // Controlli aggiuntivi fattura elettronica. Namespace e controllo lotto
                                             bool continuaElaborazioneXML = true;
-                                            if (this.Template.DESCRIZIONE.ToUpper() == "FATTURA ELETTRONICA" || this.Template.DESCRIZIONE.ToUpper() == "FATTURA ELETTRONICA ATTIVA")
-                                            {   
+                                            if (this.Template.DESCRIZIONE.ToUpper() == "FATTURA ELETTRONICA")
+                                            {
                                                 if (xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://www.fatturapa.gov.it/sdi/fatturapa/v1") ||
                         xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/"))
                                                 {
@@ -11337,64 +11205,9 @@ namespace NttDataWA.Document
 
                                                 }
 
-
                                             }
-
-
-
-                                            //CONTROLLO CLIENTE DELLA FATTURA (SE FATTURA PASSIVA)
-                                            if (this.Template.DESCRIZIONE.ToUpper() == "FATTURA ELETTRONICA")
-                                            {
-                                                DocsPaWR.DocsPaWebService ws = new DocsPaWebService();
-                                                FornitoreFattAttiva[] fornitori = ws.FattElAttiveGetFornitori(this.InfoUser);
-                                                string mappFornitore = string.Format("//*[name()='{0}']/*[name()='{1}']/*[name()='{2}']/*[name()='{3}']", "CedentePrestatore", "DatiAnagrafici", "IdFiscaleIVA", "IdCodice");
-                                                string codFornitore = (xmlDoc.DocumentElement.SelectSingleNode(mappFornitore)).InnerXml;
-                                                if (!string.IsNullOrEmpty(codFornitore))
-                                                {
-                                                    //bool esisteFornInListaFornitori = true;
-                                                    foreach (FornitoreFattAttiva forn in fornitori)
-                                                    {
-                                                        if (!string.IsNullOrEmpty(forn.CodFornitore) && forn.CodFornitore.ToUpper() == codFornitore.ToUpper())
-                                                        {
-                                                            continuaElaborazioneXML = false;
-                                                            string msg = "ErrorManualFattElAttivaNoClienteValido";
-                                                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                                                        }
-                                                    }
-                                                    
-                                                }
-                                            }
-
-                                            //CONTROLLO FORNITORE DELLA FATTURA (SE FATTURA ATTIVA)
-                                            if (this.Template.DESCRIZIONE.ToUpper() == "FATTURA ELETTRONICA ATTIVA")
-                                            {
-                                                DocsPaWR.DocsPaWebService ws = new DocsPaWebService();
-                                                FornitoreFattAttiva[] fornitori = ws.FattElAttiveGetFornitori(this.InfoUser);
-                                                string mappFornitore = string.Format("//*[name()='{0}']/*[name()='{1}']/*[name()='{2}']/*[name()='{3}']", "CedentePrestatore", "DatiAnagrafici", "IdFiscaleIVA", "IdCodice");
-                                                string codFornitore = (xmlDoc.DocumentElement.SelectSingleNode(mappFornitore)).InnerXml;
-                                                if (!string.IsNullOrEmpty(codFornitore))
-                                                {
-                                                    bool esisteFornInListaFornitori = false;
-                                                    foreach (FornitoreFattAttiva forn in fornitori)
-                                                    {
-                                                        if (!string.IsNullOrEmpty(forn.CodFornitore) && forn.CodFornitore.ToUpper() == codFornitore.ToUpper())
-                                                        {
-                                                            esisteFornInListaFornitori = true;
-                                                        }
-                                                    }
-
-                                                    if (!esisteFornInListaFornitori)
-                                                    {
-                                                        continuaElaborazioneXML = false;
-                                                        string msg = "ErrorManualFattElAttivaNoFornitoreValido";
-                                                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                                                    }
-                                                }
-                                            }
-
                                             if (continuaElaborazioneXML)
                                             {
-                                                
                                                 string notePerElaborazioneXML = "";
                                                 foreach (OggettoCustom oggettoCustom in this.Template.ELENCO_OGGETTI)
                                                 {
@@ -11424,14 +11237,6 @@ namespace NttDataWA.Document
                                                                 else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_FORNITORE_1"))
                                                                 {
                                                                     valore = "";
-                                                                }
-                                                                else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_CLIENTE_1"))
-                                                                {
-                                                                    valore = "";
-                                                                }
-                                                                else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_PIVA_CLIENTE_1"))
-                                                                {
-                                                                    valore = "999";
                                                                 }
                                                                 else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_NOTE_VER_FIRMA_1"))
                                                                 {
@@ -11577,57 +11382,6 @@ namespace NttDataWA.Document
                                                                     }
                                                                 }
                                                                 #endregion
-                                                                #region Cliente Fattura elettronica attiva
-                                                                if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_CLIENTE_1"))
-                                                                {
-                                                                    if (string.IsNullOrEmpty(valore))
-                                                                    {
-                                                                        string mappingNome = "CessionarioCommittente>DatiAnagrafici>Anagrafica>Nome";
-                                                                        mappingXml = mappingNome.Split('>');
-                                                                        mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                                                        for (int i = 1; i < mappingXml.Length; i++)
-                                                                        {
-                                                                            mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                                                        }
-                                                                        valore = "";
-                                                                        try
-                                                                        {
-                                                                            System.Xml.XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                                                            valore = node.InnerXml; // valore dell'xml estratto
-                                                                        }
-                                                                        catch (Exception nodo)
-                                                                        {
-                                                                            notePerElaborazioneXML += "Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE + ". ";
-                                                                            if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                                            {
-                                                                                throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
-                                                                            }
-                                                                        }
-
-                                                                        string mappingCognome = "CessionarioCommittente>DatiAnagrafici>Anagrafica>Cognome";
-                                                                        mappingXml = mappingCognome.Split('>');
-                                                                        mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                                                        for (int i = 1; i < mappingXml.Length; i++)
-                                                                        {
-                                                                            mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                                                        }
-                                                                        try
-                                                                        {
-                                                                            System.Xml.XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                                                            valore += (" " + node.InnerXml); // valore dell'xml estratto
-                                                                        }
-                                                                        catch (Exception nodo)
-                                                                        {
-                                                                            notePerElaborazioneXML += "Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE + ". ";
-                                                                            if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                                            {
-                                                                                throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                                #endregion
-
                                                                 oggettoCustom.VALORE_DATABASE = valore;
                                                             }
                                                             if (!string.IsNullOrEmpty(valore))
@@ -11878,7 +11632,6 @@ namespace NttDataWA.Document
                     if (this.EnableStateDiagram)
                     {
                         this.DocumentDdlStateDiagram.ClearSelection();
-                        //this.DocumentDdlStateDiagram.Items.Clear();
                         this.PnlStateDiagram.Visible = false;
                     }
 
@@ -12916,7 +12669,12 @@ namespace NttDataWA.Document
             contatore.ID = oggettoCustom.SYSTEM_ID.ToString();
             contatore.CssClass = "txt_textdata_counter";
             contatore.CssClassReadOnly = "txt_textdata_counter_disabled";
-            if (oggettoCustom.FORMATO_CONTATORE != "")
+
+            DettaglioSegnatura dettaglioSegnaturaPermanente = this.DocumentInWorking?.DettaglioSegnatura;
+            if ("1".Equals(dettaglioSegnaturaPermanente?.Segnato) && String.IsNullOrWhiteSpace(dettaglioSegnaturaPermanente.SegnaturaRepertorio)){
+                contatore.Text = dettaglioSegnaturaPermanente?.SegnaturaProtocollo + dettaglioSegnaturaPermanente?.SegnaturaRepertorio;
+            }
+            else if (oggettoCustom.FORMATO_CONTATORE != "")
             {
                 contatore.Text = oggettoCustom.FORMATO_CONTATORE;
                 if (Session["templateRiproposto"] != null)
@@ -12930,6 +12688,7 @@ namespace NttDataWA.Document
                     contatore.Text = contatore.Text.Replace("COD_UO", "");
                     contatore.Text = contatore.Text.Replace("gg/mm/aaaa hh:mm", "");
                     contatore.Text = contatore.Text.Replace("gg/mm/aaaa", "");
+                    contatore.Text = contatore.Text.Replace("TIPOLOGIA", "");
                 }
                 else
                 {
@@ -12967,35 +12726,24 @@ namespace NttDataWA.Document
                             contatore.Text = contatore.Text.Replace("gg/mm/aaaa", oggettoCustom.DATA_INSERIMENTO.Substring(0, 10));
                         }
 
-
-                        // se il contatore è un REPERTORIO allora va sostituito con questo.
-                        if (!string.IsNullOrEmpty(oggettoCustom.REPERTORIO) && oggettoCustom.REPERTORIO.Equals("1"))
-                        {
-                            contatore.Text = UIManager.DocumentManager.getSegnaturaRepertorioNoHTML(this.DocumentInWorking.systemId, codiceAmministrazione);
-                        }
-                        else 
                         if (!string.IsNullOrEmpty(oggettoCustom.ID_AOO_RF) && oggettoCustom.ID_AOO_RF != "0")
                         {
                             Registro reg = UserManager.getRegistroBySistemId(this, oggettoCustom.ID_AOO_RF);
                             if (reg != null)
                             {
-                                if (!string.IsNullOrEmpty(reg.chaRF) && reg.chaRF.Equals("1") //è un RF
-                                        && !string.IsNullOrEmpty(reg.idAOOCollegata))
-                                {
-                                    Registro regAOO = UserManager.getRegistroBySistemId(this, reg.idAOOCollegata);
-                                    contatore.Text = contatore.Text.Replace("RF", reg.codRegistro);
-                                    contatore.Text = contatore.Text.Replace("AOO", regAOO.codRegistro);
-                                }
-                                else   //è un REGISTRO o AOO considero anche il caso in cui un pazzo mi mette anche RF 
-                                {
-                                    contatore.Text = contatore.Text.Replace("AOO", reg.codRegistro);
-                                    contatore.Text = contatore.Text.Replace("RF", reg.codRegistro);
-
-
-                                }
+                                contatore.Text = contatore.Text.Replace("RF", reg.codRegistro);
+                                contatore.Text = contatore.Text.Replace("AOO", reg.codRegistro);
                             }
                         }
-                        
+                        if (contatore.Text.ToUpper().Contains("VERSIONE"))
+                        {
+                            contatore.Text = UIManager.DocumentManager.getSegnaturaRepertorioNoHTML(this.DocumentInWorking.systemId, codiceAmministrazione);
+                        }
+
+                        if (this.DocumentInWorking.tipologiaAtto != null) 
+                        {
+                            contatore.Text = contatore.Text.Replace("TIPOLOGIA", this.DocumentInWorking.tipologiaAtto.descrizione);
+                        }
                     }
                     else
                     {
@@ -13180,7 +12928,6 @@ namespace NttDataWA.Document
             if (data.ReadOnly && this.DocumentInWorking != null && this.DocumentInWorking.isRiprodotto)
             {
                 data.Text = string.Empty;
-                oggettoCustom.VALORE_DATABASE = string.Empty;
 
             }
             if (this.Template.OLD_OGG_CUSTOM[index] == null) //se true bisogna valorizzare OLD_OGG_CUSTOM[index] con i dati da inserire nello storico per questo campo
@@ -14164,25 +13911,11 @@ namespace NttDataWA.Document
         {
             try
             {
-                /*
                 if (this.DocumentInWorking != null &&
                     !string.IsNullOrEmpty(this.DocumentInWorking.systemId) &&
                     LibroFirmaManager.IsDocOrAllInLibroFirma(this.DocumentInWorking.systemId))
                 {
                     string msgDesc = "WarningDocumentOrAttachIsInLfSend";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    return;
-                }
-                */
-                if(LibroFirmaManager.CheckAllegatiInLibroFirma(this.DocumentInWorking.systemId))
-                {
-                    string msgDesc = "WarningSendAttachIsInLf";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    return;
-                }
-                if(!LibroFirmaManager.IsTitolarePassoInAttesa(this.DocumentInWorking.systemId, Azione.DOCUMENTOSPEDISCI))
-                {
-                    string msgDesc = "WarningDocumentInLfAzioneNonAtessa";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
                     return;
                 }
@@ -14314,18 +14047,28 @@ namespace NttDataWA.Document
 
         protected void DocumentBtnSave_Click(object sender, EventArgs e)
         {
+            bool result = false;
             try
             {
+                if (this.IsDocumentInCheckOutState())
+                {
+                    this.SaveDocument();
+                    result = true;
+                }
+
+
+
+
                 // logger.Info("BEGIN");
                 // Se il documento è in ceckout, non si può effettuare il salvataggio
-                if (this.IsDocumentInCheckOutState())
+                    //if (this.IsDocumentInCheckOutState())
                     //ClientScript.RegisterStartupScript(
                     //    this.GetType(),
                     //    "NonSalvabile",
                     //    "alert('Non è possibile effettuare il salvataggio in quanto il documento principale oppure almeno un suo allegato risulta bloccato.');",
                     //    true);
                     // else
-                    this.SaveDocument();
+                    //this.SaveDocument();
                 // La riga commentata fa comparire la popup solo quando viene messo il check su privato.
                 //if (DocumentManager.IsDocPecPendente(this.DocumentInWorking.systemId) && this.DocumentCheckPrivate.Checked && (this.DocumentInWorking.protocollo != null && string.IsNullOrEmpty(this.DocumentInWorking.protocollo.segnatura) && DocumentInWorking.tipoProto == "A"))
                 if (DocumentManager.IsDocPecPendente(this.DocumentInWorking.systemId) && (this.DocumentInWorking.protocollo != null && string.IsNullOrEmpty(this.DocumentInWorking.protocollo.segnatura) && DocumentInWorking.tipoProto == "A"))
@@ -14341,11 +14084,15 @@ namespace NttDataWA.Document
                     this.DisabledDocumentCheckPrivate.Attributes.Remove("class");
                 }
 
-                // logger.Info("END");
+
+                // Alessandro Aiello 04/02/2019
+                // nel caso di modifiche  (fascicolo o tipologia) resetto la segnatura così da ricalcolarla
+                this.DocumentInWorking.DettaglioSegnatura = null;
             }
             catch (System.Exception ex)
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
+                result = false;
                 return;
             }
             if (IsCosolidato)
@@ -14353,11 +14100,16 @@ namespace NttDataWA.Document
                 HttpContext.Current.Session.Remove("IsCosolidato");
                 Response.Redirect("Document.aspx");
             }
+            if (result)
+            {
+                Response.Redirect("Document.aspx");
+            }
+            
         }
 
         private void SaveDocument()
         {
-            //logger.Info("BEGIN");
+            this._logger.Info("START");
             SchedaDocumento newDoc = DocumentManager.CloneDocument(this.DocumentInWorking);
             List<string> errors = new List<string>();
 
@@ -14551,19 +14303,6 @@ namespace NttDataWA.Document
                     else
                     {
                         newDoc.daAggiornareTipoAtto = false;
-                    }
-
-                    if (DocumentManager.IsDocumentoInLibroFirma(newDoc))
-                    {
-                        //Se una delle azione non corrisponde al passo di firma in attesa, blocco il salvataggio del documento.
-                        if (!LibroFirmaManager.CheckAzioneAttesaPassoFirma(newDoc))
-                        {
-                            newDoc.template = null;
-                            newDoc.tipologiaAtto = null;
-                            newDoc.daAggiornareTipoAtto = false; 
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningDocumentInLfAzioneNonAtessa', 'warning');} else {parent.parent.ajaxDialogModal('WarningDocumentInLfAzioneNonAtessa', 'warning');}", true);
-                            return;
-                        }
                     }
 
                     if (newDoc.tipoProto.Equals("A") && !string.IsNullOrEmpty(this.TxtProtocolSender.Text))
@@ -14763,9 +14502,6 @@ namespace NttDataWA.Document
                                         returnMsg += "WarningDocumentNoClassificatedSelect";
                                         retMes2 = fasc.descrizione;
                                         break;
-                                    case 3:
-                                        returnMsg += "WarningDocumentInLfAzioneNonAtessa";
-                                        break;
                                 }
 
                             }
@@ -14858,23 +14594,10 @@ namespace NttDataWA.Document
 
                                 if (statoFinale)
                                 {
-                                    UIManager.DocumentManager.setSelectedRecord(newDoc);
-                                    this.DocumentInWorking = newDoc;
                                     statoFinale = false;
                                     string msgConfirm = "WarningDocumentConfirmFinalState";
                                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "if (parent.fra_main) {parent.fra_main.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenFinalState', '');} else {parent.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenFinalState', '');}", true);
                                     this.UpConfirmStateDiagram.Update();
-                                    return;
-                                }
-                                if (CheckAvvioModelloFirma())
-                                {
-                                    Stato stato = (from s in StateDiagram.STATI where s.SYSTEM_ID.ToString() == this.DocumentDdlStateDiagram.SelectedValue select s).FirstOrDefault();
-                                    this.IdProcessoDaAvviare = stato.ID_PROCESSO_FIRMA;
-                                    this.CambiaStatoDocumento = true;
-                                    this.IdStatoSelezionatoDocumento = stato.SYSTEM_ID.ToString();
-                                    newDoc.template = this.Template;
-                                    UIManager.DocumentManager.setSelectedRecord(newDoc);
-                                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupStartProcessSignature", "ajaxModalPopupStartProcessSignature();", true);
                                     return;
                                 }
                                 else
@@ -14886,7 +14609,7 @@ namespace NttDataWA.Document
                                     if (newDoc.ConsolidationState != null && !newDoc.ConsolidationState.State.Equals(DocumentConsolidationStateEnum.None))
                                         this.IsCosolidato = true;
                                     Stato state = (from s in StateDiagram.STATI where s.SYSTEM_ID.ToString() == this.DocumentDdlStateDiagram.SelectedValue select s).FirstOrDefault();
-                                    if (state.CONVERSIONE_PDF || !string.IsNullOrEmpty(state.ID_PROCESSO_FIRMA))
+                                    if (state.CONVERSIONE_PDF)
                                         this.IsCosolidato = true;   //FACCIO IL REDIRECT SULLA PAGINA PER AGGIORNARE NEL CASO DI CONVERSIONE PDF
                                     string idTemplate = this.Template.SYSTEM_ID.ToString();
 
@@ -14990,8 +14713,7 @@ namespace NttDataWA.Document
                     }
                     UIManager.DocumentManager.setSelectedRecord(newDoc);
                     this.DocumentInWorking = newDoc;
-                    if(DocumentInWorking.protocollo != null && !string.IsNullOrEmpty(DocumentInWorking.protocollo.segnatura))
-                        this.DocumentInWorking.spedizioneDocumento = SenderManager.GetSpedizioneDocumento(newDoc);
+                    this.DocumentInWorking.spedizioneDocumento = SenderManager.GetSpedizioneDocumento(newDoc);
                     FileManager.setSelectedFile(newDoc.documenti[0]);
 
                     this.IsForwarded = false;
@@ -15116,6 +14838,7 @@ namespace NttDataWA.Document
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
             }
+            this._logger.Info("END");
         }
 
         /// <summary>
@@ -15147,6 +14870,8 @@ namespace NttDataWA.Document
         /// <param name="e"></param>
         protected void DocumentBtnCreateDocument_Click(object sender, EventArgs e)
         {
+            this._logger.Info("START");
+            bool result = false;
             try
             {
                 //logger.Info("BEGIN");
@@ -15154,7 +14879,7 @@ namespace NttDataWA.Document
 
                 if (this.DocumentInWorking.checkOutStatus == null)
                 {
-                    this.CreateDocument();
+                    result = this.CreateDocument();
                 }
                 else
                 {
@@ -15171,11 +14896,14 @@ namespace NttDataWA.Document
                 this.DdlOggettario.Enabled = false;
                 this.UpdPnlObject.Update();
 
-                //logger.Info("END");
+                // Alessandro Aiello 04/02/2019
+                // nel caso di modifiche  (fascicolo o tipologia) resetto la segnatura così da ricalcolarla
+                this.DocumentInWorking.DettaglioSegnatura = null;
             }
             catch (System.Exception ex)
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
+                result = false;
                 return;
             }
             if (IsCosolidato)
@@ -15183,13 +14911,16 @@ namespace NttDataWA.Document
                 HttpContext.Current.Session.Remove("IsCosolidato");
                 Response.Redirect("Document.aspx");
             }
+            if (result)
+            {
+                Response.Redirect("Document.aspx");
+            }
         }
 
-        private void CreateDocument()
+        private bool CreateDocument()
         {
 
             List<string> errors = new List<string>();
-            bool repositoryContext = false;
             // logger.Info("BEGIN");
             try
             {
@@ -15204,7 +14935,7 @@ namespace NttDataWA.Document
                         this.Template = this.PopulateTemplate();
                     }
                     this.HiddenControlPrivateTypeOperation.Value = "CREATEDOCUMENT";
-                    return;
+                    return false;
                 }
 
                 if (this.DocumentChekUser.Checked && !this.ControlUserDocumentWarning())
@@ -15215,21 +14946,21 @@ namespace NttDataWA.Document
                         this.Template = this.PopulateTemplate();
                     }
                     this.HiddenControlPrivateTypeOperation.Value = "CREATEDOCUMENT";
-                    return;
+                    return false;
                 }
 
                 //Verifico se si stà fascicolando all'interno di un fascicolo pubblico
                 if (!ControlPublicFolderWarning())
                 {
                     this.HiddenPublicFolderTypeOperation.Value = "CREATEDOCUMENT";
-                    return;
+                    return false;
                 }
                 else
                 {
                     this.HiddenPublicFolder.Value = string.Empty;
                 }
 
-                if (this.DocumentCheckPrivate.Checked || this.DocumentChekUser.Checked)
+                if (this.DocumentCheckPrivate.Checked)
                 {
                     this.ResetControlPrivateDocumentWarning();
                 }
@@ -15260,7 +14991,7 @@ namespace NttDataWA.Document
                 if (!string.IsNullOrEmpty(msg))
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'error');} else {parent.ajaxDialogModal('" + msg.Replace("'", "\\'") + "', 'error');}", true);
-                    return;
+                    return false;
                 }
                 DocsPaWR.Fascicolo fasc = this.Project;
 
@@ -15275,13 +15006,13 @@ namespace NttDataWA.Document
                     {
                         string msgDesc = fasc.isFascicolazioneConsentita ? "WarningDocumentNoDocumentInsert" : "WarningDocumentNoDocumentInsertClassification";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                     if(fasc.tipo.Equals("P") && !fasc.isFascicolazioneConsentita)
                     {
                         string msgDesc = "WarningDocumentNoDocumentInsertFolder";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
                 }
                 //PROFILAZIONE DINAMICA
@@ -15297,7 +15028,7 @@ namespace NttDataWA.Document
                     {
                         string msgDesc = "WarningDocumentRequestfields";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
+                        return false;
                     }
 
                     string customMessaget = string.Empty;
@@ -15314,7 +15045,7 @@ namespace NttDataWA.Document
                         {
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + messag.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + messag.Replace("'", @"\'") + "', 'warning', '" + messag.Replace("'", @"\'") + "');}", true);
                         }
-                        return;
+                        return false;
                     }
                     //FINE PROFILAZIONE DINAMICA  	
                 }
@@ -15330,7 +15061,7 @@ namespace NttDataWA.Document
                 if (!string.IsNullOrEmpty(msg))
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    return;
+                    return false;
                 }
 
 
@@ -15345,7 +15076,7 @@ namespace NttDataWA.Document
                         msg = "WarningDocumentRequestfields";
 
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '" + msg.Replace("'", @"\'") + "');}", true);
-                        return;
+                        return false;
                     }
 
                     string customMessaget = string.Empty;
@@ -15362,7 +15093,7 @@ namespace NttDataWA.Document
                         {
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + messag.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + messag.Replace("'", @"\'") + "', 'warning', '" + messag.Replace("'", @"\'") + "');}", true);
                         }
-                        return;
+                        return false;
                     }
 
                     if (this.EnableStateDiagram && this.PnlScadenza.Visible && !string.IsNullOrEmpty(this.DocumentStateDiagramDataValue.Text))
@@ -15374,7 +15105,7 @@ namespace NttDataWA.Document
                         {
                             msg = "WarningDocumentDateState";
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '" + msg.Replace("'", @"\'") + "');}", true);
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -15401,7 +15132,7 @@ namespace NttDataWA.Document
                     DateTime dataInserita = Convert.ToDateTime(this.DocumentStateDiagramDataValue.Text);
                     newDoc.dataScadenza = Utils.utils.formatDataDocsPa(dataInserita);
                 }
-                repositoryContext = newDoc.repositoryContext != null;
+
                 newDoc = DocumentManager.creaDocumentoGrigio(this, newDoc);
 
                 if (newDoc != null && !string.IsNullOrEmpty(newDoc.systemId))
@@ -15431,7 +15162,7 @@ namespace NttDataWA.Document
                 else
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorCreateDocument', 'error', '');} else {parent.ajaxDialogModal('ErrorCreateDocument', 'error', '');}", true);
-                    return;
+                    return false;
                 }
                 //DIAGRAMMI DI STATO
                 if (this.EnableStateDiagram && this.CustomDocuments && this.Template != null)
@@ -15452,7 +15183,7 @@ namespace NttDataWA.Document
                                 {
                                     string msgDesc = "WarningDocumentFinaleStatBLocked";
                                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", "\\'") + "', 'warning');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", "\\'") + "', 'warning');}", true);
-                                    return;
+                                    return false;
                                 }
                                 statoFinale = true;
                             }
@@ -15462,7 +15193,7 @@ namespace NttDataWA.Document
                                 string msgConfirm = "WarningDocumentConfirmAutomaticState";
                                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "if (parent.fra_main) {parent.fra_main.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenAutomaticState', '');} else {parent.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenAutomaticState', '');}", true);
                                 this.UpConfirmStateDiagram.Update();
-                                return;
+                                return false;
                             }
 
                             if (statoFinale)
@@ -15471,17 +15202,7 @@ namespace NttDataWA.Document
                                 string msgConfirm = "WarningDocumentConfirmFinalState";
                                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "if (parent.fra_main) {parent.fra_main.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenFinalState', '');} else {parent.ajaxConfirmModal('" + msgConfirm.Replace("'", @"\'") + "', 'HiddenFinalState', '');}", true);
                                 this.UpConfirmStateDiagram.Update();
-                                return;
-                            }
-                            if (CheckAvvioModelloFirma())
-                            {
-                                Stato stato = (from s in StateDiagram.STATI where s.SYSTEM_ID.ToString() == this.DocumentDdlStateDiagram.SelectedValue select s).FirstOrDefault();
-                                this.IdProcessoDaAvviare = stato.ID_PROCESSO_FIRMA;
-                                this.CambiaStatoDocumento = true;
-                                this.IdStatoSelezionatoDocumento = stato.SYSTEM_ID.ToString();
-                                newDoc.template = this.Template;
-                                UIManager.DocumentManager.setSelectedRecord(newDoc);
-                                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupStartProcessSignature", "ajaxModalPopupStartProcessSignature();", true);
+                                return false;
                             }
                             else
                             {
@@ -15586,25 +15307,20 @@ namespace NttDataWA.Document
                     this.DocumentTabs.RefreshLayoutTab();
                     if (newDoc.documenti[0].fileSize.Equals("0"))
                     {
+
                         this.DocumentButtons.RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ALL);
                         this.DocumentButtons.RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_UPLOADFILE);
-                    }
-                    else
-                    {
-                        this.ViewDocument.RefreshAcquiredDocument();
+
                     }
                     this.UpContainerDocumentTab.Update();
                 }
+
                 if (newDoc != null && !string.IsNullOrEmpty(newDoc.systemId))
                 {
                     this.DocumentInWorking = newDoc;
                     ////metodo per la trasmissione rapida (templ & Modelli)
                     this.execTrasmRapida(ref errors);
-                    if (!string.IsNullOrEmpty(this.DocumentDdlTransmissionsModel.SelectedValue) && (errors == null || errors.Count < 1))
-                    {
-                        this.IsCosolidato = true;   //FACCIO IL REDIRECT SULLA PAGINA PER AGGIORNARLA COMPLETAMENTE(QUESTO NEL CASO IN CUI IL MODELLO PREVEDE LA CESSIONE DEI
-                        //DIRITTI E QUINDI DISABILITARE TUTTO)
-                    }
+
                     this.DocumentDdlTransmissionsModel.SelectedValue = string.Empty;
                     this.UpPnlTransmissionsModel.Update();
 
@@ -15620,7 +15336,13 @@ namespace NttDataWA.Document
                         string errFormt = Server.UrlEncode(errorInPopup);
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + utils.FormatJs(errFormt) + "');} else {parent.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + utils.FormatJs(errFormt) + "');}; ", true);
                     }
+                    else
+                    {
+                        this.IsCosolidato = true;   //FACCIO IL REDIRECT SULLA PAGINA PER AGGIORNARLA COMPLETAMENTE(QUESTO NEL CASO IN CUI IL MODELLO PREVEDE LA CESSIONE DEI
+                        //DIRITTI E QUINDI DISABILITARE TUTTO)
+                    }
                 }
+
                 //FINE DIAGRAMMI DI STATO 
                 if (this.PnlScadenza.Visible &&
             !string.IsNullOrEmpty(newDoc.dataScadenza) &&
@@ -15640,6 +15362,8 @@ namespace NttDataWA.Document
                 // FascicoliManager.removeFascicoloSelezionatoFascRapida(this);
                 //Session.Remove("validCodeFasc");
             }
+
+            return true;
             // logger.Info("END");
         }
 
@@ -16146,13 +15870,7 @@ namespace NttDataWA.Document
                 {
                     //Caso in cui il documento è stato protocollato
                     // schedaDocumento = DocumentManager.DO_RemoveDestinatarioModificati(schedaDocumento, ((NttDataWA.DocsPaWR.ProtocolloUscita)schedaDocumento.protocollo).destinatari[this.lbx_dest.SelectedIndex].systemId);
-                    int index = this.ListBoxRecipient.SelectedIndex;
                     this.RemoveRecipient(this.ListBoxRecipient.SelectedIndex, "P");
-                    if (index < this.ListBoxRecipient.Items.Count)
-                    {
-                        this.ListBoxRecipient.SelectedIndex = index;
-                        this.ListBoxRecipient.Focus();
-                    }
                     this.UpPnlRecipients.Update();
 
                     //if (this.DocumentInWorking != null && !string.IsNullOrEmpty(this.DocumentInWorking.systemId))
@@ -16190,13 +15908,7 @@ namespace NttDataWA.Document
                 {
                     //Caso di modifica
                     //schedaDocumento = DocumentManager.DO_RemoveDestinatarioCCModificati(schedaDocumento, ((NttDataWA.DocsPaWR.ProtocolloUscita)schedaDocumento.protocollo).destinatariConoscenza[this.lbx_destCC.SelectedIndex].systemId);
-                    int index = this.ListBoxRecipientCC.SelectedIndex;
                     this.RemoveRecipient(this.ListBoxRecipientCC.SelectedIndex, "C");
-                    if (index < this.ListBoxRecipientCC.Items.Count)
-                    {
-                        this.ListBoxRecipientCC.SelectedIndex = index;
-                        this.ListBoxRecipientCC.Focus();
-                    }
                     this.UpPnlRecipients.Update();
 
                     //if (this.DocumentInWorking != null && !string.IsNullOrEmpty(this.DocumentInWorking.systemId))
@@ -16533,7 +16245,7 @@ namespace NttDataWA.Document
             }
 
             return calltype;
-        }         
+        }
 
         protected void DocumentImgAnswerSearch_Click(object sender, ImageClickEventArgs e)
         {
@@ -19118,7 +18830,7 @@ namespace NttDataWA.Document
                                     }
                                     else
                                     {
-                                        lsCorr = UIManager.AddressBookManager.getCorrispondentiByCodRF(addressBookCorrespondent.CodiceRubrica);
+                                        lsCorr = UIManager.AddressBookManager.getCorrispondentiByCodRFIdAmm(addressBookCorrespondent.CodiceRubrica, idAmm);
                                         if (lsCorr.Count != 0)
                                         {
                                             corr = new DocsPaWR.Corrispondente();
@@ -19209,7 +18921,7 @@ namespace NttDataWA.Document
                                     }
                                     else
                                     {
-                                        lsCorr = UIManager.AddressBookManager.getCorrispondentiByCodRF(addressBookCorrespondent.CodiceRubrica);
+                                        lsCorr = UIManager.AddressBookManager.getCorrispondentiByCodRFIdAmm(addressBookCorrespondent.CodiceRubrica, idAmm);
                                         if (lsCorr.Count != 0)
                                         {
                                             corr = new DocsPaWR.Corrispondente();
@@ -19298,7 +19010,7 @@ namespace NttDataWA.Document
                                     }
                                     else
                                     {
-                                        lsCorrCC = UIManager.AddressBookManager.getCorrispondentiByCodRF(addressBookCorrespondent.CodiceRubrica);
+                                        lsCorrCC = UIManager.AddressBookManager.getCorrispondentiByCodRFIdAmm(addressBookCorrespondent.CodiceRubrica, idAmm);
                                         if (lsCorrCC.Count != 0)
                                         {
                                             corrCC = new DocsPaWR.Corrispondente();
@@ -19409,39 +19121,37 @@ namespace NttDataWA.Document
             {
                 link = (LinkDocFasc)this.PnlTypeDocument.FindControl(this.SearchProjectCustom.ReturnValue);
             }
-            if (link != null)
+
+            if (link.IsFascicolo)
             {
-                if (link.IsFascicolo)
-                {
 
-                    Fascicolo fasc = ProjectManager.getFascicoloById(HttpContext.Current.Session["LinkCustom.return"].ToString());
-                    if (fasc != null)
-                    {
-                        link.hf_Id = fasc.systemID;
-                        link.txt_NomeObj = fasc.descrizione;
-                        link.txt_Maschera = fasc.codice + " " + CutValue(fasc.descrizione);
-                    }
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('SearchProjectCustom','');", true);
+                Fascicolo fasc = ProjectManager.getFascicoloById(HttpContext.Current.Session["LinkCustom.return"].ToString());
+                if (fasc != null)
+                {
+                    link.hf_Id = fasc.systemID;
+                    link.txt_NomeObj = fasc.descrizione;
+                    link.txt_Maschera = fasc.codice + " " + CutValue(fasc.descrizione);
                 }
-                else
+                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('SearchProjectCustom','');", true);
+            }
+            else
+            {
+                InfoDocumento infoDoc = DocumentManager.GetInfoDocumento(HttpContext.Current.Session["LinkCustom.return"].ToString(), HttpContext.Current.Session["LinkCustom.return"].ToString(), this.Page);
+                if (infoDoc != null)
                 {
-                    InfoDocumento infoDoc = DocumentManager.GetInfoDocumento(HttpContext.Current.Session["LinkCustom.return"].ToString(), HttpContext.Current.Session["LinkCustom.return"].ToString(), this.Page);
-                    if (infoDoc != null)
+
+                    link.hf_Id = infoDoc.idProfile;
+                    link.txt_NomeObj = infoDoc.oggetto;
+                    //this.txt_NomeObj.Text = infoDoc.oggetto;
+
+                    if (!string.IsNullOrEmpty(infoDoc.segnatura))
                     {
-
-                        link.hf_Id = infoDoc.idProfile;
-                        link.txt_NomeObj = infoDoc.oggetto;
-                        //this.txt_NomeObj.Text = infoDoc.oggetto;
-
-                        if (!string.IsNullOrEmpty(infoDoc.segnatura))
-                        {
-                            link.txt_Maschera = infoDoc.segnatura + " " + CutValue(infoDoc.oggetto);
-                            //this.txt_Maschera.Text = infoDoc.segnatura + " " + CutValue(infoDoc.oggetto);
-                        }
-                        else
-                        {
-                            link.txt_Maschera = infoDoc.idProfile + " " + CutValue(infoDoc.oggetto);
-                        }
+                        link.txt_Maschera = infoDoc.segnatura + " " + CutValue(infoDoc.oggetto);
+                        //this.txt_Maschera.Text = infoDoc.segnatura + " " + CutValue(infoDoc.oggetto);
+                    }
+                    else
+                    {
+                        link.txt_Maschera = infoDoc.idProfile + " " + CutValue(infoDoc.oggetto);
                     }
                 }
             }
@@ -19749,6 +19459,7 @@ namespace NttDataWA.Document
                 string language = UIManager.UserManager.GetUserLanguage();
                 this.DocumentBtnSend.Text = Utils.Languages.GetLabelFromCode("DocumentBtnSend", language);
                 this.DocumentBtnTransmit.Text = Utils.Languages.GetLabelFromCode("DocumentBtnTransmit", language);
+                this._attivaPulsanteApponiSegnaturaPermanente(false, true);
             }
             catch (System.Exception ex)
             {
@@ -19772,10 +19483,7 @@ namespace NttDataWA.Document
                 repeat = this.RiproponiDati(this.DocumentInWorking, this.ReferenceOffice);
                 this.DocumentInWorking = repeat;
                 DocumentManager.setSelectedRecord(this.DocumentInWorking);
-
-                //Commentato per anomalia acquisisci prima di salvare: andava in errore quando si visualizzava il documento
-                //FileManager.removeSelectedFile();
-                FileManager.setSelectedFile(this.DocumentInWorking.documenti[0]);
+                FileManager.removeSelectedFile();
             }
 
             this.PopulateRecord(true);
@@ -19868,7 +19576,6 @@ namespace NttDataWA.Document
 
             this.TxtProtocolSender.ReadOnly = false;
             this.TxtProtocolSender.Text = string.Empty;
-            this.TxtProtocolSender.ToolTip = string.Empty;
             this.TxtDateProtocol.ReadOnly = false;
             this.TxtDateProtocol.Text = string.Empty;
             this.UpPnlSenderProtocol.Update();
@@ -19921,8 +19628,6 @@ namespace NttDataWA.Document
             this.DocumentBtnSend.Enabled = false;
             this.DocumentBtnTransmit.Enabled = false;
             this.DocumentBtnPrint.Enabled = false;
-            this.DocumentBtnAccept.Visible = false;
-            this.DocumentBtnView.Visible = false;
             if (!string.IsNullOrEmpty(this.DocumentInWorking.tipoProto) && (this.DocumentInWorking.tipoProto.Equals("P") || this.DocumentInWorking.tipoProto.Equals("A") || this.DocumentInWorking.tipoProto.Equals("I")))
             {
                 this.DocumentBntRecord.Visible = true;
@@ -19970,15 +19675,9 @@ namespace NttDataWA.Document
             if (this.DocumentInWorking.documenti[0].fileSize.Equals("0"))
             {
                 this.DocumentButtons.RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.D_ALL);
-
-                //INC000001139647 nel caso di riproponi era disabilitato il pulsante acquisisci prima di salvare
-                if (this.DocumentInWorking.repositoryContext != null)
-                    this.DocumentButtons.RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_UPLOADFILE);
+                //this.DocumentButtons.RefreshButtons(NttDataWA.UserControls.DocumentButtons.TypeRefresh.E_UPLOADFILE);
                 this.DocumentButtons.InitializeCheckInOutPanel();
             }
-
-            this.PnlDirittiDocumento.Visible = false;
-            this.UpDirittiDocumento.Update();
 
             /*
             CheckInOut.CheckInOutServices.RefreshCheckOutStatus();
@@ -20029,7 +19728,6 @@ namespace NttDataWA.Document
                         this.PopulateProfiledDocument();
                         if (this.EnableStateDiagram)
                         {
-                            this.DocumentDdlStateDiagram.Enabled = true;
                             this.DocumentDdlStateDiagram.ClearSelection();
                             //Verifico se esiste un diagramma di stato associato al tipo di documento
                             this.StateDiagram = DiagrammiManager.getDgByIdTipoDoc(this.DocumentDdlTypeDocument.SelectedItem.Value, this.InfoUser.idAmministrazione);
@@ -20211,14 +19909,6 @@ namespace NttDataWA.Document
 
         protected void DocumentBtnForward_Click(object sender, EventArgs e)
         {
-            if (this.DocumentInWorking != null &&
-                    !string.IsNullOrEmpty(this.DocumentInWorking.systemId) &&
-                    LibroFirmaManager.IsDocOrAllInLibroFirma(this.DocumentInWorking.systemId))
-            {
-                string msgDesc = "WarningDocumentOrAttachIsInLfGenerico";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msgDesc.Replace("'", @"\'") + "', 'warning', '');}", true);
-                return;
-            }
             //logger.Info("BEGIN");
             if (this.DocumentInWorking.protocollo != null &&
                 this.DocumentInWorking.protocollo.GetType() == typeof(DocsPaWR.ProtocolloUscita))
@@ -20819,27 +20509,26 @@ namespace NttDataWA.Document
                 if (datas != null)
                 {
                     check = (datas.Tables[0].Rows.Count).ToString();
-
-                    //Se è presente esattamente un corrispondente ma non coincide con il mittente del predisposto, forzo la scelta con l'unico corr trovando tramite K2
-                    if(check.Equals("1"))
-                    {
-                        try
-                        {
-                            if (datas.Tables[0].Rows[0]["ID_REGISTRO"] != null && !mitt.idRegistro.Equals(datas.Tables[0].Rows[0]["ID_REGISTRO"].ToString()))
-                            {
-                                check = "-2";
-                            }
-                        }
-                        catch(Exception e)
-                        {
-
-                        }
-                    }
                 }
                 if (newDoc.interop == "S" && !check.Equals("0"))
+
+                    //old
+                // if (((from r in datas.Tables[0].AsEnumerable() where r.Field<decimal>("SYSTEM_ID").ToString().Equals(mitt.systemId) select r).Count()) < 1)
+                //check = "0";
+
                 {
-                    if (((from r in datas.Tables[0].AsEnumerable() where r.Field<decimal>("SYSTEM_ID").ToString().Equals(mitt.systemId) select r).Count()) < 1)
+                    bool exist = false;
+                    foreach (DataRow r in datas.Tables[0].AsEnumerable())
+                    {
+                        if (r["SYSTEM_ID"].ToString().Equals(mitt.systemId))
+                        {
+                            exist = true;
+                        }
+                    }
+                    //if (((from r in datas.Tables[0].AsEnumerable() where r.Field<decimal>("SYSTEM_ID").ToString().Equals(mitt.systemId) select r).Count()) < 1)
+                    if (!exist)
                         check = "0";
+
                 }
             }
             return check;
@@ -20954,14 +20643,6 @@ namespace NttDataWA.Document
                         this.DocumentImgSenderInt.Visible = true;
                         NotOpenK1K2 = true;
                         break;
-                    case "-2":
-                        this.DocumentImgSenderWarning.Visible = true;
-                        this.DocumentImgSenderInt.Visible = false;
-                        this.DocumentImgAddNewCorrispondent.Visible = false;
-                        this.DocumentImgSenderWarning.AlternateText = Utils.Languages.GetLabelFromCode("DocumentImgSenderWarningToolTipSelectSender", UIManager.UserManager.GetUserLanguage());
-                        this.DocumentImgSenderWarning.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgSenderWarningToolTipSelectSender", UIManager.UserManager.GetUserLanguage());
-                        NotOpenK1K2 = false;
-                        break;
                     default:
                         this.DocumentImgSenderWarning.Visible = true;
                         this.DocumentImgSenderInt.Visible = false;
@@ -21052,8 +20733,7 @@ namespace NttDataWA.Document
                     {
                         if (canaleOrig.typeId.ToUpper().Equals("MAIL") ||
                             canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITA") ||
-                            canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE") ||
-                            canaleOrig.typeId.ToUpper().Equals("LETTERA"))
+                            canaleOrig.typeId.ToUpper().Equals("INTEROPERABILITAPITRE"))
                         {
 
                             formatDestinatario.AppendFormat("({0})  {1}", canaleOrig.typeId, AddressBookManager.getDecrizioneCorrispondenteSemplice(corr));
@@ -21173,275 +20853,54 @@ namespace NttDataWA.Document
             }
         }
 
-        private bool CheckAvvioModelloFirma()
+
+
+
+
+
+
+        /// <summary>
+        /// Apposisione della Segnatura Permanente
+        /// Author: Alessandro Aiello
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void DocumentBtnApponiSegnaturaPermanente_Click(object sender, EventArgs e)
         {
-            bool result = false;
-
-            Stato state = (from s in StateDiagram.STATI where s.SYSTEM_ID.ToString() == this.DocumentDdlStateDiagram.SelectedValue select s).FirstOrDefault();
-            if (!string.IsNullOrEmpty(state.ID_PROCESSO_FIRMA))
-            {
-                result = LibroFirmaManager.IsModelloDiFirma(state.ID_PROCESSO_FIRMA);
-            }
-            return result;
-        }
-
-        private string IdProcessoDaAvviare
-        {
-            get
-            {
-                string result = string.Empty;
-                if (HttpContext.Current.Session["IdProcessoDaAvviare"] != null)
-                {
-                    result = HttpContext.Current.Session["IdProcessoDaAvviare"].ToString();
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["IdProcessoDaAvviare"] = value;
-            }
-        }
-        
-        private bool CambiaStatoDocumento
-        {
-            get
-            {
-                bool result = false;
-                if (HttpContext.Current.Session["CambiaStatoDocumento"] != null)
-                {
-                    result = bool.Parse(HttpContext.Current.Session["CambiaStatoDocumento"].ToString());
-                }
-                return result;
-            }
-            set
-            {
-                HttpContext.Current.Session["CambiaStatoDocumento"] = value;
-            }
-        }
-
-        private string IdStatoSelezionatoDocumento
-        {
-            get
-            {
-                if (HttpContext.Current.Session["IdStatoSelezionatoDocumento"] != null)
-                    return HttpContext.Current.Session["IdStatoSelezionatoDocumento"] as String;
-                else
-                    return null;
-            }
-            set
-            {
-                HttpContext.Current.Session["IdStatoSelezionatoDocumento"] = value;
-            }
-        }
-
-        private void EnableDdlStateDiagram()
-        {
-            this.DocumentDdlStateDiagram.Enabled = true;
-            this.DocumentStateDiagramDataValue.ReadOnly = false;
-
-            //Se ho un diagramma con stato con avvio processo di firma, disabilito il cambio di stato
-            if (this.DocumentInWorking.documenti[0].inLibroFirma)
-            {
-                if (this.StateDiagram != null
-                    && (from s in StateDiagram.STATI where !string.IsNullOrEmpty(s.ID_PROCESSO_FIRMA) select s).FirstOrDefault() != null)
-                {
-                    this.DocumentDdlStateDiagram.Enabled = false;
-                    this.DocumentStateDiagramDataValue.ReadOnly = true;
-                }
-            }
-            if (this.DocumentInWorking != null && !string.IsNullOrEmpty(this.DocumentInWorking.systemId))
-            {
-                if (!string.IsNullOrEmpty(this.DocumentInWorking.accessRights)
-                && Convert.ToInt32(this.DocumentInWorking.accessRights) < Convert.ToInt32(HMdiritti.HMdiritti_Write))
-                {
-                    this.DocumentDdlStateDiagram.Enabled = false;
-                    this.DocumentStateDiagramDataValue.ReadOnly = true;
-                }
-
-                if ((DocumentManager.IsDocumentCheckedOut() || CheckInOut.CheckInOutServices.IsCheckedOutDocument(DocumentManager.getSelectedRecord().docNumber, DocumentManager.getSelectedRecord().docNumber, UserManager.GetInfoUser(), true, DocumentManager.getSelectedRecord())))
-                {
-                    if (this.DocumentInWorking.checkOutStatus != null)
-                    {
-                        this.DocumentDdlStateDiagram.Enabled = false;
-                        this.DocumentStateDiagramDataValue.ReadOnly = true;
-                    }
-                }
-            }
-
-            //Quando un documento è di una tipologia non in esercizio, non deve essere possibile cambiare lo stato
-            if (this.Template.IN_ESERCIZIO.ToUpper().Equals("NO"))
-            {
-                this.DocumentDdlStateDiagram.SelectedIndex = 0;
-                this.DocumentDdlStateDiagram.Enabled = false;
-            }
-
-            this.UpDocumentButtons.Update();
-            this.UpPnlTypeDocument.Update();
-
-        }
-
-        private void DisableFunctionLibroFirma()
-        {
-            if (this.DocumentInWorking.documenti[0].inLibroFirma)
-            {
-                if (this.StateDiagram != null
-                    && (from s in StateDiagram.STATI where !string.IsNullOrEmpty(s.ID_PROCESSO_FIRMA) select s).FirstOrDefault() != null)
-                {
-                    this.DocumentDdlStateDiagram.Enabled = false;
-                    this.DocumentStateDiagramDataValue.ReadOnly = true;
-                }
-            }
-            //if (!LibroFirmaManager.IsTitolare(DocumentInWorking.docNumber, UserManager.GetInfoUser()))
-            //{
-            //    this.DocumentDdlTypeDocument.Enabled = false;
-            //    this.DocumentBntRecord.Enabled = false;
-            //    foreach (Control ctrl in this.PnlTypeDocument.Controls)
-            //    {
-            //        if (ctrl is Panel)
-            //            ((Panel)ctrl).Enabled = false;
-            //    }
-            //}
-            //else
-            //{
-            //    string tipoPasso = LibroFirmaManager.GetTypeSignatureToBeEntered(DocumentInWorking.documenti[0]); ;
-            //    if (tipoPasso.Equals(LibroFirmaManager.TypeEvent.))
-            //    {
-            //        if (string.IsNullOrEmpty(this.DocumentDdlTypeDocument.SelectedItem.Value))
-            //            this.DocumentDdlTypeDocument.Enabled = true;
-            //        this.DocumentBntRecord.Enabled = true;
-            //    }
-
-            //}
-            this.UpDocumentButtons.Update();
-            this.UpPnlTypeDocument.Update();
-        }
-
-        private void EditDocumentInSessione()
-        {
-            SchedaDocumento newDoc = DocumentManager.CloneDocument(this.DocumentInWorking);
-            if (newDoc != null && newDoc.mezzoSpedizione == null)
-            {
-                newDoc.mezzoSpedizione = "0";
-            }
-            newDoc = this.SetEditDocument(newDoc);
-
-            if (newDoc != null && this.MeansSendingRequired)
-            {
-                if (newDoc.mezzoSpedizione.Equals("0") && !string.IsNullOrEmpty(this.DdlMeansSending.SelectedValue) && newDoc.mezzoSpedizione != this.DdlMeansSending.SelectedValue)
-                {
-                    newDoc.mezzoSpedizione = this.DdlMeansSending.SelectedValue;
-                    newDoc.descMezzoSpedizione = this.DdlMeansSending.SelectedItem.Text;
-                }
-
-                if (!newDoc.mezzoSpedizione.Equals("0") && !string.IsNullOrEmpty(this.DdlMeansSending.SelectedValue) && newDoc.mezzoSpedizione != this.DdlMeansSending.SelectedValue)
-                {
-                    newDoc.mezzoSpedizione = this.DdlMeansSending.SelectedValue;
-                    newDoc.descMezzoSpedizione = this.DdlMeansSending.SelectedItem.Text;
-                }
-            }
-
-            //PROFILAZIONE DINAMICA
-            if (!string.IsNullOrEmpty(this.DocumentDdlTypeDocument.SelectedValue))
-            {
-                newDoc.template = this.PopulateTemplate();
-                newDoc.tipologiaAtto = new TipologiaAtto();
-                newDoc.tipologiaAtto.systemId = this.DocumentDdlTypeDocument.SelectedValue;
-                newDoc.tipologiaAtto.descrizione = this.DocumentDdlTypeDocument.SelectedItem.Text;
-            }
-
-            // Se i dati risultano modificati, viene creata una nuova nota
-            this.InsertNote();
-
-            if (newDoc.tipoProto != null && newDoc.tipoProto.Equals("A") && !string.IsNullOrEmpty(this.TxtProtocolSender.Text))
-            {
-                ((DocsPaWR.ProtocolloEntrata)newDoc.protocollo).descrizioneProtocolloMittente = this.TxtProtocolSender.Text;
-            }
-
-            if (newDoc.tipoProto != null && newDoc.tipoProto.Equals("A") && !string.IsNullOrEmpty(this.TxtDateProtocol.Text))
-            {
-                ((DocsPaWR.ProtocolloEntrata)newDoc.protocollo).dataProtocolloMittente = this.TxtDateProtocol.Text;
-            }
-
-            if (newDoc.tipoProto != null && newDoc.tipoProto.Equals("A") && !string.IsNullOrEmpty(this.TxtArrivalDate.Text))
-                newDoc.documenti[0].dataArrivo = this.TxtArrivalDate.Text + " " + this.TxtTimeOfArrival.Text;
-
-            if (this.EnableStateDiagram && this.PnlScadenza.Visible && !string.IsNullOrEmpty(this.DocumentStateDiagramDataValue.Text))
-            {
-                DateTime dataInserita = Convert.ToDateTime(this.DocumentStateDiagramDataValue.Text);
-                newDoc.dataScadenza = Utils.utils.formatDataDocsPa(dataInserita);
-            }
-
-            DocumentManager.setSelectedRecord(newDoc);
-        }
-
-        protected void btnChangeTabNewDocument_Click(object sender, EventArgs e)
-        {
-            this.EditDocumentInSessione();
-            Response.Redirect("Attachments.aspx");
-        }
-
-        protected void DocumentBtnAccept_Click(object sender, EventArgs e)
-        {
+            this._logger.Info("START");
+            bool _result;
             try
             {
-                bool result = TrasmManager.AcceptMassiveTrasmDocument(DocumentManager.getSelectedRecord().docNumber);
-                if (result)
+                _result = DocumentManager.ApponiSegnaturaPermanente(this.DocumentInWorking, this.DocumentInWorking.DettaglioSegnatura, this.InfoUser);
+                if (!_result)
                 {
-                    this.DocumentBtnAccept.Visible = DocumentManager.ExistsTrasmPendenteConWorkflowDocumento(this.DocumentInWorking.docNumber, this.Role.systemId, this.InfoUser.idPeople);
-                    string accessRight = DocumentManager.getAccessRightDocBySystemID(this.DocumentInWorking.docNumber, this.InfoUser);
-                    this.DocumentInWorking.accessRights = accessRight;
-                    DocumentManager.setSelectedRecord(this.DocumentInWorking);
-                    switch ((HMdiritti)Enum.Parse(typeof(HMdiritti), accessRight))
-                    {
-                        case HMdiritti.HDdiritti_Waiting:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelWaiting", UserManager.GetUserLanguage());
-                            break;
-                        case HMdiritti.HMdiritti_Read:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelReadOnly", UserManager.GetUserLanguage());
-                            break;
-                        case HMdiritti.HMdiritti_Proprietario:
-                        case HMdiritti.HMdiritti_Write:
-                            this.LblTipoDiritto.Text = Utils.Languages.GetLabelFromCode("VisibilityLabelRW", UserManager.GetUserLanguage());
-                            break;
-                    }
-                    if (!string.IsNullOrEmpty(DocumentInWorking.accessRights) && Convert.ToInt32(DocumentInWorking.accessRights) > Convert.ToInt32(HMdiritti.HMdiritti_Read))
-                        DisableCheckInOut(true);
-                    this.ViewDocument.InitializeContent();
-                    this.UpContainer.Update();
-                    this.UpDocumentButtons.Update();
-                    this.UpDirittiDocumento.Update();
+                    this._logger.Warn("SEGNATURA NON APPOSTA");
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ErroreApposizionePermanente", " alert('Errore nell'apposizione della Segnatura Permanente');", true);
                 }
                 else
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorDocumentAccept', 'warning', '');} else {parent.ajaxDialogModal('ErrorDocumentAccept', 'warning', '');}", true);
-                }
-            }
-            catch (Exception ex)
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorDocumentAccept', 'error', '');} else {parent.ajaxDialogModal('ErrorDocumentAccept', 'error', '');}", true);
-            }
-        }
+                    // resetto la segnatura attuale così da recuperarla dal DB al reload della pagina!
+                    this.DocumentInWorking.DettaglioSegnatura = null;
 
-        protected void DocumentBtnView_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                bool result = TrasmManager.ViewMassiveTrasmDocument(DocumentManager.getSelectedRecord().docNumber);
-                if (result)
-                {
-                    this.DocumentBtnView.Visible = false;
-                    this.UpDocumentButtons.Update();
-                }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorDocumentView', 'warning', '');} else {parent.ajaxDialogModal('ErrorDocumentView', 'warning', '');}", true);
-                }
-            }
-            catch (Exception ex)
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('ErrorDocumentView', 'error', '');} else {parent.ajaxDialogModal('ErrorDocumentView', 'error', '');}", true);
-            }
-        }
+                    //this.DocumentInWorking.ConsolidationState = DiagrammiManager.GetDocumentConsolidationState(this.DocumentInWorking.systemId);
+                    //if (this.DocumentInWorking.ConsolidationState == null)
+                    //{
+                    //    this._logger.Warn("SEGNATURA APPOSTA MA NON CONSOLIDATO");
+                    //    ScriptManager.RegisterStartupScript(this, this.GetType(), "ErroreApposizionePermanente", " alert('Errore nel Consolidamento');", true);
+                    //}
 
+                }
+            }
+            catch(Exception ex)
+            {
+                _result = false;
+                this._logger.Error(ex.Message, ex);
+            }
+
+
+            this._logger.Info("END");
+            if (_result) { Response.Redirect("Document.aspx"); }
+            
+        }
     }
 }

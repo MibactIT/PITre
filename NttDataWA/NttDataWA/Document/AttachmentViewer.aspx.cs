@@ -185,19 +185,6 @@ namespace NttDataWA.Document
             }
         }
 
-        private bool ChangeSignature
-        {
-            get
-            {
-                if (HttpContext.Current.Session["ChangeSignature"] != null)
-                    return (bool)HttpContext.Current.Session["ChangeSignature"];
-                else return false;
-            }
-            set
-            {
-                HttpContext.Current.Session["ChangeSignature"] = value;
-            }
-        }
 
         #endregion
 
@@ -405,13 +392,8 @@ namespace NttDataWA.Document
                                 DateTime.TryParseExact(fileRequest.dataAcquisizione, PDFDownloadHandler._httpDateFormats, null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out dataFile);
                                 string nomeOriginale = (doc.nomeOriginale != null) ? doc.nomeOriginale.Replace(",", "") : doc.nomeOriginale;
                                 string name = fileRequest.versionId + nomeOriginale;
-
-                                //INC000001202054 UNITN. il visualizzatore nativo di Chrome salva i pdf estratto dal file CADES come 
-                                string nomeSenzap7mOtsd = removeAllCryptExtensions(name);
-
-                                PDFDownloadHandler handler = new PDFDownloadHandler(doc.contentType, nomeSenzap7mOtsd, ChangeSignature, dataFile, FileDoc.content.Length, doc.content, Request, Response);
+                                PDFDownloadHandler handler = new PDFDownloadHandler(doc.contentType, name, dataFile, FileDoc.content.Length, doc.content, Request, Response);
                                 handler.ManageMultipartDownload();
-                                this.ChangeSignature = false;
                             }
                             catch (System.Exception ex)
                             {
@@ -456,7 +438,6 @@ namespace NttDataWA.Document
             System.IO.TextReader tr = new System.IO.StreamReader(new System.IO.MemoryStream(xmlByteArray));
             string fattura = tr.ReadToEnd();
             fattura = fattura.Replace("<?xml version=\"1.1", "<?xml version=\"1.0");  //FIX per l'xml 1.1 (che non viene processato da dotnet)
-            bool isFattura = false;
             
             try
             {
@@ -515,83 +496,16 @@ namespace NttDataWA.Document
                         System.IO.MemoryStream msOut = new System.IO.MemoryStream();
                         //salvo il risultato sul memorystream 
                         xd.Save(msOut);
-                        isFattura = true;
                         //esco con il risultato
                         return msOut.ToArray();
-                        
                     }
                 }
-                if(!isFattura && (xd.DocumentElement.NamespaceURI.ToLower().Equals("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fattura/messaggi/v1.0")
-                                || xd.DocumentElement.NamespaceURI.ToLower().Equals("http://www.fatturapa.gov.it/sdi/fatturapa/v1.0")
-                                || xd.DocumentElement.NamespaceURI.ToLower().Equals("http://www.fatturapa.gov.it/sdi/messaggi/v1.0")))
-                {
-                    // Ricevute SDI
-                    System.Xml.XmlNamespaceManager mgr = new System.Xml.XmlNamespaceManager(xd.NameTable);
-
-                    if(xd.DocumentElement.NamespaceURI.ToLower().Equals("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fattura/messaggi/v1.0"))
-                    {
-                        mgr.AddNamespace("ns3", "http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fattura/messaggi/v1.0");
-                    }
-                    else if(xd.DocumentElement.NamespaceURI.ToLower().Equals("http://www.fatturapa.gov.it/sdi/fatturapa/v1.0"))
-                    {
-                        mgr.AddNamespace("ns3", "http://www.fatturapa.gov.it/sdi/fatturapa/v1.0");
-                    }
-                    else if(xd.DocumentElement.NamespaceURI.ToLower().Equals("http://www.fatturapa.gov.it/sdi/messaggi/v1.0"))
-                    {
-                        mgr.AddNamespace("ns3", "http://www.fatturapa.gov.it/sdi/messaggi/v1.0");
-                    }
-                    else
-                    {
-                        return null;
-                    }
-
-                    string urlXSL = string.Empty;
-
-                    if(xd.SelectSingleNode("//ns3:RicevutaConsegna", mgr) != null)
-                    {
-                        urlXSL = "../xml/RC_v1.1.xsl";
-                    }
-                    else if(xd.SelectSingleNode("//ns3:NotificaMancataConsegna", mgr) != null || xd.SelectSingleNode("//ns3:RicevutaImpossibilitaRecapito", mgr) != null)
-                    {
-                        urlXSL = "../xml/MC_v1.1.xsl";
-                    }
-                    else if (xd.SelectSingleNode("//ns3:NotificaScarto", mgr) != null || xd.SelectSingleNode("//ns3:RicevutaScarto", mgr) != null)
-                    {
-                        urlXSL = "../xml/NS_v1.1.xsl";
-                    }
-                    else if (xd.SelectSingleNode("//ns3:NotificaEsito", mgr) != null)
-                    {
-                        urlXSL = "../xml/EC_v1.0.xsl";
-                    }
-                    else if (xd.SelectSingleNode("//ns3:NotificaDecorrenzaTermini", mgr) != null)
-                    {
-                        urlXSL = "../xml/DT_v1.0.xsl";
-                    }
-                    else if (xd.SelectSingleNode("//types:ScartoEsitoCommittente", mgr) != null)
-                    {
-                        urlXSL = "../xml/SE_v1.0.xsl";
-                    }
-
-
-                    string decl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-                    string decl8 = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-                    string pi = "<?xml-stylesheet type=\"text/xsl\" href=\"" + urlXSL + "\"?>";
-
-                    string previewXml = fattura.Replace(decl, decl + "\n" + pi);
-                    previewXml = previewXml.Replace(decl8, decl8 + "\n" + pi);
-                    xd.LoadXml(previewXml);
-                    Byte[] bytes = System.Text.Encoding.UTF8.GetBytes(xd.OuterXml);
-
-                    return bytes;
-
-
-                }
             }
-            catch(Exception)
-            {
-
-            }
-
+            // il caricamento dell'xml ha dato errore (xml non formattato, tag non chiusi etc etc etc)
+            catch
+            { }
+            //l'eleaborazione è avvenuta in modo corretto, o non è una fattura  elettronica 
+            //oppure non è un xml oppure si è verificato un errore
             return null;
         }
 

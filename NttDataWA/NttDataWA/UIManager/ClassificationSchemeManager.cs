@@ -256,8 +256,7 @@ namespace NttDataWA.UIManager
                         switch (nodo.SelectSingleNode("STATO").InnerText)
                         {
                             case "A":
-                                string active = Utils.Languages.GetLabelFromCode("ClassificationSchemeManagerActive", UIManager.UserManager.GetUserLanguage());
-                                nodoT.Text = nodo.SelectSingleNode("DESCRIZIONE").InnerText + " " + active;
+                                nodoT.Text = nodo.SelectSingleNode("DESCRIZIONE").InnerText + " attivo";
                                 break;
 
                             case "C":

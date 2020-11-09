@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NttDataWA</RootNamespace>
     <AssemblyName>NttDataWA</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -28,9 +28,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
-    <UseGlobalApplicationHostFile />
     <TargetFrameworkProfile />
-    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -85,10 +83,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NttDatalLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\NttDatalLibrary\bin\Debug\NttDatalLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="StampaPDF, Version=3.30.0.26365, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\StampaPDF.dll</HintPath>
@@ -99,9 +93,9 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.DataVisualization" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
@@ -205,23 +199,6 @@
     <Content Include="CheckInOut\UndoCheckOutPage.aspx" />
     <Content Include="CheckInOut\UndoCheckOutWaitingPage.htm" />
     <Content Include="CheckPage.aspx" />
-    <Content Include="ClientBigfile\DownloadClientBigfile.aspx" />
-    <Content Include="Images\Common\btn_bg_80.png" />
-    <Content Include="Images\Common\btn_bg_80_hover.png" />
-    <Content Include="ImportDati\Images\default_thumb.jpg" />
-    <Content Include="ImportDati\Images\pbar-ani.gif" />
-    <Content Include="libs\jquery-ui-1.9.2.custom\js\jquery-ui-1.9.2.custom.min.js" />
-    <Content Include="Popup\AttachmentsUpload.aspx" />
-    <Content Include="Scripts\UploadFile\application.js" />
-    <Content Include="Scripts\UploadFile\jquery.fileupload-ui.js" />
-    <Content Include="Scripts\UploadFile\jquery.fileupload.js" />
-    <Content Include="Scripts\UploadFile\jquery.iframe-transport.js" />
-    <Content Include="Scripts\UploadFile\jquery.tmpl.js" />
-    <Content Include="Scripts\UploadFile\jquery.tmplPlus.js" />
-    <Content Include="Scripts\UploadFile\UploadFileToDocument.js" />
-    <Content Include="Scripts\UploadFile\UploadMassiveAttachments.js" />
-    <Content Include="xml\RC_v1.1.xsl" />
-    <None Include="ClientBigfile\FileUpLoadSetup.exe" />
     <Content Include="Css\bootstrap.css" />
     <Content Include="Css\chosen.css" />
     <Content Include="Css\docspa_30.css" />
@@ -249,6 +226,7 @@
     <Content Include="Css\redmond\jquery-ui-1.8.24.custom.css" />
     <Content Include="Css\Right\Layout.css" />
     <Content Include="Css\Right\Login.css" />
+    <Content Include="Css\SegnaturaPermanente.css" />
     <Content Include="Css\servicepage.css" />
     <Content Include="Css\tipsy.css" />
     <Content Include="ExportDati\DownloadCorrispondenti.aspx" />
@@ -810,7 +788,6 @@
     <Content Include="Images\Icons\import_doc_in_project_hover.png" />
     <Content Include="Images\Icons\info_1.png" />
     <Content Include="Images\Icons\info_1_hover.png" />
-    <Content Include="Images\Icons\item_selected.png" />
     <Content Include="Images\Icons\key_words.png" />
     <Content Include="Images\Icons\key_words_hover.png" />
     <Content Include="Images\Icons\LibroFirma\add_step.png" />
@@ -839,7 +816,6 @@
     <Content Include="Images\Icons\LibroFirma\EsaminaUnoAUno_disabled.png" />
     <Content Include="Images\Icons\LibroFirma\EsaminaUnoAUno_hover.png" />
     <Content Include="Images\Icons\LibroFirma\event.png" />
-    <Content Include="Images\Icons\LibroFirma\Event_Automatic.png" />
     <Content Include="Images\Icons\LibroFirma\event_disabled.png" />
     <Content Include="Images\Icons\LibroFirma\event_hover.png" />
     <Content Include="Images\Icons\LibroFirma\Event_People.png" />
@@ -992,8 +968,6 @@
     <Content Include="Images\Icons\response_protocol.png" />
     <Content Include="Images\Icons\response_protocol_disabled.png" />
     <Content Include="Images\Icons\response_protocol_hover.png" />
-    <Content Include="Images\Icons\retry.png" />
-    <Content Include="Images\Icons\retry_hover.png" />
     <Content Include="Images\Icons\rf_icon.png" />
     <Content Include="Images\Icons\rf_icon_disabled.png" />
     <Content Include="Images\Icons\rf_icon_hover.png" />
@@ -1177,12 +1151,6 @@
     <Content Include="Images\Languages\Arabic.jpg" />
     <Content Include="Images\Languages\English.jpg" />
     <Content Include="Images\Languages\Italian.jpg" />
-    <Content Include="Images\Preview\NextPdf.png" />
-    <Content Include="Images\Preview\NextPdf_disabled.png" />
-    <Content Include="Images\Preview\NextPdf_hover.png" />
-    <Content Include="Images\Preview\PreviousPdf.png" />
-    <Content Include="Images\Preview\PreviousPdf_disabled.png" />
-    <Content Include="Images\Preview\PreviousPdf_hover.png" />
     <Content Include="Images\Progressbar\00_perc.jpg" />
     <Content Include="Images\Progressbar\100_perc.jpg" />
     <Content Include="Images\Progressbar\10_perc.jpg" />
@@ -1250,7 +1218,6 @@
     <Content Include="Images\Uploader\Progressbar_Wrapper.gif" />
     <Content Include="ImportDati\fatturapa_v1.0.xsl" />
     <Content Include="ImportDati\fatturapa_v1.1.xsl" />
-    <Content Include="ImportDati\fatturapa_v1.2.xsl" />
     <Content Include="ImportDati\formatPdfExport_proj.xml" />
     <Content Include="ImportDati\formatPdfExport.xml" />
     <Content Include="ImportDati\ImportDocuments.aspx" />
@@ -1296,6 +1263,8 @@
     <Content Include="Libraries\StampaPDF.dll" />
     <Content Include="Libraries\vic.dll" />
     <Content Include="Login.htm" />
+    <Content Include="LoginLdap.aspx" />
+    <Content Include="LoginLdapFra.aspx" />
     <Content Include="Management\CheckMailboxReport.aspx" />
     <Content Include="Management\ConservationArea.aspx" />
     <Content Include="Management\DistributionList.aspx" />
@@ -1312,24 +1281,16 @@
     <Content Include="Management\Prints.aspx" />
     <Content Include="Management\Proceedings.aspx" />
     <Content Include="Management\RegisterRepertories.aspx" />
-    <Content Include="Management\ReportAccessi.aspx" />
     <Content Include="Management\SignatureProcesses.aspx" />
     <Content Include="Mandate\Mandate.aspx" />
-    <Content Include="Popup\AddFilterSignatureProcesses.aspx" />
-    <Content Include="Popup\AddFilterVisibilitySignatureProcess.aspx" />
-    <Content Include="Popup\AddNewProcess.aspx" />
-    <Content Include="Popup\DescriptionProjectList.aspx" />
     <Content Include="Popup\FlussoAutomatico.aspx" />
-    <Content Include="Popup\InvoicePDFViewer.aspx" />
-    <Content Include="Popup\InvoicePreview.aspx" />
     <Content Include="Popup\MassiveReportDragAndDrop.aspx" />
-    <Content Include="Popup\MassiveTransmissionAccept.aspx" />
     <Content Include="Popup\MissingRoles.aspx" />
     <Content Include="Popup\NewProject.aspx" />
     <Content Include="Popup\Phases.aspx" />
+    <Content Include="Popup\RedirectProject.aspx" />
     <Content Include="Popup\SelectNextMessage.aspx" />
-    <Content Include="Popup\StateInstanceProcessSignature.aspx" />
-    <Content Include="Popup\ViewNote.aspx" />
+    <Content Include="Popup\SignaturePermanenteConfig.aspx" />
     <Content Include="Project\ImportExport\GetInfoUserJSON.aspx" />
     <Content Include="Project\ImportExport\ImportDocumentSocket.aspx" />
     <Content Include="models\mtext\Create.aspx" />
@@ -1595,17 +1556,6 @@
     <Content Include="Scripts\jquery-1.8.1.min.js" />
     <Content Include="DragAndDrop\DragAndDropHandler.ashx" />
     <Content Include="DragAndDrop\EnabledHandler.ashx" />
-    <Content Include="ImportDati\FileUploadHandler.ashx" />
-    <Content Include="Css\FileUpload\jquery.fileupload-ui.css" />
-    <Content Include="ImportDati\AttachmentsUploadHandler.ashx" />
-    <Content Include="ImportDati\DocumentsUploadHandler.ashx" />
-    <Content Include="ImportDati\Thumbnail.ashx" />
-    <Content Include="ImportDati\AttachmentsHandler.ashx" />
-    <Content Include="Popup\UploadDocumentHandler.ashx" />
-    <Content Include="Popup\UploadAttachmentsHandler.ashx" />
-    <Content Include="Handler\SessionHandler.ashx" />
-    <Content Include="Handler\UploadMassiveAttachments.ashx" />
-    <None Include="Properties\PublishProfiles\FE.pubxml" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.9.1.js" />
     <Content Include="Scripts\jquery-1.9.1.min.js" />
@@ -1626,6 +1576,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\ProjectDragAndDrop.js" />
     <Content Include="Scripts\require.js" />
+    <Content Include="Scripts\SegnaturaPermanente.js" />
     <Content Include="Scripts\src\html5Upload.js" />
     <Content Include="Scripts\webclientconnector.js" />
     <None Include="Scripts\_references.js" />
@@ -1711,11 +1662,7 @@
     <Content Include="UserControls\ViewDocument.ascx" />
     <Content Include="Utils\ValidateCertificateHandler.ashx" />
     <None Include="Web References\DocsPaWR\DocsPaWS.disco" />
-    <Content Include="xml\DT_v1.0.xsl" />
-    <Content Include="xml\EC_v1.0.xsl" />
     <Content Include="xml\fatturapa_v1.2.xsl" />
-    <Content Include="xml\MC_v1.1.xsl" />
-    <Content Include="xml\NS_v1.1.xsl" />
     <Content Include="xml\rapporto_versamento.xsl">
       <SubType>Designer</SubType>
     </Content>
@@ -1744,12 +1691,8 @@
     <None Include="Languages\ItalianInps\Labels.txt.bak" />
     <None Include="Languages\ItalianInps\Messages.txt.bak" />
     <None Include="Popup\DOCSPA.INI" />
-    <Resource Include="Popup\ET_DYMO.LABEL">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <AdditionalFiles Include="Popup\ET_DYMO_FASC.label">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AdditionalFiles>
+    <None Include="Popup\ET_DYMO.LABEL" />
+    <None Include="Popup\ET_DYMO_FASC.label" />
     <None Include="Properties\DataSources\System.Data.DataSet.datasource" />
     <Content Include="Search\SearchDocumentAdvanced.aspx" />
     <Content Include="Search\SearchDocumentPrints.aspx" />
@@ -1809,7 +1752,6 @@
     <None Include="activex\INI\Etichette\TLP2844\DOCSPA.INI" />
     <None Include="activex\INI\Penna\DOCSPA.INI" />
     <None Include="activex\INI\Timbro\DOCSPA.INI" />
-    <None Include="bin\AjaxUploader.lic" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1903,7 +1845,6 @@
     <None Include="activex\INI\Etichette\TLP2844\DOCSPA.INI" />
     <None Include="activex\INI\Penna\DOCSPA.INI" />
     <None Include="activex\INI\Timbro\DOCSPA.INI" />
-    <None Include="bin\AjaxUploader.lic" />
     <None Include="ProspettiRiepilogativi\Frontend\TemplateXML\XMLReport.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -1927,15 +1868,11 @@
     </Content>
     <Content Include="WebClientHTML5\DownloadConnector.ashx" />
     <Content Include="WebClientHTML5\DownloadConnector.ashx" />
-    <None Include="Web References\DocsPaWR\DocsPaWS.wsdl">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="Web References\DocsPaWR\DocsPaWS.wsdl" />
     <None Include="Web References\DocsPaWR\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="WebClientHTML5\WebClientConnector.msi" />
-    <None Include="WebClientHTML5\WebClientConnector.tar.gz" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AcrobatIntegration\ClientController.ascx.cs">
@@ -2200,13 +2137,6 @@
     <Compile Include="CheckPage.aspx.designer.cs">
       <DependentUpon>CheckPage.aspx</DependentUpon>
     </Compile>
-    <Compile Include="ClientBigfile\DownloadClientBigfile.aspx.cs">
-      <DependentUpon>DownloadClientBigfile.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ClientBigfile\DownloadClientBigfile.aspx.designer.cs">
-      <DependentUpon>DownloadClientBigfile.aspx</DependentUpon>
-    </Compile>
     <Compile Include="CommonAddressBook\Configurations.cs" />
     <Compile Include="CommonAddressBook\RubricaServices.cs" />
     <Compile Include="Document\AttachmentInlineSaver.aspx.cs">
@@ -2250,24 +2180,6 @@
     </Compile>
     <Compile Include="Document\Events.aspx.designer.cs">
       <DependentUpon>Events.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Handler\SessionHandler.ashx.cs">
-      <DependentUpon>SessionHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="Handler\UploadMassiveAttachments.ashx.cs">
-      <DependentUpon>UploadMassiveAttachments.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="ImportDati\AttachmentsHandler.ashx.cs">
-      <DependentUpon>AttachmentsHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="ImportDati\AttachmentsUploadHandler.ashx.cs">
-      <DependentUpon>AttachmentsUploadHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="ImportDati\DocumentsUploadHandler.ashx.cs">
-      <DependentUpon>DocumentsUploadHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="ImportDati\FileUploadHandler.ashx.cs">
-      <DependentUpon>FileUploadHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="Document\SearchDocument.aspx.cs">
       <DependentUpon>SearchDocument.aspx</DependentUpon>
@@ -2404,8 +2316,6 @@
     <Compile Include="imageLoader.aspx.designer.cs">
       <DependentUpon>imageLoader.aspx</DependentUpon>
     </Compile>
-    <Compile Include="ImportDati\FileTransferHandler.cs" />
-    <Compile Include="ImportDati\FileUploadHandlerBase.cs" />
     <Compile Include="ImportDati\ImportDocuments.aspx.cs">
       <DependentUpon>ImportDocuments.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2448,9 +2358,6 @@
     <Compile Include="ImportDati\PreviewInvoice.aspx.designer.cs">
       <DependentUpon>PreviewInvoice.aspx</DependentUpon>
     </Compile>
-    <Compile Include="ImportDati\Thumbnail.ashx.cs">
-      <DependentUpon>Thumbnail.ashx</DependentUpon>
-    </Compile>
     <Compile Include="ImportDati\ZipDocumenti.aspx.cs">
       <DependentUpon>ZipDocumenti.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2471,6 +2378,20 @@
     </Compile>
     <Compile Include="Login.aspx.designer.cs">
       <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LoginLdap.aspx.cs">
+      <DependentUpon>LoginLdap.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LoginLdap.aspx.designer.cs">
+      <DependentUpon>LoginLdap.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LoginLdapFra.aspx.cs">
+      <DependentUpon>LoginLdapFra.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LoginLdapFra.aspx.designer.cs">
+      <DependentUpon>LoginLdapFra.aspx</DependentUpon>
     </Compile>
     <Compile Include="LogOut.aspx.cs">
       <DependentUpon>LogOut.aspx</DependentUpon>
@@ -2597,13 +2518,6 @@
     <Compile Include="Management\RegisterRepertories.aspx.designer.cs">
       <DependentUpon>RegisterRepertories.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Management\ReportAccessi.aspx.cs">
-      <DependentUpon>ReportAccessi.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Management\ReportAccessi.aspx.designer.cs">
-      <DependentUpon>ReportAccessi.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Management\SignatureProcesses.aspx.cs">
       <DependentUpon>SignatureProcesses.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2625,41 +2539,6 @@
     <Compile Include="MasterPages\Base.Master.designer.cs">
       <DependentUpon>Base.Master</DependentUpon>
     </Compile>
-    <Compile Include="Popup\AddFilterSignatureProcesses.aspx.cs">
-      <DependentUpon>AddFilterSignatureProcesses.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\AddFilterSignatureProcesses.aspx.designer.cs">
-      <DependentUpon>AddFilterSignatureProcesses.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\AddFilterVisibilitySignatureProcess.aspx.cs">
-      <DependentUpon>AddFilterVisibilitySignatureProcess.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\AddFilterVisibilitySignatureProcess.aspx.designer.cs">
-      <DependentUpon>AddFilterVisibilitySignatureProcess.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\AddNewProcess.aspx.cs">
-      <DependentUpon>AddNewProcess.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\AddNewProcess.aspx.designer.cs">
-      <DependentUpon>AddNewProcess.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\AttachmentsUpload.aspx.cs">
-      <DependentUpon>AttachmentsUpload.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\AttachmentsUpload.aspx.designer.cs">
-      <DependentUpon>AttachmentsUpload.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\DescriptionProjectList.aspx.cs">
-      <DependentUpon>DescriptionProjectList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\DescriptionProjectList.aspx.designer.cs">
-      <DependentUpon>DescriptionProjectList.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Popup\FlussoAutomatico.aspx.cs">
       <DependentUpon>FlussoAutomatico.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2667,33 +2546,12 @@
     <Compile Include="Popup\FlussoAutomatico.aspx.designer.cs">
       <DependentUpon>FlussoAutomatico.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Popup\InvoicePDFViewer.aspx.cs">
-      <DependentUpon>InvoicePDFViewer.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\InvoicePDFViewer.aspx.designer.cs">
-      <DependentUpon>InvoicePDFViewer.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\InvoicePreview.aspx.cs">
-      <DependentUpon>InvoicePreview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\InvoicePreview.aspx.designer.cs">
-      <DependentUpon>InvoicePreview.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Popup\MassiveReportDragAndDrop.aspx.cs">
       <DependentUpon>MassiveReportDragAndDrop.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Popup\MassiveReportDragAndDrop.aspx.designer.cs">
       <DependentUpon>MassiveReportDragAndDrop.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\MassiveTransmissionAccept.aspx.cs">
-      <DependentUpon>MassiveTransmissionAccept.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\MassiveTransmissionAccept.aspx.designer.cs">
-      <DependentUpon>MassiveTransmissionAccept.aspx</DependentUpon>
     </Compile>
     <Compile Include="Popup\MissingRoles.aspx.cs">
       <DependentUpon>MissingRoles.aspx</DependentUpon>
@@ -2716,6 +2574,13 @@
     <Compile Include="Popup\Phases.aspx.designer.cs">
       <DependentUpon>Phases.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Popup\RedirectProject.aspx.cs">
+      <DependentUpon>RedirectProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Popup\RedirectProject.aspx.designer.cs">
+      <DependentUpon>RedirectProject.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Popup\SelectNextMessage.aspx.cs">
       <DependentUpon>SelectNextMessage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2723,25 +2588,12 @@
     <Compile Include="Popup\SelectNextMessage.aspx.designer.cs">
       <DependentUpon>SelectNextMessage.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Popup\StateInstanceProcessSignature.aspx.cs">
-      <DependentUpon>StateInstanceProcessSignature.aspx</DependentUpon>
+    <Compile Include="Popup\SignaturePermanenteConfig.aspx.cs">
+      <DependentUpon>SignaturePermanenteConfig.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Popup\StateInstanceProcessSignature.aspx.designer.cs">
-      <DependentUpon>StateInstanceProcessSignature.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\UploadAttachmentsHandler.ashx.cs">
-      <DependentUpon>UploadAttachmentsHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\UploadDocumentHandler.ashx.cs">
-      <DependentUpon>UploadDocumentHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="Popup\ViewNote.aspx.cs">
-      <DependentUpon>ViewNote.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Popup\ViewNote.aspx.designer.cs">
-      <DependentUpon>ViewNote.aspx</DependentUpon>
+    <Compile Include="Popup\SignaturePermanenteConfig.aspx.designer.cs">
+      <DependentUpon>SignaturePermanenteConfig.aspx</DependentUpon>
     </Compile>
     <Compile Include="Project\ImportExport\GetInfoUserJSON.aspx.cs">
       <DependentUpon>GetInfoUserJSON.aspx</DependentUpon>
@@ -4316,7 +4168,6 @@
     <Compile Include="UIManager\ProfilerProjectManager.cs" />
     <Compile Include="UIManager\ProjectManager.cs" />
     <Compile Include="UIManager\RegisterRepertories.cs" />
-    <Compile Include="UIManager\RegistroAccessiManager.cs" />
     <Compile Include="UIManager\RegistryManager.cs" />
     <Compile Include="UIManager\ReportingManager.cs" />
     <Compile Include="UIManager\RoleManager.cs" />
@@ -4512,7 +4363,6 @@
     <Compile Include="Utils\DocumentConsolidationHandler.cs" />
     <Compile Include="Utils\EnableFilter.cs" />
     <Compile Include="Utils\Error.cs" />
-    <Compile Include="Utils\FatturaPARepository.cs" />
     <Compile Include="Utils\FileJSON.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -4596,6 +4446,10 @@
       <Project>{6C46C55E-3739-40CA-BDE2-9478757B147B}</Project>
       <Name>MText</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NttDatalLibrary\NttDatalLibrary.csproj">
+      <Project>{ef230baf-b5d9-4df0-b843-6567c38f9583}</Project>
+      <Name>NttDatalLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PrintPen\DocsPa_PrintPen.csproj">
       <Project>{11723fe3-1bc5-4f62-9f8d-6efbfec111ff}</Project>
       <Name>DocsPa_PrintPen</Name>
@@ -4617,10 +4471,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>NttDataWA_DocsPaWR_DocsPaWebService</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="http://localhost/Vt-Docs/DocsPaWS/DocsPaWS.asmx">
+    <WebReferenceUrl Include="http://localhost/GiadaV4.5/DocsPaWS/DocsPaWS.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\DocsPaWR\</RelPath>
-      <UpdateFromURL>http://localhost/Vt-Docs/DocsPaWS/DocsPaWS.asmx</UpdateFromURL>
+      <UpdateFromURL>http://localhost/GiadaV4.5/DocsPaWS/DocsPaWS.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
@@ -4738,6 +4592,27 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

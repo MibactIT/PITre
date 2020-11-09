@@ -5,11 +5,14 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using NttDataWA.DocsPaWR;
+using log4net;
 
 namespace NttDataWA.Document
 {
     public partial class SearchDocument : System.Web.UI.Page
     {
+        private ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private string PROTOCOL = "P";
         private string NOTPROTOCOL = "N";
 
@@ -20,6 +23,7 @@ namespace NttDataWA.Document
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            logger.Info("START");
             try {
                 if (!IsPostBack)
                 {
@@ -55,6 +59,10 @@ namespace NttDataWA.Document
             {
                 UIManager.AdministrationManager.DiagnosticError(ex);
                 return;
+            }
+            finally
+            {
+                logger.Info("END");
             }
         }
 
@@ -171,6 +179,7 @@ namespace NttDataWA.Document
 
         protected void Record()
         {
+            logger.Info("START");
             DocsPaWR.ResultProtocollazione result = DocsPaWR.ResultProtocollazione.OK;
             DocsPaWR.Fascicolo fasc = new DocsPaWR.Fascicolo();
             string resFunz = string.Empty;
@@ -247,7 +256,7 @@ namespace NttDataWA.Document
             this.link4.Attributes.Add("class", "docOther");
             this.link5.Attributes.Add("class", "docOther");
             this.link6.Attributes.Add("class", "docOther");
-
+            logger.Info("END");
         }
 
         protected void TxtCodeSender_OnTextChanged(object sender, EventArgs e)

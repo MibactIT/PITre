@@ -45,10 +45,8 @@ namespace NttDataWA.CheckInOut
             this.tipoProto = this.Request.QueryString["tipoProto"];
             //verifico utente loggato
             Utente loggedUser = UIManager.UserManager.GetUserInSession();
-
             //UIManager.UserManager.SetUserLanguage("English");
             UIManager.LoginManager.IniInitializesLanguages();
-
             string login = Utils.utils.getHttpFullPath() + "/Login.aspx?from=" + this.strFrom + "&idProfile=" + this.idProfile + "&groupId=" + this.groupId + "&numVersion=" + this.numVersion + "&idAmministrazione=" + this.idAmministrazione + "&idObj=" + this.idObj + "&tipoProto=" + this.tipoProto;
             if (loggedUser == null && !string.IsNullOrEmpty(tknVCAP))
             {

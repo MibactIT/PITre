@@ -10,8 +10,7 @@ using NttDataWA.UserControls;
 using NttDataWA.UIManager;
 using NttDataWA.Utils;
 using NttDataWA.CheckInOut;
-
-
+using System.IO;
 
 namespace NttDataWA.UserControls
 {
@@ -318,6 +317,7 @@ namespace NttDataWA.UserControls
             if (!UserManager.IsAuthorizedFunctions("DO_DOC_VISUALIZZA"))
             {
                 this.DocumentImgSignaturePosition.Visible = false;
+                this.DocumentImgSignaturePermanentConfig.Visible = false;
             }
 
             if (!UserManager.IsAuthorizedFunctions("DO_DOC_VISUALIZZA"))
@@ -336,7 +336,7 @@ namespace NttDataWA.UserControls
                 this.DocumentImgSignatureHSM.Visible = false;
             }
 
-            if (!UserManager.IsAuthorizedFunctions("DO_DOC_FIRMA_ELETTRONICA") || UserManager.IsAuthorizedFunctions("DO_DISABLE_FIRMA_ELETTRONICA"))
+            if (!UserManager.IsAuthorizedFunctions("DO_DOC_FIRMA_ELETTRONICA"))
             {
                 this.DocumentImgVisureSign.Visible = false;
             }
@@ -347,10 +347,6 @@ namespace NttDataWA.UserControls
             if (!UserManager.IsAuthorizedFunctions("DO_STATE_SIGNATURE_PROCESS"))
             {
                 this.DocumentImgProcessState.Visible = false;
-            }
-            if(!UserManager.IsAuthorizedFunctions("IMPORTA_FATTURE"))
-            {
-                this.DocumentImgInvoicePreviewPdf.Visible = false;
             }
         }
 
@@ -440,6 +436,10 @@ namespace NttDataWA.UserControls
             this.DocumentImgZoomFile.ToolTip = Utils.Languages.GetLabelFromCode("DocumentZoomFile", language);
             this.DocumentImgSignaturePosition.AlternateText = Utils.Languages.GetLabelFromCode("DocumentSignaturePosition", language);
             this.DocumentImgSignaturePosition.ToolTip = Utils.Languages.GetLabelFromCode("DocumentSignaturePosition", language);
+
+            this.DocumentImgSignaturePermanentConfig.AlternateText = Utils.Languages.GetLabelFromCode("DocumentSignaturePermanentPosition", language);
+            this.DocumentImgSignaturePermanentConfig.ToolTip = Utils.Languages.GetLabelFromCode("DocumentSignaturePermanentPosition", language);
+
             this.DocumentImgSignature.AlternateText = Utils.Languages.GetLabelFromCode("DocumentSignature", language);
             this.DocumentImgSignature.ToolTip = Utils.Languages.GetLabelFromCode("DocumentSignature", language);
             this.DocumentImgCoSignature.AlternateText = Utils.Languages.GetLabelFromCode("DocumentCoSignature", language);
@@ -471,8 +471,7 @@ namespace NttDataWA.UserControls
             this.DocumentImgConvertPdf.AlternateText = Utils.Languages.GetLabelFromCode("DocumentImgConvertPDF", language);
             this.DocumentImgConvertPdf.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgConvertPDF", language);
             this.InformationFile.Title = Utils.Languages.GetLabelFromCode("InformationFileTitle", language);
-            this.DocumentImgInvoicePreviewPdf.AlternateText = Utils.Languages.GetLabelFromCode("DocumentImgInvoicePreviewPDF", language);
-            this.DocumentImgInvoicePreviewPdf.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgInvoicePreviewPDF", language);
+
             this.DocumentImgSignatureHSM.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgSignatureHSM", language);
             this.DocumentImgSignatureHSM.AlternateText = Utils.Languages.GetLabelFromCode("DocumentImgSignatureHSM", language);
             this.DocumentImgStartProcessSignature.ToolTip = Utils.Languages.GetLabelFromCode("DocumentImgStartProcessSignatureTooltip", language);
@@ -875,12 +874,6 @@ namespace NttDataWA.UserControls
                     case TypeRefresh.E_START_SIGNATURE_PROCESS:
                         this.DocumentImgStartProcessSignature.Enabled = true;
                         break;
-                    case TypeRefresh.D_PROCESS_STATE:
-                        this.DocumentImgProcessState.Enabled = false;
-                        break;
-                    case TypeRefresh.E_PROCESS_STATE:
-                        this.DocumentImgProcessState.Enabled = true;
-                        break;
                     case TypeRefresh.D_DIGITAL_SIGN:
                         this.DocumentImgSignature.Enabled = false;
                         this.DocumentImgSignatureHSM.Enabled = false;
@@ -890,6 +883,47 @@ namespace NttDataWA.UserControls
                         this.DocumentImgVisureSign.Enabled = false;
                         break;
                 }
+
+
+
+                if( "1".Equals(doc.DettaglioSegnatura?.IsPermanenteProtocollo)
+                    || "1".Equals(doc.DettaglioSegnatura?.IsPermanenteRepertorio)
+                    || "1".Equals(doc.DettaglioSegnatura?.IsPermanenteNP))
+                {
+                    if (doc.documenti[0] != null && Path.GetExtension(doc.documenti[0].fileName).ToLower() == ".pdf")
+                    {
+                        DocumentImgSignaturePermanentConfig.Visible = true;
+                        DocumentImgSignaturePosition.Visible = true; // ABBATANGELI - Mibact rispristinato a true
+                    }
+                    else
+                        DocumentImgSignaturePermanentConfig.Visible = false;
+                }
+                else
+                {
+                    DocumentImgSignaturePermanentConfig.Visible = false; // rispristinare a false
+                }
+                // controlle definitivo sui diritti
+
+                bool abilitaImgSign = false;
+
+                if (DocumentImgSignaturePosition.Enabled)
+                {
+                    if (doc.DettaglioSegnatura != null)
+                    {
+                        if (!"1".Equals(doc.DettaglioSegnatura?.Segnato))
+                        {
+                            abilitaImgSign = true;
+                        }
+                        else
+                        {
+                            if (doc.documenti[0] != null)
+                                abilitaImgSign = doc.documenti[0].versionId != doc.DettaglioSegnatura.VersionId;
+                        }
+                    }
+                }
+
+                DocumentImgSignaturePermanentConfig.Enabled = abilitaImgSign;
+
             }
 
             this.UpDocumentButtons.Update();
@@ -928,114 +962,20 @@ namespace NttDataWA.UserControls
             this.UpDocumentButtons.Update();
         }
 
-        protected void DocumentImgStartProcessSignature_Click(object sender, EventArgs e)
-        {
-            if (!CheckMaxFileSize())
-            {
-                return;
-            }
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupStartProcessSignature", "ajaxModalPopupStartProcessSignature();", true);
-
-        }
-
-        protected void DocumentImgVisureSign_Click(object sender, EventArgs e)
-        {
-            if (BloccaModificaAllegatoPerDocumentoPrincipaleInLibroFirma())
-                return;
-
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupDigitalVisureSelector", "ajaxModalPopupDigitalVisureSelector();", true);
-        }
-
-        protected void DocumentImgSignatureHSM_Click(object sender, EventArgs e)
-        {
-            if (!CheckMaxFileSize())
-            {
-                return;
-            }
-            if (BloccaModificaAllegatoPerDocumentoPrincipaleInLibroFirma())
-                return;
-
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupHSMSignature", "ajaxModalPopupHSMSignature();", true);
-        }
-
-        protected void DocumentImgUploadFile_Click(object sender, EventArgs e)
-        {
-            if (BloccaModificaAllegatoPerDocumentoPrincipaleInLibroFirma())
-                return;
-
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupUplodadFile", "ajaxModalPopupUplodadFile();", true);
-        }
-
-        protected void DocumentImgSignature_Click(object sender, EventArgs e)
-        {
-            if (!CheckMaxFileSize())
-            {
-                return;
-            }
-            if (BloccaModificaAllegatoPerDocumentoPrincipaleInLibroFirma())
-                return;
-
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupHSMSignature", "ajaxModalPopupDigitalSignSelector();", true);
-        }
-
-        private bool CheckMaxFileSize()
-        {
-            DocsPaWR.FileRequest fileReq = null;
-            if (FileManager.GetSelectedAttachment() == null)
-            {
-                fileReq = UIManager.FileManager.getSelectedFile();
-            }
-            else
-            {
-                fileReq = FileManager.GetSelectedAttachment();
-            }
-            int maxDimFileSign = 0;
-            if (!string.IsNullOrEmpty(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString())) &&
-               !Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()).Equals("0"))
-                maxDimFileSign = Convert.ToInt32(Utils.InitConfigurationKeys.GetValue(UserManager.GetUserInSession().idAmministrazione, Utils.DBKeys.FE_DO_BIG_FILE_MIN.ToString()));
-            if (maxDimFileSign > 0 && Convert.ToInt32(fileReq.fileSize) > maxDimFileSign)
-            {
-                string maxSize = Convert.ToString(Math.Round((double)maxDimFileSign / 1048576, 3));
-                string msgDesc = "WarningStartProcessSignatureMaxDimFile";
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + maxSize + "');} else {parent.ajaxDialogModal('" + utils.FormatJs(msgDesc) + "', 'warning', '', '" + maxSize + "');}", true);
-                return false;
-            }
-            else
-                return true;
-        }
-
-        private bool BloccaModificaAllegatoPerDocumentoPrincipaleInLibroFirma()
-        {
-            bool result = false;
-            //Nel caso di allegati, per cui non è attivo un processo di firma, non posso compiere azioni se il documento principale è in libro firma. 
-            if(FileManager.GetSelectedAttachment() != null)
-            {
-                FileRequest fileReq = FileManager.GetSelectedAttachment();
-                if(!fileReq.inLibroFirma && DocumentManager.IsDocumentoInLibroFirma(DocumentManager.getSelectedRecord()) && LibroFirmaManager.IsAttivoBloccoModificheDocumentoInLibroFirma())
-                {
-                    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');} else {parent.parent.ajaxDialogModal('WarningBloccoModificheDocumentoInLf', 'warning');}", true);
-                    result = true;
-                }
-            }
-            return result;
-        }
-
         protected void DocumentImgSignaturePosition_Click(object sender, EventArgs e)
         {
             //Imposto la seguente variabile di sessione a true per risolvere un'anomalia di alcune versioni del browser, ovvero
             //alla chiusura della popup IsPostBack è false e quindi riesegue tutto il codice.
-            
-            if (!(UIManager.UserManager.IsAuthorizedFunctions("IGNORE_BIGFILE_LIMITATION")) && (!CheckMaxFileSize()))
-            {
-                return;
-            }
-            else
-            {
-                OpenSignaturePopup = true;
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupSignature", "ajaxModalPopupSignature();", true);
-
-            }
+            OpenSignaturePopup = true;
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupSignature", "ajaxModalPopupSignature();", true);
         }
+
+        protected void DocumentImgSignaturePermanentConfig_Click(object sender, ImageClickEventArgs e)
+        {
+            OpenSignaturePopup = true;
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupSignaturePermanenteConfig", "ajaxModalPopupSignaturePermanenteConfig();", true);
+        }
+
 
         protected void DocumentImgConvertPdf_Click(object sender, EventArgs e)
         {
@@ -1043,9 +983,6 @@ namespace NttDataWA.UserControls
             {
                 if (this.DocumentInWorking != null)
                 {
-                    if (BloccaModificaAllegatoPerDocumentoPrincipaleInLibroFirma())
-                        return;
-
                     DocsPaWR.FileRequest fr = new FileRequest();
 
                     if (UIManager.DocumentManager.getSelectedAttachId() != null)
@@ -1094,9 +1031,6 @@ namespace NttDataWA.UserControls
                     ((Literal)((ViewDocument)Parent.FindControl("ViewDocument")).FindControl("LitDocumentConversionPDF")).Text = Utils.Languages.GetLabelFromCode("DocumentButtonsConversionPDF", UIManager.UserManager.GetUserLanguage());
                     ((UpdatePanel)((ViewDocument)Parent.FindControl("ViewDocument")).FindControl("UpBottomButtons")).Update();
 
-                    if (!string.IsNullOrEmpty(this.PageCaller) && this.PageCaller.Equals("DOCUMENT"))
-                        ((NttDataWA.Document.Document)this.Page).DisableConvertPdf();
-
                     // INC000000598064
                     // Disabilito il tasto modifica allegati quando il doc è in conversione
                     Control ctl = Parent.Parent.Parent.Parent.Parent;
@@ -1131,87 +1065,6 @@ namespace NttDataWA.UserControls
                     }
 
                 }
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-        protected void DocumentImgLock_Click(object sender, EventArgs e)
-        {
-            if (!CheckMaxFileSize())
-            {
-                return;
-            }
-            if (BloccaModificaAllegatoPerDocumentoPrincipaleInLibroFirma())
-                return;
-
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupCheckOutDocument", "ajaxModalPopupCheckOutDocument();", true);
-
-        }
-
-        protected void DocumentImgUnLock_Click(object sender, EventArgs e)
-        {
-            if (!CheckMaxFileSize())
-            {
-                return;
-            }
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupCheckInDocument", "ajaxModalPopupCheckInDocument();", true);
-
-        }
-
-
-        protected void DocumentImgUnlockWithoutSave_Click(object sender, EventArgs e)
-        {
-            if (!CheckMaxFileSize())
-            {
-                return;
-            }
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupUndoCheckOut", "ajaxModalPopupUndoCheckOut();", true);
-
-        }
-
-
-        protected void DocumentImgOpenFile_Click(object sender, EventArgs e)
-        {
-            if (UserManager.IsAuthorizedFunctions("DOWNLOAD_BIG_FILE"))
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupOpenLocalCheckOutFile", "ajaxModalPopupOpenLocalCheckOutFile();", true);
-            }
-            else if (!CheckMaxFileSize())
-            {
-                return;
-            }
-            else
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupOpenLocalCheckOutFile", "ajaxModalPopupOpenLocalCheckOutFile();", true);
-            }
-        }
-
-        protected void DocumentImgSaveLocalFile_Click(object sender, EventArgs e)
-        {
-            if (UserManager.IsAuthorizedFunctions("DOWNLOAD_BIG_FILE"))
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupSaveDialog", "ajaxModalPopupSaveDialog();", true);
-            }
-            else if (!CheckMaxFileSize())
-            {
-                return;
-            }
-            else
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupSaveDialog", "ajaxModalPopupSaveDialog();", true);
-            }
-        }
-
-        protected void DocumentImgInvoicePreviewPdf_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "ajaxModalPopupInvoicePreview", "ajaxModalPopupInvoicePreview();", true);
-                NttDataWA.Popup.DocumentViewer.OpenDocumentViewer = true;
             }
             catch (System.Exception ex)
             {
@@ -1344,7 +1197,6 @@ namespace NttDataWA.UserControls
                 {
                     this.imgSeparator6.Visible = false;
                     this.DocumentImgConvertPdf.Visible = false;
-                    this.DocumentImgInvoicePreviewPdf.Enabled = false;
                     return;
                 }
 
@@ -1353,7 +1205,6 @@ namespace NttDataWA.UserControls
                 {
                     this.imgSeparator6.Visible = false;
                     this.DocumentImgConvertPdf.Visible = false;
-                    this.DocumentImgInvoicePreviewPdf.Visible = false;
                     return;
                 }
 
@@ -1362,7 +1213,6 @@ namespace NttDataWA.UserControls
                 {
                     this.imgSeparator6.Visible = false;
                     this.DocumentImgConvertPdf.Visible = false;
-                    this.DocumentImgInvoicePreviewPdf.Visible = false;
                     return;
                 }
 
@@ -1388,7 +1238,6 @@ namespace NttDataWA.UserControls
                     {
                         this.imgSeparator6.Visible = false;
                         this.DocumentImgConvertPdf.Visible = false;
-                        this.DocumentImgInvoicePreviewPdf.Enabled = false;
                         return;
                     }
                 }
@@ -1414,13 +1263,7 @@ namespace NttDataWA.UserControls
                 {
                     this.imgSeparator6.Visible = false;
                     this.DocumentImgConvertPdf.Visible = false;
-                    this.DocumentImgInvoicePreviewPdf.Enabled = false;
                     return;
-                }
-
-                if (!(fileRequest.fileName.ToUpper().EndsWith("XML") || (fileRequest.fileName.ToUpper().EndsWith("P7M"))))
-                {
-                    this.DocumentImgInvoicePreviewPdf.Enabled = false;
                 }
 
                 //DISABILITO : se il documento è bloccato ma non per una conversione 
@@ -1453,7 +1296,8 @@ namespace NttDataWA.UserControls
                     //DocsPaWR.Registro[] userRegistri = UserManager.getListaRegistriWithRF(RoleManager.GetRoleInSession().systemId, "01", string.Empty);
                     DocsPaWR.Registro[] userRegistri = UIManager.RegistryManager.GetRFListInSession();
                     bool visibility = UserManager.verifyRegNoAOO(this.DocumentInWorking, userRegistri);
-                    this.DocumentImgConvertPdf.Enabled = true;
+
+                        this.DocumentImgConvertPdf.Enabled = true;
                     this.imgSeparator6.Visible = visibility;
                     this.DocumentImgConvertPdf.Visible = visibility;
                     return;
@@ -1510,8 +1354,6 @@ namespace NttDataWA.UserControls
             D_LIBROFIRMA_UNLOCK,
             D_START_SIGNATURE_PROCESS,
             E_START_SIGNATURE_PROCESS,
-            D_PROCESS_STATE,
-            E_PROCESS_STATE,
             D_DIGITAL_SIGN,
             D_ELECTRONIC_SIGN,
             E_LIBROFIRMA_UNLOCK,

@@ -3774,7 +3774,7 @@ namespace NttDataWA.Project
             this.upPnlNoteAccRif.Update();
 
             listTrasmSing = trasm.trasmissioniSingole;
-            if (listTrasmSing != null && listTrasmSing.Length > 0 && !string.IsNullOrEmpty(trasm.dataInvio))
+            if (listTrasmSing != null && listTrasmSing.Length > 0)
             {
                 DocsPaWR.InfoUtente infoUtente = UserManager.GetInfoUser();
                 //Vedo se presente la trasmissione all'utente
@@ -3885,7 +3885,7 @@ namespace NttDataWA.Project
                     // checks on transm selected
                     if (this.SelectedRowIndex >= 0)
                     {
-                        if ((trasm != null && trasm.systemId != null) && (trasm.dataInvio == null || trasm.dataInvio == "") && trasm.ruolo.idGruppo.Equals(RoleManager.GetRoleInSession().idGruppo))
+                        if ((trasm != null && trasm.systemId != null) && (trasm.dataInvio == null || trasm.dataInvio == ""))
                         {
                             this.TransmissionsBtnModify.Enabled = true; // modify is enabled only if not yet transmitted
                             this.TransmissionsBtnTransmit.Enabled = true; // transmission is enabled only if not yet transmitted

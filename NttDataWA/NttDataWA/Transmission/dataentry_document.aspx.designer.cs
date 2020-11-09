@@ -58,24 +58,6 @@ namespace NttDataWA.Transmission {
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 AddressBook;
         
         /// <summary>
-        /// ViewNoteGen control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 ViewNoteGen;
-        
-        /// <summary>
-        /// ViewNoteInd control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 ViewNoteInd;
-        
-        /// <summary>
         /// UpUserControlHeaderDocument control.
         /// </summary>
         /// <remarks>
@@ -569,14 +551,5 @@ namespace NttDataWA.Transmission {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnAddressBookPostback;
-        
-        /// <summary>
-        /// btnViewNoteIndPostback control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnViewNoteIndPostback;
     }
 }

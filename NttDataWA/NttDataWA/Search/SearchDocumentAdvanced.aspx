@@ -805,6 +805,83 @@
             $("#contentDx").scrollTop(0);
         }
 
+        function uoProtocollatricePopulated(sender, e) {
+            var behavior = $find('AutoCompleteExIngressoUoProtocollatrice');
+            var target = behavior.get_completionList();
+            if (behavior._currentPrefix != null) {
+                var prefix = behavior._currentPrefix.toLowerCase();
+                var i;
+                for (i = 0; i < target.childNodes.length; i++) {
+                    var sValue = target.childNodes[i].innerHTML.toLowerCase();
+                    if (sValue.indexOf(prefix) != -1) {
+                        var fstr = target.childNodes[i].innerHTML.substring(0, sValue.indexOf(prefix));
+
+                        var pstr = target.childNodes[i].innerHTML.substring(fstr.length, fstr.length + prefix.length);
+
+                        var estr = target.childNodes[i].innerHTML.substring(fstr.length + prefix.length, target.childNodes[i].innerHTML.length);
+
+                        target.childNodes[i].innerHTML = fstr + '<span class="selectedWord">' + pstr + '</span>' + estr;
+                        try {
+                            target.childNodes[i].attributes["_value"].value = fstr + pstr + estr;
+                        }
+                        catch (ex) {
+                            target.childNodes[i].attributes["_value"] = fstr + pstr + estr;
+                        }
+                    }
+                }
+            }
+        }
+
+        function uoProtocollatriceSelected(sender, e) {
+            var value = e.get_value();
+            if (!value) {
+
+                if (e._item.parentElement && e._item.parentElement.tagName == "LI") {
+
+                    try {
+                        value = e._item.parentElement.attributes["_value"].value;
+                    }
+                    catch (ex1) {
+                        value = e._item.parentElement.attributes["_value"];
+                    }
+                    if (value == undefined || value == null)
+                        value = e._item.parentElement.attributes["_value"];
+                }
+                else if (e._item.parentElement && e._item.parentElement.parentElement.tagName == "LI") {
+                    try {
+                        value = e._item.parentElement.attributes["_value"].value;
+                    }
+                    catch (ex1) {
+                        value = e._item.parentElement.attributes["_value"];
+                    }
+                    if (value == undefined || value == null)
+                        value = e._item.parentElement.attributes["_value"];
+                }
+                else if (e._item.parentNode && e._item.parentNode.tagName == "LI") {
+                    value = e._item.parentNode._value;
+                }
+                else if (e._item.parentNode && e._item.parentNode.parentNode.tagName == "LI") {
+                    value = e._item.parentNode.parentNode._value;
+                }
+                else value = "";
+
+            }
+
+            var searchText = $get('<%=txt_descrUO_Prot.ClientID %>').value;
+            searchText = searchText.replace('null', '');
+            var testo = value;
+            var indiceFineCodice = testo.lastIndexOf(')');
+            document.getElementById("<%=this.txt_descrUO_Prot.ClientID%>").focus();
+            document.getElementById("<%=this.txt_descrUO_Prot.ClientID%>").value = "";
+            var indiceDescrizione = testo.lastIndexOf('(');
+            var descrizione = testo.substr(0, indiceDescrizione - 1);
+            var codice = testo.substring(indiceDescrizione + 1, indiceFineCodice);
+            document.getElementById("<%=this.txt_codUO_Prot.ClientID%>").value = codice;
+            document.getElementById("<%=txt_descrUO_Prot.ClientID%>").value = descrizione;
+
+            __doPostBack('<%=this.txt_codUO_Prot.ClientID%>', '');
+        }
+
     </script>
     <style type="text/css">
         .gridViewResult th
@@ -912,7 +989,7 @@
     <uc:ajaxpopup2 Id="ChooseCorrespondent" runat="server" Url="../popup/ChooseCorrespondent.aspx"
         Width="700" Height="500" PermitClose="false" PermitScroll="false" CloseFunction="function (event, ui) { __doPostBack('UpdPnlObject', '');}" />
     <uc:ajaxpopup2 Id="StartProcessSignature" runat="server" Url="../popup/StartProcessSignature.aspx?from=SearchDocument"
-        Width="1200" Height="800" PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', ''); }" />
+        Width="600" Height="500" PermitClose="false" PermitScroll="true" CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', ''); }" />
     <uc:ajaxpopup2 Id="InfoSignatureProcessesStarted" runat="server" Url="../popup/InfoSignatureProcessesStarted.aspx"
         PermitClose="false" PermitScroll="false" Width="600" Height="300" CloseFunction="function (event, ui) {__doPostBack('upPnlButtons', '');}" />
      <uc:ajaxpopup2 Id="DetailsLFAutomaticMode" runat="server" Url="../popup/DetailsLFAutomaticMode.aspx"
@@ -1376,6 +1453,54 @@
                                                                     UseContextKey="true" OnClientItemSelected="recipientSelected" BehaviorID="AutoCompleteExIngressoRecipient"
                                                                     OnClientPopulated="recipientPopulated" Enabled="false">
                                                                 </uc1:AutoCompleteExtender>
+                                                            </div>
+                                                            <%--************* UO PROTOCOLLATRICE *************** --%>
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    <p>
+                                                                        <span class="weight">
+                                                                            <asp:Literal runat="server" ID="LtlUOProtocollatrice"></asp:Literal>
+                                                                        </span>
+                                                                    </p>
+                                                                </div>
+                                                                <div class="col-right-no-margin1">
+                                                                    <cc1:CustomImageButton runat="server" ID="DocumentImgRecipientAddressBookUoProtocollatrice"
+                                                                        ImageUrl="../Images/Icons/address_book.png" OnMouseOutImage="../Images/Icons/address_book.png"
+                                                                        OnMouseOverImage="../Images/Icons/address_book_hover.png" CssClass="clickable"
+                                                                        ImageUrlDisabled="../Images/Icons/address_book_disabled.png" OnClick="ImgUoProtocollatriceAddressBook_Click" />
+                                                                </div>
+                                                            </div>
+                                                            <asp:HiddenField runat="server" ID="IdUOProtocollatrice" />
+                                                            <div class="row">
+                                                                <div class="colHalf">
+                                                                    <cc1:CustomTextArea ID="txt_codUO_Prot" runat="server" CssClass="txt_addressBookLeft"
+                                                                        AutoPostBack="true" CssClassReadOnly="txt_addressBookLeft_disabled" AutoCompleteType="Disabled"
+                                                                        OnTextChanged="TxtCode_OnTextChanged">
+                                                                    </cc1:CustomTextArea>
+                                                                </div>
+                                                                <div class="colHalf2">
+                                                                    <div class="colHalf3">
+                                                                        <cc1:CustomTextArea ID="txt_descrUO_Prot" runat="server" CssClass="txt_addressBookRight"
+                                                                             autocomplete="off" CssClassReadOnly="txt_addressBookRight" AutoCompleteType="Disabled">
+                                                                        </cc1:CustomTextArea>
+                                                                    </div>
+                                                                </div>
+                                                                <uc1:AutoCompleteExtender runat="server" ID="RapidUoProtocollatrice" TargetControlID="txt_descrUO_Prot"
+                                                                    CompletionListCssClass="autocomplete_completionListElement" CompletionListItemCssClass="single_item"
+                                                                    CompletionListHighlightedItemCssClass="single_item_hover" ServiceMethod="GetListaCorrispondentiVeloce"
+                                                                    MinimumPrefixLength="3" CompletionInterval="1000" EnableCaching="true" CompletionSetCount="20"
+                                                                    DelimiterCharacters=";" ServicePath="~/AjaxProxy.asmx" ShowOnlyCurrentWordInCompletionListItem="true"
+                                                                    UseContextKey="true" OnClientItemSelected="uoProtocollatriceSelected" BehaviorID="AutoCompleteExIngressoUoProtocollatrice"
+                                                                    OnClientPopulated="uoProtocollatricePopulated ">
+                                                                </uc1:AutoCompleteExtender>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-left">
+                                                                    <asp:CheckBox ID="chk_uo_prot_sottostanti" runat="server" Checked="false" />
+                                                                </div>
+                                                                <div class="col-right">
+                                                                    <asp:CheckBox ID="chk_uo_prot_storicizzati" runat="server" Checked="false" />
+                                                                </div>
                                                             </div>
                                                         </ContentTemplate>
                                                     </asp:UpdatePanel>
@@ -1879,8 +2004,6 @@
                                                                 <asp:ListItem Value="E" Selected="True" runat="server" id="optConsErr"></asp:ListItem>
                                                                 <asp:ListItem Value="T" Selected="True" runat="server" id="optConsTim"></asp:ListItem>
                                                                 <asp:ListItem Value="F" Selected="True" runat="server" id="optConsFld"></asp:ListItem>
-                                                                <asp:ListItem Value="B" Selected="True" runat="server" id="optConsBfw"></asp:ListItem>
-                                                                <asp:ListItem Value="K" Selected="True" runat="server" id="optConsBfe"></asp:ListItem>
                                                             </asp:CheckBoxList>
                                                         </div>
                                                     </div>

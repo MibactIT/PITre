@@ -250,18 +250,9 @@ namespace NttDataWA.Popup
         {
             ElementoInLibroFirma elemento = this.ListaElementiSelezionati[this.ElementoSelezionato];
             InfoDocLibroFirma doc = elemento.InfoDocumento;
-            DocsPaWR.SchedaDocumento schedaDocumentoSelezionato = DocumentManager.getDocumentDetails(this, elemento.InfoDocumento.Docnumber, elemento.InfoDocumento.Docnumber);
-            FileManager.setSelectedFile(schedaDocumentoSelezionato.documenti[0]);
-            if (!string.IsNullOrEmpty(elemento.InfoDocumento.IdDocumentoPrincipale))
-            {
-                DocumentManager.setSelectedAttachId(schedaDocumentoSelezionato.documenti[0].versionId);
-                DocumentManager.setSelectedRecord(DocumentManager.getDocumentDetails(this, elemento.InfoDocumento.IdDocumentoPrincipale, elemento.InfoDocumento.IdDocumentoPrincipale));
-            }
-            else
-            {
-                DocumentManager.RemoveSelectedAttachId();
-                DocumentManager.setSelectedRecord(schedaDocumentoSelezionato);
-            }
+            DocsPaWR.SchedaDocumento schedaDocumento = DocumentManager.getDocumentDetails(this, elemento.InfoDocumento.Docnumber, elemento.InfoDocumento.Docnumber);
+            FileManager.setSelectedFile(schedaDocumento.documenti[0]);
+            DocumentManager.setSelectedRecord(schedaDocumento);
 
             this.lblIdDocumento.Text = doc.Docnumber;
 
@@ -273,7 +264,7 @@ namespace NttDataWA.Popup
             {
                 this.pnlSegnatura.Attributes.Add("style", "display:block");
                 this.lblSegnatura.CssClass = "redWeight";
-                this.lblSegnatura.Text = schedaDocumentoSelezionato.protocollo.segnatura;
+                this.lblSegnatura.Text = schedaDocumento.protocollo.segnatura;
             }
 
             this.lblDataCreazione.Text = doc.DataCreazione;
@@ -378,7 +369,7 @@ namespace NttDataWA.Popup
 
             this.trvDettagliFirma.Nodes.Clear();
 
-            BuildTreeView(schedaDocumentoSelezionato);
+            BuildTreeView(schedaDocumento);
 
             this.TreeSignatureProcess.Nodes.Clear();
             if (elemento.Modalita.Equals(LibroFirmaManager.Modalita.AUTOMATICA))
@@ -429,7 +420,6 @@ namespace NttDataWA.Popup
             RefreshElementCounter();
             EnabledNavigationButton();
             EnableButton();
-            EnabledButtonEsamina(true);
 
             this.upPnlInfoDoc.Update();
             this.upPnlInfoElementoLF.Update();
@@ -1251,17 +1241,5 @@ namespace NttDataWA.Popup
         }
 
         #endregion
-
-        public void EnabledButtonEsamina(bool enable)
-        {
-            this.EsaminaLFSelezionaPerFirma.Enabled = enable;
-            this.EsaminaLFNonDiCompetenza.Enabled = enable;
-            this.EsaminaLFDeseleziona.Enabled = enable;
-            this.EsaminaLFSelezionaPerRespingimento.Enabled = enable;
-            this.imgStato.Enabled = enable;
-
-            this.upPnlImgState.Update();
-            this.UpPnlButtons.Update();
-        }
     }
 }

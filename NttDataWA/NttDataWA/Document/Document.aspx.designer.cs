@@ -58,6 +58,15 @@ namespace NttDataWA.Document {
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 Signature;
         
         /// <summary>
+        /// SignaturePermanenteConfig control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::AjaxPopupControl.UserControls.ajaxpopup21 SignaturePermanenteConfig;
+        
+        /// <summary>
         /// SignatureA4 control.
         /// </summary>
         /// <remarks>
@@ -589,24 +598,6 @@ namespace NttDataWA.Document {
         protected global::AjaxPopupControl.UserControls.ajaxpopup21 AddressBookFromPopup;
         
         /// <summary>
-        /// InvoicePreview control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 InvoicePreview;
-        
-        /// <summary>
-        /// MassiveTransmissionAccept control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::AjaxPopupControl.UserControls.ajaxpopup21 MassiveTransmissionAccept;
-        
-        /// <summary>
         /// UpUserControlHeaderDocument control.
         /// </summary>
         /// <remarks>
@@ -794,42 +785,6 @@ namespace NttDataWA.Document {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList DdlRegistries;
-        
-        /// <summary>
-        /// UpDirittiDocumento control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpDirittiDocumento;
-        
-        /// <summary>
-        /// PnlDirittiDocumento control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlDirittiDocumento;
-        
-        /// <summary>
-        /// LblDiritti control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblDiritti;
-        
-        /// <summary>
-        /// LblTipoDiritto control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblTipoDiritto;
         
         /// <summary>
         /// UpDocumentPrivate control.
@@ -2731,6 +2686,15 @@ namespace NttDataWA.Document {
         protected global::NttDatalLibrary.CustomButton DocumentBntRecord;
         
         /// <summary>
+        /// DocumentBtnApponiSegnaturaPermanente control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::NttDatalLibrary.CustomButton DocumentBtnApponiSegnaturaPermanente;
+        
+        /// <summary>
         /// DocumentBtnRepeat control.
         /// </summary>
         /// <remarks>
@@ -2830,24 +2794,6 @@ namespace NttDataWA.Document {
         protected global::NttDatalLibrary.CustomButton DocumentBtnConsolid;
         
         /// <summary>
-        /// DocumentBtnAccept control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton DocumentBtnAccept;
-        
-        /// <summary>
-        /// DocumentBtnView control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::NttDatalLibrary.CustomButton DocumentBtnView;
-        
-        /// <summary>
         /// btnSenderPostback control.
         /// </summary>
         /// <remarks>
@@ -2891,15 +2837,6 @@ namespace NttDataWA.Document {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnReportSpedizioniPostback;
-        
-        /// <summary>
-        /// btnChangeTabNewDocument control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnChangeTabNewDocument;
         
         /// <summary>
         /// HiddenControlRepeatCopyDocuments control.

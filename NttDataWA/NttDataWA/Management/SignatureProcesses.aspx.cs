@@ -15,18 +15,6 @@ namespace NttDataWA.Management
     {
         #region Property
 
-        private List<FiltroProcessoFirma> FiltersProcesses
-        {
-            get
-            {
-                return (List<FiltroProcessoFirma>)HttpContext.Current.Session["FiltroProcessoFirma"];
-            }
-            set
-            {
-                HttpContext.Current.Session["FiltroProcessoFirma"] = value;
-            }
-        }
-
         private List<ProcessoFirma> ListaProcessiDiFirma
         {
             get
@@ -104,12 +92,8 @@ namespace NttDataWA.Management
         private const string WAIT = "W";
         private const string EVENT = "E";
         private const string CHECK_INSERT_IN_LF = "INSERIMENTO_DOCUMENTO_LF";
-        private const string CHECK_ERRORE_PASSO_AUTOMATICO = "ERRORE_PASSO_AUTOMATICO";
-        private const string CHECK_CONCLUSIONE_PROCESSO_LF = "CONCLUSIONE_PROCESSO_LF";
-        private const string CHECK_INTERROTTO_PROCESSO = "INTERROTTO_PROCESSO";
         private const char ROLE_DISABLED = 'R';
         private const char USER_DISABLED = 'U';
-        private const char REGISTRO_DISABLED = 'F';
         private const string RUOLO = "R";
         private const string TIPO_RUOLO = "TR";
         #endregion
@@ -139,13 +123,6 @@ namespace NttDataWA.Management
             }
         }
 
-        public bool IsRoleCreateModelProcessEnabled()
-        {
-            bool result = false;
-            result = UIManager.UserManager.IsAuthorizedFunctions("DO_CREATE_MODEL_PROCESS");
-            return result;
-        }
-
         private void ReadRetValueFromPopup()
         {
             if (!string.IsNullOrEmpty(this.HiddenRemoveSignatureProcess.Value))
@@ -166,17 +143,6 @@ namespace NttDataWA.Management
                 this.HiddenRemoveStepSignatureProcess.Value = string.Empty;
                 return;
             }
-            if (!string.IsNullOrEmpty(this.AddNewProcess.ReturnValue))
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('AddNewProcess','');", true);
-                this.CalcolaProssimoPasso(ProcessoDiFirmaSelected);
-                this.ListaProcessiDiFirma.Add(ProcessoDiFirmaSelected);
-                this.AddNodeToTop(ProcessoDiFirmaSelected).Select();
-                this.txtNameSignatureProcesses.Text = ProcessoDiFirmaSelected.nome;
-                this.TreeSignatureProcess.SelectedNode.Expand();
-                this.UpdateContentPage();
-                this.upPnlTreeSignatureProcess.Update();
-            }
             if (this.Request.Form["__EVENTARGUMENT"] != null && (this.Request.Form["__EVENTARGUMENT"].Equals(CLOSE_POPUP_ADDRESS_BOOK)))
             {
                 string addressBookCallFrom = HttpContext.Current.Session["AddressBook.from"].ToString();
@@ -184,34 +150,13 @@ namespace NttDataWA.Management
                 {
                     case "VISIBILITY_SIGNATURE_PROCESS":
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "popupObject", "document.getElementById('ifrm_VisibilitySignatureProcess').contentWindow.closeAddressBookPopup();", true);
-                        HttpContext.Current.Session["AddressBook.from"] = null;
                         break;
                     case "SIGNATURE_PROCESS":
                         btnAddressBookPostback();
-                        HttpContext.Current.Session["AddressBook.from"] = null;
-                        break;
-                    case "FILTER_SIGNATURE_PROCESS_ROLE":
-                    case "FILTER_SIGNATURE_PROCESS_USER":
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "popupObject", "document.getElementById('ifrm_AddFilterSignatureProcesses').contentWindow.closeAddressBookPopup();", true);
-                        break;
-                    case "FILTER_VISIBILITY_SIGNATURE_PROCESS":
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "popupObject", "document.getElementById('ifrm_VisibilitySignatureProcess').contentWindow.document.getElementById('ifrm_AddFilterVisibilitySignatureProcess').contentWindow.closeAddressBookPopup();", true);
-                        HttpContext.Current.Session["AddressBook.from"] = null;
                         break;
                 }
+                HttpContext.Current.Session["AddressBook.from"] = null;
                 return;
-            }
-            if (!string.IsNullOrEmpty(this.AddFilterSignatureProcesses.ReturnValue))
-            {
-                this.ProcessoDiFirmaSelected = null;
-                ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "setReturnValue", "SetRetValue('AddFilterSignatureProcesses','');", true);
-                ListaProcessiDiFirma = SignatureProcessesManager.GetProcessiDiFirmaByFilter(this.FiltersProcesses);
-                TreeviewProcesses_Bind();
-                this.upPnlTreeSignatureProcess.Update();
-                UpdateContentPage();
-
-                this.IndexImgRemoveFilter.Enabled = true;
-                this.UpPnlBAction.Update();
             }
         }
 
@@ -224,9 +169,7 @@ namespace NttDataWA.Management
             this.SignatureProcessesBtnSave.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesBtnSave", language);
             this.SignatureProcessesBtnRemove.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesBtnRemove", language);
             this.lblNameSignatureProcesses.Text = Utils.Languages.GetLabelFromCode("lblNameSignatureProcesses", language);
-            
             this.LitSignatureProcessesRole.Text = Utils.Languages.GetLabelFromCode("LitSignatureProcessesRole", language);
-
             this.ltlSignatureProcessesTypeSignature.Text = Utils.Languages.GetLabelFromCode("ltlSignatureProcessesTypeSignature", language);
             this.ltlSignatureProcessesTypeSignatureD.Text = Utils.Languages.GetLabelFromCode("ltlSignatureProcessesTypeSignatureD", language);
             this.ltlSignatureProcessesTypeSignatureE.Text = Utils.Languages.GetLabelFromCode("ltlSignatureProcessesTypeSignatureE", language);
@@ -258,26 +201,6 @@ namespace NttDataWA.Management
             this.optTypeRole.Text = Utils.Languages.GetLabelFromCode("SignatureProcessOptTypeRole", language);
             this.DdlTypeRole.Attributes.Add("data-placeholder", Utils.Languages.GetLabelFromCode("SignatureProcessesDdlTypeRole", language));
             this.LtlTypeRole.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLtlTypeRole", language);
-            this.IndexImgAddFilter.ToolTip = Utils.Languages.GetLabelFromCode("IndexImgAddFilterTooltip", language);
-            this.IndexImgAddFilter.AlternateText = Utils.Languages.GetLabelFromCode("IndexImgAddFilterTooltip", language);
-            this.IndexImgRemoveFilter.ToolTip = Utils.Languages.GetLabelFromCode("IndexImgRemoveFilterTooltip", language);
-            this.IndexImgRemoveFilter.AlternateText = Utils.Languages.GetLabelFromCode("IndexImgRemoveFilterTooltip", language);
-            this.AddFilterSignatureProcesses.Title = Utils.Languages.GetLabelFromCode("AddFilterPopup", language);
-            this.SignatureProcessesBtnDuplica.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesBtnDuplica", language);
-            this.AddNewProcess.Title = Utils.Languages.GetLabelFromCode("AddNewProcessDuplicaProcesso", language);
-            this.ltlRegistroAOO.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLtlRegistroAOO", language);
-            this.DdlRegistroAOO.Attributes.Add("data-placeholder", Utils.Languages.GetLabelFromCode("SignatureProcessesDdlRegistroAOO", language));
-            this.ltlRegistroRF.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLtlRegistroRFSegnatura", language);
-            this.ltlElencoCaselle.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLtlElencoCaselle", language);
-            this.DdlRegistroRF.Attributes.Add("data-placeholder", Utils.Languages.GetLabelFromCode("SignatureProcessesDdlRegistroRF", language));
-            this.DdlRegistroRF.Attributes.Add("data-placeholder", Utils.Languages.GetLabelFromCode("SignatureProcessesDdlRegistroRF", language));
-            this.DdlElencoCaselle.Attributes.Add("data-placeholder", Utils.Languages.GetLabelFromCode("SignatureProcessesDdlElencoCaselle", language));
-            if (!IsRoleCreateModelProcessEnabled())
-            {
-                this.ltlRegistroAOO.Text += "*";
-                this.LitSignatureProcessesRole.Text += "*";
-                this.ltlElencoCaselle.Text += "*";
-            }
         }
 
         private void InitializaPage()
@@ -326,7 +249,6 @@ namespace NttDataWA.Management
             HttpContext.Current.Session.Remove("ProcessoDiFirmaSelected");
             HttpContext.Current.Session.Remove("PassoDiFirmaSelected");
             HttpContext.Current.Session.Remove("ListaProcessiDiFirma");
-            HttpContext.Current.Session.Remove("FiltroProcessoFirma");
         }
         #endregion
 
@@ -355,409 +277,6 @@ namespace NttDataWA.Management
             }
         }
 
-        protected void DdlTypeEvent_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                this.cbx_automatico.Visible = false;
-                this.cbx_automatico.Checked = false;
-                this.ResetCampiAutomatciPassoSelezionato();
-                if (!string.IsNullOrEmpty(DdlTypeEvent.SelectedValue))
-                {
-                    if (SignatureProcessesManager.IsEventoAutomatico(DdlTypeEvent.SelectedValue))
-                    {
-                        Azione azione = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                        //Verifico se il ruolo è abilitato alla creazione del passo automatico
-                        switch (azione)
-                        {
-                            case Azione.RECORD_PREDISPOSED:
-                                this.cbx_automatico.Visible = UserManager.IsAuthorizedFunctions("CREA_PASSO_PROTO_AUTO");
-                                break;
-                            case Azione.DOCUMENTOSPEDISCI:
-                                this.cbx_automatico.Visible = UserManager.IsAuthorizedFunctions("CREA_PASSO_SPEDIZIONE_AUTO");
-                                break;
-                            case Azione.DOCUMENTO_REPERTORIATO:
-                                this.cbx_automatico.Visible = UserManager.IsAuthorizedFunctions("CREA_PASSO_REPERTORIAZIONE_AUTO");
-                                break;
-                        }
-                    }
-                }
-                this.UpTypeEvent.Update();
-            }
-            catch(Exception ex)
-            {
-
-            }
-        }
-
-        private void AggiornaCampiAuotomaticPassoSelezionato()
-        {
-            this.PassoDiFirmaSelected.IdAOO = this.DdlRegistroAOO.SelectedValue;
-            this.PassoDiFirmaSelected.IdRF = this.DdlRegistroRF.SelectedValue;
-            this.PassoDiFirmaSelected.IdMailRegistro = this.DdlElencoCaselle.SelectedValue;
-        }
-
-        private void ResetCampiAutomatciPassoSelezionato()
-        {
-            this.VisibilitaCampiAutomatici(this.cbx_automatico.Checked, null);
-        }
-
-        protected void cbx_automatico_CheckedChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if(this.cbx_automatico.Checked)
-                {
-                    Utente utenteAutomatico = UserManager.GetUtenteAutomatico();
-                    if (utenteAutomatico == null || string.IsNullOrEmpty(utenteAutomatico.idPeople))
-                    {
-                        this.cbx_automatico.Checked = false;
-                        string msg = "WarningUtenteAutomaticoNonConfigurato";
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        return;
-                    }
-                }
-                else
-                {
-                    //Se il passo non è automatico e ho selezionato il ruolo, popolo la combo degli utenti
-                    if (this.PassoDiFirmaSelected.ruoloCoinvolto != null)
-                      this.LoadDllUtenteCoinvolto(UIManager.UserManager.getUserInRoleByIdGruppo(this.PassoDiFirmaSelected.ruoloCoinvolto.idGruppo));
-                }
-                this.ResetCampiAutomatciPassoSelezionato();
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-        
-        protected void DdlRegistroAOO_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                Azione codiceEvento = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                switch (codiceEvento)
-                {
-                    case Azione.RECORD_PREDISPOSED:
-                    case Azione.DOCUMENTO_REPERTORIATO:
-                        LoadRegistriRF();
-                        break;
-                    case Azione.DOCUMENTOSPEDISCI:
-                        LoadRegistroRFSpedizione();
-                        LoadElencoCaselleMittente();
-                        break;
-                }
-                this.UpPnlRegistroRF.Update();
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-
-        protected void DdlRegistroRF_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                this.PassoDiFirmaSelected.IdMailRegistro = string.Empty;
-                Azione codiceEvento = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                if(codiceEvento.Equals(Azione.DOCUMENTOSPEDISCI))
-                    LoadElencoCaselleMittente();
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-
-        /// <summary>
-        /// Resistuisce l'elenco delle caselle associate al registro/rf per le quali il ruolo è abilitato in spedizione
-        /// </summary>
-        /// <returns>List CasellaRegistro</returns>
-        private  List<CasellaRegistro> GetComboRegisterSend(string idRegistro, string idRuolo)
-        {
-            try
-            {
-                List<CasellaRegistro> listCaselle = new List<CasellaRegistro>();
-                string casellaPrincipale = MultiBoxManager.GetMailPrincipaleRegistro(idRegistro);
-                DataSet ds = MultiBoxManager.GetRightMailRegistro(idRegistro, idRuolo);
-                if (ds.Tables.Count > 0)
-                {
-                    if (ds.Tables["RIGHT_RUOLO_MAIL_REGISTRI"].Rows.Count > 0)
-                    {
-                        foreach (DataRow row in ds.Tables["RIGHT_RUOLO_MAIL_REGISTRI"].Rows)
-                        {
-                            System.Text.StringBuilder formatMail = new System.Text.StringBuilder();
-                            if (row["SPEDISCI"].ToString().Equals("1"))
-                            {
-                                listCaselle.Add(new CasellaRegistro
-                                {
-                                    Principale = row["EMAIL_REGISTRO"].ToString().Equals(casellaPrincipale) ? "1" : "0",
-                                    EmailRegistro = row["EMAIL_REGISTRO"].ToString(),
-                                    Note = row["VAR_NOTE"].ToString(),
-                                    System_id = row["ID_MAIL_REGISTRI"].ToString()
-                                });
-                            }
-                        }
-                    }
-                }
-                return listCaselle;
-            }
-            catch (System.Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return null;
-            }
-        }
-
-        private void ResetCampiAutomatici()
-        {
-            this.PnlCampiPassoAutomatco.Visible = false;
-            this.PnlElencoCaselle.Visible = false;
-            this.DdlRegistroAOO.Items.Clear();
-            this.DdlRegistroAOO.Enabled = false;
-            this.DdlRegistroRF.Items.Clear();
-            this.DdlRegistroRF.Enabled = false;
-            this.DdlElencoCaselle.Items.Clear();
-            this.DdlElencoCaselle.Enabled = false;
-        }
-
-        private void VisibilitaCampiAutomatici(bool visible, PassoFirma passo)
-        {
-            ResetCampiAutomatici();
-            if (visible)
-            {
-                this.PnlCampiPassoAutomatco.Visible = true;
-                this.PnlUenteCoinvolto.Visible = false;
-                this.ddlUtenteCoinvolto.SelectedIndex = -1;
-                this.ltlRegistroRF.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLtlRegistroRFSegnatura", UserManager.GetUserLanguage());
-                Azione codiceEvento = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                switch (codiceEvento)
-                {
-                    case Azione.RECORD_PREDISPOSED:
-                    case Azione.DOCUMENTO_REPERTORIATO:
-                        LoadRegistriAOO();
-                        if(passo != null)
-                            this.DdlRegistroAOO.SelectedValue = passo.IdAOO;
-                        LoadRegistriRF();
-                        if(passo != null)
-                            this.DdlRegistroRF.SelectedValue = passo.IdRF;
-                        break;
-                    case Azione.DOCUMENTOSPEDISCI:
-                        this.ltlRegistroRF.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLtlRegistroRFSpedizione", UserManager.GetUserLanguage());
-                        if (!IsRoleCreateModelProcessEnabled())
-                            this.ltlRegistroRF.Text += "*";
-                        this.PnlElencoCaselle.Visible = true;
-                        LoadRegistriAOO();
-                        if(passo != null)
-                            this.DdlRegistroAOO.SelectedValue = passo.IdAOO;
-                        LoadRegistroRFSpedizione();
-                        if (passo != null)
-                            this.DdlRegistroRF.SelectedValue = passo.IdRF;
-                        LoadElencoCaselleMittente();
-                        if(passo != null)
-                            this.DdlElencoCaselle.SelectedValue = passo.IdMailRegistro;
-                        break;
-                }
-            }
-            else
-            {
-                this.PnlUenteCoinvolto.Visible = true;           
-            }
-            this.SetOpzioniNotifiche();
-            this.UpdPnlUtenteCoinvolto.Update();
-            this.UpPnlCampiPassoAutomatco.Update();
-        }
-
-        private void LoadRegistriAOO()
-        {
-            ListItem empty = new ListItem("", "");
-            this.DdlRegistroAOO.Items.Add(empty);
-            this.DdlRegistroAOO.SelectedIndex = -1;
-
-            if (!string.IsNullOrEmpty(this.idRuolo.Value) && this.PassoDiFirmaSelected.ruoloCoinvolto != null)
-            {
-                this.DdlRegistroAOO.Enabled = true;
-                Registro[] registriAOO = UIManager.RegistryManager.GetRegistriesByRole(this.PassoDiFirmaSelected.ruoloCoinvolto.systemId);
-                foreach (DocsPaWR.Registro reg in registriAOO)
-                {
-                    if (!reg.flag_pregresso)
-                    {
-                        ListItem item = new ListItem();
-                        item.Text = reg.codRegistro;
-                        item.Value = reg.systemId;
-                        this.DdlRegistroAOO.Items.Add(item);
-                    }
-                }
-                if(this.DdlRegistroAOO.Items != null && this.DdlRegistroAOO.Items.Count == 2)
-                {
-                    this.DdlRegistroAOO.SelectedIndex = 1;
-                }
-                /*
-                if (!string.IsNullOrEmpty(PassoDiFirmaSelected.IdAOO))
-                {
-                    this.DdlRegistroAOO.SelectedValue = PassoDiFirmaSelected.IdAOO;
-                }
-                */
-                this.DdlRegistroAOO.Enabled = true;
-            }
-        }
-
-        private void LoadRegistriRF()
-        {
-            this.DdlRegistroRF.Items.Clear();
-            this.DdlRegistroRF.Enabled = false;
-            ListItem empty = new ListItem("", "");
-            this.DdlRegistroRF.Items.Add(empty);
-            this.DdlRegistroRF.SelectedIndex = -1;
-
-            string idAOO = this.DdlRegistroAOO.SelectedValue;
-            if (!string.IsNullOrEmpty(idAOO))
-            {
-                Registro[] registriRfVisibili = UIManager.RegistryManager.GetListRegistriesAndRF(this.PassoDiFirmaSelected.ruoloCoinvolto.systemId, "1", idAOO);
-                foreach (NttDataWA.DocsPaWR.Registro registro in registriRfVisibili)
-                {
-                    ListItem item = new ListItem(registro.codRegistro + " - " + registro.descrizione, registro.systemId);
-                    this.DdlRegistroRF.Items.Add(item);
-                }
-                if (registriRfVisibili != null && registriRfVisibili.Length == 1)
-                    this.DdlRegistroRF.SelectedIndex = 1;
-                /*
-                if (!string.IsNullOrEmpty(PassoDiFirmaSelected.IdRF))
-                    this.DdlRegistroRF.SelectedValue = PassoDiFirmaSelected.IdRF;
-                */
-                this.DdlRegistroRF.Enabled = true;
-            }
-        }
-
-        /// <summary>
-        /// Seleziono solo gli Rf/registro visibili al ruolo abilitati alla spedizione
-        /// </summary>
-        private void LoadRegistroRFSpedizione()
-        {
-            this.DdlRegistroRF.Items.Clear();
-            ListItem empty = new ListItem("", "");
-            this.DdlRegistroRF.Items.Add(empty);
-            this.DdlRegistroRF.SelectedIndex = -1;
-            string idAOO = this.DdlRegistroAOO.SelectedValue;
-            if (!string.IsNullOrEmpty(idAOO))
-            {
-                //prendo il registro corrente
-                DataSet dsReg = MultiBoxManager.GetRightMailRegistro(idAOO, this.PassoDiFirmaSelected.ruoloCoinvolto.systemId);
-                if (dsReg.Tables["RIGHT_RUOLO_MAIL_REGISTRI"].Rows.Count > 0)
-                {
-                    foreach (DataRow row in dsReg.Tables["RIGHT_RUOLO_MAIL_REGISTRI"].Rows)
-                    {
-                        if (row["SPEDISCI"].ToString().Equals("1"))
-                        {
-                            string codiceAoo = this.DdlRegistroAOO.SelectedItem.Text;
-                            ListItem aoo = new ListItem(codiceAoo, idAOO);
-                            this.DdlRegistroRF.Items.Add(aoo);
-                            break;
-                        }
-                    }
-                }
-                NttDataWA.DocsPaWR.Registro[] rf = RegistryManager.GetListRegistriesAndRF(this.PassoDiFirmaSelected.ruoloCoinvolto.systemId, "1", idAOO);
-                foreach (NttDataWA.DocsPaWR.Registro registro in rf)
-                {
-                    DataSet ds = MultiBoxManager.GetRightMailRegistro(registro.systemId, this.PassoDiFirmaSelected.ruoloCoinvolto.systemId);
-                    if (ds.Tables["RIGHT_RUOLO_MAIL_REGISTRI"].Rows.Count > 0)
-                    {
-                        foreach (DataRow row in ds.Tables["RIGHT_RUOLO_MAIL_REGISTRI"].Rows)
-                        {
-                            if (row["SPEDISCI"].ToString().Equals("1"))
-                            {
-                                ListItem item = new ListItem(registro.codRegistro + " - " + registro.descrizione, registro.systemId);
-                                this.DdlRegistroRF.Items.Add(item);
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (this.DdlRegistroRF.Items.Count == 2)
-                    this.DdlRegistroRF.SelectedIndex = 1;
-                /*
-                if (!string.IsNullOrEmpty(PassoDiFirmaSelected.IdRF))
-                    this.DdlRegistroRF.SelectedValue = PassoDiFirmaSelected.IdRF;
-                */
-                this.DdlRegistroRF.Enabled = true;
-            }
-            else
-            {
-                this.DdlRegistroRF.Enabled = false;
-            }     
-        }
-
-        private void LoadElencoCaselleMittente()
-        {
-            DdlElencoCaselle.Enabled = false;
-            DdlElencoCaselle.Items.Clear();
-            DdlElencoCaselle.Items.Add(new ListItem("", ""));
-            string idRegistro = string.Empty;
-            if (!string.IsNullOrEmpty(this.DdlRegistroRF.SelectedValue))
-                idRegistro = this.DdlRegistroRF.SelectedValue;
-            if (!string.IsNullOrEmpty(idRegistro))
-            {
-                List<DocsPaWR.CasellaRegistro> listCaselle = new List<DocsPaWR.CasellaRegistro>();
-                listCaselle = GetComboRegisterSend(DdlRegistroRF.SelectedValue, this.PassoDiFirmaSelected.ruoloCoinvolto.systemId);
-                if (listCaselle.Count > 0)
-                {
-                    DdlElencoCaselle.Enabled = true;
-                    foreach (DocsPaWR.CasellaRegistro c in listCaselle)
-                    {
-                        System.Text.StringBuilder formatMail = new System.Text.StringBuilder();
-                        if (c.Principale.Equals("1"))
-                            formatMail.Append("* ");
-                        formatMail.Append(c.EmailRegistro);
-                        if (!string.IsNullOrEmpty(c.Note))
-                        {
-                            formatMail.Append(" - ");
-                            formatMail.Append(c.Note);
-                        }
-                        DdlElencoCaselle.Items.Add(new ListItem(formatMail.ToString(), c.System_id));
-                    }
-
-                    foreach (ListItem i in DdlElencoCaselle.Items)
-                    {
-                        if (i.Text.Split(new string[] { "*" }, 2, System.StringSplitOptions.None).Length > 1)
-                        {
-                            DdlElencoCaselle.SelectedValue = i.Value;
-                            break;
-                        }
-                    }
-                    if (listCaselle.Count == 1)
-                        DdlElencoCaselle.SelectedIndex = 1;
-
-                    /*
-                    //imposto la casella principale come selezionata
-                    if (string.IsNullOrEmpty(this.PassoDiFirmaSelected.IdMailRegistro))
-                    {
-                        foreach (ListItem i in DdlElencoCaselle.Items)
-                        {
-                            if (i.Text.Split(new string[] { "*" }, 2, System.StringSplitOptions.None).Length > 1)
-                            {
-                                DdlElencoCaselle.SelectedValue = i.Value;
-                                break;
-                            }
-                        }
-                        if (listCaselle.Count == 1)
-                            DdlElencoCaselle.SelectedIndex = 1;
-                    }
-                    else
-                    {
-                        DdlElencoCaselle.SelectedValue = PassoDiFirmaSelected.IdMailRegistro;
-                    }
-                    */
-                }
-            }
-            else
-            {
-                this.DdlElencoCaselle.Items.Clear();
-                this.DdlElencoCaselle.Enabled = false;
-            }
-            this.UpPnlElencoCaselle.Update();
-        }
-
         protected void SignatureProcessesBtnSave_Click(object sender, EventArgs e)
         {
             string msg = string.Empty;
@@ -774,34 +293,21 @@ namespace NttDataWA.Management
                 //Creazione di un nuovo processo di firma
                 if (string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
                 {
-                    ResultProcessoFirma result = ResultProcessoFirma.OK;
-                    this.ProcessoDiFirmaSelected = SignatureProcessesManager.InsertProcessoDiFirma(this.ProcessoDiFirmaSelected, out result);
-                    if (result.ToString().Equals(ResultProcessoFirma.OK.ToString()))
+                    this.ProcessoDiFirmaSelected = SignatureProcessesManager.InsertProcessoDiFirma(this.ProcessoDiFirmaSelected);
+
+                    if (this.ProcessoDiFirmaSelected != null)
                     {
-                        if (this.ProcessoDiFirmaSelected != null)
-                        {
-                            this.CalcolaProssimoPasso(ProcessoDiFirmaSelected);
-                            this.ListaProcessiDiFirma.Add(ProcessoDiFirmaSelected);
-                            this.AddNodeToTop(ProcessoDiFirmaSelected).Select();
-                            this.TreeSignatureProcess.SelectedNode.Expand();
-                            this.UpdateContentPage();
-                        }
-                        else
-                        {
-                            msg = "ErrorCreationProcess";
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
-                            return;
-                        }
+                        this.CalcolaProssimoPasso();
+                        this.ListaProcessiDiFirma.Add(ProcessoDiFirmaSelected);
+                        this.AddNode(ProcessoDiFirmaSelected).Select();
+                        this.TreeSignatureProcess.SelectedNode.Expand();
+                        this.UpdateContentPage();
                     }
                     else
                     {
-                        switch (result)
-                        {
-                            case ResultProcessoFirma.EXISTING_PROCESS_NAME:
-                                msg = "WarningSignatureProcessUniqueProcessName";
-                                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                                break;
-                        }
+                        msg = "ErrorCreationProcess";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
+                        return;
                     }
 
                 }
@@ -845,7 +351,7 @@ namespace NttDataWA.Management
 
         protected void SignatureProcessesBtnRemove_Click(object sender, EventArgs e)
         {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "parent.fra_main.ajaxConfirmModal('ConfirmRemoveSignatureProcess', 'HiddenRemoveSignatureProcess', '','" + Utils.utils.FormatJs(this.ProcessoDiFirmaSelected.nome) + "');", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxConfirmModal", "parent.fra_main.ajaxConfirmModal('ConfirmRemoveSignatureProcess', 'HiddenRemoveSignatureProcess', '','" + this.ProcessoDiFirmaSelected.nome + "');", true);
             return;
         }
 
@@ -864,38 +370,16 @@ namespace NttDataWA.Management
             }
         }
 
-        protected void SignatureProcessesBtnVisibility_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if(this.ProcessoDiFirmaSelected != null && !string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso) 
-                    && (this.ProcessoDiFirmaSelected.passi == null || this.ProcessoDiFirmaSelected.passi.Count() == 0))
-                {
-                    string msg = "WarningSignatureProcessesNoSteps";
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) { parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else { parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                    return;
-                }
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxModalPopupVisibilitySignatureProcess", "ajaxModalPopupVisibilitySignatureProcess();", true);
-                return;
-            }
-            catch (Exception ex)
-            {
-                UIManager.AdministrationManager.DiagnosticError(ex);
-                return;
-            }
-        }
-
-
         protected void RblTypeStep_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
+                this.cbxOptionNotify.Items.FindByValue(CHECK_INSERT_IN_LF).Enabled = true;
                 if (this.RblTypeStep.SelectedValue.Equals(SIGN))
                 {
                     this.PnlTypeStep.Visible = true;
                     this.pnlSign.Visible = true;
                     this.rblTypeSignature.SelectedIndex = 0;
-                    this.DdlTypeEvent.SelectedIndex = -1;
                     this.RblTypeSignature_SelectedIndexChanged(null, null);
                     this.PnlTypeEvent.Visible = false;
                 }
@@ -909,6 +393,10 @@ namespace NttDataWA.Management
                     this.ddlUtenteCoinvolto.Enabled = false;
                     this.DdlTypeEvent.SelectedIndex = -1;
                     this.txtNotes.Text = string.Empty;
+                    foreach (ListItem item in this.cbxOptionNotify.Items)
+                    {
+                        item.Selected = false;
+                    }
                 }
 
                 if (this.RblTypeStep.SelectedValue.Equals(EVENT))
@@ -916,8 +404,12 @@ namespace NttDataWA.Management
                     this.PnlTypeStep.Visible = true;
                     this.PnlTypeEvent.Visible = true;
                     this.pnlSign.Visible = false;
+
+                    //Disabilito il check di notifica per inserimento in libro firma
+                    this.cbxOptionNotify.Items.FindByValue(CHECK_INSERT_IN_LF).Selected = false;
+                    this.cbxOptionNotify.Items.FindByValue(CHECK_INSERT_IN_LF).Enabled = false;
                 }
-                this.VisibilitaCampiAutomatici(false, null);
+
                 this.UpTypeStep.Update();
             }
             catch (Exception ex)
@@ -927,51 +419,12 @@ namespace NttDataWA.Management
             }
         }
 
-        private void SetOpzioniNotifiche()
-        {
-            if (this.RblTypeStep.SelectedValue.Equals(SIGN))
-            {
-                this.cbxOptionNotify.Items.FindByValue(CHECK_INSERT_IN_LF).Enabled = true;
-                this.cbxOptionNotify.Items.FindByValue(CHECK_ERRORE_PASSO_AUTOMATICO).Attributes.Add("style", "display:none");
-                this.cbxOptionNotify.Items.FindByValue(CHECK_ERRORE_PASSO_AUTOMATICO).Selected = false;
-            }
-
-            if (this.RblTypeStep.SelectedValue.Equals(WAIT))
-            {
-                this.cbxOptionNotify.Items.FindByValue(CHECK_INSERT_IN_LF).Attributes.Add("style", "display:none");
-                this.cbxOptionNotify.Items.FindByValue(CHECK_ERRORE_PASSO_AUTOMATICO).Attributes.Add("style", "display:none");
-                foreach (ListItem item in this.cbxOptionNotify.Items)
-                {
-                    item.Selected = false;
-                }
-            }
-
-            if (this.RblTypeStep.SelectedValue.Equals(EVENT))
-            {
-                this.cbxOptionNotify.Items.FindByValue(CHECK_INSERT_IN_LF).Selected = false;
-                this.cbxOptionNotify.Items.FindByValue(CHECK_INSERT_IN_LF).Enabled = false;
-                this.cbxOptionNotify.Items.FindByValue(CHECK_ERRORE_PASSO_AUTOMATICO).Attributes.Add("style", "display:block");
-                this.cbxOptionNotify.Items.FindByValue(CHECK_ERRORE_PASSO_AUTOMATICO).Selected = true;
-                if (!this.cbx_automatico.Checked)
-                {
-                    this.cbxOptionNotify.Items.FindByValue(CHECK_ERRORE_PASSO_AUTOMATICO).Attributes.Add("style", "display:none");
-                    this.cbxOptionNotify.Items.FindByValue(CHECK_ERRORE_PASSO_AUTOMATICO).Selected = false;                   
-                }
-                else
-                {
-                    this.cbxOptionNotify.Items.FindByValue(CHECK_CONCLUSIONE_PROCESSO_LF).Selected = true;
-                    this.cbxOptionNotify.Items.FindByValue(CHECK_INTERROTTO_PROCESSO).Selected = true;
-                }
-            }
-            this.UpdPnlNotififyOption.Update();
-        }
-
         protected void RblTypeSignature_SelectedIndexChanged(object sender, EventArgs e)
         {
             setVisibilityTypeEvent();
             if (!string.IsNullOrEmpty(this.TxtCodeRole.Text))
             {
-                if (!IsRuoloAbilitatoAlPassoSelezionato(this.PassoDiFirmaSelected.ruoloCoinvolto))
+                if (!IsRoleEnabledSignature(this.PassoDiFirmaSelected.ruoloCoinvolto))
                 {
                     string msg = "WarningRoleNotEnabledSign";
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) { parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else { parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
@@ -1020,49 +473,27 @@ namespace NttDataWA.Management
                 List<NttDataWA.Popup.AddressBook.CorrespondentDetail> atList = (List<NttDataWA.Popup.AddressBook.CorrespondentDetail>)HttpContext.Current.Session["AddressBook.At"];
                 if (atList != null && atList.Count > 0)
                 {
-                    Corrispondente corr = null;
-                    string idAmm = UIManager.UserManager.GetInfoUser().idAmministrazione;
-                    foreach (NttDataWA.Popup.AddressBook.CorrespondentDetail addressBookCorrespondent in atList)
-                    {
-
-                        if (!addressBookCorrespondent.isRubricaComune)
-                        {
-                            corr = UIManager.AddressBookManager.GetCorrespondentBySystemId(addressBookCorrespondent.SystemID);
-                        }
-                        else
-                        {
-                            corr = UIManager.AddressBookManager.getCorrispondenteByCodRubricaRubricaComune(addressBookCorrespondent.CodiceRubrica);
-                        }
-
-                    }
+                    Corrispondente corr = new Corrispondente() { systemId = atList[0].SystemID, codiceRubrica = atList[0].CodiceRubrica, descrizione = atList[0].Descrizione };
                     Ruolo ruolo = RoleManager.GetRuolo(corr.systemId);
-                    if (ruolo != null)
+                    if (IsRoleEnabledSignature(ruolo))
                     {
-                        if (IsRuoloAbilitatoAlPassoSelezionato(ruolo) && !corr.disabledTrasm)
-                        {
-                            this.TxtCodeRole.Text = corr.codiceRubrica;
-                            this.TxtDescriptionRole.Text = corr.descrizione;
-                            this.idRuolo.Value = ruolo.idGruppo;
-                            this.PassoDiFirmaSelected.ruoloCoinvolto = ruolo;
-                            this.UpdPnlRole.Update();
-                            this.LoadDllUtenteCoinvolto(UIManager.UserManager.getUserInRoleByIdGruppo(ruolo.idGruppo));
-                        }
-                        else
-                        {
-                            this.TxtCodeRole.Text = string.Empty;
-                            this.TxtDescriptionRole.Text = string.Empty;
-                            this.idRuolo.Value = string.Empty;
-                            this.UpdPnlRole.Update();
-                            string msg = "WarningRoleNotEnabledSign";
-                            if (corr.disabledTrasm)
-                                msg = "WarningRoleDisabledTrasm";
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) { parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else { parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
-                        }
+                        this.TxtCodeRole.Text = corr.codiceRubrica;
+                        this.TxtDescriptionRole.Text = corr.descrizione;
+                        this.idRuolo.Value = ruolo.idGruppo;
+                        this.PassoDiFirmaSelected.ruoloCoinvolto = ruolo;
+                        this.UpdPnlRole.Update();
+                        this.LoadDllUtenteCoinvolto(UIManager.UserManager.getUserInRoleByIdGruppo(ruolo.idGruppo));
+                    }
+                    else
+                    {
+                        this.TxtCodeRole.Text = string.Empty;
+                        this.TxtDescriptionRole.Text = string.Empty;
+                        this.idRuolo.Value = string.Empty;
+                        this.UpdPnlRole.Update();
+                        string msg = "WarningRoleNotEnabledSign";
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) { parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else { parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
                     }
                 }
-                //Aggiorno i campi automatici se sono previsti
-                this.ResetCampiAutomatciPassoSelezionato();
-
                 HttpContext.Current.Session["AddressBook.At"] = null;
                 HttpContext.Current.Session["AddressBook.Cc"] = null;
                 HttpContext.Current.Session["AddressBook.type"] = null;
@@ -1084,7 +515,7 @@ namespace NttDataWA.Management
             try
             {
                 this.ClearFieldsStep();
-                this.CalcolaProssimoPasso(this.ProcessoDiFirmaSelected);
+                this.CalcolaProssimoPasso();
                 this.PassoDiFirmaSelected = new PassoFirma();
                 this.PassoDiFirmaSelected.Invalidated = '0';
                 this.UpdateContentPage();
@@ -1160,16 +591,29 @@ namespace NttDataWA.Management
                     if (nuovoPasso != null)
                     {
                         this.PassoDiFirmaSelected = nuovoPasso;
-                        ProcessoFirma processo = UIManager.SignatureProcessesManager.GetProcessoDiFirma(nuovoPasso.idProcesso);
-                        //Aggiorno il Treeview
-                        TreeNode parentNode = this.TreeSignatureProcess.SelectedNode;
-                        this.UpdateNode(parentNode, processo);
-                        //Aggiorno il processo in sessione
-                        this.ListaProcessiDiFirma.Where(p => p.idProcesso.Equals(processo.idProcesso)).ToList().ForEach(f => f.passi = processo.passi);
 
+                        //Aggiorno la lista dei passi del processo selezionato
+                        ProcessoFirma processo = (from p in this.ListaProcessiDiFirma where p.idProcesso.Equals(this.PassoDiFirmaSelected.idProcesso) select p).FirstOrDefault();
+                        IncrementaNumeroSequenzaPassi(ref processo, nuovoPasso);
+                        List<PassoFirma> listaPassi = new List<PassoFirma>();
+                        if (processo.passi != null && processo.passi.Length > 0)
+                        {
+                            listaPassi.AddRange(processo.passi.ToList<PassoFirma>());
+                        }
+                        listaPassi.Add(this.PassoDiFirmaSelected);
+                        listaPassi = (from p in listaPassi orderby p.numeroSequenza ascending select p).ToList<PassoFirma>();
+                        processo.passi = listaPassi.ToArray();
+
+                        //Aggiorno il nodo padre inserendo il nuovo passo
+                        TreeNode parentNode = this.TreeSignatureProcess.FindNode(this.ProcessoDiFirmaSelected.idProcesso);
+                        parentNode.ChildNodes.Clear();
+                        foreach (PassoFirma p in processo.passi)
+                        {
+                            this.AddChildrenElements(p, ref parentNode);
+                        }
+                        parentNode.Select();
+                        this.upPnlTreeSignatureProcess.Update();
                         this.PassoDiFirmaSelected = null;
-
-                        this.CalcolaProssimoPasso(processo);
                     }
                     else
                     {
@@ -1177,20 +621,60 @@ namespace NttDataWA.Management
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'error', '');}", true);
                         return;
                     }
+                    this.CalcolaProssimoPasso();
                 }
                 else //Sto aggiornando un passo esistente
                 {
                     if (UIManager.SignatureProcessesManager.AggiornaPassoDiFirma(PassoDiFirmaSelected, oldNumeroSequenza))
                     {
-                        ProcessoFirma processo = UIManager.SignatureProcessesManager.GetProcessoDiFirma(PassoDiFirmaSelected.idProcesso);
-                        
-                        //Aggiorno il treeview
-                        TreeNode parentNode = this.TreeSignatureProcess.SelectedNode.Parent;
-                        this.UpdateNode(parentNode, processo);
-                        //Aggiorno il processo in sessione
-                        this.ListaProcessiDiFirma.Where(p => p.idProcesso.Equals(processo.idProcesso)).ToList().ForEach(f => f.passi = processo.passi);                      
-                        this.lblSectionDocument.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLblSectionDocument", UIManager.UserManager.GetUserLanguage()) + PassoDiFirmaSelected.numeroSequenza.ToString();
-                        this.txtNr.Text = PassoDiFirmaSelected.numeroSequenza.ToString();
+                        //Aggiorno il passo in sessione
+                        ProcessoFirma processo = (from p in this.ListaProcessiDiFirma where p.idProcesso.Equals(this.PassoDiFirmaSelected.idProcesso) select p).FirstOrDefault();
+                        PassoFirma passo = (from p in processo.passi where p.idPasso.Equals(this.PassoDiFirmaSelected.idPasso) select p).FirstOrDefault();
+                        passo.numeroSequenza = this.PassoDiFirmaSelected.numeroSequenza;
+                        passo.Evento = this.PassoDiFirmaSelected.Evento;
+                        passo.note = this.PassoDiFirmaSelected.note;
+                        passo.dataScadenza = this.PassoDiFirmaSelected.dataScadenza;
+                        passo.idEventiDaNotificare = this.PassoDiFirmaSelected.idEventiDaNotificare;
+                        passo.TpoRuoloCoinvolto = this.PassoDiFirmaSelected.TpoRuoloCoinvolto;
+                        passo.ruoloCoinvolto = this.PassoDiFirmaSelected.ruoloCoinvolto;
+                        passo.utenteCoinvolto = this.PassoDiFirmaSelected.utenteCoinvolto;
+
+                        //Se il passo era invalidato, lo aggiorno a valido e se, non esistono altri passi invalidi, aggiorno anche il processo
+                        if (passo.Invalidated == ROLE_DISABLED || passo.Invalidated == USER_DISABLED)
+                        {
+                            passo.Invalidated = '0';
+                            this.PnlWarningRoleUserDisabled.Visible = false;
+                            if ((from p in processo.passi where p.Invalidated == ROLE_DISABLED || p.Invalidated == USER_DISABLED select p).FirstOrDefault() == null)
+                            {
+                                processo.isInvalidated = false;
+                                this.UpdateRootElement(processo);
+                            }
+                        }
+
+                        //Aggiorno il nodo nel treeview
+                        this.UpdateChildrenElement(passo);
+
+                        //Se il numero di sequenza è stato cambiato aggiorno il numero di sequenza degli altri passi
+                        if (passo.numeroSequenza != oldNumeroSequenza)
+                        {
+                            AggiornaNumeroSequenzaPassi(ref processo, passo, oldNumeroSequenza);
+
+                            processo.passi = (from p in processo.passi orderby p.numeroSequenza ascending select p).ToArray();
+
+                            //Aggiorno il nodo padre inserendo il nuovo passo
+                            TreeNode parentNode = this.TreeSignatureProcess.FindNode(this.ProcessoDiFirmaSelected.idProcesso);
+                            parentNode.ChildNodes.Clear();
+                            foreach (PassoFirma p in processo.passi)
+                            {
+                                this.AddChildrenElements(p, ref parentNode);
+                            }
+                            TreeNode node = (from n in parentNode.ChildNodes.Cast<TreeNode>() where n.Value.Equals(passo.idPasso) select n).FirstOrDefault();
+                            node.Select();
+                            this.upPnlTreeSignatureProcess.Update();
+                        }
+
+                        this.lblSectionDocument.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLblSectionDocument", UIManager.UserManager.GetUserLanguage()) + passo.numeroSequenza.ToString();
+                        this.txtNr.Text = passo.numeroSequenza.ToString();
                         this.UpdPnlStep.Update();
 
                         msg = "ConfirmStepChange";
@@ -1252,7 +736,7 @@ namespace NttDataWA.Management
                         else
                         {
                             Ruolo ruolo = RoleManager.GetRuolo(corr.systemId);
-                            if (IsRuoloAbilitatoAlPassoSelezionato(ruolo) && !corr.disabledTrasm)
+                            if (IsRoleEnabledSignature(ruolo))
                             {
                                 this.TxtCodeRole.Text = corr.codiceRubrica;
                                 this.TxtDescriptionRole.Text = corr.descrizione;
@@ -1268,8 +752,6 @@ namespace NttDataWA.Management
                                 this.idRuolo.Value = string.Empty;
                                 this.UpdPnlRole.Update();
                                 string msg = "WarningRoleNotEnabledSign";
-                                if (corr.disabledTrasm)
-                                    msg = "WarningRoleDisabledTrasm";
                                 ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) { parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else { parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
                             }
                         }
@@ -1283,18 +765,23 @@ namespace NttDataWA.Management
                         string msg = "ErrorTransmissionCorrespondentNotFound";
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "ajaxDialogModal", "if (parent.fra_main) {parent.fra_main.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');} else {parent.ajaxDialogModal('" + msg.Replace("'", @"\'") + "', 'warning', '');}", true);
                     }
+                    //else
+                    //{
+                    //    corr = null;
+                    //    this.FoundCorr = listaCorr;
+                    //    this.TypeChooseCorrespondent = "Sender";
+                    //    this.TypeRecord = "A";
+                    //    ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "chooseCorrespondent", "ajaxModalPopupChooseCorrespondent();", true);
+                    //}
                 }
                 else
                 {
                     this.TxtCodeRole.Text = string.Empty;
                     this.TxtDescriptionRole.Text = string.Empty;
                     this.idRuolo.Value = string.Empty;
-                    this.PassoDiFirmaSelected.ruoloCoinvolto = null;
                     this.LoadDllUtenteCoinvolto(null);
                     this.UpdPnlRole.Update();
                 }
-                //Aggiorno i campi automatici se sono previsti
-                this.ResetCampiAutomatciPassoSelezionato();
             }
             catch (Exception ex)
             {
@@ -1304,36 +791,17 @@ namespace NttDataWA.Management
             }
         }
 
-        protected void IndexImgRemoveFilter_Click(object sender, EventArgs e)
-        {
-            ListaProcessiDiFirma = SignatureProcessesManager.GetProcessiDiFirma();
-            this.FiltersProcesses = null;
-            this.ProcessoDiFirmaSelected = null;
-            TreeviewProcesses_Bind();
-            this.upPnlTreeSignatureProcess.Update();
-            UpdateContentPage();
-
-            this.IndexImgRemoveFilter.Enabled = false;
-            this.UpPnlBAction.Update();
-        }
-
         #endregion
 
         #region Treeview
 
         private void TreeviewProcesses_Bind()
         {
-            this.TreeSignatureProcess.Nodes.Clear();
-            TreeNode root = new TreeNode();
-            root.Text = Utils.Languages.GetLabelFromCode("ManagementMonitoringProcessesTutti", UIManager.UserManager.GetUserLanguage());
-            root.Value = "";
-            this.TreeSignatureProcess.Nodes.Add(root);
-
             if (ListaProcessiDiFirma != null && ListaProcessiDiFirma.Count > 0)
             {
                 foreach (ProcessoFirma p in ListaProcessiDiFirma)
                 {
-                    root.ChildNodes.Add(AddNode(p));
+                    this.AddNode(p);
                 }
                 this.TreeSignatureProcess.DataBind();
             }
@@ -1343,24 +811,7 @@ namespace NttDataWA.Management
         private TreeNode AddNode(ProcessoFirma p)
         {
             TreeNode root = new TreeNode();
-
-            string infoModello = p.IsProcessModel ? Utils.Languages.GetLabelFromCode("ManagementSignatureProcessModel", UserManager.GetUserLanguage()) : string.Empty;
-            root.Text = p.isInvalidated ? "<strike>" + p.nome + infoModello + "</strike>" : p.nome + " " + infoModello;
-            root.Value = p.idProcesso;
-            root.ToolTip = p.nome;
-            foreach (PassoFirma passo in p.passi)
-            {
-                this.AddChildrenElements(passo, ref root);
-            }
-            return root;
-        }
-
-        private TreeNode AddNodeToTop(ProcessoFirma p)
-        {
-            TreeNode root = new TreeNode();
-
-            string infoModello = p.IsProcessModel ? Utils.Languages.GetLabelFromCode("ManagementSignatureProcessModel", UserManager.GetUserLanguage()) : string.Empty;
-            root.Text = p.isInvalidated ? "<strike>" + p.nome + infoModello + "</strike>" : p.nome + " " + infoModello;
+            root.Text = p.isInvalidated ? "<strike>" + p.nome + "</strike>" : p.nome;
             root.Value = p.idProcesso;
             root.ToolTip = p.nome;
             foreach (PassoFirma passo in p.passi)
@@ -1368,7 +819,7 @@ namespace NttDataWA.Management
                 this.AddChildrenElements(passo, ref root);
             }
 
-            this.TreeSignatureProcess.Nodes[0].ChildNodes.AddAt(0,root);
+            this.TreeSignatureProcess.Nodes.Add(root);
             return root;
         }
 
@@ -1401,30 +852,10 @@ namespace NttDataWA.Management
         {
             TreeNode root = this.TreeSignatureProcess.SelectedNode.Parent;
 
-            string infoModello = p.IsProcessModel ? Utils.Languages.GetLabelFromCode("ManagementSignatureProcessModel", UserManager.GetUserLanguage()) : string.Empty;
-            root.Text = p.isInvalidated ? "<strike>" + p.nome + infoModello + "</strike>" : p.nome + " " + infoModello;
+            root.Text = p.isInvalidated ? "<strike>" + p.nome + "</strike>" : p.nome;
             root.Value = p.idProcesso;
             root.ToolTip = p.nome;
 
-            this.upPnlTreeSignatureProcess.Update();
-        }
-
-        /// <summary>
-        /// Aggiorna nel treeview l'intero nodo, compreso nodi figli
-        /// </summary>
-        /// <param name="p"></param>
-        private void UpdateNode(TreeNode node , ProcessoFirma p)
-        {
-            string infoModello = p.IsProcessModel ? Utils.Languages.GetLabelFromCode("ManagementSignatureProcessModel", UserManager.GetUserLanguage()) : string.Empty;
-            node.Text = p.isInvalidated ? "<strike>" + p.nome + infoModello + "</strike>" : p.nome + " " + infoModello;
-            node.Value = p.idProcesso;
-            node.ToolTip = p.nome;
-            node.ChildNodes.Clear();
-            foreach (PassoFirma passo in p.passi)
-            {
-                this.AddChildrenElements(passo, ref node);
-            }
-            node.Select();
             this.upPnlTreeSignatureProcess.Update();
         }
 
@@ -1434,33 +865,24 @@ namespace NttDataWA.Management
             try
             {
                 TreeNode node = this.TreeSignatureProcess.SelectedNode;
-                if (!NessunNodoSelezionato())
+
+                if (node.Parent == null)
                 {
-                    if (IsNodoProcesso())
-                    {
-                        this.ProcessoDiFirmaSelected = (from processo in this.ListaProcessiDiFirma where processo.idProcesso.Equals(node.Value) select processo).FirstOrDefault();
-                        this.txtNameSignatureProcesses.Text = this.ProcessoDiFirmaSelected.nome;
-                        this.PassoDiFirmaSelected = null;
-                        this.CalcolaProssimoPasso(ProcessoDiFirmaSelected);
-                    }
-                    else
-                    {
-                        TreeNode nodeParent = node.Parent;
-                        this.ClearFieldsStep();
-                        this.ProcessoDiFirmaSelected = (from processo in this.ListaProcessiDiFirma where processo.idProcesso.Equals(nodeParent.Value) select processo).FirstOrDefault();
-                        this.txtNameSignatureProcesses.Text = this.ProcessoDiFirmaSelected.nome;
-                        this.PassoDiFirmaSelected = (from p in this.ProcessoDiFirmaSelected.passi where p.idPasso.Equals(node.Value) select p).FirstOrDefault();
-                        this.PopolaCampiPasso(PassoDiFirmaSelected);
-                    }
-                    this.UpdateContentPage();
+                    this.ProcessoDiFirmaSelected = (from processo in this.ListaProcessiDiFirma where processo.idProcesso.Equals(node.Value) select processo).FirstOrDefault();
+                    this.txtNameSignatureProcesses.Text = this.ProcessoDiFirmaSelected.nome;
+                    this.PassoDiFirmaSelected = null;
+                    this.CalcolaProssimoPasso();
                 }
-                else //Ho selezionato il nodo radice tutti
+                else
                 {
-                    ClearFieldsProcess();
-                    ClearFieldsStep();
-                    this.ProcessoDiFirmaSelected = null;
-                    UpdateContentPage();
+                    TreeNode nodeParent = node.Parent;
+                    this.ClearFieldsStep();
+                    this.ProcessoDiFirmaSelected = (from processo in this.ListaProcessiDiFirma where processo.idProcesso.Equals(nodeParent.Value) select processo).FirstOrDefault();
+                    this.txtNameSignatureProcesses.Text = this.ProcessoDiFirmaSelected.nome;
+                    this.PassoDiFirmaSelected = (from p in this.ProcessoDiFirmaSelected.passi where p.idPasso.Equals(node.Value) select p).FirstOrDefault();
+                    this.PopolaCampiPasso(PassoDiFirmaSelected);
                 }
+                this.UpdateContentPage();
             }
             catch (Exception ex)
             {
@@ -1489,8 +911,6 @@ namespace NttDataWA.Management
             {
                 this.plcTypeSignatureD.Visible = true;
                 this.plcTypeSignatureE.Visible = false;
-                this.cbx_automatico.Visible = false;
-                this.cbx_automatico.Checked = false;
                 this.rblTypeSignatureD.SelectedIndex = 0;
             }
             else
@@ -1555,58 +975,57 @@ namespace NttDataWA.Management
         /// </summary>
         private void SetButtons()
         {
-            this.SignatureProcessesBtnSave.Enabled = false;
-            this.SignatureProcessesBtnDuplica.Enabled = false;
-            this.SignatureProcessesStatistics.Enabled = false;
-            this.SignatureProcessesBtnRemove.Enabled = false;
-            //this.SignatureProcessesBtnVisibility.Enabled = false;
-            this.SignatureProcessesBtnNew.Enabled = true;
-
-            //I bottoni salva ed elimina e duplica sono applicabili solo per il processo, quindi sono abilitati solo se 
+            //I bottoni salva ed elimina sono applicabili solo per il processo, quindi sono abilitati solo se 
             //nel treeview è selezionato un processo
             TreeNode selectedNode = this.TreeSignatureProcess.SelectedNode;
-
-            //Non ho selezionato alcun nodo
-            if (NessunNodoSelezionato() && this.ProcessoDiFirmaSelected != null && string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
+            this.SignatureProcessesBtnNew.Enabled = true;
+            if (selectedNode == null)
             {
-                this.SignatureProcessesBtnNew.Enabled = false;
-                this.SignatureProcessesBtnSave.Enabled = true;
+                this.SignatureProcessesBtnSave.Enabled = false;
+                this.SignatureProcessesStatistics.Enabled = false;
+                this.SignatureProcessesBtnRemove.Enabled = false;
+                this.SignatureProcessesBtnVisibility.Enabled = false;
+                if (this.ProcessoDiFirmaSelected != null && string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
+                {
+                    this.SignatureProcessesBtnNew.Enabled = false;
+                    this.SignatureProcessesBtnSave.Enabled = true;
+                    this.SignatureProcessesStatistics.Enabled = true;
+                    this.SignatureProcessesBtnVisibility.Enabled = false;
+                }
             }
-
-            //Ho selezionato un nodo di tipo PASSO
-            if (IsNodoPasso()) 
+            else if (selectedNode.Parent != null)
             {
+                this.SignatureProcessesBtnSave.Enabled = false;
+                this.SignatureProcessesStatistics.Enabled = false;
+                this.SignatureProcessesBtnRemove.Enabled = false;
+                this.SignatureProcessesBtnVisibility.Enabled = false;
+
                 this.BtnConfirmAddStep.ToolTip = Utils.Languages.GetLabelFromCode("SignatureProcessesBtnSaveStepToolTip", UIManager.UserManager.GetUserLanguage());
                 this.BtnDeleteStep.Visible = true;
                 this.PnlBtnAddStep.Visible = false;
             }
-
-            //Ho selezionato un Nodo di tipo processo
-            if (IsNodoProcesso()) 
+            else
             {
-                //Se stiamo creando un passo di firma
+                this.btnAddStep.Enabled = true;
+                this.PnlBtnAddStep.Visible = true;
+                this.SignatureProcessesBtnSave.Enabled = true;
+                this.SignatureProcessesStatistics.Enabled = true;
+                this.SignatureProcessesBtnRemove.Enabled = true;
+                this.SignatureProcessesBtnVisibility.Enabled = true;
+
                 if (this.PassoDiFirmaSelected != null && string.IsNullOrEmpty(this.PassoDiFirmaSelected.idPasso))
                 {
+                    this.SignatureProcessesBtnSave.Enabled = false;
+                    this.SignatureProcessesStatistics.Enabled = false;
+                    this.SignatureProcessesBtnRemove.Enabled = false;
+                    this.SignatureProcessesBtnVisibility.Enabled = false;
                     this.btnAddStep.Enabled = false;
                     this.BtnConfirmAddStep.ToolTip = Utils.Languages.GetLabelFromCode("SignatureProcessesBtnConfirmAddStepToolTip", UIManager.UserManager.GetUserLanguage());
                     this.BtnDeleteStep.Visible = false;
                 }
-                else
+                if (this.ProcessoDiFirmaSelected.passi == null || this.ProcessoDiFirmaSelected.passi.Length < 1)
                 {
-                    this.btnAddStep.Enabled = true;
-                    this.PnlBtnAddStep.Visible = true;
-                    this.SignatureProcessesBtnSave.Enabled = true;
-                    this.SignatureProcessesBtnDuplica.Enabled = true;
-                    this.SignatureProcessesStatistics.Enabled = true;
-                    this.SignatureProcessesBtnRemove.Enabled = true;
-
-                    /*
-                    this.SignatureProcessesBtnVisibility.Enabled = true;
-                    if (this.ProcessoDiFirmaSelected.passi == null || this.ProcessoDiFirmaSelected.passi.Length < 1)
-                    {
-                        this.SignatureProcessesBtnVisibility.Enabled = false;
-                    }
-                    */
+                    this.SignatureProcessesBtnVisibility.Enabled = false;
                 }
             }
             this.UplAddStep.Update();
@@ -1617,7 +1036,6 @@ namespace NttDataWA.Management
         {
             this.PnlWarningRoleUserDisabled.Visible = false;
             this.txtNr.Text = string.Empty;
-            this.idRuolo.Value = string.Empty;
             this.TxtCodeRole.Text = string.Empty;
             this.TxtDescriptionRole.Text = string.Empty;
             this.ddlUtenteCoinvolto.Items.Clear();
@@ -1626,11 +1044,6 @@ namespace NttDataWA.Management
             this.RblTypeStep.SelectedValue = SIGN;
             this.RblTypeStep_SelectedIndexChanged(null, null);
             this.DdlTypeEvent.SelectedIndex = -1;
-
-            //per passi automatici
-            this.cbx_automatico.Visible = false;
-            this.cbx_automatico.Checked = false;
-            this.ResetCampiAutomatici();
 
             this.rblTypeSignature.SelectedValue = DIGITALE;
             this.rblTypeSignatureD.SelectedIndex = 0;
@@ -1649,9 +1062,11 @@ namespace NttDataWA.Management
 
             this.txtNotes.Text = string.Empty;
 
+            foreach (ListItem item in this.cbxOptionNotify.Items)
+            {
+                item.Selected = false;
+            }
             this.PassoDiFirmaSelected = null;
-            this.SetOpzioniNotifiche();
-            this.cbxOptionNotify.ClearSelection();
             this.UpdPnlDetailsStep.Update();
         }
 
@@ -1669,19 +1084,21 @@ namespace NttDataWA.Management
         private void UpdateContentPage()
         {
             this.pnlStep.Visible = true;
-            if (NessunNodoSelezionato())//Se non c'è alcun nodo selezionato o ho selezionato il nodo radice non vedo nulla
+            if (this.TreeSignatureProcess.SelectedNode == null)//Se non c'è alcun nodo selezionato non vedo nulla
             {
                 this.pnlStep.Visible = false;
                 this.pnlProcessName.Visible = false;
-                if (this.ProcessoDiFirmaSelected != null)
-                    this.pnlProcessName.Visible = true; 
+                if (this.ProcessoDiFirmaSelected != null && string.IsNullOrEmpty(this.ProcessoDiFirmaSelected.idProcesso))
+                {
+                    this.pnlProcessName.Visible = true;
+                }
             }
-            else if (IsNodoPasso()) //Se è selezionato il passo non vedo il nome del processo
+            else if (this.TreeSignatureProcess.SelectedNode.Parent != null) //Se è selezionato il passo non vedo il nome del processo
             {
                 this.pnlDetailsSteps.Visible = true;
                 this.pnlProcessName.Visible = false;
             }
-            else if (IsNodoProcesso()) //Selezionato un processo
+            else if (this.TreeSignatureProcess.SelectedNode.Parent == null) //Selezionato un processo
             {
                 this.pnlStep.Visible = true;
                 this.pnlProcessName.Visible = true;
@@ -1692,7 +1109,6 @@ namespace NttDataWA.Management
                 }
                 else
                 {
-                    this.pnlProcessName.Visible = true;
                     this.pnlDetailsSteps.Visible = false;
                 }
             }
@@ -1702,36 +1118,6 @@ namespace NttDataWA.Management
             this.UpdPnlStep.Update();
             this.UplAddStep.Update();
             this.UpdPlnProcessName.Update();
-        }
-
-        /// <summary>
-        /// Ho selezionato il nodi radice 'TUTTI' oppure non ho selezionato nulla
-        /// </summary>
-        /// <returns></returns>
-        private bool NessunNodoSelezionato()
-        {
-            TreeNode nodoSelezionato = this.TreeSignatureProcess.SelectedNode;
-            return nodoSelezionato == null || string.IsNullOrEmpty(nodoSelezionato.Value);
-        }
-
-        /// <summary>
-        /// Ho selezionato un nodo di tipo processo
-        /// </summary>
-        /// <returns></returns>
-        private bool IsNodoProcesso()
-        {
-            TreeNode nodoSelezionato = this.TreeSignatureProcess.SelectedNode;
-            return nodoSelezionato != null && nodoSelezionato.Parent != null && string.IsNullOrEmpty(nodoSelezionato.Parent.Value);
-        }
-
-        /// <summary>
-        /// Ho selezionato un nodo di tipo passo
-        /// </summary>
-        /// <returns></returns>
-        private bool IsNodoPasso()
-        {
-            TreeNode nodoSelezionato = this.TreeSignatureProcess.SelectedNode;
-            return nodoSelezionato!= null && nodoSelezionato.Parent != null && !string.IsNullOrEmpty(nodoSelezionato.Parent.Value);
         }
 
         /// <summary>
@@ -1791,6 +1177,7 @@ namespace NttDataWA.Management
         private string CheckFields()
         {
             string errorMessage = string.Empty;
+            PassoFirma p;
             bool isAuthorizedLibroFirma = true;
             int numPassi = string.IsNullOrEmpty(this.PassoDiFirmaSelected.idPasso) ? this.ProcessoDiFirmaSelected.passi.Length + 1 : this.ProcessoDiFirmaSelected.passi.Length;
             if (Convert.ToInt32(this.txtNr.Text) > numPassi || Convert.ToInt32(this.txtNr.Text) < 1)
@@ -1798,33 +1185,36 @@ namespace NttDataWA.Management
                 errorMessage = "WarningSequenceNumberNoValid";
                 return errorMessage;
             }
-            //Se il ruolo non è abilitato alla creazione di modelli, deve inserire tutti i campi obbligatori
-            if (RblTypeStep.SelectedValue != LibroFirmaManager.TypeStep.WAIT && !IsRoleCreateModelProcessEnabled())
-            {
-                errorMessage = ControlloCampiObbligatori();
-                if (!string.IsNullOrEmpty(errorMessage))
-                    return errorMessage;
-            }
 
             switch (RblTypeStep.SelectedValue)
             {
                 case LibroFirmaManager.TypeStep.SIGN:
                     if (this.RblRoleOrTypeRole.SelectedValue.Equals(RUOLO))
-                    {                        
-                        if (this.PassoDiFirmaSelected.ruoloCoinvolto != null && !string.IsNullOrEmpty(this.PassoDiFirmaSelected.ruoloCoinvolto.idGruppo))
+                    {
+                        if (string.IsNullOrEmpty(this.idRuolo.Value))
                         {
-                            if (this.PassoDiFirmaSelected.ruoloCoinvolto.disabledTrasm)
-                            {
-                                errorMessage = "WarningRoleDisabledTrasm";
-                                return errorMessage;
-                            }
-                            isAuthorizedLibroFirma = UserManager.IsRoleAuthorizedFunctions("DO_LIBRO_FIRMA", this.PassoDiFirmaSelected.ruoloCoinvolto);
-                            if (!isAuthorizedLibroFirma)
-                            {
-                                errorMessage = "WarningNotAuthorizedLibroFirma";
-                                return errorMessage;
-                            }
+                            errorMessage = "WarningRequiredFieldRole";
+                            return errorMessage;
                         }
+
+                        if (!IsRoleEnabledSignature(this.PassoDiFirmaSelected.ruoloCoinvolto))
+                        {
+                            errorMessage = "WarningRoleNotEnabledSign";
+                            return errorMessage;
+                        }
+                        isAuthorizedLibroFirma = ((from function in this.PassoDiFirmaSelected.ruoloCoinvolto.funzioni
+                                                   where function.codice.ToUpper().Equals("DO_LIBRO_FIRMA")
+                                                   select function.systemId).Count() > 0);
+                        if (!isAuthorizedLibroFirma)
+                        {
+                            errorMessage = "WarningNotAuthorizedLibroFirma";
+                            return errorMessage;
+                        }
+                    }
+                    else if (this.RblRoleOrTypeRole.Equals(TIPO_RUOLO))
+                    {
+                        errorMessage = "WarningRequiredFieldTypeRole";
+                        return errorMessage;
                     }
                     if (string.IsNullOrEmpty(this.PassoDiFirmaSelected.idPasso))
                     {
@@ -1881,83 +1271,44 @@ namespace NttDataWA.Management
                     }
                     break;
                 case LibroFirmaManager.TypeStep.EVENT:
+
+                    if (this.RblRoleOrTypeRole.SelectedValue.Equals(RUOLO) && string.IsNullOrEmpty(this.idRuolo.Value))
+                    {
+                        errorMessage = "WarningRequiredFieldRole";
+                        return errorMessage;
+                    }
+                    else if (this.RblRoleOrTypeRole.SelectedValue.Equals(TIPO_RUOLO) && string.IsNullOrEmpty(this.DdlTypeRole.SelectedValue))
+                    {
+                        errorMessage = "WarningRequiredFieldTypeRole";
+                        return errorMessage;
+                    }
                     if (DdlTypeEvent.SelectedIndex == -1)
                     {
                         errorMessage = "WarningRequiredEventType";
                         return errorMessage;
                     }
+                    //NEL CASO DI TIPO EVENTO, NON ESSENDOCI L'INSERIMENTO IN LF, IL RUOLO PUò NON ESSERE AUTORIZZATO AL LIBRO FIRMA
+                    //isAuthorizedLibroFirma = ((from function in this.PassoDiFirmaSelected.ruoloCoinvolto.funzioni
+                    //                           where function.codice.ToUpper().Equals("DO_LIBRO_FIRMA")
+                    //                           select function.systemId).Count() > 0);
+                    //if (!isAuthorizedLibroFirma)
+                    //{
+                    //    errorMessage = "WarningNotAuthorizedLibroFirma";
+                    //    return errorMessage;
+                    //}
+
                     //Un passo di tipo EVENTO non può essere inserito prima di un passo di attesa o di un passo di firma
                     bool canInsertStepEvent = (from i in this.ProcessoDiFirmaSelected.passi
                                                where i.numeroSequenza >= Convert.ToInt32(this.txtNr.Text)
                                                   && (string.IsNullOrEmpty(this.PassoDiFirmaSelected.idPasso) || i.numeroSequenza != this.PassoDiFirmaSelected.numeroSequenza)
                                                   && (i.Evento.TipoEvento.Equals(LibroFirmaManager.TypeStep.SIGN) || (i.Evento.TipoEvento.Equals(LibroFirmaManager.TypeStep.WAIT)))
                                                select i).FirstOrDefault() == null;
-
                     if (!canInsertStepEvent)
                     {
                         errorMessage = "WarningNotStepEvent";
                         return errorMessage;
                     }
-                    Azione codiceEvento = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                    switch (codiceEvento)
-                    {
-                        case Azione.RECORD_PREDISPOSED:
-                        case Azione.DOCUMENTO_REPERTORIATO:
-                            //Un passo di protocollazione non può essere creato dopo un passo di spedizione
-                            if (codiceEvento.Equals(Azione.RECORD_PREDISPOSED))
-                            {
-                                bool canInsertRecorPredisposed = (from i in this.ProcessoDiFirmaSelected.passi
-                                                                    where i.Evento.CodiceAzione.Equals(Azione.DOCUMENTOSPEDISCI.ToString()) &&
-                                                                    (i.numeroSequenza < Convert.ToInt32(this.txtNr.Text) ||
-                                                                    (i.numeroSequenza == Convert.ToInt32(this.txtNr.Text) && !string.IsNullOrEmpty(this.PassoDiFirmaSelected.idPasso))) 
-                                                                    select i).FirstOrDefault() == null;
-                                if (!canInsertRecorPredisposed)
-                                {
-                                    errorMessage = "WarningPassoProtocolloDopoSpedizione";
-                                    return errorMessage;
-                                }
 
-                                //Se esiste un passo di spedizione, il registro di AOO deve coincidere con quello selezionato per la spedizione
-                                if (!string.IsNullOrEmpty(this.PassoDiFirmaSelected.IdAOO))
-                                {
-                                    PassoFirma passoSpedizione = (from p in this.ProcessoDiFirmaSelected.passi
-                                                                       where p.Evento.CodiceAzione.Equals(Azione.DOCUMENTOSPEDISCI.ToString())
-                                                                       select p).FirstOrDefault();
-                                    if (passoSpedizione != null && !string.IsNullOrEmpty(passoSpedizione.IdAOO) && !passoSpedizione.IdAOO.Equals(PassoDiFirmaSelected.IdAOO))
-                                    {
-                                        errorMessage = "WarningSignatureProcessesRegistroErrato";
-                                        return errorMessage;
-                                    }
-                                }
-                            }
-                            break;
-                        case Azione.DOCUMENTOSPEDISCI:
-                            //Un passo di spedizione non puo essere inserito prima di un passo di protocollazione.
-                            bool canInsertSpedisci = (from i in this.ProcessoDiFirmaSelected.passi
-                                                        where i.Evento.CodiceAzione.Equals(Azione.RECORD_PREDISPOSED.ToString()) && 
-                                                        i.numeroSequenza >= Convert.ToInt32(this.txtNr.Text)                            
-                                                       select i).FirstOrDefault() == null;
-                            if (!canInsertSpedisci)
-                            {
-                                errorMessage = "WarningPassoProtocolloDopoSpedizione";
-                                return errorMessage;
-                            }
-
-                            //Se esiste un passo di protocollazione, il registro di AOO deve coincidere con quello selezionato per la protocollazione
-                            if (!string.IsNullOrEmpty(this.PassoDiFirmaSelected.IdAOO))
-                            {
-                                PassoFirma passoProtocollazione = (from p in this.ProcessoDiFirmaSelected.passi
-                                                                   where p.Evento.CodiceAzione.Equals(Azione.RECORD_PREDISPOSED.ToString())
-                                                                   select p).FirstOrDefault();
-                                if (passoProtocollazione != null && !string.IsNullOrEmpty(passoProtocollazione.IdAOO) && !passoProtocollazione.IdAOO.Equals(PassoDiFirmaSelected.IdAOO))
-                                {
-                                    errorMessage = "WarningSignatureProcessesRegistroErrato";
-                                    return errorMessage;
-                                }
-                            }
-                                 
-                            break;
-                    }
                     break;
                 case LibroFirmaManager.TypeStep.WAIT:
 
@@ -2015,45 +1366,6 @@ namespace NttDataWA.Management
             return errorMessage;
         }
 
-        private string ControlloCampiObbligatori()
-        {
-            string errorMessage = string.Empty;
-
-            if (this.RblRoleOrTypeRole.SelectedValue.Equals(RUOLO) && string.IsNullOrEmpty(this.idRuolo.Value))
-            {
-                errorMessage = "WarningRequiredFieldRole";
-                return errorMessage;
-            }
-            else if (this.RblRoleOrTypeRole.SelectedValue.Equals(TIPO_RUOLO) && string.IsNullOrEmpty(this.DdlTypeRole.SelectedValue))
-            {
-                errorMessage = "WarningRequiredFieldTypeRole";
-                return errorMessage;
-            }
-            //Se il passo è di tipo evento e automatico, controllo che sia stato inserito idAOO, idRF e nel caso di soedizione la casella
-            if (RblTypeStep.SelectedValue.Equals(LibroFirmaManager.TypeStep.EVENT) && this.cbx_automatico.Checked)
-            {
-                if (string.IsNullOrEmpty(this.DdlRegistroAOO.SelectedValue))
-                {
-                    errorMessage = "WarningRequiredFieldRegistroRFSegnatura";
-                    return errorMessage;
-                }
-                Azione codiceEvento = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                if(codiceEvento.Equals(Azione.DOCUMENTOSPEDISCI))
-                {
-                    if (string.IsNullOrEmpty(this.DdlRegistroRF.SelectedValue))
-                    {
-                        errorMessage = "WarningRequiredFieldRegistroRFMittente";
-                        return errorMessage;
-                    }
-                    if (string.IsNullOrEmpty(this.DdlElencoCaselle.SelectedValue))
-                    {
-                        errorMessage = "WarningRequiredFieldCasellaMittente";
-                        return errorMessage;
-                    }
-                }
-            }
-            return errorMessage;
-        }
 
         private void PopolaPassoDiFirma()
         {
@@ -2102,39 +1414,18 @@ namespace NttDataWA.Management
                 {
                     passo.Evento.CodiceAzione = this.DdlTypeEvent.SelectedValue;
                     passo.Evento.Descrizione = this.DdlTypeEvent.SelectedItem.Text;
-                    passo.IsAutomatico = this.cbx_automatico.Checked;
-                    Azione codiceEvento = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                    if (passo.IsAutomatico)
-                    {
-                        switch (codiceEvento)
-                        {
-                            case Azione.RECORD_PREDISPOSED:
-                            case Azione.DOCUMENTO_REPERTORIATO:
-                                passo.IdAOO = this.DdlRegistroAOO.SelectedValue;
-                                passo.IdRF = this.DdlRegistroRF.SelectedValue;
-                                break;
-                            case Azione.DOCUMENTOSPEDISCI:
-                                passo.IdAOO = this.DdlRegistroAOO.SelectedValue;
-                                passo.IdRF = this.DdlRegistroRF.SelectedValue;
-                                passo.IdMailRegistro = this.DdlElencoCaselle.SelectedValue;
-                                break;
-                        }
-                    }
                 }
                 //Verifico se ho selezionato un ruolo o Tipo ruolo
                 if (this.RblRoleOrTypeRole.SelectedValue.Equals(RUOLO))
                 {
-                    if (PassoDiFirmaSelected.ruoloCoinvolto != null && !string.IsNullOrEmpty(PassoDiFirmaSelected.ruoloCoinvolto.idGruppo))
+                    if (this.PassoDiFirmaSelected != null)
                     {
-                        if (this.PassoDiFirmaSelected != null)
-                        {
-                            passo.ruoloCoinvolto = PassoDiFirmaSelected.ruoloCoinvolto;
-                        }
-
-                        passo.utenteCoinvolto = new Utente();
-                        passo.utenteCoinvolto.idPeople = this.ddlUtenteCoinvolto.SelectedValue;
-                        passo.utenteCoinvolto.descrizione = this.ddlUtenteCoinvolto.SelectedItem != null ? this.ddlUtenteCoinvolto.SelectedItem.Text : string.Empty;
+                        passo.ruoloCoinvolto = PassoDiFirmaSelected.ruoloCoinvolto;
                     }
+
+                    passo.utenteCoinvolto = new Utente();
+                    passo.utenteCoinvolto.idPeople = this.ddlUtenteCoinvolto.SelectedValue;
+                    passo.utenteCoinvolto.descrizione = this.ddlUtenteCoinvolto.SelectedItem.Text;
                 }
                 else
                 {
@@ -2186,11 +1477,6 @@ namespace NttDataWA.Management
                 this.msgTextInvalidated.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesUserDisabled", UserManager.GetUserLanguage());
                 this.PnlWarningRoleUserDisabled.Visible = true;
             }
-            if (p.Invalidated == REGISTRO_DISABLED)
-            {
-                this.msgTextInvalidated.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesRegistroDisabled", UserManager.GetUserLanguage());
-                this.PnlWarningRoleUserDisabled.Visible = true;
-            }
 
             switch (p.Evento.TipoEvento)
             {
@@ -2213,28 +1499,6 @@ namespace NttDataWA.Management
                     break;
                 case LibroFirmaManager.TypeStep.EVENT:
                     this.DdlTypeEvent.SelectedValue = p.Evento.CodiceAzione;
-                    if (SignatureProcessesManager.IsEventoAutomatico(p.Evento.CodiceAzione))
-                    {
-                        Azione azione = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                        //Verifico se il ruolo è abilitato alla creazione del passo automatico
-                        switch (azione)
-                        {
-                            case Azione.RECORD_PREDISPOSED:
-                                this.cbx_automatico.Visible = UserManager.IsAuthorizedFunctions("CREA_PASSO_PROTO_AUTO");
-                                break;
-                            case Azione.DOCUMENTOSPEDISCI:
-                                this.cbx_automatico.Visible = UserManager.IsAuthorizedFunctions("CREA_PASSO_SPEDIZIONE_AUTO");
-                                break;
-                            case Azione.DOCUMENTO_REPERTORIATO:
-                                this.cbx_automatico.Visible = UserManager.IsAuthorizedFunctions("CREA_PASSO_REPERTORIAZIONE_AUTO");
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        this.cbx_automatico.Visible = false;
-                    }
-                    this.cbx_automatico.Checked = p.IsAutomatico;
                     FillPanelDetailEvent_Sign(p);
                     break;
             }
@@ -2256,8 +1520,7 @@ namespace NttDataWA.Management
                 this.PnlRole.Attributes.Add("style", "display:block");
                 this.PnlUenteCoinvolto.Attributes.Add("style", "display:block");
                 this.PnlTypeRole.Attributes.Add("style", "display:none");
-                if (p.Invalidated != USER_DISABLED && p.Invalidated != ROLE_DISABLED &&
-                    p.ruoloCoinvolto != null && !string.IsNullOrEmpty(p.ruoloCoinvolto.idGruppo))
+                if (p.Invalidated != USER_DISABLED && p.Invalidated != ROLE_DISABLED)
                 {
                     this.TxtCodeRole.Text = p.ruoloCoinvolto.codiceRubrica;
                     this.TxtDescriptionRole.Text = p.ruoloCoinvolto.descrizione;
@@ -2282,8 +1545,8 @@ namespace NttDataWA.Management
                     this.ddlUtenteCoinvolto.ClearSelection();
                 }
             }
-            this.VisibilitaCampiAutomatici(p.IsAutomatico, p);
             this.txtNotes.Text = p.note;
+
             foreach (ListItem item in this.cbxOptionNotify.Items)
             {
                 item.Selected = (from e in p.idEventiDaNotificare where e.Equals(item.Value) select e).FirstOrDefault() != null;
@@ -2295,7 +1558,7 @@ namespace NttDataWA.Management
             string msg = string.Empty;
             if (UIManager.SignatureProcessesManager.RimuoviProcessoDiFirma(this.ProcessoDiFirmaSelected))
             {
-                this.TreeSignatureProcess.Nodes[0].ChildNodes.Remove(this.TreeSignatureProcess.SelectedNode);
+                this.TreeSignatureProcess.Nodes.Remove(this.TreeSignatureProcess.SelectedNode);
                 this.upPnlTreeSignatureProcess.Update();
                 this.ProcessoDiFirmaSelected = null;
                 this.UpdateContentPage();
@@ -2313,15 +1576,35 @@ namespace NttDataWA.Management
             string msg = string.Empty;
             if (UIManager.SignatureProcessesManager.RimuoviPassoDiFirma(this.PassoDiFirmaSelected))
             {
-                ProcessoFirma processo = UIManager.SignatureProcessesManager.GetProcessoDiFirma(PassoDiFirmaSelected.idProcesso);
-                //Aggiorno il treeview
-                TreeNode parentNode = this.TreeSignatureProcess.SelectedNode.Parent;
-                this.UpdateNode(parentNode, processo);
-                //Aggiorno il processo in sessione
-                this.ListaProcessiDiFirma.Where(p => p.idProcesso.Equals(processo.idProcesso)).ToList().ForEach(f => f.passi = processo.passi);
+                //Rimuovo il passo dall'oggetto in sessione
+                ProcessoFirma processo = (from p in this.ListaProcessiDiFirma where p.idProcesso.Equals(this.PassoDiFirmaSelected.idProcesso) select p).FirstOrDefault();
+                DecrementaNumeroSequenzaPassi(ref processo, PassoDiFirmaSelected);
+                List<PassoFirma> listaPassi = (from p in processo.passi where !p.idPasso.Equals(PassoDiFirmaSelected.idPasso) select p).ToList();
+                processo.passi = listaPassi.ToArray();
+
+                //Se il passo era invalidato, lo aggiorno a valido e se, non esistono altri passi invalidi, aggiorno anche il processo
+                if (PassoDiFirmaSelected.Invalidated == ROLE_DISABLED || PassoDiFirmaSelected.Invalidated == USER_DISABLED)
+                {
+                    if ((from p in processo.passi where p.Invalidated == ROLE_DISABLED || p.Invalidated == USER_DISABLED select p).FirstOrDefault() == null)
+                    {
+                        processo.isInvalidated = false;
+                        this.UpdateRootElement(processo);
+                    }
+                }
+
+                //Rimuovo il nodo dal treeview e aggiorno la numerazione dei passi
+                TreeNode nodoParent = this.TreeSignatureProcess.SelectedNode.Parent;
+                nodoParent.ChildNodes.Clear();
+                foreach (PassoFirma p in processo.passi)
+                {
+                    this.AddChildrenElements(p, ref nodoParent);
+                }
+                nodoParent.Select();
+
+                this.upPnlTreeSignatureProcess.Update();
 
                 this.PassoDiFirmaSelected = null;
-                this.CalcolaProssimoPasso(processo);
+                this.CalcolaProssimoPasso();
                 this.UpdateContentPage();
             }
             else
@@ -2377,6 +1660,27 @@ namespace NttDataWA.Management
             }
         }
 
+
+        //private void RblTypeSignature_Bind()
+        //{
+        //    List<ListItem> listItem = new List<ListItem>();
+
+        //    listItem.Add(new ListItem()
+        //    {
+        //        Text = Utils.Languages.GetLabelFromCode("rblSignatureProcessesOptDigitale", UIManager.UserManager.GetUserLanguage()),
+        //        Value = TipoFirma.DIGITALE_CADES.ToString()
+        //    });
+
+        //    listItem.Add(new ListItem()
+        //    {
+        //        Text = Utils.Languages.GetLabelFromCode("rblSignatureProcessesOptElettronica", UIManager.UserManager.GetUserLanguage()),
+        //        Value = TipoFirma.ELETTRONICA.ToString()
+        //    });
+
+        //    this.rblTypeSignature.Items.Clear();
+        //    this.rblTypeSignature.Items.AddRange(listItem.ToArray());
+        //    this.rblTypeSignature.SelectedValue = TipoFirma.DIGITALE_CADES.ToString();
+        //}
 
         /// <summary>
         /// Costruisce i radio button per la firma
@@ -2446,12 +1750,12 @@ namespace NttDataWA.Management
             #endregion
         }
 
-        private void CalcolaProssimoPasso(ProcessoFirma processo)
+        private void CalcolaProssimoPasso()
         {
             this.lblSectionDocument.Text = Utils.Languages.GetLabelFromCode("SignatureProcessesLblSectionDocument", UIManager.UserManager.GetUserLanguage()) +
-                 (processo.passi.Length + 1).ToString();
+                 (this.ProcessoDiFirmaSelected.passi.Length + 1).ToString();
 
-            this.txtNr.Text = (processo.passi.Length + 1).ToString();
+            this.txtNr.Text = (this.ProcessoDiFirmaSelected.passi.Length + 1).ToString();
 
             this.pnlStep.Visible = true;
             this.UpdPnlStep.Update();
@@ -2462,55 +1766,38 @@ namespace NttDataWA.Management
         /// </summary>
         /// <param name="role"></param>
         /// <returns></returns>
-        private bool IsRuoloAbilitatoAlPassoSelezionato(Ruolo role)
+        private bool IsRoleEnabledSignature(Ruolo role)
         {
             bool isAuthorizedSign = true;
             if (this.RblTypeStep.SelectedValue.Equals(LibroFirmaManager.TypeStep.SIGN))
             {
                 if (this.rblTypeSignature.SelectedValue.Equals(DIGITALE))
                 {
-                    isAuthorizedSign = UserManager.IsRoleAuthorizedFunctions("DO_DOC_FIRMA", role) || UserManager.IsRoleAuthorizedFunctions("FIRMA_HSM", role);
+                    isAuthorizedSign = ((from function in role.funzioni
+                                         where function.codice.ToUpper().Equals("DO_DOC_FIRMA")
+                                         select function.systemId).Count() > 0 ||
+                                    (from function in role.funzioni
+                                     where function.codice.ToUpper().Equals("FIRMA_HSM")
+                                     select function.systemId).Count() > 0);
                 }
                 if (this.rblTypeSignature.SelectedValue.Equals(ELETTRONICA))
                 {
                     if (this.rblTypeSignatureE.SelectedValue.Equals(LibroFirmaManager.TypeEvent.VERIFIED))
                     {
-                        isAuthorizedSign = UserManager.IsRoleAuthorizedFunctions("DO_DOC_FIRMA_ELETTRONICA", role);
+                        isAuthorizedSign = ((from function in role.funzioni
+                                             where function.codice.ToUpper().Equals("DO_DOC_FIRMA_ELETTRONICA")
+                                             select function.systemId).Count() > 0);
                     }
                     else if (this.rblTypeSignatureE.SelectedValue.Equals(LibroFirmaManager.TypeEvent.ADVANCEMENT_PROCESS))
                     {
-                        isAuthorizedSign = UserManager.IsRoleAuthorizedFunctions("DO_DOC_AVANZAMENTO_ITER", role);
+                        isAuthorizedSign = ((from function in role.funzioni
+                                             where function.codice.ToUpper().Equals("DO_DOC_AVANZAMENTO_ITER")
+                                             select function.systemId).Count() > 0);
                     }
-                }
-            }
-            if (this.RblTypeStep.SelectedValue.Equals(LibroFirmaManager.TypeStep.EVENT))
-            {
-                Azione codiceEvento = (Azione)Enum.Parse(typeof(Azione), this.DdlTypeEvent.SelectedValue, true);
-                switch (codiceEvento)
-                {
-                    case Azione.RECORD_PREDISPOSED:
-                        //Verifico che il ruolo selezionato ha la funzionalità di protocollazione abilitata
-                        if (cbx_automatico.Checked)
-                            isAuthorizedSign = UserManager.IsRoleAuthorizedFunctions("DO_PROT_PROTOCOLLA", role) && UserManager.IsRoleAuthorizedFunctions("DO_PROT_PROTOCOLLA_AUTOMATICO", role);
-                        else
-                            isAuthorizedSign = UserManager.IsRoleAuthorizedFunctions("DO_PROT_PROTOCOLLA", role);
-                        break;
-                    case Azione.DOCUMENTO_REPERTORIATO:
-                        if(cbx_automatico.Checked)
-                            isAuthorizedSign = UserManager.IsRoleAuthorizedFunctions("DO_REPERTORIAZIONE_ATOMATICA", role);
-                        break;
-                    case Azione.DOCUMENTOSPEDISCI:
-                        //Verifico che il ruolo selezionato ha la funzionalità di protocollazione abilitata
-                        if (cbx_automatico.Checked)
-                            isAuthorizedSign = UserManager.IsRoleAuthorizedFunctions("DO_OUT_SPEDISCI", role) && UserManager.IsRoleAuthorizedFunctions("DO_OUT_SPEDISCI_AUTOMATICA", role);
-                        else
-                            isAuthorizedSign = UserManager.IsRoleAuthorizedFunctions("DO_OUT_SPEDISCI", role);
-                        break;
                 }
             }
             return isAuthorizedSign;
         }
-
         #endregion
     }
 }

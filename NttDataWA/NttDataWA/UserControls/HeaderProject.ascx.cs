@@ -230,7 +230,7 @@ namespace NttDataWA.UserControls
                             this.projectLblStatoGenerato.Text = Utils.Languages.GetLabelFromCode("prjectStatoRegistroAperto", UIManager.UserManager.GetUserLanguage());
                             this.projectLblStatoGenerato.CssClass = "open";
                         }
-                        
+
 
                         if (this.MissingRolesList != null && this.MissingRolesList.Count > 0)
                         {
