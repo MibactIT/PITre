@@ -24,15 +24,85 @@ namespace ConservazioneWA.WSConservazioneLocale {
     
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="DocsPaConservazioneWSSoap", Namespace="http://localhost")]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(FileRequest))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(Destinatario))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FiltroRicercaNote))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(AssociazioneNota))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FiltroRicercaNote))]
     public partial class DocsPaConservazioneWS : System.Web.Services.Protocols.SoapHttpClientProtocol {
+        
+        private System.Threading.SendOrPostCallback setPolicyVerificataLiteOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback getSegnatura_ID_DocOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback createReportConservazioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetListNonConfPolicyOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetInfoEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetItemsEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback RemoveItemsEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback RemoveIstanzaEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback SaveFieldsEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback RichiediCertificazioneIstanzaEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback MarcaCertificazioneIstanzaEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback UpdateCertificazioneIstanzaEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback RifiutaCertificazioneIstanzaEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback RiabilitaIstanzaEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback ChiudiIstanzaEsibizioneAsyncOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetEsibizioneDownloadUrlOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetAbilitatoCentroServiziOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetAbilitatoEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetContatoriEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetContatoriEsibizioneConservazioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback CreateAndAddDocInAreaEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback SerializeSchedaEsibOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback UpdateSizeItemEsibOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback updateItemsEsibOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback checkItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback isLocalStoreOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetIdCorrGlobaliEsibizioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback rigeneraIstanzaOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback isIstanzaRigenerataOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetChiaveConfigurazioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback IsAlertConservazioneAttivoOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetParametriAlertConservazioneOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback InvioAlertAsyncOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback RegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback IsVerificaLeggibilitaAnticipataOperationCompleted;
         
         private System.Threading.SendOrPostCallback MettiInLavorazioneAsyncOperationCompleted;
         
@@ -47,8 +117,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         private System.Threading.SendOrPostCallback getItemsConservazioneOperationCompleted;
         
         private System.Threading.SendOrPostCallback getItemsConservazioneWithSecurityOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback getItemsConservazioneLiteOperationCompleted;
         
         private System.Threading.SendOrPostCallback validateIstanzaConservazioneOperationCompleted;
         
@@ -212,76 +280,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         
         private System.Threading.SendOrPostCallback getMaxDimensioniIstanzaOperationCompleted;
         
-        private System.Threading.SendOrPostCallback setPolicyVerificataLiteOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback getSegnatura_ID_DocOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback createReportConservazioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetListNonConfPolicyOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetInfoEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetItemsEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback RemoveItemsEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback RemoveIstanzaEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback SaveFieldsEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback RichiediCertificazioneIstanzaEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback MarcaCertificazioneIstanzaEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback UpdateCertificazioneIstanzaEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback RifiutaCertificazioneIstanzaEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback RiabilitaIstanzaEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback ChiudiIstanzaEsibizioneAsyncOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetEsibizioneDownloadUrlOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetAbilitatoCentroServiziOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetAbilitatoEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetContatoriEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetContatoriEsibizioneConservazioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback CreateAndAddDocInAreaEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback SerializeSchedaEsibOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback UpdateSizeItemEsibOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback updateItemsEsibOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback checkItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback isLocalStoreOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetIdCorrGlobaliEsibizioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback rigeneraIstanzaOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback isIstanzaRigenerataOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetChiaveConfigurazioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback IsAlertConservazioneAttivoOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback GetParametriAlertConservazioneOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback InvioAlertAsyncOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback RegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback IsVerificaLeggibilitaAnticipataOperationCompleted;
-        
         private bool useDefaultCredentialsSetExplicitly;
         
         /// <remarks/>
@@ -321,6 +319,111 @@ namespace ConservazioneWA.WSConservazioneLocale {
         }
         
         /// <remarks/>
+        public event setPolicyVerificataLiteCompletedEventHandler setPolicyVerificataLiteCompleted;
+        
+        /// <remarks/>
+        public event getSegnatura_ID_DocCompletedEventHandler getSegnatura_ID_DocCompleted;
+        
+        /// <remarks/>
+        public event createReportConservazioneCompletedEventHandler createReportConservazioneCompleted;
+        
+        /// <remarks/>
+        public event GetListNonConfPolicyCompletedEventHandler GetListNonConfPolicyCompleted;
+        
+        /// <remarks/>
+        public event GetInfoEsibizioneCompletedEventHandler GetInfoEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event GetItemsEsibizioneCompletedEventHandler GetItemsEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event RemoveItemsEsibizioneCompletedEventHandler RemoveItemsEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event RemoveIstanzaEsibizioneCompletedEventHandler RemoveIstanzaEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event SaveFieldsEsibizioneCompletedEventHandler SaveFieldsEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event RichiediCertificazioneIstanzaEsibizioneCompletedEventHandler RichiediCertificazioneIstanzaEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event MarcaCertificazioneIstanzaEsibizioneCompletedEventHandler MarcaCertificazioneIstanzaEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event UpdateCertificazioneIstanzaEsibizioneCompletedEventHandler UpdateCertificazioneIstanzaEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event RifiutaCertificazioneIstanzaEsibizioneCompletedEventHandler RifiutaCertificazioneIstanzaEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event RiabilitaIstanzaEsibizioneCompletedEventHandler RiabilitaIstanzaEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event ChiudiIstanzaEsibizioneAsyncCompletedEventHandler ChiudiIstanzaEsibizioneAsyncCompleted;
+        
+        /// <remarks/>
+        public event GetEsibizioneDownloadUrlCompletedEventHandler GetEsibizioneDownloadUrlCompleted;
+        
+        /// <remarks/>
+        public event GetAbilitatoCentroServiziCompletedEventHandler GetAbilitatoCentroServiziCompleted;
+        
+        /// <remarks/>
+        public event GetAbilitatoEsibizioneCompletedEventHandler GetAbilitatoEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event GetContatoriEsibizioneCompletedEventHandler GetContatoriEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event GetContatoriEsibizioneConservazioneCompletedEventHandler GetContatoriEsibizioneConservazioneCompleted;
+        
+        /// <remarks/>
+        public event CreateAndAddDocInAreaEsibizioneCompletedEventHandler CreateAndAddDocInAreaEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event SerializeSchedaEsibCompletedEventHandler SerializeSchedaEsibCompleted;
+        
+        /// <remarks/>
+        public event UpdateSizeItemEsibCompletedEventHandler UpdateSizeItemEsibCompleted;
+        
+        /// <remarks/>
+        public event updateItemsEsibCompletedEventHandler updateItemsEsibCompleted;
+        
+        /// <remarks/>
+        public event checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventHandler checkItemEsibizionePresenteInIstanzaEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event isLocalStoreCompletedEventHandler isLocalStoreCompleted;
+        
+        /// <remarks/>
+        public event GetIdCorrGlobaliEsibizioneCompletedEventHandler GetIdCorrGlobaliEsibizioneCompleted;
+        
+        /// <remarks/>
+        public event rigeneraIstanzaCompletedEventHandler rigeneraIstanzaCompleted;
+        
+        /// <remarks/>
+        public event isIstanzaRigenerataCompletedEventHandler isIstanzaRigenerataCompleted;
+        
+        /// <remarks/>
+        public event GetChiaveConfigurazioneCompletedEventHandler GetChiaveConfigurazioneCompleted;
+        
+        /// <remarks/>
+        public event IsAlertConservazioneAttivoCompletedEventHandler IsAlertConservazioneAttivoCompleted;
+        
+        /// <remarks/>
+        public event GetParametriAlertConservazioneCompletedEventHandler GetParametriAlertConservazioneCompleted;
+        
+        /// <remarks/>
+        public event InvioAlertAsyncCompletedEventHandler InvioAlertAsyncCompleted;
+        
+        /// <remarks/>
+        public event RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompletedEventHandler RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompleted;
+        
+        /// <remarks/>
+        public event IsVerificaLeggibilitaAnticipataCompletedEventHandler IsVerificaLeggibilitaAnticipataCompleted;
+        
+        /// <remarks/>
         public event MettiInLavorazioneAsyncCompletedEventHandler MettiInLavorazioneAsyncCompleted;
         
         /// <remarks/>
@@ -340,9 +443,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         
         /// <remarks/>
         public event getItemsConservazioneWithSecurityCompletedEventHandler getItemsConservazioneWithSecurityCompleted;
-        
-        /// <remarks/>
-        public event getItemsConservazioneLiteCompletedEventHandler getItemsConservazioneLiteCompleted;
         
         /// <remarks/>
         public event validateIstanzaConservazioneCompletedEventHandler validateIstanzaConservazioneCompleted;
@@ -588,109 +688,1135 @@ namespace ConservazioneWA.WSConservazioneLocale {
         public event getMaxDimensioniIstanzaCompletedEventHandler getMaxDimensioniIstanzaCompleted;
         
         /// <remarks/>
-        public event setPolicyVerificataLiteCompletedEventHandler setPolicyVerificataLiteCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/setPolicyVerificataLite", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void setPolicyVerificataLite(string idConservazione) {
+            this.Invoke("setPolicyVerificataLite", new object[] {
+                        idConservazione});
+        }
         
         /// <remarks/>
-        public event getSegnatura_ID_DocCompletedEventHandler getSegnatura_ID_DocCompleted;
+        public void setPolicyVerificataLiteAsync(string idConservazione) {
+            this.setPolicyVerificataLiteAsync(idConservazione, null);
+        }
         
         /// <remarks/>
-        public event createReportConservazioneCompletedEventHandler createReportConservazioneCompleted;
+        public void setPolicyVerificataLiteAsync(string idConservazione, object userState) {
+            if ((this.setPolicyVerificataLiteOperationCompleted == null)) {
+                this.setPolicyVerificataLiteOperationCompleted = new System.Threading.SendOrPostCallback(this.OnsetPolicyVerificataLiteOperationCompleted);
+            }
+            this.InvokeAsync("setPolicyVerificataLite", new object[] {
+                        idConservazione}, this.setPolicyVerificataLiteOperationCompleted, userState);
+        }
+        
+        private void OnsetPolicyVerificataLiteOperationCompleted(object arg) {
+            if ((this.setPolicyVerificataLiteCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.setPolicyVerificataLiteCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event GetListNonConfPolicyCompletedEventHandler GetListNonConfPolicyCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/getSegnatura_ID_Doc", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string getSegnatura_ID_Doc(string idProfile) {
+            object[] results = this.Invoke("getSegnatura_ID_Doc", new object[] {
+                        idProfile});
+            return ((string)(results[0]));
+        }
         
         /// <remarks/>
-        public event GetInfoEsibizioneCompletedEventHandler GetInfoEsibizioneCompleted;
+        public void getSegnatura_ID_DocAsync(string idProfile) {
+            this.getSegnatura_ID_DocAsync(idProfile, null);
+        }
         
         /// <remarks/>
-        public event GetItemsEsibizioneCompletedEventHandler GetItemsEsibizioneCompleted;
+        public void getSegnatura_ID_DocAsync(string idProfile, object userState) {
+            if ((this.getSegnatura_ID_DocOperationCompleted == null)) {
+                this.getSegnatura_ID_DocOperationCompleted = new System.Threading.SendOrPostCallback(this.OngetSegnatura_ID_DocOperationCompleted);
+            }
+            this.InvokeAsync("getSegnatura_ID_Doc", new object[] {
+                        idProfile}, this.getSegnatura_ID_DocOperationCompleted, userState);
+        }
+        
+        private void OngetSegnatura_ID_DocOperationCompleted(object arg) {
+            if ((this.getSegnatura_ID_DocCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.getSegnatura_ID_DocCompleted(this, new getSegnatura_ID_DocCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event RemoveItemsEsibizioneCompletedEventHandler RemoveItemsEsibizioneCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/createReportConservazione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public FileDocumento createReportConservazione(FiltroRicerca[] filtriReport, string tipoRep, string tipoFile, string titoloReport, string reportKey, string contextName, InfoUtente infoUt) {
+            object[] results = this.Invoke("createReportConservazione", new object[] {
+                        filtriReport,
+                        tipoRep,
+                        tipoFile,
+                        titoloReport,
+                        reportKey,
+                        contextName,
+                        infoUt});
+            return ((FileDocumento)(results[0]));
+        }
         
         /// <remarks/>
-        public event RemoveIstanzaEsibizioneCompletedEventHandler RemoveIstanzaEsibizioneCompleted;
+        public void createReportConservazioneAsync(FiltroRicerca[] filtriReport, string tipoRep, string tipoFile, string titoloReport, string reportKey, string contextName, InfoUtente infoUt) {
+            this.createReportConservazioneAsync(filtriReport, tipoRep, tipoFile, titoloReport, reportKey, contextName, infoUt, null);
+        }
         
         /// <remarks/>
-        public event SaveFieldsEsibizioneCompletedEventHandler SaveFieldsEsibizioneCompleted;
+        public void createReportConservazioneAsync(FiltroRicerca[] filtriReport, string tipoRep, string tipoFile, string titoloReport, string reportKey, string contextName, InfoUtente infoUt, object userState) {
+            if ((this.createReportConservazioneOperationCompleted == null)) {
+                this.createReportConservazioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OncreateReportConservazioneOperationCompleted);
+            }
+            this.InvokeAsync("createReportConservazione", new object[] {
+                        filtriReport,
+                        tipoRep,
+                        tipoFile,
+                        titoloReport,
+                        reportKey,
+                        contextName,
+                        infoUt}, this.createReportConservazioneOperationCompleted, userState);
+        }
+        
+        private void OncreateReportConservazioneOperationCompleted(object arg) {
+            if ((this.createReportConservazioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.createReportConservazioneCompleted(this, new createReportConservazioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event RichiediCertificazioneIstanzaEsibizioneCompletedEventHandler RichiediCertificazioneIstanzaEsibizioneCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetListNonConfPolicy", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetListNonConfPolicy(string maskPolicy) {
+            object[] results = this.Invoke("GetListNonConfPolicy", new object[] {
+                        maskPolicy});
+            return ((string)(results[0]));
+        }
         
         /// <remarks/>
-        public event MarcaCertificazioneIstanzaEsibizioneCompletedEventHandler MarcaCertificazioneIstanzaEsibizioneCompleted;
+        public void GetListNonConfPolicyAsync(string maskPolicy) {
+            this.GetListNonConfPolicyAsync(maskPolicy, null);
+        }
         
         /// <remarks/>
-        public event UpdateCertificazioneIstanzaEsibizioneCompletedEventHandler UpdateCertificazioneIstanzaEsibizioneCompleted;
+        public void GetListNonConfPolicyAsync(string maskPolicy, object userState) {
+            if ((this.GetListNonConfPolicyOperationCompleted == null)) {
+                this.GetListNonConfPolicyOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetListNonConfPolicyOperationCompleted);
+            }
+            this.InvokeAsync("GetListNonConfPolicy", new object[] {
+                        maskPolicy}, this.GetListNonConfPolicyOperationCompleted, userState);
+        }
+        
+        private void OnGetListNonConfPolicyOperationCompleted(object arg) {
+            if ((this.GetListNonConfPolicyCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetListNonConfPolicyCompleted(this, new GetListNonConfPolicyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event RifiutaCertificazioneIstanzaEsibizioneCompletedEventHandler RifiutaCertificazioneIstanzaEsibizioneCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetInfoEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public InfoEsibizione[] GetInfoEsibizione(InfoUtente infoUtente, object[] filters) {
+            object[] results = this.Invoke("GetInfoEsibizione", new object[] {
+                        infoUtente,
+                        filters});
+            return ((InfoEsibizione[])(results[0]));
+        }
         
         /// <remarks/>
-        public event RiabilitaIstanzaEsibizioneCompletedEventHandler RiabilitaIstanzaEsibizioneCompleted;
+        public void GetInfoEsibizioneAsync(InfoUtente infoUtente, object[] filters) {
+            this.GetInfoEsibizioneAsync(infoUtente, filters, null);
+        }
         
         /// <remarks/>
-        public event ChiudiIstanzaEsibizioneAsyncCompletedEventHandler ChiudiIstanzaEsibizioneAsyncCompleted;
+        public void GetInfoEsibizioneAsync(InfoUtente infoUtente, object[] filters, object userState) {
+            if ((this.GetInfoEsibizioneOperationCompleted == null)) {
+                this.GetInfoEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetInfoEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("GetInfoEsibizione", new object[] {
+                        infoUtente,
+                        filters}, this.GetInfoEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnGetInfoEsibizioneOperationCompleted(object arg) {
+            if ((this.GetInfoEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetInfoEsibizioneCompleted(this, new GetInfoEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event GetEsibizioneDownloadUrlCompletedEventHandler GetEsibizioneDownloadUrlCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetItemsEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public ItemsEsibizione[] GetItemsEsibizione(InfoUtente infoUtente, string idEsibizione) {
+            object[] results = this.Invoke("GetItemsEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione});
+            return ((ItemsEsibizione[])(results[0]));
+        }
         
         /// <remarks/>
-        public event GetAbilitatoCentroServiziCompletedEventHandler GetAbilitatoCentroServiziCompleted;
+        public void GetItemsEsibizioneAsync(InfoUtente infoUtente, string idEsibizione) {
+            this.GetItemsEsibizioneAsync(infoUtente, idEsibizione, null);
+        }
         
         /// <remarks/>
-        public event GetAbilitatoEsibizioneCompletedEventHandler GetAbilitatoEsibizioneCompleted;
+        public void GetItemsEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
+            if ((this.GetItemsEsibizioneOperationCompleted == null)) {
+                this.GetItemsEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetItemsEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("GetItemsEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione}, this.GetItemsEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnGetItemsEsibizioneOperationCompleted(object arg) {
+            if ((this.GetItemsEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetItemsEsibizioneCompleted(this, new GetItemsEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event GetContatoriEsibizioneCompletedEventHandler GetContatoriEsibizioneCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RemoveItemsEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool RemoveItemsEsibizione(InfoUtente infoUtente, string idDocumento) {
+            object[] results = this.Invoke("RemoveItemsEsibizione", new object[] {
+                        infoUtente,
+                        idDocumento});
+            return ((bool)(results[0]));
+        }
         
         /// <remarks/>
-        public event GetContatoriEsibizioneConservazioneCompletedEventHandler GetContatoriEsibizioneConservazioneCompleted;
+        public void RemoveItemsEsibizioneAsync(InfoUtente infoUtente, string idDocumento) {
+            this.RemoveItemsEsibizioneAsync(infoUtente, idDocumento, null);
+        }
         
         /// <remarks/>
-        public event CreateAndAddDocInAreaEsibizioneCompletedEventHandler CreateAndAddDocInAreaEsibizioneCompleted;
+        public void RemoveItemsEsibizioneAsync(InfoUtente infoUtente, string idDocumento, object userState) {
+            if ((this.RemoveItemsEsibizioneOperationCompleted == null)) {
+                this.RemoveItemsEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRemoveItemsEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("RemoveItemsEsibizione", new object[] {
+                        infoUtente,
+                        idDocumento}, this.RemoveItemsEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnRemoveItemsEsibizioneOperationCompleted(object arg) {
+            if ((this.RemoveItemsEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.RemoveItemsEsibizioneCompleted(this, new RemoveItemsEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event SerializeSchedaEsibCompletedEventHandler SerializeSchedaEsibCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RemoveIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool RemoveIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione) {
+            object[] results = this.Invoke("RemoveIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione});
+            return ((bool)(results[0]));
+        }
         
         /// <remarks/>
-        public event UpdateSizeItemEsibCompletedEventHandler UpdateSizeItemEsibCompleted;
+        public void RemoveIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione) {
+            this.RemoveIstanzaEsibizioneAsync(infoUtente, idEsibizione, null);
+        }
         
         /// <remarks/>
-        public event updateItemsEsibCompletedEventHandler updateItemsEsibCompleted;
+        public void RemoveIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
+            if ((this.RemoveIstanzaEsibizioneOperationCompleted == null)) {
+                this.RemoveIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRemoveIstanzaEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("RemoveIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione}, this.RemoveIstanzaEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnRemoveIstanzaEsibizioneOperationCompleted(object arg) {
+            if ((this.RemoveIstanzaEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.RemoveIstanzaEsibizioneCompleted(this, new RemoveIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventHandler checkItemEsibizionePresenteInIstanzaEsibizioneCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/SaveFieldsEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool SaveFieldsEsibizione(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
+            object[] results = this.Invoke("SaveFieldsEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione,
+                        descrizione,
+                        note});
+            return ((bool)(results[0]));
+        }
         
         /// <remarks/>
-        public event isLocalStoreCompletedEventHandler isLocalStoreCompleted;
+        public void SaveFieldsEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
+            this.SaveFieldsEsibizioneAsync(infoUtente, idEsibizione, descrizione, note, null);
+        }
         
         /// <remarks/>
-        public event GetIdCorrGlobaliEsibizioneCompletedEventHandler GetIdCorrGlobaliEsibizioneCompleted;
+        public void SaveFieldsEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note, object userState) {
+            if ((this.SaveFieldsEsibizioneOperationCompleted == null)) {
+                this.SaveFieldsEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSaveFieldsEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("SaveFieldsEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione,
+                        descrizione,
+                        note}, this.SaveFieldsEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnSaveFieldsEsibizioneOperationCompleted(object arg) {
+            if ((this.SaveFieldsEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.SaveFieldsEsibizioneCompleted(this, new SaveFieldsEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event rigeneraIstanzaCompletedEventHandler rigeneraIstanzaCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RichiediCertificazioneIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool RichiediCertificazioneIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
+            object[] results = this.Invoke("RichiediCertificazioneIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione,
+                        descrizione,
+                        note});
+            return ((bool)(results[0]));
+        }
         
         /// <remarks/>
-        public event isIstanzaRigenerataCompletedEventHandler isIstanzaRigenerataCompleted;
+        public void RichiediCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
+            this.RichiediCertificazioneIstanzaEsibizioneAsync(infoUtente, idEsibizione, descrizione, note, null);
+        }
         
         /// <remarks/>
-        public event GetChiaveConfigurazioneCompletedEventHandler GetChiaveConfigurazioneCompleted;
+        public void RichiediCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note, object userState) {
+            if ((this.RichiediCertificazioneIstanzaEsibizioneOperationCompleted == null)) {
+                this.RichiediCertificazioneIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRichiediCertificazioneIstanzaEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("RichiediCertificazioneIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione,
+                        descrizione,
+                        note}, this.RichiediCertificazioneIstanzaEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnRichiediCertificazioneIstanzaEsibizioneOperationCompleted(object arg) {
+            if ((this.RichiediCertificazioneIstanzaEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.RichiediCertificazioneIstanzaEsibizioneCompleted(this, new RichiediCertificazioneIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event IsAlertConservazioneAttivoCompletedEventHandler IsAlertConservazioneAttivoCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/MarcaCertificazioneIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool MarcaCertificazioneIstanzaEsibizione(string systemID, InfoUtente utente, [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")] byte[] signedContent) {
+            object[] results = this.Invoke("MarcaCertificazioneIstanzaEsibizione", new object[] {
+                        systemID,
+                        utente,
+                        signedContent});
+            return ((bool)(results[0]));
+        }
         
         /// <remarks/>
-        public event GetParametriAlertConservazioneCompletedEventHandler GetParametriAlertConservazioneCompleted;
+        public void MarcaCertificazioneIstanzaEsibizioneAsync(string systemID, InfoUtente utente, byte[] signedContent) {
+            this.MarcaCertificazioneIstanzaEsibizioneAsync(systemID, utente, signedContent, null);
+        }
         
         /// <remarks/>
-        public event InvioAlertAsyncCompletedEventHandler InvioAlertAsyncCompleted;
+        public void MarcaCertificazioneIstanzaEsibizioneAsync(string systemID, InfoUtente utente, byte[] signedContent, object userState) {
+            if ((this.MarcaCertificazioneIstanzaEsibizioneOperationCompleted == null)) {
+                this.MarcaCertificazioneIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnMarcaCertificazioneIstanzaEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("MarcaCertificazioneIstanzaEsibizione", new object[] {
+                        systemID,
+                        utente,
+                        signedContent}, this.MarcaCertificazioneIstanzaEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnMarcaCertificazioneIstanzaEsibizioneOperationCompleted(object arg) {
+            if ((this.MarcaCertificazioneIstanzaEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.MarcaCertificazioneIstanzaEsibizioneCompleted(this, new MarcaCertificazioneIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
-        public event RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompletedEventHandler RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompleted;
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/UpdateCertificazioneIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool UpdateCertificazioneIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione) {
+            object[] results = this.Invoke("UpdateCertificazioneIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione});
+            return ((bool)(results[0]));
+        }
         
         /// <remarks/>
-        public event IsVerificaLeggibilitaAnticipataCompletedEventHandler IsVerificaLeggibilitaAnticipataCompleted;
+        public void UpdateCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione) {
+            this.UpdateCertificazioneIstanzaEsibizioneAsync(infoUtente, idEsibizione, null);
+        }
+        
+        /// <remarks/>
+        public void UpdateCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
+            if ((this.UpdateCertificazioneIstanzaEsibizioneOperationCompleted == null)) {
+                this.UpdateCertificazioneIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnUpdateCertificazioneIstanzaEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("UpdateCertificazioneIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione}, this.UpdateCertificazioneIstanzaEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnUpdateCertificazioneIstanzaEsibizioneOperationCompleted(object arg) {
+            if ((this.UpdateCertificazioneIstanzaEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.UpdateCertificazioneIstanzaEsibizioneCompleted(this, new UpdateCertificazioneIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RifiutaCertificazioneIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool RifiutaCertificazioneIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione, string note) {
+            object[] results = this.Invoke("RifiutaCertificazioneIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione,
+                        note});
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void RifiutaCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string note) {
+            this.RifiutaCertificazioneIstanzaEsibizioneAsync(infoUtente, idEsibizione, note, null);
+        }
+        
+        /// <remarks/>
+        public void RifiutaCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string note, object userState) {
+            if ((this.RifiutaCertificazioneIstanzaEsibizioneOperationCompleted == null)) {
+                this.RifiutaCertificazioneIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRifiutaCertificazioneIstanzaEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("RifiutaCertificazioneIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione,
+                        note}, this.RifiutaCertificazioneIstanzaEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnRifiutaCertificazioneIstanzaEsibizioneOperationCompleted(object arg) {
+            if ((this.RifiutaCertificazioneIstanzaEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.RifiutaCertificazioneIstanzaEsibizioneCompleted(this, new RifiutaCertificazioneIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RiabilitaIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string RiabilitaIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione) {
+            object[] results = this.Invoke("RiabilitaIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void RiabilitaIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione) {
+            this.RiabilitaIstanzaEsibizioneAsync(infoUtente, idEsibizione, null);
+        }
+        
+        /// <remarks/>
+        public void RiabilitaIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
+            if ((this.RiabilitaIstanzaEsibizioneOperationCompleted == null)) {
+                this.RiabilitaIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRiabilitaIstanzaEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("RiabilitaIstanzaEsibizione", new object[] {
+                        infoUtente,
+                        idEsibizione}, this.RiabilitaIstanzaEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnRiabilitaIstanzaEsibizioneOperationCompleted(object arg) {
+            if ((this.RiabilitaIstanzaEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.RiabilitaIstanzaEsibizioneCompleted(this, new RiabilitaIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/ChiudiIstanzaEsibizioneAsync", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void ChiudiIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
+            this.Invoke("ChiudiIstanzaEsibizioneAsync", new object[] {
+                        infoUtente,
+                        idEsibizione,
+                        descrizione,
+                        note});
+        }
+        
+        /// <remarks/>
+        public void ChiudiIstanzaEsibizioneAsyncAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
+            this.ChiudiIstanzaEsibizioneAsyncAsync(infoUtente, idEsibizione, descrizione, note, null);
+        }
+        
+        /// <remarks/>
+        public void ChiudiIstanzaEsibizioneAsyncAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note, object userState) {
+            if ((this.ChiudiIstanzaEsibizioneAsyncOperationCompleted == null)) {
+                this.ChiudiIstanzaEsibizioneAsyncOperationCompleted = new System.Threading.SendOrPostCallback(this.OnChiudiIstanzaEsibizioneAsyncOperationCompleted);
+            }
+            this.InvokeAsync("ChiudiIstanzaEsibizioneAsync", new object[] {
+                        infoUtente,
+                        idEsibizione,
+                        descrizione,
+                        note}, this.ChiudiIstanzaEsibizioneAsyncOperationCompleted, userState);
+        }
+        
+        private void OnChiudiIstanzaEsibizioneAsyncOperationCompleted(object arg) {
+            if ((this.ChiudiIstanzaEsibizioneAsyncCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ChiudiIstanzaEsibizioneAsyncCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetEsibizioneDownloadUrl", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetEsibizioneDownloadUrl(InfoUtente infoUtente, string idEsibizione) {
+            object[] results = this.Invoke("GetEsibizioneDownloadUrl", new object[] {
+                        infoUtente,
+                        idEsibizione});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetEsibizioneDownloadUrlAsync(InfoUtente infoUtente, string idEsibizione) {
+            this.GetEsibizioneDownloadUrlAsync(infoUtente, idEsibizione, null);
+        }
+        
+        /// <remarks/>
+        public void GetEsibizioneDownloadUrlAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
+            if ((this.GetEsibizioneDownloadUrlOperationCompleted == null)) {
+                this.GetEsibizioneDownloadUrlOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetEsibizioneDownloadUrlOperationCompleted);
+            }
+            this.InvokeAsync("GetEsibizioneDownloadUrl", new object[] {
+                        infoUtente,
+                        idEsibizione}, this.GetEsibizioneDownloadUrlOperationCompleted, userState);
+        }
+        
+        private void OnGetEsibizioneDownloadUrlOperationCompleted(object arg) {
+            if ((this.GetEsibizioneDownloadUrlCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetEsibizioneDownloadUrlCompleted(this, new GetEsibizioneDownloadUrlCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetAbilitatoCentroServizi", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetAbilitatoCentroServizi(string idPeople, string idAmm) {
+            object[] results = this.Invoke("GetAbilitatoCentroServizi", new object[] {
+                        idPeople,
+                        idAmm});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetAbilitatoCentroServiziAsync(string idPeople, string idAmm) {
+            this.GetAbilitatoCentroServiziAsync(idPeople, idAmm, null);
+        }
+        
+        /// <remarks/>
+        public void GetAbilitatoCentroServiziAsync(string idPeople, string idAmm, object userState) {
+            if ((this.GetAbilitatoCentroServiziOperationCompleted == null)) {
+                this.GetAbilitatoCentroServiziOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetAbilitatoCentroServiziOperationCompleted);
+            }
+            this.InvokeAsync("GetAbilitatoCentroServizi", new object[] {
+                        idPeople,
+                        idAmm}, this.GetAbilitatoCentroServiziOperationCompleted, userState);
+        }
+        
+        private void OnGetAbilitatoCentroServiziOperationCompleted(object arg) {
+            if ((this.GetAbilitatoCentroServiziCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetAbilitatoCentroServiziCompleted(this, new GetAbilitatoCentroServiziCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetAbilitatoEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetAbilitatoEsibizione(string idPeople, string idAmm) {
+            object[] results = this.Invoke("GetAbilitatoEsibizione", new object[] {
+                        idPeople,
+                        idAmm});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetAbilitatoEsibizioneAsync(string idPeople, string idAmm) {
+            this.GetAbilitatoEsibizioneAsync(idPeople, idAmm, null);
+        }
+        
+        /// <remarks/>
+        public void GetAbilitatoEsibizioneAsync(string idPeople, string idAmm, object userState) {
+            if ((this.GetAbilitatoEsibizioneOperationCompleted == null)) {
+                this.GetAbilitatoEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetAbilitatoEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("GetAbilitatoEsibizione", new object[] {
+                        idPeople,
+                        idAmm}, this.GetAbilitatoEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnGetAbilitatoEsibizioneOperationCompleted(object arg) {
+            if ((this.GetAbilitatoEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetAbilitatoEsibizioneCompleted(this, new GetAbilitatoEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetContatoriEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public ContatoriEsibizione GetContatoriEsibizione(InfoUtente infoUtente, string idGruppo) {
+            object[] results = this.Invoke("GetContatoriEsibizione", new object[] {
+                        infoUtente,
+                        idGruppo});
+            return ((ContatoriEsibizione)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetContatoriEsibizioneAsync(InfoUtente infoUtente, string idGruppo) {
+            this.GetContatoriEsibizioneAsync(infoUtente, idGruppo, null);
+        }
+        
+        /// <remarks/>
+        public void GetContatoriEsibizioneAsync(InfoUtente infoUtente, string idGruppo, object userState) {
+            if ((this.GetContatoriEsibizioneOperationCompleted == null)) {
+                this.GetContatoriEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetContatoriEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("GetContatoriEsibizione", new object[] {
+                        infoUtente,
+                        idGruppo}, this.GetContatoriEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnGetContatoriEsibizioneOperationCompleted(object arg) {
+            if ((this.GetContatoriEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetContatoriEsibizioneCompleted(this, new GetContatoriEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetContatoriEsibizioneConservazione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public ContatoriEsibizione GetContatoriEsibizioneConservazione(InfoUtente infoUtente) {
+            object[] results = this.Invoke("GetContatoriEsibizioneConservazione", new object[] {
+                        infoUtente});
+            return ((ContatoriEsibizione)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetContatoriEsibizioneConservazioneAsync(InfoUtente infoUtente) {
+            this.GetContatoriEsibizioneConservazioneAsync(infoUtente, null);
+        }
+        
+        /// <remarks/>
+        public void GetContatoriEsibizioneConservazioneAsync(InfoUtente infoUtente, object userState) {
+            if ((this.GetContatoriEsibizioneConservazioneOperationCompleted == null)) {
+                this.GetContatoriEsibizioneConservazioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetContatoriEsibizioneConservazioneOperationCompleted);
+            }
+            this.InvokeAsync("GetContatoriEsibizioneConservazione", new object[] {
+                        infoUtente}, this.GetContatoriEsibizioneConservazioneOperationCompleted, userState);
+        }
+        
+        private void OnGetContatoriEsibizioneConservazioneOperationCompleted(object arg) {
+            if ((this.GetContatoriEsibizioneConservazioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetContatoriEsibizioneConservazioneCompleted(this, new GetContatoriEsibizioneConservazioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/CreateAndAddDocInAreaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string CreateAndAddDocInAreaEsibizione(string idProfile, string idProject, string docNumber, InfoUtente infoUtente, string tipoOggetto, string idConservazione, out SchedaDocumento sd) {
+            object[] results = this.Invoke("CreateAndAddDocInAreaEsibizione", new object[] {
+                        idProfile,
+                        idProject,
+                        docNumber,
+                        infoUtente,
+                        tipoOggetto,
+                        idConservazione});
+            sd = ((SchedaDocumento)(results[1]));
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void CreateAndAddDocInAreaEsibizioneAsync(string idProfile, string idProject, string docNumber, InfoUtente infoUtente, string tipoOggetto, string idConservazione) {
+            this.CreateAndAddDocInAreaEsibizioneAsync(idProfile, idProject, docNumber, infoUtente, tipoOggetto, idConservazione, null);
+        }
+        
+        /// <remarks/>
+        public void CreateAndAddDocInAreaEsibizioneAsync(string idProfile, string idProject, string docNumber, InfoUtente infoUtente, string tipoOggetto, string idConservazione, object userState) {
+            if ((this.CreateAndAddDocInAreaEsibizioneOperationCompleted == null)) {
+                this.CreateAndAddDocInAreaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnCreateAndAddDocInAreaEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("CreateAndAddDocInAreaEsibizione", new object[] {
+                        idProfile,
+                        idProject,
+                        docNumber,
+                        infoUtente,
+                        tipoOggetto,
+                        idConservazione}, this.CreateAndAddDocInAreaEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnCreateAndAddDocInAreaEsibizioneOperationCompleted(object arg) {
+            if ((this.CreateAndAddDocInAreaEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.CreateAndAddDocInAreaEsibizioneCompleted(this, new CreateAndAddDocInAreaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/SerializeSchedaEsib", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public int SerializeSchedaEsib(SchedaDocumento schDoc, string systemID) {
+            object[] results = this.Invoke("SerializeSchedaEsib", new object[] {
+                        schDoc,
+                        systemID});
+            return ((int)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void SerializeSchedaEsibAsync(SchedaDocumento schDoc, string systemID) {
+            this.SerializeSchedaEsibAsync(schDoc, systemID, null);
+        }
+        
+        /// <remarks/>
+        public void SerializeSchedaEsibAsync(SchedaDocumento schDoc, string systemID, object userState) {
+            if ((this.SerializeSchedaEsibOperationCompleted == null)) {
+                this.SerializeSchedaEsibOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSerializeSchedaEsibOperationCompleted);
+            }
+            this.InvokeAsync("SerializeSchedaEsib", new object[] {
+                        schDoc,
+                        systemID}, this.SerializeSchedaEsibOperationCompleted, userState);
+        }
+        
+        private void OnSerializeSchedaEsibOperationCompleted(object arg) {
+            if ((this.SerializeSchedaEsibCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.SerializeSchedaEsibCompleted(this, new SerializeSchedaEsibCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/UpdateSizeItemEsib", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool UpdateSizeItemEsib(string sysId, int size) {
+            object[] results = this.Invoke("UpdateSizeItemEsib", new object[] {
+                        sysId,
+                        size});
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void UpdateSizeItemEsibAsync(string sysId, int size) {
+            this.UpdateSizeItemEsibAsync(sysId, size, null);
+        }
+        
+        /// <remarks/>
+        public void UpdateSizeItemEsibAsync(string sysId, int size, object userState) {
+            if ((this.UpdateSizeItemEsibOperationCompleted == null)) {
+                this.UpdateSizeItemEsibOperationCompleted = new System.Threading.SendOrPostCallback(this.OnUpdateSizeItemEsibOperationCompleted);
+            }
+            this.InvokeAsync("UpdateSizeItemEsib", new object[] {
+                        sysId,
+                        size}, this.UpdateSizeItemEsibOperationCompleted, userState);
+        }
+        
+        private void OnUpdateSizeItemEsibOperationCompleted(object arg) {
+            if ((this.UpdateSizeItemEsibCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.UpdateSizeItemEsibCompleted(this, new UpdateSizeItemEsibCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/updateItemsEsib", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool updateItemsEsib(string tipoFile, string numAllegati, string systemId) {
+            object[] results = this.Invoke("updateItemsEsib", new object[] {
+                        tipoFile,
+                        numAllegati,
+                        systemId});
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void updateItemsEsibAsync(string tipoFile, string numAllegati, string systemId) {
+            this.updateItemsEsibAsync(tipoFile, numAllegati, systemId, null);
+        }
+        
+        /// <remarks/>
+        public void updateItemsEsibAsync(string tipoFile, string numAllegati, string systemId, object userState) {
+            if ((this.updateItemsEsibOperationCompleted == null)) {
+                this.updateItemsEsibOperationCompleted = new System.Threading.SendOrPostCallback(this.OnupdateItemsEsibOperationCompleted);
+            }
+            this.InvokeAsync("updateItemsEsib", new object[] {
+                        tipoFile,
+                        numAllegati,
+                        systemId}, this.updateItemsEsibOperationCompleted, userState);
+        }
+        
+        private void OnupdateItemsEsibOperationCompleted(object arg) {
+            if ((this.updateItemsEsibCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.updateItemsEsibCompleted(this, new updateItemsEsibCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/checkItemEsibizionePresenteInIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool checkItemEsibizionePresenteInIstanzaEsibizione(string id_profile, string id_project, string type, InfoUtente infoUtente, string idIstanzaConservazione) {
+            object[] results = this.Invoke("checkItemEsibizionePresenteInIstanzaEsibizione", new object[] {
+                        id_profile,
+                        id_project,
+                        type,
+                        infoUtente,
+                        idIstanzaConservazione});
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void checkItemEsibizionePresenteInIstanzaEsibizioneAsync(string id_profile, string id_project, string type, InfoUtente infoUtente, string idIstanzaConservazione) {
+            this.checkItemEsibizionePresenteInIstanzaEsibizioneAsync(id_profile, id_project, type, infoUtente, idIstanzaConservazione, null);
+        }
+        
+        /// <remarks/>
+        public void checkItemEsibizionePresenteInIstanzaEsibizioneAsync(string id_profile, string id_project, string type, InfoUtente infoUtente, string idIstanzaConservazione, object userState) {
+            if ((this.checkItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted == null)) {
+                this.checkItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OncheckItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("checkItemEsibizionePresenteInIstanzaEsibizione", new object[] {
+                        id_profile,
+                        id_project,
+                        type,
+                        infoUtente,
+                        idIstanzaConservazione}, this.checkItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OncheckItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted(object arg) {
+            if ((this.checkItemEsibizionePresenteInIstanzaEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.checkItemEsibizionePresenteInIstanzaEsibizioneCompleted(this, new checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/isLocalStore", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool isLocalStore() {
+            object[] results = this.Invoke("isLocalStore", new object[0]);
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void isLocalStoreAsync() {
+            this.isLocalStoreAsync(null);
+        }
+        
+        /// <remarks/>
+        public void isLocalStoreAsync(object userState) {
+            if ((this.isLocalStoreOperationCompleted == null)) {
+                this.isLocalStoreOperationCompleted = new System.Threading.SendOrPostCallback(this.OnisLocalStoreOperationCompleted);
+            }
+            this.InvokeAsync("isLocalStore", new object[0], this.isLocalStoreOperationCompleted, userState);
+        }
+        
+        private void OnisLocalStoreOperationCompleted(object arg) {
+            if ((this.isLocalStoreCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.isLocalStoreCompleted(this, new isLocalStoreCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetIdCorrGlobaliEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetIdCorrGlobaliEsibizione(string idGruppo) {
+            object[] results = this.Invoke("GetIdCorrGlobaliEsibizione", new object[] {
+                        idGruppo});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetIdCorrGlobaliEsibizioneAsync(string idGruppo) {
+            this.GetIdCorrGlobaliEsibizioneAsync(idGruppo, null);
+        }
+        
+        /// <remarks/>
+        public void GetIdCorrGlobaliEsibizioneAsync(string idGruppo, object userState) {
+            if ((this.GetIdCorrGlobaliEsibizioneOperationCompleted == null)) {
+                this.GetIdCorrGlobaliEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetIdCorrGlobaliEsibizioneOperationCompleted);
+            }
+            this.InvokeAsync("GetIdCorrGlobaliEsibizione", new object[] {
+                        idGruppo}, this.GetIdCorrGlobaliEsibizioneOperationCompleted, userState);
+        }
+        
+        private void OnGetIdCorrGlobaliEsibizioneOperationCompleted(object arg) {
+            if ((this.GetIdCorrGlobaliEsibizioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetIdCorrGlobaliEsibizioneCompleted(this, new GetIdCorrGlobaliEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/rigeneraIstanza", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool rigeneraIstanza(string idConservazione, string idSupporto, InfoUtente infoUtente, out string message) {
+            object[] results = this.Invoke("rigeneraIstanza", new object[] {
+                        idConservazione,
+                        idSupporto,
+                        infoUtente});
+            message = ((string)(results[1]));
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void rigeneraIstanzaAsync(string idConservazione, string idSupporto, InfoUtente infoUtente) {
+            this.rigeneraIstanzaAsync(idConservazione, idSupporto, infoUtente, null);
+        }
+        
+        /// <remarks/>
+        public void rigeneraIstanzaAsync(string idConservazione, string idSupporto, InfoUtente infoUtente, object userState) {
+            if ((this.rigeneraIstanzaOperationCompleted == null)) {
+                this.rigeneraIstanzaOperationCompleted = new System.Threading.SendOrPostCallback(this.OnrigeneraIstanzaOperationCompleted);
+            }
+            this.InvokeAsync("rigeneraIstanza", new object[] {
+                        idConservazione,
+                        idSupporto,
+                        infoUtente}, this.rigeneraIstanzaOperationCompleted, userState);
+        }
+        
+        private void OnrigeneraIstanzaOperationCompleted(object arg) {
+            if ((this.rigeneraIstanzaCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.rigeneraIstanzaCompleted(this, new rigeneraIstanzaCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/isIstanzaRigenerata", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool isIstanzaRigenerata(string idConservazione, InfoUtente infoUtente) {
+            object[] results = this.Invoke("isIstanzaRigenerata", new object[] {
+                        idConservazione,
+                        infoUtente});
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void isIstanzaRigenerataAsync(string idConservazione, InfoUtente infoUtente) {
+            this.isIstanzaRigenerataAsync(idConservazione, infoUtente, null);
+        }
+        
+        /// <remarks/>
+        public void isIstanzaRigenerataAsync(string idConservazione, InfoUtente infoUtente, object userState) {
+            if ((this.isIstanzaRigenerataOperationCompleted == null)) {
+                this.isIstanzaRigenerataOperationCompleted = new System.Threading.SendOrPostCallback(this.OnisIstanzaRigenerataOperationCompleted);
+            }
+            this.InvokeAsync("isIstanzaRigenerata", new object[] {
+                        idConservazione,
+                        infoUtente}, this.isIstanzaRigenerataOperationCompleted, userState);
+        }
+        
+        private void OnisIstanzaRigenerataOperationCompleted(object arg) {
+            if ((this.isIstanzaRigenerataCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.isIstanzaRigenerataCompleted(this, new isIstanzaRigenerataCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetChiaveConfigurazione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetChiaveConfigurazione(string idAmm, string key) {
+            object[] results = this.Invoke("GetChiaveConfigurazione", new object[] {
+                        idAmm,
+                        key});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetChiaveConfigurazioneAsync(string idAmm, string key) {
+            this.GetChiaveConfigurazioneAsync(idAmm, key, null);
+        }
+        
+        /// <remarks/>
+        public void GetChiaveConfigurazioneAsync(string idAmm, string key, object userState) {
+            if ((this.GetChiaveConfigurazioneOperationCompleted == null)) {
+                this.GetChiaveConfigurazioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetChiaveConfigurazioneOperationCompleted);
+            }
+            this.InvokeAsync("GetChiaveConfigurazione", new object[] {
+                        idAmm,
+                        key}, this.GetChiaveConfigurazioneOperationCompleted, userState);
+        }
+        
+        private void OnGetChiaveConfigurazioneOperationCompleted(object arg) {
+            if ((this.GetChiaveConfigurazioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetChiaveConfigurazioneCompleted(this, new GetChiaveConfigurazioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/IsAlertConservazioneAttivo", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool IsAlertConservazioneAttivo(string idAmm, string codice) {
+            object[] results = this.Invoke("IsAlertConservazioneAttivo", new object[] {
+                        idAmm,
+                        codice});
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void IsAlertConservazioneAttivoAsync(string idAmm, string codice) {
+            this.IsAlertConservazioneAttivoAsync(idAmm, codice, null);
+        }
+        
+        /// <remarks/>
+        public void IsAlertConservazioneAttivoAsync(string idAmm, string codice, object userState) {
+            if ((this.IsAlertConservazioneAttivoOperationCompleted == null)) {
+                this.IsAlertConservazioneAttivoOperationCompleted = new System.Threading.SendOrPostCallback(this.OnIsAlertConservazioneAttivoOperationCompleted);
+            }
+            this.InvokeAsync("IsAlertConservazioneAttivo", new object[] {
+                        idAmm,
+                        codice}, this.IsAlertConservazioneAttivoOperationCompleted, userState);
+        }
+        
+        private void OnIsAlertConservazioneAttivoOperationCompleted(object arg) {
+            if ((this.IsAlertConservazioneAttivoCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.IsAlertConservazioneAttivoCompleted(this, new IsAlertConservazioneAttivoCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetParametriAlertConservazione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetParametriAlertConservazione(string idAmm, string codice) {
+            object[] results = this.Invoke("GetParametriAlertConservazione", new object[] {
+                        idAmm,
+                        codice});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetParametriAlertConservazioneAsync(string idAmm, string codice) {
+            this.GetParametriAlertConservazioneAsync(idAmm, codice, null);
+        }
+        
+        /// <remarks/>
+        public void GetParametriAlertConservazioneAsync(string idAmm, string codice, object userState) {
+            if ((this.GetParametriAlertConservazioneOperationCompleted == null)) {
+                this.GetParametriAlertConservazioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetParametriAlertConservazioneOperationCompleted);
+            }
+            this.InvokeAsync("GetParametriAlertConservazione", new object[] {
+                        idAmm,
+                        codice}, this.GetParametriAlertConservazioneOperationCompleted, userState);
+        }
+        
+        private void OnGetParametriAlertConservazioneOperationCompleted(object arg) {
+            if ((this.GetParametriAlertConservazioneCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetParametriAlertConservazioneCompleted(this, new GetParametriAlertConservazioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/InvioAlertAsync", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void InvioAlertAsync(InfoUtente infoUtente, string codice, string idIstanza, string idSupporto) {
+            this.Invoke("InvioAlertAsync", new object[] {
+                        infoUtente,
+                        codice,
+                        idIstanza,
+                        idSupporto});
+        }
+        
+        /// <remarks/>
+        public void InvioAlertAsyncAsync(InfoUtente infoUtente, string codice, string idIstanza, string idSupporto) {
+            this.InvioAlertAsyncAsync(infoUtente, codice, idIstanza, idSupporto, null);
+        }
+        
+        /// <remarks/>
+        public void InvioAlertAsyncAsync(InfoUtente infoUtente, string codice, string idIstanza, string idSupporto, object userState) {
+            if ((this.InvioAlertAsyncOperationCompleted == null)) {
+                this.InvioAlertAsyncOperationCompleted = new System.Threading.SendOrPostCallback(this.OnInvioAlertAsyncOperationCompleted);
+            }
+            this.InvokeAsync("InvioAlertAsync", new object[] {
+                        infoUtente,
+                        codice,
+                        idIstanza,
+                        idSupporto}, this.InvioAlertAsyncOperationCompleted, userState);
+        }
+        
+        private void OnInvioAlertAsyncOperationCompleted(object arg) {
+            if ((this.InvioAlertAsyncCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.InvioAlertAsyncCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RegistraEsitoVerificaLeggibilitaSupportoRegistrato", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void RegistraEsitoVerificaLeggibilitaSupportoRegistrato(InfoUtente infoUtente, string idIstanza, string idSupporto, bool esitoVerifica, string percentualeVerifica, string dataProssimaVerifica, string noteDiVerifica, string tipoVerifica) {
+            this.Invoke("RegistraEsitoVerificaLeggibilitaSupportoRegistrato", new object[] {
+                        infoUtente,
+                        idIstanza,
+                        idSupporto,
+                        esitoVerifica,
+                        percentualeVerifica,
+                        dataProssimaVerifica,
+                        noteDiVerifica,
+                        tipoVerifica});
+        }
+        
+        /// <remarks/>
+        public void RegistraEsitoVerificaLeggibilitaSupportoRegistratoAsync(InfoUtente infoUtente, string idIstanza, string idSupporto, bool esitoVerifica, string percentualeVerifica, string dataProssimaVerifica, string noteDiVerifica, string tipoVerifica) {
+            this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoAsync(infoUtente, idIstanza, idSupporto, esitoVerifica, percentualeVerifica, dataProssimaVerifica, noteDiVerifica, tipoVerifica, null);
+        }
+        
+        /// <remarks/>
+        public void RegistraEsitoVerificaLeggibilitaSupportoRegistratoAsync(InfoUtente infoUtente, string idIstanza, string idSupporto, bool esitoVerifica, string percentualeVerifica, string dataProssimaVerifica, string noteDiVerifica, string tipoVerifica, object userState) {
+            if ((this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted == null)) {
+                this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted);
+            }
+            this.InvokeAsync("RegistraEsitoVerificaLeggibilitaSupportoRegistrato", new object[] {
+                        infoUtente,
+                        idIstanza,
+                        idSupporto,
+                        esitoVerifica,
+                        percentualeVerifica,
+                        dataProssimaVerifica,
+                        noteDiVerifica,
+                        tipoVerifica}, this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted, userState);
+        }
+        
+        private void OnRegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted(object arg) {
+            if ((this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/IsVerificaLeggibilitaAnticipata", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public bool IsVerificaLeggibilitaAnticipata(string idConservazione, string idSupporto, string idAmm) {
+            object[] results = this.Invoke("IsVerificaLeggibilitaAnticipata", new object[] {
+                        idConservazione,
+                        idSupporto,
+                        idAmm});
+            return ((bool)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void IsVerificaLeggibilitaAnticipataAsync(string idConservazione, string idSupporto, string idAmm) {
+            this.IsVerificaLeggibilitaAnticipataAsync(idConservazione, idSupporto, idAmm, null);
+        }
+        
+        /// <remarks/>
+        public void IsVerificaLeggibilitaAnticipataAsync(string idConservazione, string idSupporto, string idAmm, object userState) {
+            if ((this.IsVerificaLeggibilitaAnticipataOperationCompleted == null)) {
+                this.IsVerificaLeggibilitaAnticipataOperationCompleted = new System.Threading.SendOrPostCallback(this.OnIsVerificaLeggibilitaAnticipataOperationCompleted);
+            }
+            this.InvokeAsync("IsVerificaLeggibilitaAnticipata", new object[] {
+                        idConservazione,
+                        idSupporto,
+                        idAmm}, this.IsVerificaLeggibilitaAnticipataOperationCompleted, userState);
+        }
+        
+        private void OnIsVerificaLeggibilitaAnticipataOperationCompleted(object arg) {
+            if ((this.IsVerificaLeggibilitaAnticipataCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.IsVerificaLeggibilitaAnticipataCompleted(this, new IsVerificaLeggibilitaAnticipataCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/MettiInLavorazioneAsync", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -907,37 +2033,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
             if ((this.getItemsConservazioneWithSecurityCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.getItemsConservazioneWithSecurityCompleted(this, new getItemsConservazioneWithSecurityCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/getItemsConservazioneLite", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public ItemsConservazione[] getItemsConservazioneLite(string IdConservazione, InfoUtente infoUtente) {
-            object[] results = this.Invoke("getItemsConservazioneLite", new object[] {
-                        IdConservazione,
-                        infoUtente});
-            return ((ItemsConservazione[])(results[0]));
-        }
-        
-        /// <remarks/>
-        public void getItemsConservazioneLiteAsync(string IdConservazione, InfoUtente infoUtente) {
-            this.getItemsConservazioneLiteAsync(IdConservazione, infoUtente, null);
-        }
-        
-        /// <remarks/>
-        public void getItemsConservazioneLiteAsync(string IdConservazione, InfoUtente infoUtente, object userState) {
-            if ((this.getItemsConservazioneLiteOperationCompleted == null)) {
-                this.getItemsConservazioneLiteOperationCompleted = new System.Threading.SendOrPostCallback(this.OngetItemsConservazioneLiteOperationCompleted);
-            }
-            this.InvokeAsync("getItemsConservazioneLite", new object[] {
-                        IdConservazione,
-                        infoUtente}, this.getItemsConservazioneLiteOperationCompleted, userState);
-        }
-        
-        private void OngetItemsConservazioneLiteOperationCompleted(object arg) {
-            if ((this.getItemsConservazioneLiteCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.getItemsConservazioneLiteCompleted(this, new getItemsConservazioneLiteCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -3697,1137 +4792,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/setPolicyVerificataLite", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public void setPolicyVerificataLite(string idConservazione) {
-            this.Invoke("setPolicyVerificataLite", new object[] {
-                        idConservazione});
-        }
-        
-        /// <remarks/>
-        public void setPolicyVerificataLiteAsync(string idConservazione) {
-            this.setPolicyVerificataLiteAsync(idConservazione, null);
-        }
-        
-        /// <remarks/>
-        public void setPolicyVerificataLiteAsync(string idConservazione, object userState) {
-            if ((this.setPolicyVerificataLiteOperationCompleted == null)) {
-                this.setPolicyVerificataLiteOperationCompleted = new System.Threading.SendOrPostCallback(this.OnsetPolicyVerificataLiteOperationCompleted);
-            }
-            this.InvokeAsync("setPolicyVerificataLite", new object[] {
-                        idConservazione}, this.setPolicyVerificataLiteOperationCompleted, userState);
-        }
-        
-        private void OnsetPolicyVerificataLiteOperationCompleted(object arg) {
-            if ((this.setPolicyVerificataLiteCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.setPolicyVerificataLiteCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/getSegnatura_ID_Doc", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string getSegnatura_ID_Doc(string idProfile) {
-            object[] results = this.Invoke("getSegnatura_ID_Doc", new object[] {
-                        idProfile});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void getSegnatura_ID_DocAsync(string idProfile) {
-            this.getSegnatura_ID_DocAsync(idProfile, null);
-        }
-        
-        /// <remarks/>
-        public void getSegnatura_ID_DocAsync(string idProfile, object userState) {
-            if ((this.getSegnatura_ID_DocOperationCompleted == null)) {
-                this.getSegnatura_ID_DocOperationCompleted = new System.Threading.SendOrPostCallback(this.OngetSegnatura_ID_DocOperationCompleted);
-            }
-            this.InvokeAsync("getSegnatura_ID_Doc", new object[] {
-                        idProfile}, this.getSegnatura_ID_DocOperationCompleted, userState);
-        }
-        
-        private void OngetSegnatura_ID_DocOperationCompleted(object arg) {
-            if ((this.getSegnatura_ID_DocCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.getSegnatura_ID_DocCompleted(this, new getSegnatura_ID_DocCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/createReportConservazione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public FileDocumento createReportConservazione(FiltroRicerca[] filtriReport, string tipoRep, string tipoFile, string titoloReport, string reportKey, string contextName, InfoUtente infoUt) {
-            object[] results = this.Invoke("createReportConservazione", new object[] {
-                        filtriReport,
-                        tipoRep,
-                        tipoFile,
-                        titoloReport,
-                        reportKey,
-                        contextName,
-                        infoUt});
-            return ((FileDocumento)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void createReportConservazioneAsync(FiltroRicerca[] filtriReport, string tipoRep, string tipoFile, string titoloReport, string reportKey, string contextName, InfoUtente infoUt) {
-            this.createReportConservazioneAsync(filtriReport, tipoRep, tipoFile, titoloReport, reportKey, contextName, infoUt, null);
-        }
-        
-        /// <remarks/>
-        public void createReportConservazioneAsync(FiltroRicerca[] filtriReport, string tipoRep, string tipoFile, string titoloReport, string reportKey, string contextName, InfoUtente infoUt, object userState) {
-            if ((this.createReportConservazioneOperationCompleted == null)) {
-                this.createReportConservazioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OncreateReportConservazioneOperationCompleted);
-            }
-            this.InvokeAsync("createReportConservazione", new object[] {
-                        filtriReport,
-                        tipoRep,
-                        tipoFile,
-                        titoloReport,
-                        reportKey,
-                        contextName,
-                        infoUt}, this.createReportConservazioneOperationCompleted, userState);
-        }
-        
-        private void OncreateReportConservazioneOperationCompleted(object arg) {
-            if ((this.createReportConservazioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.createReportConservazioneCompleted(this, new createReportConservazioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetListNonConfPolicy", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetListNonConfPolicy(string maskPolicy) {
-            object[] results = this.Invoke("GetListNonConfPolicy", new object[] {
-                        maskPolicy});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetListNonConfPolicyAsync(string maskPolicy) {
-            this.GetListNonConfPolicyAsync(maskPolicy, null);
-        }
-        
-        /// <remarks/>
-        public void GetListNonConfPolicyAsync(string maskPolicy, object userState) {
-            if ((this.GetListNonConfPolicyOperationCompleted == null)) {
-                this.GetListNonConfPolicyOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetListNonConfPolicyOperationCompleted);
-            }
-            this.InvokeAsync("GetListNonConfPolicy", new object[] {
-                        maskPolicy}, this.GetListNonConfPolicyOperationCompleted, userState);
-        }
-        
-        private void OnGetListNonConfPolicyOperationCompleted(object arg) {
-            if ((this.GetListNonConfPolicyCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetListNonConfPolicyCompleted(this, new GetListNonConfPolicyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetInfoEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public InfoEsibizione[] GetInfoEsibizione(InfoUtente infoUtente, object[] filters) {
-            object[] results = this.Invoke("GetInfoEsibizione", new object[] {
-                        infoUtente,
-                        filters});
-            return ((InfoEsibizione[])(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetInfoEsibizioneAsync(InfoUtente infoUtente, object[] filters) {
-            this.GetInfoEsibizioneAsync(infoUtente, filters, null);
-        }
-        
-        /// <remarks/>
-        public void GetInfoEsibizioneAsync(InfoUtente infoUtente, object[] filters, object userState) {
-            if ((this.GetInfoEsibizioneOperationCompleted == null)) {
-                this.GetInfoEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetInfoEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("GetInfoEsibizione", new object[] {
-                        infoUtente,
-                        filters}, this.GetInfoEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnGetInfoEsibizioneOperationCompleted(object arg) {
-            if ((this.GetInfoEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetInfoEsibizioneCompleted(this, new GetInfoEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetItemsEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public ItemsEsibizione[] GetItemsEsibizione(InfoUtente infoUtente, string idEsibizione) {
-            object[] results = this.Invoke("GetItemsEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione});
-            return ((ItemsEsibizione[])(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetItemsEsibizioneAsync(InfoUtente infoUtente, string idEsibizione) {
-            this.GetItemsEsibizioneAsync(infoUtente, idEsibizione, null);
-        }
-        
-        /// <remarks/>
-        public void GetItemsEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
-            if ((this.GetItemsEsibizioneOperationCompleted == null)) {
-                this.GetItemsEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetItemsEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("GetItemsEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione}, this.GetItemsEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnGetItemsEsibizioneOperationCompleted(object arg) {
-            if ((this.GetItemsEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetItemsEsibizioneCompleted(this, new GetItemsEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RemoveItemsEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool RemoveItemsEsibizione(InfoUtente infoUtente, string idDocumento) {
-            object[] results = this.Invoke("RemoveItemsEsibizione", new object[] {
-                        infoUtente,
-                        idDocumento});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void RemoveItemsEsibizioneAsync(InfoUtente infoUtente, string idDocumento) {
-            this.RemoveItemsEsibizioneAsync(infoUtente, idDocumento, null);
-        }
-        
-        /// <remarks/>
-        public void RemoveItemsEsibizioneAsync(InfoUtente infoUtente, string idDocumento, object userState) {
-            if ((this.RemoveItemsEsibizioneOperationCompleted == null)) {
-                this.RemoveItemsEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRemoveItemsEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("RemoveItemsEsibizione", new object[] {
-                        infoUtente,
-                        idDocumento}, this.RemoveItemsEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnRemoveItemsEsibizioneOperationCompleted(object arg) {
-            if ((this.RemoveItemsEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.RemoveItemsEsibizioneCompleted(this, new RemoveItemsEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RemoveIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool RemoveIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione) {
-            object[] results = this.Invoke("RemoveIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void RemoveIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione) {
-            this.RemoveIstanzaEsibizioneAsync(infoUtente, idEsibizione, null);
-        }
-        
-        /// <remarks/>
-        public void RemoveIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
-            if ((this.RemoveIstanzaEsibizioneOperationCompleted == null)) {
-                this.RemoveIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRemoveIstanzaEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("RemoveIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione}, this.RemoveIstanzaEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnRemoveIstanzaEsibizioneOperationCompleted(object arg) {
-            if ((this.RemoveIstanzaEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.RemoveIstanzaEsibizioneCompleted(this, new RemoveIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/SaveFieldsEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool SaveFieldsEsibizione(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
-            object[] results = this.Invoke("SaveFieldsEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione,
-                        descrizione,
-                        note});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void SaveFieldsEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
-            this.SaveFieldsEsibizioneAsync(infoUtente, idEsibizione, descrizione, note, null);
-        }
-        
-        /// <remarks/>
-        public void SaveFieldsEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note, object userState) {
-            if ((this.SaveFieldsEsibizioneOperationCompleted == null)) {
-                this.SaveFieldsEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSaveFieldsEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("SaveFieldsEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione,
-                        descrizione,
-                        note}, this.SaveFieldsEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnSaveFieldsEsibizioneOperationCompleted(object arg) {
-            if ((this.SaveFieldsEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.SaveFieldsEsibizioneCompleted(this, new SaveFieldsEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RichiediCertificazioneIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool RichiediCertificazioneIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
-            object[] results = this.Invoke("RichiediCertificazioneIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione,
-                        descrizione,
-                        note});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void RichiediCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
-            this.RichiediCertificazioneIstanzaEsibizioneAsync(infoUtente, idEsibizione, descrizione, note, null);
-        }
-        
-        /// <remarks/>
-        public void RichiediCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note, object userState) {
-            if ((this.RichiediCertificazioneIstanzaEsibizioneOperationCompleted == null)) {
-                this.RichiediCertificazioneIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRichiediCertificazioneIstanzaEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("RichiediCertificazioneIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione,
-                        descrizione,
-                        note}, this.RichiediCertificazioneIstanzaEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnRichiediCertificazioneIstanzaEsibizioneOperationCompleted(object arg) {
-            if ((this.RichiediCertificazioneIstanzaEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.RichiediCertificazioneIstanzaEsibizioneCompleted(this, new RichiediCertificazioneIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/MarcaCertificazioneIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool MarcaCertificazioneIstanzaEsibizione(string systemID, InfoUtente utente, [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")] byte[] signedContent) {
-            object[] results = this.Invoke("MarcaCertificazioneIstanzaEsibizione", new object[] {
-                        systemID,
-                        utente,
-                        signedContent});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void MarcaCertificazioneIstanzaEsibizioneAsync(string systemID, InfoUtente utente, byte[] signedContent) {
-            this.MarcaCertificazioneIstanzaEsibizioneAsync(systemID, utente, signedContent, null);
-        }
-        
-        /// <remarks/>
-        public void MarcaCertificazioneIstanzaEsibizioneAsync(string systemID, InfoUtente utente, byte[] signedContent, object userState) {
-            if ((this.MarcaCertificazioneIstanzaEsibizioneOperationCompleted == null)) {
-                this.MarcaCertificazioneIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnMarcaCertificazioneIstanzaEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("MarcaCertificazioneIstanzaEsibizione", new object[] {
-                        systemID,
-                        utente,
-                        signedContent}, this.MarcaCertificazioneIstanzaEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnMarcaCertificazioneIstanzaEsibizioneOperationCompleted(object arg) {
-            if ((this.MarcaCertificazioneIstanzaEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.MarcaCertificazioneIstanzaEsibizioneCompleted(this, new MarcaCertificazioneIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/UpdateCertificazioneIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool UpdateCertificazioneIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione) {
-            object[] results = this.Invoke("UpdateCertificazioneIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void UpdateCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione) {
-            this.UpdateCertificazioneIstanzaEsibizioneAsync(infoUtente, idEsibizione, null);
-        }
-        
-        /// <remarks/>
-        public void UpdateCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
-            if ((this.UpdateCertificazioneIstanzaEsibizioneOperationCompleted == null)) {
-                this.UpdateCertificazioneIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnUpdateCertificazioneIstanzaEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("UpdateCertificazioneIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione}, this.UpdateCertificazioneIstanzaEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnUpdateCertificazioneIstanzaEsibizioneOperationCompleted(object arg) {
-            if ((this.UpdateCertificazioneIstanzaEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.UpdateCertificazioneIstanzaEsibizioneCompleted(this, new UpdateCertificazioneIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RifiutaCertificazioneIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool RifiutaCertificazioneIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione, string note) {
-            object[] results = this.Invoke("RifiutaCertificazioneIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione,
-                        note});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void RifiutaCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string note) {
-            this.RifiutaCertificazioneIstanzaEsibizioneAsync(infoUtente, idEsibizione, note, null);
-        }
-        
-        /// <remarks/>
-        public void RifiutaCertificazioneIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string note, object userState) {
-            if ((this.RifiutaCertificazioneIstanzaEsibizioneOperationCompleted == null)) {
-                this.RifiutaCertificazioneIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRifiutaCertificazioneIstanzaEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("RifiutaCertificazioneIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione,
-                        note}, this.RifiutaCertificazioneIstanzaEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnRifiutaCertificazioneIstanzaEsibizioneOperationCompleted(object arg) {
-            if ((this.RifiutaCertificazioneIstanzaEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.RifiutaCertificazioneIstanzaEsibizioneCompleted(this, new RifiutaCertificazioneIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RiabilitaIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string RiabilitaIstanzaEsibizione(InfoUtente infoUtente, string idEsibizione) {
-            object[] results = this.Invoke("RiabilitaIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void RiabilitaIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione) {
-            this.RiabilitaIstanzaEsibizioneAsync(infoUtente, idEsibizione, null);
-        }
-        
-        /// <remarks/>
-        public void RiabilitaIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
-            if ((this.RiabilitaIstanzaEsibizioneOperationCompleted == null)) {
-                this.RiabilitaIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRiabilitaIstanzaEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("RiabilitaIstanzaEsibizione", new object[] {
-                        infoUtente,
-                        idEsibizione}, this.RiabilitaIstanzaEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnRiabilitaIstanzaEsibizioneOperationCompleted(object arg) {
-            if ((this.RiabilitaIstanzaEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.RiabilitaIstanzaEsibizioneCompleted(this, new RiabilitaIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/ChiudiIstanzaEsibizioneAsync", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public void ChiudiIstanzaEsibizioneAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
-            this.Invoke("ChiudiIstanzaEsibizioneAsync", new object[] {
-                        infoUtente,
-                        idEsibizione,
-                        descrizione,
-                        note});
-        }
-        
-        /// <remarks/>
-        public void ChiudiIstanzaEsibizioneAsyncAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note) {
-            this.ChiudiIstanzaEsibizioneAsyncAsync(infoUtente, idEsibizione, descrizione, note, null);
-        }
-        
-        /// <remarks/>
-        public void ChiudiIstanzaEsibizioneAsyncAsync(InfoUtente infoUtente, string idEsibizione, string descrizione, string note, object userState) {
-            if ((this.ChiudiIstanzaEsibizioneAsyncOperationCompleted == null)) {
-                this.ChiudiIstanzaEsibizioneAsyncOperationCompleted = new System.Threading.SendOrPostCallback(this.OnChiudiIstanzaEsibizioneAsyncOperationCompleted);
-            }
-            this.InvokeAsync("ChiudiIstanzaEsibizioneAsync", new object[] {
-                        infoUtente,
-                        idEsibizione,
-                        descrizione,
-                        note}, this.ChiudiIstanzaEsibizioneAsyncOperationCompleted, userState);
-        }
-        
-        private void OnChiudiIstanzaEsibizioneAsyncOperationCompleted(object arg) {
-            if ((this.ChiudiIstanzaEsibizioneAsyncCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.ChiudiIstanzaEsibizioneAsyncCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetEsibizioneDownloadUrl", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetEsibizioneDownloadUrl(InfoUtente infoUtente, string idEsibizione) {
-            object[] results = this.Invoke("GetEsibizioneDownloadUrl", new object[] {
-                        infoUtente,
-                        idEsibizione});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetEsibizioneDownloadUrlAsync(InfoUtente infoUtente, string idEsibizione) {
-            this.GetEsibizioneDownloadUrlAsync(infoUtente, idEsibizione, null);
-        }
-        
-        /// <remarks/>
-        public void GetEsibizioneDownloadUrlAsync(InfoUtente infoUtente, string idEsibizione, object userState) {
-            if ((this.GetEsibizioneDownloadUrlOperationCompleted == null)) {
-                this.GetEsibizioneDownloadUrlOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetEsibizioneDownloadUrlOperationCompleted);
-            }
-            this.InvokeAsync("GetEsibizioneDownloadUrl", new object[] {
-                        infoUtente,
-                        idEsibizione}, this.GetEsibizioneDownloadUrlOperationCompleted, userState);
-        }
-        
-        private void OnGetEsibizioneDownloadUrlOperationCompleted(object arg) {
-            if ((this.GetEsibizioneDownloadUrlCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetEsibizioneDownloadUrlCompleted(this, new GetEsibizioneDownloadUrlCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetAbilitatoCentroServizi", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetAbilitatoCentroServizi(string idPeople, string idAmm) {
-            object[] results = this.Invoke("GetAbilitatoCentroServizi", new object[] {
-                        idPeople,
-                        idAmm});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetAbilitatoCentroServiziAsync(string idPeople, string idAmm) {
-            this.GetAbilitatoCentroServiziAsync(idPeople, idAmm, null);
-        }
-        
-        /// <remarks/>
-        public void GetAbilitatoCentroServiziAsync(string idPeople, string idAmm, object userState) {
-            if ((this.GetAbilitatoCentroServiziOperationCompleted == null)) {
-                this.GetAbilitatoCentroServiziOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetAbilitatoCentroServiziOperationCompleted);
-            }
-            this.InvokeAsync("GetAbilitatoCentroServizi", new object[] {
-                        idPeople,
-                        idAmm}, this.GetAbilitatoCentroServiziOperationCompleted, userState);
-        }
-        
-        private void OnGetAbilitatoCentroServiziOperationCompleted(object arg) {
-            if ((this.GetAbilitatoCentroServiziCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetAbilitatoCentroServiziCompleted(this, new GetAbilitatoCentroServiziCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetAbilitatoEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetAbilitatoEsibizione(string idPeople, string idAmm) {
-            object[] results = this.Invoke("GetAbilitatoEsibizione", new object[] {
-                        idPeople,
-                        idAmm});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetAbilitatoEsibizioneAsync(string idPeople, string idAmm) {
-            this.GetAbilitatoEsibizioneAsync(idPeople, idAmm, null);
-        }
-        
-        /// <remarks/>
-        public void GetAbilitatoEsibizioneAsync(string idPeople, string idAmm, object userState) {
-            if ((this.GetAbilitatoEsibizioneOperationCompleted == null)) {
-                this.GetAbilitatoEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetAbilitatoEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("GetAbilitatoEsibizione", new object[] {
-                        idPeople,
-                        idAmm}, this.GetAbilitatoEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnGetAbilitatoEsibizioneOperationCompleted(object arg) {
-            if ((this.GetAbilitatoEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetAbilitatoEsibizioneCompleted(this, new GetAbilitatoEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetContatoriEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public ContatoriEsibizione GetContatoriEsibizione(InfoUtente infoUtente, string idGruppo) {
-            object[] results = this.Invoke("GetContatoriEsibizione", new object[] {
-                        infoUtente,
-                        idGruppo});
-            return ((ContatoriEsibizione)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetContatoriEsibizioneAsync(InfoUtente infoUtente, string idGruppo) {
-            this.GetContatoriEsibizioneAsync(infoUtente, idGruppo, null);
-        }
-        
-        /// <remarks/>
-        public void GetContatoriEsibizioneAsync(InfoUtente infoUtente, string idGruppo, object userState) {
-            if ((this.GetContatoriEsibizioneOperationCompleted == null)) {
-                this.GetContatoriEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetContatoriEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("GetContatoriEsibizione", new object[] {
-                        infoUtente,
-                        idGruppo}, this.GetContatoriEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnGetContatoriEsibizioneOperationCompleted(object arg) {
-            if ((this.GetContatoriEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetContatoriEsibizioneCompleted(this, new GetContatoriEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetContatoriEsibizioneConservazione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public ContatoriEsibizione GetContatoriEsibizioneConservazione(InfoUtente infoUtente) {
-            object[] results = this.Invoke("GetContatoriEsibizioneConservazione", new object[] {
-                        infoUtente});
-            return ((ContatoriEsibizione)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetContatoriEsibizioneConservazioneAsync(InfoUtente infoUtente) {
-            this.GetContatoriEsibizioneConservazioneAsync(infoUtente, null);
-        }
-        
-        /// <remarks/>
-        public void GetContatoriEsibizioneConservazioneAsync(InfoUtente infoUtente, object userState) {
-            if ((this.GetContatoriEsibizioneConservazioneOperationCompleted == null)) {
-                this.GetContatoriEsibizioneConservazioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetContatoriEsibizioneConservazioneOperationCompleted);
-            }
-            this.InvokeAsync("GetContatoriEsibizioneConservazione", new object[] {
-                        infoUtente}, this.GetContatoriEsibizioneConservazioneOperationCompleted, userState);
-        }
-        
-        private void OnGetContatoriEsibizioneConservazioneOperationCompleted(object arg) {
-            if ((this.GetContatoriEsibizioneConservazioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetContatoriEsibizioneConservazioneCompleted(this, new GetContatoriEsibizioneConservazioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/CreateAndAddDocInAreaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string CreateAndAddDocInAreaEsibizione(string idProfile, string idProject, string docNumber, InfoUtente infoUtente, string tipoOggetto, string idConservazione, out SchedaDocumento sd) {
-            object[] results = this.Invoke("CreateAndAddDocInAreaEsibizione", new object[] {
-                        idProfile,
-                        idProject,
-                        docNumber,
-                        infoUtente,
-                        tipoOggetto,
-                        idConservazione});
-            sd = ((SchedaDocumento)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void CreateAndAddDocInAreaEsibizioneAsync(string idProfile, string idProject, string docNumber, InfoUtente infoUtente, string tipoOggetto, string idConservazione) {
-            this.CreateAndAddDocInAreaEsibizioneAsync(idProfile, idProject, docNumber, infoUtente, tipoOggetto, idConservazione, null);
-        }
-        
-        /// <remarks/>
-        public void CreateAndAddDocInAreaEsibizioneAsync(string idProfile, string idProject, string docNumber, InfoUtente infoUtente, string tipoOggetto, string idConservazione, object userState) {
-            if ((this.CreateAndAddDocInAreaEsibizioneOperationCompleted == null)) {
-                this.CreateAndAddDocInAreaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnCreateAndAddDocInAreaEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("CreateAndAddDocInAreaEsibizione", new object[] {
-                        idProfile,
-                        idProject,
-                        docNumber,
-                        infoUtente,
-                        tipoOggetto,
-                        idConservazione}, this.CreateAndAddDocInAreaEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnCreateAndAddDocInAreaEsibizioneOperationCompleted(object arg) {
-            if ((this.CreateAndAddDocInAreaEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.CreateAndAddDocInAreaEsibizioneCompleted(this, new CreateAndAddDocInAreaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/SerializeSchedaEsib", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public int SerializeSchedaEsib(SchedaDocumento schDoc, string systemID) {
-            object[] results = this.Invoke("SerializeSchedaEsib", new object[] {
-                        schDoc,
-                        systemID});
-            return ((int)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void SerializeSchedaEsibAsync(SchedaDocumento schDoc, string systemID) {
-            this.SerializeSchedaEsibAsync(schDoc, systemID, null);
-        }
-        
-        /// <remarks/>
-        public void SerializeSchedaEsibAsync(SchedaDocumento schDoc, string systemID, object userState) {
-            if ((this.SerializeSchedaEsibOperationCompleted == null)) {
-                this.SerializeSchedaEsibOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSerializeSchedaEsibOperationCompleted);
-            }
-            this.InvokeAsync("SerializeSchedaEsib", new object[] {
-                        schDoc,
-                        systemID}, this.SerializeSchedaEsibOperationCompleted, userState);
-        }
-        
-        private void OnSerializeSchedaEsibOperationCompleted(object arg) {
-            if ((this.SerializeSchedaEsibCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.SerializeSchedaEsibCompleted(this, new SerializeSchedaEsibCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/UpdateSizeItemEsib", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool UpdateSizeItemEsib(string sysId, int size) {
-            object[] results = this.Invoke("UpdateSizeItemEsib", new object[] {
-                        sysId,
-                        size});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void UpdateSizeItemEsibAsync(string sysId, int size) {
-            this.UpdateSizeItemEsibAsync(sysId, size, null);
-        }
-        
-        /// <remarks/>
-        public void UpdateSizeItemEsibAsync(string sysId, int size, object userState) {
-            if ((this.UpdateSizeItemEsibOperationCompleted == null)) {
-                this.UpdateSizeItemEsibOperationCompleted = new System.Threading.SendOrPostCallback(this.OnUpdateSizeItemEsibOperationCompleted);
-            }
-            this.InvokeAsync("UpdateSizeItemEsib", new object[] {
-                        sysId,
-                        size}, this.UpdateSizeItemEsibOperationCompleted, userState);
-        }
-        
-        private void OnUpdateSizeItemEsibOperationCompleted(object arg) {
-            if ((this.UpdateSizeItemEsibCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.UpdateSizeItemEsibCompleted(this, new UpdateSizeItemEsibCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/updateItemsEsib", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool updateItemsEsib(string tipoFile, string numAllegati, string systemId) {
-            object[] results = this.Invoke("updateItemsEsib", new object[] {
-                        tipoFile,
-                        numAllegati,
-                        systemId});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void updateItemsEsibAsync(string tipoFile, string numAllegati, string systemId) {
-            this.updateItemsEsibAsync(tipoFile, numAllegati, systemId, null);
-        }
-        
-        /// <remarks/>
-        public void updateItemsEsibAsync(string tipoFile, string numAllegati, string systemId, object userState) {
-            if ((this.updateItemsEsibOperationCompleted == null)) {
-                this.updateItemsEsibOperationCompleted = new System.Threading.SendOrPostCallback(this.OnupdateItemsEsibOperationCompleted);
-            }
-            this.InvokeAsync("updateItemsEsib", new object[] {
-                        tipoFile,
-                        numAllegati,
-                        systemId}, this.updateItemsEsibOperationCompleted, userState);
-        }
-        
-        private void OnupdateItemsEsibOperationCompleted(object arg) {
-            if ((this.updateItemsEsibCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.updateItemsEsibCompleted(this, new updateItemsEsibCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/checkItemEsibizionePresenteInIstanzaEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool checkItemEsibizionePresenteInIstanzaEsibizione(string id_profile, string id_project, string type, InfoUtente infoUtente, string idIstanzaConservazione) {
-            object[] results = this.Invoke("checkItemEsibizionePresenteInIstanzaEsibizione", new object[] {
-                        id_profile,
-                        id_project,
-                        type,
-                        infoUtente,
-                        idIstanzaConservazione});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void checkItemEsibizionePresenteInIstanzaEsibizioneAsync(string id_profile, string id_project, string type, InfoUtente infoUtente, string idIstanzaConservazione) {
-            this.checkItemEsibizionePresenteInIstanzaEsibizioneAsync(id_profile, id_project, type, infoUtente, idIstanzaConservazione, null);
-        }
-        
-        /// <remarks/>
-        public void checkItemEsibizionePresenteInIstanzaEsibizioneAsync(string id_profile, string id_project, string type, InfoUtente infoUtente, string idIstanzaConservazione, object userState) {
-            if ((this.checkItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted == null)) {
-                this.checkItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OncheckItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("checkItemEsibizionePresenteInIstanzaEsibizione", new object[] {
-                        id_profile,
-                        id_project,
-                        type,
-                        infoUtente,
-                        idIstanzaConservazione}, this.checkItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OncheckItemEsibizionePresenteInIstanzaEsibizioneOperationCompleted(object arg) {
-            if ((this.checkItemEsibizionePresenteInIstanzaEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.checkItemEsibizionePresenteInIstanzaEsibizioneCompleted(this, new checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/isLocalStore", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool isLocalStore() {
-            object[] results = this.Invoke("isLocalStore", new object[0]);
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void isLocalStoreAsync() {
-            this.isLocalStoreAsync(null);
-        }
-        
-        /// <remarks/>
-        public void isLocalStoreAsync(object userState) {
-            if ((this.isLocalStoreOperationCompleted == null)) {
-                this.isLocalStoreOperationCompleted = new System.Threading.SendOrPostCallback(this.OnisLocalStoreOperationCompleted);
-            }
-            this.InvokeAsync("isLocalStore", new object[0], this.isLocalStoreOperationCompleted, userState);
-        }
-        
-        private void OnisLocalStoreOperationCompleted(object arg) {
-            if ((this.isLocalStoreCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.isLocalStoreCompleted(this, new isLocalStoreCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetIdCorrGlobaliEsibizione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetIdCorrGlobaliEsibizione(string idGruppo) {
-            object[] results = this.Invoke("GetIdCorrGlobaliEsibizione", new object[] {
-                        idGruppo});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetIdCorrGlobaliEsibizioneAsync(string idGruppo) {
-            this.GetIdCorrGlobaliEsibizioneAsync(idGruppo, null);
-        }
-        
-        /// <remarks/>
-        public void GetIdCorrGlobaliEsibizioneAsync(string idGruppo, object userState) {
-            if ((this.GetIdCorrGlobaliEsibizioneOperationCompleted == null)) {
-                this.GetIdCorrGlobaliEsibizioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetIdCorrGlobaliEsibizioneOperationCompleted);
-            }
-            this.InvokeAsync("GetIdCorrGlobaliEsibizione", new object[] {
-                        idGruppo}, this.GetIdCorrGlobaliEsibizioneOperationCompleted, userState);
-        }
-        
-        private void OnGetIdCorrGlobaliEsibizioneOperationCompleted(object arg) {
-            if ((this.GetIdCorrGlobaliEsibizioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetIdCorrGlobaliEsibizioneCompleted(this, new GetIdCorrGlobaliEsibizioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/rigeneraIstanza", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool rigeneraIstanza(string idConservazione, string idSupporto, InfoUtente infoUtente, out string message) {
-            object[] results = this.Invoke("rigeneraIstanza", new object[] {
-                        idConservazione,
-                        idSupporto,
-                        infoUtente});
-            message = ((string)(results[1]));
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void rigeneraIstanzaAsync(string idConservazione, string idSupporto, InfoUtente infoUtente) {
-            this.rigeneraIstanzaAsync(idConservazione, idSupporto, infoUtente, null);
-        }
-        
-        /// <remarks/>
-        public void rigeneraIstanzaAsync(string idConservazione, string idSupporto, InfoUtente infoUtente, object userState) {
-            if ((this.rigeneraIstanzaOperationCompleted == null)) {
-                this.rigeneraIstanzaOperationCompleted = new System.Threading.SendOrPostCallback(this.OnrigeneraIstanzaOperationCompleted);
-            }
-            this.InvokeAsync("rigeneraIstanza", new object[] {
-                        idConservazione,
-                        idSupporto,
-                        infoUtente}, this.rigeneraIstanzaOperationCompleted, userState);
-        }
-        
-        private void OnrigeneraIstanzaOperationCompleted(object arg) {
-            if ((this.rigeneraIstanzaCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.rigeneraIstanzaCompleted(this, new rigeneraIstanzaCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/isIstanzaRigenerata", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool isIstanzaRigenerata(string idConservazione, InfoUtente infoUtente) {
-            object[] results = this.Invoke("isIstanzaRigenerata", new object[] {
-                        idConservazione,
-                        infoUtente});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void isIstanzaRigenerataAsync(string idConservazione, InfoUtente infoUtente) {
-            this.isIstanzaRigenerataAsync(idConservazione, infoUtente, null);
-        }
-        
-        /// <remarks/>
-        public void isIstanzaRigenerataAsync(string idConservazione, InfoUtente infoUtente, object userState) {
-            if ((this.isIstanzaRigenerataOperationCompleted == null)) {
-                this.isIstanzaRigenerataOperationCompleted = new System.Threading.SendOrPostCallback(this.OnisIstanzaRigenerataOperationCompleted);
-            }
-            this.InvokeAsync("isIstanzaRigenerata", new object[] {
-                        idConservazione,
-                        infoUtente}, this.isIstanzaRigenerataOperationCompleted, userState);
-        }
-        
-        private void OnisIstanzaRigenerataOperationCompleted(object arg) {
-            if ((this.isIstanzaRigenerataCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.isIstanzaRigenerataCompleted(this, new isIstanzaRigenerataCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetChiaveConfigurazione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetChiaveConfigurazione(string idAmm, string key) {
-            object[] results = this.Invoke("GetChiaveConfigurazione", new object[] {
-                        idAmm,
-                        key});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetChiaveConfigurazioneAsync(string idAmm, string key) {
-            this.GetChiaveConfigurazioneAsync(idAmm, key, null);
-        }
-        
-        /// <remarks/>
-        public void GetChiaveConfigurazioneAsync(string idAmm, string key, object userState) {
-            if ((this.GetChiaveConfigurazioneOperationCompleted == null)) {
-                this.GetChiaveConfigurazioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetChiaveConfigurazioneOperationCompleted);
-            }
-            this.InvokeAsync("GetChiaveConfigurazione", new object[] {
-                        idAmm,
-                        key}, this.GetChiaveConfigurazioneOperationCompleted, userState);
-        }
-        
-        private void OnGetChiaveConfigurazioneOperationCompleted(object arg) {
-            if ((this.GetChiaveConfigurazioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetChiaveConfigurazioneCompleted(this, new GetChiaveConfigurazioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/IsAlertConservazioneAttivo", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool IsAlertConservazioneAttivo(string idAmm, string codice) {
-            object[] results = this.Invoke("IsAlertConservazioneAttivo", new object[] {
-                        idAmm,
-                        codice});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void IsAlertConservazioneAttivoAsync(string idAmm, string codice) {
-            this.IsAlertConservazioneAttivoAsync(idAmm, codice, null);
-        }
-        
-        /// <remarks/>
-        public void IsAlertConservazioneAttivoAsync(string idAmm, string codice, object userState) {
-            if ((this.IsAlertConservazioneAttivoOperationCompleted == null)) {
-                this.IsAlertConservazioneAttivoOperationCompleted = new System.Threading.SendOrPostCallback(this.OnIsAlertConservazioneAttivoOperationCompleted);
-            }
-            this.InvokeAsync("IsAlertConservazioneAttivo", new object[] {
-                        idAmm,
-                        codice}, this.IsAlertConservazioneAttivoOperationCompleted, userState);
-        }
-        
-        private void OnIsAlertConservazioneAttivoOperationCompleted(object arg) {
-            if ((this.IsAlertConservazioneAttivoCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.IsAlertConservazioneAttivoCompleted(this, new IsAlertConservazioneAttivoCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/GetParametriAlertConservazione", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetParametriAlertConservazione(string idAmm, string codice) {
-            object[] results = this.Invoke("GetParametriAlertConservazione", new object[] {
-                        idAmm,
-                        codice});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void GetParametriAlertConservazioneAsync(string idAmm, string codice) {
-            this.GetParametriAlertConservazioneAsync(idAmm, codice, null);
-        }
-        
-        /// <remarks/>
-        public void GetParametriAlertConservazioneAsync(string idAmm, string codice, object userState) {
-            if ((this.GetParametriAlertConservazioneOperationCompleted == null)) {
-                this.GetParametriAlertConservazioneOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetParametriAlertConservazioneOperationCompleted);
-            }
-            this.InvokeAsync("GetParametriAlertConservazione", new object[] {
-                        idAmm,
-                        codice}, this.GetParametriAlertConservazioneOperationCompleted, userState);
-        }
-        
-        private void OnGetParametriAlertConservazioneOperationCompleted(object arg) {
-            if ((this.GetParametriAlertConservazioneCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetParametriAlertConservazioneCompleted(this, new GetParametriAlertConservazioneCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/InvioAlertAsync", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public void InvioAlertAsync(InfoUtente infoUtente, string codice, string idIstanza, string idSupporto) {
-            this.Invoke("InvioAlertAsync", new object[] {
-                        infoUtente,
-                        codice,
-                        idIstanza,
-                        idSupporto});
-        }
-        
-        /// <remarks/>
-        public void InvioAlertAsyncAsync(InfoUtente infoUtente, string codice, string idIstanza, string idSupporto) {
-            this.InvioAlertAsyncAsync(infoUtente, codice, idIstanza, idSupporto, null);
-        }
-        
-        /// <remarks/>
-        public void InvioAlertAsyncAsync(InfoUtente infoUtente, string codice, string idIstanza, string idSupporto, object userState) {
-            if ((this.InvioAlertAsyncOperationCompleted == null)) {
-                this.InvioAlertAsyncOperationCompleted = new System.Threading.SendOrPostCallback(this.OnInvioAlertAsyncOperationCompleted);
-            }
-            this.InvokeAsync("InvioAlertAsync", new object[] {
-                        infoUtente,
-                        codice,
-                        idIstanza,
-                        idSupporto}, this.InvioAlertAsyncOperationCompleted, userState);
-        }
-        
-        private void OnInvioAlertAsyncOperationCompleted(object arg) {
-            if ((this.InvioAlertAsyncCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.InvioAlertAsyncCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/RegistraEsitoVerificaLeggibilitaSupportoRegistrato", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public void RegistraEsitoVerificaLeggibilitaSupportoRegistrato(InfoUtente infoUtente, string idIstanza, string idSupporto, bool esitoVerifica, string percentualeVerifica, string dataProssimaVerifica, string noteDiVerifica, string tipoVerifica) {
-            this.Invoke("RegistraEsitoVerificaLeggibilitaSupportoRegistrato", new object[] {
-                        infoUtente,
-                        idIstanza,
-                        idSupporto,
-                        esitoVerifica,
-                        percentualeVerifica,
-                        dataProssimaVerifica,
-                        noteDiVerifica,
-                        tipoVerifica});
-        }
-        
-        /// <remarks/>
-        public void RegistraEsitoVerificaLeggibilitaSupportoRegistratoAsync(InfoUtente infoUtente, string idIstanza, string idSupporto, bool esitoVerifica, string percentualeVerifica, string dataProssimaVerifica, string noteDiVerifica, string tipoVerifica) {
-            this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoAsync(infoUtente, idIstanza, idSupporto, esitoVerifica, percentualeVerifica, dataProssimaVerifica, noteDiVerifica, tipoVerifica, null);
-        }
-        
-        /// <remarks/>
-        public void RegistraEsitoVerificaLeggibilitaSupportoRegistratoAsync(InfoUtente infoUtente, string idIstanza, string idSupporto, bool esitoVerifica, string percentualeVerifica, string dataProssimaVerifica, string noteDiVerifica, string tipoVerifica, object userState) {
-            if ((this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted == null)) {
-                this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted = new System.Threading.SendOrPostCallback(this.OnRegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted);
-            }
-            this.InvokeAsync("RegistraEsitoVerificaLeggibilitaSupportoRegistrato", new object[] {
-                        infoUtente,
-                        idIstanza,
-                        idSupporto,
-                        esitoVerifica,
-                        percentualeVerifica,
-                        dataProssimaVerifica,
-                        noteDiVerifica,
-                        tipoVerifica}, this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted, userState);
-        }
-        
-        private void OnRegistraEsitoVerificaLeggibilitaSupportoRegistratoOperationCompleted(object arg) {
-            if ((this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://localhost/IsVerificaLeggibilitaAnticipata", RequestNamespace="http://localhost", ResponseNamespace="http://localhost", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool IsVerificaLeggibilitaAnticipata(string idConservazione, string idSupporto, string idAmm) {
-            object[] results = this.Invoke("IsVerificaLeggibilitaAnticipata", new object[] {
-                        idConservazione,
-                        idSupporto,
-                        idAmm});
-            return ((bool)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void IsVerificaLeggibilitaAnticipataAsync(string idConservazione, string idSupporto, string idAmm) {
-            this.IsVerificaLeggibilitaAnticipataAsync(idConservazione, idSupporto, idAmm, null);
-        }
-        
-        /// <remarks/>
-        public void IsVerificaLeggibilitaAnticipataAsync(string idConservazione, string idSupporto, string idAmm, object userState) {
-            if ((this.IsVerificaLeggibilitaAnticipataOperationCompleted == null)) {
-                this.IsVerificaLeggibilitaAnticipataOperationCompleted = new System.Threading.SendOrPostCallback(this.OnIsVerificaLeggibilitaAnticipataOperationCompleted);
-            }
-            this.InvokeAsync("IsVerificaLeggibilitaAnticipata", new object[] {
-                        idConservazione,
-                        idSupporto,
-                        idAmm}, this.IsVerificaLeggibilitaAnticipataOperationCompleted, userState);
-        }
-        
-        private void OnIsVerificaLeggibilitaAnticipataOperationCompleted(object arg) {
-            if ((this.IsVerificaLeggibilitaAnticipataCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.IsVerificaLeggibilitaAnticipataCompleted(this, new IsVerificaLeggibilitaAnticipataCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
         public new void CancelAsync(object userState) {
             base.CancelAsync(userState);
         }
@@ -4847,4928 +4811,56 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class InfoUtente {
+    public partial class FiltroRicerca {
         
-        private string idCorrGlobaliField;
+        private string argomentoField;
         
-        private string idPeopleField;
-        
-        private string userIdField;
-        
-        private string dstField;
-        
-        private string idGruppoField;
-        
-        private string idAmministrazioneField;
-        
-        private string sedeField;
-        
-        private string urlWAField;
-        
-        private InfoUtente delegatoField;
-        
-        private object[] extApplicationsField;
-        
-        private string codWorkingApplicationField;
-        
-        private string matricolaField;
-        
-        private string diSistemaField;
-        
-        /// <remarks/>
-        public string idCorrGlobali {
-            get {
-                return this.idCorrGlobaliField;
-            }
-            set {
-                this.idCorrGlobaliField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idPeople {
-            get {
-                return this.idPeopleField;
-            }
-            set {
-                this.idPeopleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string userId {
-            get {
-                return this.userIdField;
-            }
-            set {
-                this.userIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dst {
-            get {
-                return this.dstField;
-            }
-            set {
-                this.dstField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idGruppo {
-            get {
-                return this.idGruppoField;
-            }
-            set {
-                this.idGruppoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idAmministrazione {
-            get {
-                return this.idAmministrazioneField;
-            }
-            set {
-                this.idAmministrazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string sede {
-            get {
-                return this.sedeField;
-            }
-            set {
-                this.sedeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string urlWA {
-            get {
-                return this.urlWAField;
-            }
-            set {
-                this.urlWAField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public InfoUtente delegato {
-            get {
-                return this.delegatoField;
-            }
-            set {
-                this.delegatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public object[] extApplications {
-            get {
-                return this.extApplicationsField;
-            }
-            set {
-                this.extApplicationsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codWorkingApplication {
-            get {
-                return this.codWorkingApplicationField;
-            }
-            set {
-                this.codWorkingApplicationField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string matricola {
-            get {
-                return this.matricolaField;
-            }
-            set {
-                this.matricolaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string diSistema {
-            get {
-                return this.diSistemaField;
-            }
-            set {
-                this.diSistemaField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class DocumentConsolidationStateInfo {
-        
-        private DocumentConsolidationStateEnum stateField;
-        
-        private string authorField;
-        
-        private string roleField;
-        
-        private string dateField;
-        
-        /// <remarks/>
-        public DocumentConsolidationStateEnum State {
-            get {
-                return this.stateField;
-            }
-            set {
-                this.stateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Author {
-            get {
-                return this.authorField;
-            }
-            set {
-                this.authorField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Role {
-            get {
-                return this.roleField;
-            }
-            set {
-                this.roleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Date {
-            get {
-                return this.dateField;
-            }
-            set {
-                this.dateField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum DocumentConsolidationStateEnum {
-        
-        /// <remarks/>
-        None,
-        
-        /// <remarks/>
-        Step1,
-        
-        /// <remarks/>
-        Step2,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class InfoDocumento {
-        
-        private string idProfileField;
-        
-        private string docNumberField;
-        
-        private string numProtField;
-        
-        private string oggettoField;
-        
-        private string dataAperturaField;
-        
-        private string tipoProtoField;
-        
-        private string codRegistroField;
-        
-        private string idRegistroField;
-        
-        private string segnaturaField;
-        
-        private string daProtocollareField;
-        
-        private string evidenzaField;
-        
-        private string dataAnnullamentoField;
-        
-        private string mittDocField;
-        
-        private string acquisitaImmagineField;
-        
-        private string privatoField;
-        
-        private string personaleField;
-        
-        private string noteCestinoField;
-        
-        private string autoreField;
-        
-        private string inCestinoField;
-        
-        private string inADLField;
-        
-        private string idTipoAttoField;
-        
-        private string tipoAttoField;
-        
-        private string isRimovibileField;
-        
-        private string inConservazioneField;
-        
-        private string inArchivioField;
-        
-        private string numSerieField;
-        
-        private string ultimaNotaField;
-        
-        private string[] mittDestField;
-        
-        private string dataArchiviazioneField;
-        
-        private bool allegatoField;
-        
-        private string protocolloTitolarioField;
-        
-        private string cha_firmatoField;
-        
-        private string contatoreField;
-        
-        private string codiceApplicazioneField;
-        
-        private string isCatenaTrasversaleField;
-        
-        private string[] mittentiField;
-        
-        private string[] destinatariField;
-        
-        /// <remarks/>
-        public string idProfile {
-            get {
-                return this.idProfileField;
-            }
-            set {
-                this.idProfileField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string docNumber {
-            get {
-                return this.docNumberField;
-            }
-            set {
-                this.docNumberField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string numProt {
-            get {
-                return this.numProtField;
-            }
-            set {
-                this.numProtField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string oggetto {
-            get {
-                return this.oggettoField;
-            }
-            set {
-                this.oggettoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataApertura {
-            get {
-                return this.dataAperturaField;
-            }
-            set {
-                this.dataAperturaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipoProto {
-            get {
-                return this.tipoProtoField;
-            }
-            set {
-                this.tipoProtoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codRegistro {
-            get {
-                return this.codRegistroField;
-            }
-            set {
-                this.codRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idRegistro {
-            get {
-                return this.idRegistroField;
-            }
-            set {
-                this.idRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string segnatura {
-            get {
-                return this.segnaturaField;
-            }
-            set {
-                this.segnaturaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string daProtocollare {
-            get {
-                return this.daProtocollareField;
-            }
-            set {
-                this.daProtocollareField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string evidenza {
-            get {
-                return this.evidenzaField;
-            }
-            set {
-                this.evidenzaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataAnnullamento {
-            get {
-                return this.dataAnnullamentoField;
-            }
-            set {
-                this.dataAnnullamentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string mittDoc {
-            get {
-                return this.mittDocField;
-            }
-            set {
-                this.mittDocField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string acquisitaImmagine {
-            get {
-                return this.acquisitaImmagineField;
-            }
-            set {
-                this.acquisitaImmagineField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string privato {
-            get {
-                return this.privatoField;
-            }
-            set {
-                this.privatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string personale {
-            get {
-                return this.personaleField;
-            }
-            set {
-                this.personaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string noteCestino {
-            get {
-                return this.noteCestinoField;
-            }
-            set {
-                this.noteCestinoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string autore {
-            get {
-                return this.autoreField;
-            }
-            set {
-                this.autoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string inCestino {
-            get {
-                return this.inCestinoField;
-            }
-            set {
-                this.inCestinoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string inADL {
-            get {
-                return this.inADLField;
-            }
-            set {
-                this.inADLField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idTipoAtto {
-            get {
-                return this.idTipoAttoField;
-            }
-            set {
-                this.idTipoAttoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipoAtto {
-            get {
-                return this.tipoAttoField;
-            }
-            set {
-                this.tipoAttoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string isRimovibile {
-            get {
-                return this.isRimovibileField;
-            }
-            set {
-                this.isRimovibileField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string inConservazione {
-            get {
-                return this.inConservazioneField;
-            }
-            set {
-                this.inConservazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string inArchivio {
-            get {
-                return this.inArchivioField;
-            }
-            set {
-                this.inArchivioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string numSerie {
-            get {
-                return this.numSerieField;
-            }
-            set {
-                this.numSerieField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ultimaNota {
-            get {
-                return this.ultimaNotaField;
-            }
-            set {
-                this.ultimaNotaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string[] mittDest {
-            get {
-                return this.mittDestField;
-            }
-            set {
-                this.mittDestField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataArchiviazione {
-            get {
-                return this.dataArchiviazioneField;
-            }
-            set {
-                this.dataArchiviazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool allegato {
-            get {
-                return this.allegatoField;
-            }
-            set {
-                this.allegatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string protocolloTitolario {
-            get {
-                return this.protocolloTitolarioField;
-            }
-            set {
-                this.protocolloTitolarioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string cha_firmato {
-            get {
-                return this.cha_firmatoField;
-            }
-            set {
-                this.cha_firmatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string contatore {
-            get {
-                return this.contatoreField;
-            }
-            set {
-                this.contatoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceApplicazione {
-            get {
-                return this.codiceApplicazioneField;
-            }
-            set {
-                this.codiceApplicazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string isCatenaTrasversale {
-            get {
-                return this.isCatenaTrasversaleField;
-            }
-            set {
-                this.isCatenaTrasversaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string[] Mittenti {
-            get {
-                return this.mittentiField;
-            }
-            set {
-                this.mittentiField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string[] Destinatari {
-            get {
-                return this.destinatariField;
-            }
-            set {
-                this.destinatariField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class CheckOutStatus {
-        
-        private string idField;
-        
-        private System.DateTime checkOutDateField;
-        
-        private string documentLocationField;
-        
-        private string machineNameField;
-        
-        private string iDUserField;
-        
-        private string userNameField;
-        
-        private string iDRoleField;
-        
-        private string roleNameField;
-        
-        private string iDDocumentField;
-        
-        private string documentNumberField;
-        
-        private string segnatureField;
-        
-        private bool inConversionePdfField;
-        
-        private bool isAllegatoField;
-        
-        /// <remarks/>
-        public string ID {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public System.DateTime CheckOutDate {
-            get {
-                return this.checkOutDateField;
-            }
-            set {
-                this.checkOutDateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DocumentLocation {
-            get {
-                return this.documentLocationField;
-            }
-            set {
-                this.documentLocationField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string MachineName {
-            get {
-                return this.machineNameField;
-            }
-            set {
-                this.machineNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IDUser {
-            get {
-                return this.iDUserField;
-            }
-            set {
-                this.iDUserField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string UserName {
-            get {
-                return this.userNameField;
-            }
-            set {
-                this.userNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IDRole {
-            get {
-                return this.iDRoleField;
-            }
-            set {
-                this.iDRoleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string RoleName {
-            get {
-                return this.roleNameField;
-            }
-            set {
-                this.roleNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IDDocument {
-            get {
-                return this.iDDocumentField;
-            }
-            set {
-                this.iDDocumentField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DocumentNumber {
-            get {
-                return this.documentNumberField;
-            }
-            set {
-                this.documentNumberField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Segnature {
-            get {
-                return this.segnatureField;
-            }
-            set {
-                this.segnatureField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool InConversionePdf {
-            get {
-                return this.inConversionePdfField;
-            }
-            set {
-                this.inConversionePdfField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool IsAllegato {
-            get {
-                return this.isAllegatoField;
-            }
-            set {
-                this.isAllegatoField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class DocumentoParolaChiave {
-        
-        private string systemIdField;
-        
-        private string descrizioneField;
-        
-        private string idAmministrazioneField;
-        
-        private string idRegistroField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idAmministrazione {
-            get {
-                return this.idAmministrazioneField;
-            }
-            set {
-                this.idAmministrazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idRegistro {
-            get {
-                return this.idRegistroField;
-            }
-            set {
-                this.idRegistroField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class TipologiaCanale {
-        
-        private string systemIdField;
-        
-        private string codiceField;
-        
-        private string descrizioneField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codice {
-            get {
-                return this.codiceField;
-            }
-            set {
-                this.codiceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class SessionRepositoryContext {
-        
-        private InfoUtente ownerField;
-        
-        private string tokenField;
-        
-        private bool isDocumentoGrigioField;
-        
-        /// <remarks/>
-        public InfoUtente Owner {
-            get {
-                return this.ownerField;
-            }
-            set {
-                this.ownerField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Token {
-            get {
-                return this.tokenField;
-            }
-            set {
-                this.tokenField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool IsDocumentoGrigio {
-            get {
-                return this.isDocumentoGrigioField;
-            }
-            set {
-                this.isDocumentoGrigioField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Firmatario {
-        
-        private string systemIdField;
-        
-        private string nomeField;
-        
-        private string cognomeField;
-        
-        private string codiceFiscaleField;
-        
-        private string dataNascitaField;
-        
-        private string identificativoCAField;
-        
-        private int livelloField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string nome {
-            get {
-                return this.nomeField;
-            }
-            set {
-                this.nomeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string cognome {
-            get {
-                return this.cognomeField;
-            }
-            set {
-                this.cognomeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceFiscale {
-            get {
-                return this.codiceFiscaleField;
-            }
-            set {
-                this.codiceFiscaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataNascita {
-            get {
-                return this.dataNascitaField;
-            }
-            set {
-                this.dataNascitaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string identificativoCA {
-            get {
-                return this.identificativoCAField;
-            }
-            set {
-                this.identificativoCAField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int livello {
-            get {
-                return this.livelloField;
-            }
-            set {
-                this.livelloField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Applicazione {
-        
-        private string systemIdField;
-        
-        private string estensioneField;
-        
-        private string descrizioneField;
-        
-        private string applicationField;
-        
-        private string mimeTypeField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string estensione {
-            get {
-                return this.estensioneField;
-            }
-            set {
-                this.estensioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string application {
-            get {
-                return this.applicationField;
-            }
-            set {
-                this.applicationField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string mimeType {
-            get {
-                return this.mimeTypeField;
-            }
-            set {
-                this.mimeTypeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Allegato))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Documento))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class FileRequest {
-        
-        private string dataInserimentoField;
-        
-        private string descrizioneField;
-        
-        private string docNumberField;
-        
-        private string docServerLocField;
-        
-        private string pathField;
-        
-        private string fileNameField;
-        
-        private string idPeopleField;
-        
-        private string versionIdField;
-        
-        private string fNversionIdField;
-        
-        private string versionField;
-        
-        private string subVersionField;
-        
-        private string versionLabelField;
-        
-        private string fileSizeField;
-        
-        private string autoreField;
-        
-        private string autoreFileField;
-        
-        private string dataAcquisizioneField;
-        
-        private string firmatoField;
-        
-        private string idPeopleDelegatoField;
-        
-        private bool daAggiornareFirmatariField;
-        
-        private Applicazione applicazioneField;
-        
-        private string tipoFirmaField;
-        
-        private string msgErrField;
-        
-        private bool inLibroFirmaField;
-        
-        private bool cartaceoField;
-        
-        private Firmatario[] firmatariField;
-        
-        private SessionRepositoryContext repositoryContextField;
-        
-        /// <remarks/>
-        public string dataInserimento {
-            get {
-                return this.dataInserimentoField;
-            }
-            set {
-                this.dataInserimentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string docNumber {
-            get {
-                return this.docNumberField;
-            }
-            set {
-                this.docNumberField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string docServerLoc {
-            get {
-                return this.docServerLocField;
-            }
-            set {
-                this.docServerLocField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string path {
-            get {
-                return this.pathField;
-            }
-            set {
-                this.pathField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string fileName {
-            get {
-                return this.fileNameField;
-            }
-            set {
-                this.fileNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idPeople {
-            get {
-                return this.idPeopleField;
-            }
-            set {
-                this.idPeopleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string versionId {
-            get {
-                return this.versionIdField;
-            }
-            set {
-                this.versionIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string fNversionId {
-            get {
-                return this.fNversionIdField;
-            }
-            set {
-                this.fNversionIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string version {
-            get {
-                return this.versionField;
-            }
-            set {
-                this.versionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string subVersion {
-            get {
-                return this.subVersionField;
-            }
-            set {
-                this.subVersionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string versionLabel {
-            get {
-                return this.versionLabelField;
-            }
-            set {
-                this.versionLabelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string fileSize {
-            get {
-                return this.fileSizeField;
-            }
-            set {
-                this.fileSizeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string autore {
-            get {
-                return this.autoreField;
-            }
-            set {
-                this.autoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string autoreFile {
-            get {
-                return this.autoreFileField;
-            }
-            set {
-                this.autoreFileField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataAcquisizione {
-            get {
-                return this.dataAcquisizioneField;
-            }
-            set {
-                this.dataAcquisizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string firmato {
-            get {
-                return this.firmatoField;
-            }
-            set {
-                this.firmatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idPeopleDelegato {
-            get {
-                return this.idPeopleDelegatoField;
-            }
-            set {
-                this.idPeopleDelegatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornareFirmatari {
-            get {
-                return this.daAggiornareFirmatariField;
-            }
-            set {
-                this.daAggiornareFirmatariField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Applicazione applicazione {
-            get {
-                return this.applicazioneField;
-            }
-            set {
-                this.applicazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipoFirma {
-            get {
-                return this.tipoFirmaField;
-            }
-            set {
-                this.tipoFirmaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string msgErr {
-            get {
-                return this.msgErrField;
-            }
-            set {
-                this.msgErrField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool inLibroFirma {
-            get {
-                return this.inLibroFirmaField;
-            }
-            set {
-                this.inLibroFirmaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool cartaceo {
-            get {
-                return this.cartaceoField;
-            }
-            set {
-                this.cartaceoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Firmatario[] firmatari {
-            get {
-                return this.firmatariField;
-            }
-            set {
-                this.firmatariField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public SessionRepositoryContext repositoryContext {
-            get {
-                return this.repositoryContextField;
-            }
-            set {
-                this.repositoryContextField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Allegato : FileRequest {
-        
-        private int numeroPagineField;
-        
-        private int positionField;
-        
-        private string forwardingSourceField;
-        
-        private int typeAttachmentField;
-        
-        /// <remarks/>
-        public int numeroPagine {
-            get {
-                return this.numeroPagineField;
-            }
-            set {
-                this.numeroPagineField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int position {
-            get {
-                return this.positionField;
-            }
-            set {
-                this.positionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ForwardingSource {
-            get {
-                return this.forwardingSourceField;
-            }
-            set {
-                this.forwardingSourceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int TypeAttachment {
-            get {
-                return this.typeAttachmentField;
-            }
-            set {
-                this.typeAttachmentField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Documento : FileRequest {
-        
-        private string daInviareField;
-        
-        private string dataArrivoField;
-        
-        private TipologiaCanale tipologiaField;
-        
-        private string dataArchiviazioneField;
-        
-        /// <remarks/>
-        public string daInviare {
-            get {
-                return this.daInviareField;
-            }
-            set {
-                this.daInviareField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataArrivo {
-            get {
-                return this.dataArrivoField;
-            }
-            set {
-                this.dataArrivoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TipologiaCanale tipologia {
-            get {
-                return this.tipologiaField;
-            }
-            set {
-                this.tipologiaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataArchiviazione {
-            get {
-                return this.dataArchiviazioneField;
-            }
-            set {
-                this.dataArchiviazioneField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Messaggio {
-        
-        private string idField;
-        
-        private string dESCRIZIONEField;
-        
-        private bool iNIZIALEField;
-        
-        private bool fINALEField;
-        
-        /// <remarks/>
-        public string ID {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DESCRIZIONE {
-            get {
-                return this.dESCRIZIONEField;
-            }
-            set {
-                this.dESCRIZIONEField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool INIZIALE {
-            get {
-                return this.iNIZIALEField;
-            }
-            set {
-                this.iNIZIALEField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool FINALE {
-            get {
-                return this.fINALEField;
-            }
-            set {
-                this.fINALEField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class StatoSpedizioneDocumento {
-        
-        private StatiSpedizioneDocumentoEnum statoField;
-        
-        private string descrizioneField;
-        
-        /// <remarks/>
-        public StatiSpedizioneDocumentoEnum Stato {
-            get {
-                return this.statoField;
-            }
-            set {
-                this.statoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum StatiSpedizioneDocumentoEnum {
-        
-        /// <remarks/>
-        DisabilitatoTrasmissioni,
-        
-        /// <remarks/>
-        DaSpedire,
-        
-        /// <remarks/>
-        Spedito,
-        
-        /// <remarks/>
-        ErroreInSpedizione,
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinatarioEsterno))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinatarioInterno))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public abstract partial class Destinatario {
-        
-        private string idField;
-        
-        private string dataUltimaSpedizioneField;
-        
-        private string emailField;
-        
-        private bool includiInSpedizioneField;
-        
-        private StatoSpedizioneDocumento statoSpedizioneField;
-        
-        /// <remarks/>
-        public string Id {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DataUltimaSpedizione {
-            get {
-                return this.dataUltimaSpedizioneField;
-            }
-            set {
-                this.dataUltimaSpedizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Email {
-            get {
-                return this.emailField;
-            }
-            set {
-                this.emailField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool IncludiInSpedizione {
-            get {
-                return this.includiInSpedizioneField;
-            }
-            set {
-                this.includiInSpedizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public StatoSpedizioneDocumento StatoSpedizione {
-            get {
-                return this.statoSpedizioneField;
-            }
-            set {
-                this.statoSpedizioneField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class DestinatarioEsterno : Destinatario {
-        
-        private bool interoperanteField;
-        
-        private bool interoperanteRGSField;
-        
-        private Corrispondente[] datiDestinatariField;
-        
-        /// <remarks/>
-        public bool Interoperante {
-            get {
-                return this.interoperanteField;
-            }
-            set {
-                this.interoperanteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool InteroperanteRGS {
-            get {
-                return this.interoperanteRGSField;
-            }
-            set {
-                this.interoperanteRGSField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Corrispondente[] DatiDestinatari {
-            get {
-                return this.datiDestinatariField;
-            }
-            set {
-                this.datiDestinatariField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UnitaOrganizzativa))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Ruolo))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Corrispondente {
-        
-        private string systemIdField;
-        
-        private string descrizioneField;
-        
-        private string codiceCorrispondenteField;
-        
-        private string codiceRubricaField;
-        
-        private string idAmministrazioneField;
-        
-        private string tipoCorrispondenteField;
-        
-        private string tipoIEField;
-        
-        private string idRegistroField;
-        
-        private Canale canalePrefField;
-        
-        private bool dettagliField;
-        
-        private System.Data.DataSet infoField;
-        
-        private ServerPosta serverPostaField;
-        
-        private string idOldField;
-        
-        private string emailField;
-        
-        private string fromEmailField;
-        
-        private bool notificaConAllegatoField;
-        
-        private string erroreField;
-        
-        private string codiceAOOField;
-        
-        private string codiceAmmField;
-        
-        private string dta_fineField;
-        
-        private string nomeField;
-        
-        private string cognomeField;
-        
-        private string indirizzoField;
-        
-        private string cittaField;
-        
-        private string capField;
-        
-        private string provField;
-        
-        private string nazionalitaField;
-        
-        private string telefono1Field;
-        
-        private string telefono2Field;
-        
-        private string faxField;
-        
-        private string codfiscField;
-        
-        private string partitaivaField;
-        
-        private string noteField;
-        
-        private bool inRubricaComuneField;
-        
-        private ProtocolloDestinatario protocolloDestinatarioField;
-        
-        private string codDescAmministrizazioneField;
-        
-        private string localitaField;
-        
-        private string luogoDINascitaField;
-        
-        private string dataNascitaField;
-        
-        private string titoloField;
-        
-        private string oldDescrizioneField;
-        
-        private bool disabledTrasmField;
-        
-        private bool interoperanteRGSField;
-        
-        private UrlInfo[] urlField;
-        
-        private MailCorrispondente[] emailsField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceCorrispondente {
-            get {
-                return this.codiceCorrispondenteField;
-            }
-            set {
-                this.codiceCorrispondenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceRubrica {
-            get {
-                return this.codiceRubricaField;
-            }
-            set {
-                this.codiceRubricaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idAmministrazione {
-            get {
-                return this.idAmministrazioneField;
-            }
-            set {
-                this.idAmministrazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipoCorrispondente {
-            get {
-                return this.tipoCorrispondenteField;
-            }
-            set {
-                this.tipoCorrispondenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipoIE {
-            get {
-                return this.tipoIEField;
-            }
-            set {
-                this.tipoIEField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idRegistro {
-            get {
-                return this.idRegistroField;
-            }
-            set {
-                this.idRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Canale canalePref {
-            get {
-                return this.canalePrefField;
-            }
-            set {
-                this.canalePrefField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool dettagli {
-            get {
-                return this.dettagliField;
-            }
-            set {
-                this.dettagliField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public System.Data.DataSet info {
-            get {
-                return this.infoField;
-            }
-            set {
-                this.infoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public ServerPosta serverPosta {
-            get {
-                return this.serverPostaField;
-            }
-            set {
-                this.serverPostaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idOld {
-            get {
-                return this.idOldField;
-            }
-            set {
-                this.idOldField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string email {
-            get {
-                return this.emailField;
-            }
-            set {
-                this.emailField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string fromEmail {
-            get {
-                return this.fromEmailField;
-            }
-            set {
-                this.fromEmailField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool notificaConAllegato {
-            get {
-                return this.notificaConAllegatoField;
-            }
-            set {
-                this.notificaConAllegatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string errore {
-            get {
-                return this.erroreField;
-            }
-            set {
-                this.erroreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceAOO {
-            get {
-                return this.codiceAOOField;
-            }
-            set {
-                this.codiceAOOField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceAmm {
-            get {
-                return this.codiceAmmField;
-            }
-            set {
-                this.codiceAmmField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dta_fine {
-            get {
-                return this.dta_fineField;
-            }
-            set {
-                this.dta_fineField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string nome {
-            get {
-                return this.nomeField;
-            }
-            set {
-                this.nomeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string cognome {
-            get {
-                return this.cognomeField;
-            }
-            set {
-                this.cognomeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string indirizzo {
-            get {
-                return this.indirizzoField;
-            }
-            set {
-                this.indirizzoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string citta {
-            get {
-                return this.cittaField;
-            }
-            set {
-                this.cittaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string cap {
-            get {
-                return this.capField;
-            }
-            set {
-                this.capField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string prov {
-            get {
-                return this.provField;
-            }
-            set {
-                this.provField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string nazionalita {
-            get {
-                return this.nazionalitaField;
-            }
-            set {
-                this.nazionalitaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string telefono1 {
-            get {
-                return this.telefono1Field;
-            }
-            set {
-                this.telefono1Field = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string telefono2 {
-            get {
-                return this.telefono2Field;
-            }
-            set {
-                this.telefono2Field = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string fax {
-            get {
-                return this.faxField;
-            }
-            set {
-                this.faxField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codfisc {
-            get {
-                return this.codfiscField;
-            }
-            set {
-                this.codfiscField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string partitaiva {
-            get {
-                return this.partitaivaField;
-            }
-            set {
-                this.partitaivaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string note {
-            get {
-                return this.noteField;
-            }
-            set {
-                this.noteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool inRubricaComune {
-            get {
-                return this.inRubricaComuneField;
-            }
-            set {
-                this.inRubricaComuneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public ProtocolloDestinatario protocolloDestinatario {
-            get {
-                return this.protocolloDestinatarioField;
-            }
-            set {
-                this.protocolloDestinatarioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codDescAmministrizazione {
-            get {
-                return this.codDescAmministrizazioneField;
-            }
-            set {
-                this.codDescAmministrizazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string localita {
-            get {
-                return this.localitaField;
-            }
-            set {
-                this.localitaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string luogoDINascita {
-            get {
-                return this.luogoDINascitaField;
-            }
-            set {
-                this.luogoDINascitaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataNascita {
-            get {
-                return this.dataNascitaField;
-            }
-            set {
-                this.dataNascitaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string titolo {
-            get {
-                return this.titoloField;
-            }
-            set {
-                this.titoloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string oldDescrizione {
-            get {
-                return this.oldDescrizioneField;
-            }
-            set {
-                this.oldDescrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool disabledTrasm {
-            get {
-                return this.disabledTrasmField;
-            }
-            set {
-                this.disabledTrasmField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool interoperanteRGS {
-            get {
-                return this.interoperanteRGSField;
-            }
-            set {
-                this.interoperanteRGSField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public UrlInfo[] Url {
-            get {
-                return this.urlField;
-            }
-            set {
-                this.urlField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public MailCorrispondente[] Emails {
-            get {
-                return this.emailsField;
-            }
-            set {
-                this.emailsField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Canale {
-        
-        private string systemIdField;
-        
-        private string descrizioneField;
-        
-        private string typeIdField;
-        
-        private string tipoCanaleField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string typeId {
-            get {
-                return this.typeIdField;
-            }
-            set {
-                this.typeIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipoCanale {
-            get {
-                return this.tipoCanaleField;
-            }
-            set {
-                this.tipoCanaleField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ServerPosta {
-        
-        private string systemIdField;
-        
-        private string descrizioneField;
-        
-        private string serverPOPField;
-        
-        private string portaPOPField;
-        
-        private string serverSMTPField;
-        
-        private string portaSMTPField;
-        
-        private string dominioField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string serverPOP {
-            get {
-                return this.serverPOPField;
-            }
-            set {
-                this.serverPOPField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string portaPOP {
-            get {
-                return this.portaPOPField;
-            }
-            set {
-                this.portaPOPField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string serverSMTP {
-            get {
-                return this.serverSMTPField;
-            }
-            set {
-                this.serverSMTPField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string portaSMTP {
-            get {
-                return this.portaSMTPField;
-            }
-            set {
-                this.portaSMTPField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dominio {
-            get {
-                return this.dominioField;
-            }
-            set {
-                this.dominioField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ProtocolloDestinatario {
-        
-        private string systemIdField;
-        
-        private string codiceAOOField;
-        
-        private string protocolloDestinatarioField;
-        
-        private string dataProtocolloDestinatarioField;
-        
-        private string codiceAmmField;
-        
-        private string descrizioneCorrField;
-        
-        private string documentTypeField;
-        
-        private string dta_spedizioneField;
-        
-        private string annullatoField;
-        
-        private string motivoField;
-        
-        private string provvedimentoField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceAOO {
-            get {
-                return this.codiceAOOField;
-            }
-            set {
-                this.codiceAOOField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string protocolloDestinatario {
-            get {
-                return this.protocolloDestinatarioField;
-            }
-            set {
-                this.protocolloDestinatarioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataProtocolloDestinatario {
-            get {
-                return this.dataProtocolloDestinatarioField;
-            }
-            set {
-                this.dataProtocolloDestinatarioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceAmm {
-            get {
-                return this.codiceAmmField;
-            }
-            set {
-                this.codiceAmmField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizioneCorr {
-            get {
-                return this.descrizioneCorrField;
-            }
-            set {
-                this.descrizioneCorrField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string documentType {
-            get {
-                return this.documentTypeField;
-            }
-            set {
-                this.documentTypeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dta_spedizione {
-            get {
-                return this.dta_spedizioneField;
-            }
-            set {
-                this.dta_spedizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string annullato {
-            get {
-                return this.annullatoField;
-            }
-            set {
-                this.annullatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string motivo {
-            get {
-                return this.motivoField;
-            }
-            set {
-                this.motivoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string provvedimento {
-            get {
-                return this.provvedimentoField;
-            }
-            set {
-                this.provvedimentoField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class UrlInfo {
-        
-        private string urlField;
-        
-        /// <remarks/>
-        public string Url {
-            get {
-                return this.urlField;
-            }
-            set {
-                this.urlField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class MailCorrispondente {
-        
-        private string systemIdField;
-        
-        private string emailField;
-        
-        private string noteField;
-        
-        private string principaleField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Email {
-            get {
-                return this.emailField;
-            }
-            set {
-                this.emailField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Note {
-            get {
-                return this.noteField;
-            }
-            set {
-                this.noteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Principale {
-            get {
-                return this.principaleField;
-            }
-            set {
-                this.principaleField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class UnitaOrganizzativa : Corrispondente {
-        
-        private string codiceField;
-        
-        private string livelloField;
-        
-        private bool interoperanteField;
-        
-        private string codiceIstatField;
-        
-        private UnitaOrganizzativa parentField;
-        
-        private Registro[] registriField;
-        
-        private string classificaUOField;
-        
-        /// <remarks/>
-        public string codice {
-            get {
-                return this.codiceField;
-            }
-            set {
-                this.codiceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string livello {
-            get {
-                return this.livelloField;
-            }
-            set {
-                this.livelloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool interoperante {
-            get {
-                return this.interoperanteField;
-            }
-            set {
-                this.interoperanteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceIstat {
-            get {
-                return this.codiceIstatField;
-            }
-            set {
-                this.codiceIstatField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public UnitaOrganizzativa parent {
-            get {
-                return this.parentField;
-            }
-            set {
-                this.parentField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Registro[] registri {
-            get {
-                return this.registriField;
-            }
-            set {
-                this.registriField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string classificaUO {
-            get {
-                return this.classificaUOField;
-            }
-            set {
-                this.classificaUOField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Registro {
-        
-        private string systemIdField;
-        
-        private string codRegistroField;
-        
-        private string codiceField;
-        
-        private string descrizioneField;
-        
-        private string emailField;
-        
-        private string statoField;
-        
-        private string dataAperturaField;
-        
-        private string dataChiusuraField;
-        
-        private string idAmministrazioneField;
-        
-        private string codAmministrazioneField;
-        
-        private string dataUltimoProtocolloField;
-        
-        private string ultimoNumeroProtocolloField;
-        
-        private string ruoloRiferimentoField;
-        
-        private string idRuoloAOOField;
-        
-        private string idUtenteAOOField;
-        
-        private string autoInteropField;
-        
-        private string chaRFField;
-        
-        private string idAOOCollegataField;
-        
-        private string rfDisabledField;
-        
-        private string diritto_Ruolo_AOOField;
-        
-        private bool sospesoField;
-        
-        private string idRuoloRespField;
-        
-        private string invioRicevutaManualeField;
-        
-        private string flagWspiaField;
-        
-        private bool flag_pregressoField;
-        
-        private string anno_pregressoField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codRegistro {
-            get {
-                return this.codRegistroField;
-            }
-            set {
-                this.codRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codice {
-            get {
-                return this.codiceField;
-            }
-            set {
-                this.codiceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string email {
-            get {
-                return this.emailField;
-            }
-            set {
-                this.emailField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string stato {
-            get {
-                return this.statoField;
-            }
-            set {
-                this.statoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataApertura {
-            get {
-                return this.dataAperturaField;
-            }
-            set {
-                this.dataAperturaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataChiusura {
-            get {
-                return this.dataChiusuraField;
-            }
-            set {
-                this.dataChiusuraField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idAmministrazione {
-            get {
-                return this.idAmministrazioneField;
-            }
-            set {
-                this.idAmministrazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codAmministrazione {
-            get {
-                return this.codAmministrazioneField;
-            }
-            set {
-                this.codAmministrazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataUltimoProtocollo {
-            get {
-                return this.dataUltimoProtocolloField;
-            }
-            set {
-                this.dataUltimoProtocolloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ultimoNumeroProtocollo {
-            get {
-                return this.ultimoNumeroProtocolloField;
-            }
-            set {
-                this.ultimoNumeroProtocolloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ruoloRiferimento {
-            get {
-                return this.ruoloRiferimentoField;
-            }
-            set {
-                this.ruoloRiferimentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idRuoloAOO {
-            get {
-                return this.idRuoloAOOField;
-            }
-            set {
-                this.idRuoloAOOField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idUtenteAOO {
-            get {
-                return this.idUtenteAOOField;
-            }
-            set {
-                this.idUtenteAOOField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string autoInterop {
-            get {
-                return this.autoInteropField;
-            }
-            set {
-                this.autoInteropField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string chaRF {
-            get {
-                return this.chaRFField;
-            }
-            set {
-                this.chaRFField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idAOOCollegata {
-            get {
-                return this.idAOOCollegataField;
-            }
-            set {
-                this.idAOOCollegataField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string rfDisabled {
-            get {
-                return this.rfDisabledField;
-            }
-            set {
-                this.rfDisabledField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Diritto_Ruolo_AOO {
-            get {
-                return this.diritto_Ruolo_AOOField;
-            }
-            set {
-                this.diritto_Ruolo_AOOField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool Sospeso {
-            get {
-                return this.sospesoField;
-            }
-            set {
-                this.sospesoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idRuoloResp {
-            get {
-                return this.idRuoloRespField;
-            }
-            set {
-                this.idRuoloRespField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string invioRicevutaManuale {
-            get {
-                return this.invioRicevutaManualeField;
-            }
-            set {
-                this.invioRicevutaManualeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string FlagWspia {
-            get {
-                return this.flagWspiaField;
-            }
-            set {
-                this.flagWspiaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool flag_pregresso {
-            get {
-                return this.flag_pregressoField;
-            }
-            set {
-                this.flag_pregressoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string anno_pregresso {
-            get {
-                return this.anno_pregressoField;
-            }
-            set {
-                this.anno_pregressoField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Ruolo : Corrispondente {
-        
-        private string livelloField;
-        
-        private string codiceField;
-        
-        private string idGruppoField;
-        
-        private string codiceIstatField;
-        
-        private bool selezionatoField;
-        
-        private TipoRuolo tipoRuoloField;
-        
-        private UnitaOrganizzativa uoField;
-        
-        private Funzione[] funzioniField;
-        
-        private Registro[] registriField;
-        
-        private bool responsabileField;
-        
-        private bool segretarioField;
-        
-        private string ruoloDiSistemaField;
-        
-        private string showHistoryField;
-        
-        /// <remarks/>
-        public string livello {
-            get {
-                return this.livelloField;
-            }
-            set {
-                this.livelloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codice {
-            get {
-                return this.codiceField;
-            }
-            set {
-                this.codiceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idGruppo {
-            get {
-                return this.idGruppoField;
-            }
-            set {
-                this.idGruppoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceIstat {
-            get {
-                return this.codiceIstatField;
-            }
-            set {
-                this.codiceIstatField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool selezionato {
-            get {
-                return this.selezionatoField;
-            }
-            set {
-                this.selezionatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TipoRuolo tipoRuolo {
-            get {
-                return this.tipoRuoloField;
-            }
-            set {
-                this.tipoRuoloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public UnitaOrganizzativa uo {
-            get {
-                return this.uoField;
-            }
-            set {
-                this.uoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Funzione[] funzioni {
-            get {
-                return this.funzioniField;
-            }
-            set {
-                this.funzioniField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Registro[] registri {
-            get {
-                return this.registriField;
-            }
-            set {
-                this.registriField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool Responsabile {
-            get {
-                return this.responsabileField;
-            }
-            set {
-                this.responsabileField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool Segretario {
-            get {
-                return this.segretarioField;
-            }
-            set {
-                this.segretarioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string RuoloDiSistema {
-            get {
-                return this.ruoloDiSistemaField;
-            }
-            set {
-                this.ruoloDiSistemaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ShowHistory {
-            get {
-                return this.showHistoryField;
-            }
-            set {
-                this.showHistoryField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class TipoRuolo {
-        
-        private string systemIdField;
-        
-        private string id_AmmField;
-        
-        private string codiceField;
-        
-        private string descrizioneField;
-        
-        private string livelloField;
-        
-        private bool abilitatoField;
-        
-        private TipoRuolo parentField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string id_Amm {
-            get {
-                return this.id_AmmField;
-            }
-            set {
-                this.id_AmmField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codice {
-            get {
-                return this.codiceField;
-            }
-            set {
-                this.codiceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string livello {
-            get {
-                return this.livelloField;
-            }
-            set {
-                this.livelloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool abilitato {
-            get {
-                return this.abilitatoField;
-            }
-            set {
-                this.abilitatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TipoRuolo Parent {
-            get {
-                return this.parentField;
-            }
-            set {
-                this.parentField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Funzione {
-        
-        private string systemIdField;
-        
-        private string codiceField;
-        
-        private string descrizioneField;
-        
-        private string idTipoFunzioneField;
-        
-        private string codTipoFunzioneField;
-        
-        private string descTipoFunzioneField;
-        
-        private string idParentField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codice {
-            get {
-                return this.codiceField;
-            }
-            set {
-                this.codiceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idTipoFunzione {
-            get {
-                return this.idTipoFunzioneField;
-            }
-            set {
-                this.idTipoFunzioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codTipoFunzione {
-            get {
-                return this.codTipoFunzioneField;
-            }
-            set {
-                this.codTipoFunzioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descTipoFunzione {
-            get {
-                return this.descTipoFunzioneField;
-            }
-            set {
-                this.descTipoFunzioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idParent {
-            get {
-                return this.idParentField;
-            }
-            set {
-                this.idParentField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class DestinatarioInterno : Destinatario {
-        
-        private Corrispondente datiDestinatarioField;
-        
-        private bool disabledTrasmField;
-        
-        /// <remarks/>
-        public Corrispondente DatiDestinatario {
-            get {
-                return this.datiDestinatarioField;
-            }
-            set {
-                this.datiDestinatarioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool DisabledTrasm {
-            get {
-                return this.disabledTrasmField;
-            }
-            set {
-                this.disabledTrasmField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class SpedizioneDocumento {
-        
-        private string idDocumentoField;
-        
-        private bool speditoField;
-        
-        private string idRegistroRfMittenteField;
-        
-        private string mailAddressField;
-        
-        private DestinatarioInterno[] destinatariInterniField;
-        
-        private DestinatarioEsterno[] destinatariEsterniField;
-        
-        private string[] listaDestinatariNonRaggiungibiliField;
-        
-        private Messaggio tipoMessaggioField;
-        
-        /// <remarks/>
-        public string IdDocumento {
-            get {
-                return this.idDocumentoField;
-            }
-            set {
-                this.idDocumentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool Spedito {
-            get {
-                return this.speditoField;
-            }
-            set {
-                this.speditoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IdRegistroRfMittente {
-            get {
-                return this.idRegistroRfMittenteField;
-            }
-            set {
-                this.idRegistroRfMittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string mailAddress {
-            get {
-                return this.mailAddressField;
-            }
-            set {
-                this.mailAddressField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public DestinatarioInterno[] DestinatariInterni {
-            get {
-                return this.destinatariInterniField;
-            }
-            set {
-                this.destinatariInterniField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public DestinatarioEsterno[] DestinatariEsterni {
-            get {
-                return this.destinatariEsterniField;
-            }
-            set {
-                this.destinatariEsterniField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string[] listaDestinatariNonRaggiungibili {
-            get {
-                return this.listaDestinatariNonRaggiungibiliField;
-            }
-            set {
-                this.listaDestinatariNonRaggiungibiliField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Messaggio tipoMessaggio {
-            get {
-                return this.tipoMessaggioField;
-            }
-            set {
-                this.tipoMessaggioField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class DocumentoDatiEmergenza {
-        
-        private string protocolloEmergenzaField;
-        
-        private string dataProtocollazioneEmergenzaField;
-        
-        private string nomeProtocollatoreEmergenzaField;
-        
-        private string cognomeProtocollatoreEmergenzaField;
-        
-        /// <remarks/>
-        public string protocolloEmergenza {
-            get {
-                return this.protocolloEmergenzaField;
-            }
-            set {
-                this.protocolloEmergenzaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataProtocollazioneEmergenza {
-            get {
-                return this.dataProtocollazioneEmergenzaField;
-            }
-            set {
-                this.dataProtocollazioneEmergenzaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string nomeProtocollatoreEmergenza {
-            get {
-                return this.nomeProtocollatoreEmergenzaField;
-            }
-            set {
-                this.nomeProtocollatoreEmergenzaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string cognomeProtocollatoreEmergenza {
-            get {
-                return this.cognomeProtocollatoreEmergenzaField;
-            }
-            set {
-                this.cognomeProtocollatoreEmergenzaField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class CreatoreDocumento {
-        
-        private string idPeopleField;
-        
-        private string idCorrGlob_RuoloField;
-        
-        private string idCorrGlob_UOField;
-        
-        private string uo_codiceCorrGlobaliField;
-        
-        private string idPeopleDelegatoField;
-        
-        /// <remarks/>
-        public string idPeople {
-            get {
-                return this.idPeopleField;
-            }
-            set {
-                this.idPeopleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idCorrGlob_Ruolo {
-            get {
-                return this.idCorrGlob_RuoloField;
-            }
-            set {
-                this.idCorrGlob_RuoloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idCorrGlob_UO {
-            get {
-                return this.idCorrGlob_UOField;
-            }
-            set {
-                this.idCorrGlob_UOField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string uo_codiceCorrGlobali {
-            get {
-                return this.uo_codiceCorrGlobaliField;
-            }
-            set {
-                this.uo_codiceCorrGlobaliField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idPeopleDelegato {
-            get {
-                return this.idPeopleDelegatoField;
-            }
-            set {
-                this.idPeopleDelegatoField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Protocollatore {
-        
-        private string utente_idPeopleField;
-        
-        private string ruolo_idCorrGlobaliField;
-        
-        private string uo_idCorrGlobaliField;
-        
-        private string uo_codiceCorrGlobaliField;
-        
-        /// <remarks/>
-        public string utente_idPeople {
-            get {
-                return this.utente_idPeopleField;
-            }
-            set {
-                this.utente_idPeopleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ruolo_idCorrGlobali {
-            get {
-                return this.ruolo_idCorrGlobaliField;
-            }
-            set {
-                this.ruolo_idCorrGlobaliField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string uo_idCorrGlobali {
-            get {
-                return this.uo_idCorrGlobaliField;
-            }
-            set {
-                this.uo_idCorrGlobaliField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string uo_codiceCorrGlobali {
-            get {
-                return this.uo_codiceCorrGlobaliField;
-            }
-            set {
-                this.uo_codiceCorrGlobaliField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class TipologiaAtto {
-        
-        private string systemIdField;
-        
-        private string descrizioneField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Oggetto {
-        
-        private string systemIdField;
-        
-        private string descrizioneField;
-        
-        private bool daAggiornareField;
-        
-        private string idRegistroField;
-        
-        private string codRegistroField;
-        
-        private string codOggettoField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornare {
-            get {
-                return this.daAggiornareField;
-            }
-            set {
-                this.daAggiornareField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idRegistro {
-            get {
-                return this.idRegistroField;
-            }
-            set {
-                this.idRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codRegistro {
-            get {
-                return this.codRegistroField;
-            }
-            set {
-                this.codRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codOggetto {
-            get {
-                return this.codOggettoField;
-            }
-            set {
-                this.codOggettoField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ProtocolloAnnullato {
-        
-        private string autorizzazioneField;
-        
-        private string dataAnnullamentoField;
-        
-        /// <remarks/>
-        public string autorizzazione {
-            get {
-                return this.autorizzazioneField;
-            }
-            set {
-                this.autorizzazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataAnnullamento {
-            get {
-                return this.dataAnnullamentoField;
-            }
-            set {
-                this.dataAnnullamentoField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProtocolloEntrata))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProtocolloUscita))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProtocolloInterno))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Protocollo {
-        
-        private string numeroField;
-        
-        private string dataProtocollazioneField;
-        
-        private string annoField;
-        
-        private string segnaturaField;
-        
-        private string daProtocollareField;
-        
-        private string invioConfermaField;
-        
-        private string modMittDestField;
-        
-        private string modMittIntField;
-        
-        private bool modUffRefField;
-        
-        private ProtocolloAnnullato protocolloAnnullatoField;
-        
-        private string descMezzoSpedizioneField;
-        
-        private int mezzoSpedizioneField;
-        
-        private string stampeEffettuateField;
-        
-        /// <remarks/>
-        public string numero {
-            get {
-                return this.numeroField;
-            }
-            set {
-                this.numeroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataProtocollazione {
-            get {
-                return this.dataProtocollazioneField;
-            }
-            set {
-                this.dataProtocollazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string anno {
-            get {
-                return this.annoField;
-            }
-            set {
-                this.annoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string segnatura {
-            get {
-                return this.segnaturaField;
-            }
-            set {
-                this.segnaturaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string daProtocollare {
-            get {
-                return this.daProtocollareField;
-            }
-            set {
-                this.daProtocollareField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string invioConferma {
-            get {
-                return this.invioConfermaField;
-            }
-            set {
-                this.invioConfermaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string modMittDest {
-            get {
-                return this.modMittDestField;
-            }
-            set {
-                this.modMittDestField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string modMittInt {
-            get {
-                return this.modMittIntField;
-            }
-            set {
-                this.modMittIntField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool ModUffRef {
-            get {
-                return this.modUffRefField;
-            }
-            set {
-                this.modUffRefField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public ProtocolloAnnullato protocolloAnnullato {
-            get {
-                return this.protocolloAnnullatoField;
-            }
-            set {
-                this.protocolloAnnullatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descMezzoSpedizione {
-            get {
-                return this.descMezzoSpedizioneField;
-            }
-            set {
-                this.descMezzoSpedizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int mezzoSpedizione {
-            get {
-                return this.mezzoSpedizioneField;
-            }
-            set {
-                this.mezzoSpedizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string stampeEffettuate {
-            get {
-                return this.stampeEffettuateField;
-            }
-            set {
-                this.stampeEffettuateField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ProtocolloEntrata : Protocollo {
-        
-        private Corrispondente mittenteField;
-        
-        private Corrispondente mittenteIntermedioField;
-        
-        private Corrispondente ufficioReferenteField;
-        
-        private string descrizioneProtocolloMittenteField;
-        
-        private string dataProtocolloMittenteField;
-        
-        private bool daAggiornareMittenteField;
-        
-        private bool daAggiornareMittenteIntermedioField;
-        
-        private string emailMittenteField;
-        
-        private Corrispondente[] mittentiField;
-        
-        private bool daAggiornareMittentiMultipliField;
-        
-        /// <remarks/>
-        public Corrispondente mittente {
-            get {
-                return this.mittenteField;
-            }
-            set {
-                this.mittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Corrispondente mittenteIntermedio {
-            get {
-                return this.mittenteIntermedioField;
-            }
-            set {
-                this.mittenteIntermedioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Corrispondente ufficioReferente {
-            get {
-                return this.ufficioReferenteField;
-            }
-            set {
-                this.ufficioReferenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizioneProtocolloMittente {
-            get {
-                return this.descrizioneProtocolloMittenteField;
-            }
-            set {
-                this.descrizioneProtocolloMittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataProtocolloMittente {
-            get {
-                return this.dataProtocolloMittenteField;
-            }
-            set {
-                this.dataProtocolloMittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornareMittente {
-            get {
-                return this.daAggiornareMittenteField;
-            }
-            set {
-                this.daAggiornareMittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornareMittenteIntermedio {
-            get {
-                return this.daAggiornareMittenteIntermedioField;
-            }
-            set {
-                this.daAggiornareMittenteIntermedioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string emailMittente {
-            get {
-                return this.emailMittenteField;
-            }
-            set {
-                this.emailMittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Corrispondente[] mittenti {
-            get {
-                return this.mittentiField;
-            }
-            set {
-                this.mittentiField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornareMittentiMultipli {
-            get {
-                return this.daAggiornareMittentiMultipliField;
-            }
-            set {
-                this.daAggiornareMittentiMultipliField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProtocolloInterno))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ProtocolloUscita : Protocollo {
-        
-        private bool daAggiornareDestinatariField;
-        
-        private bool daAggiornareDestinatariConoscenzaField;
-        
-        private bool daAggiornareMittenteField;
-        
-        private Corrispondente mittenteField;
-        
-        private Corrispondente ufficioReferenteField;
-        
-        private Corrispondente[] destinatariField;
-        
-        private Corrispondente[] destinatariConoscenzaField;
-        
-        /// <remarks/>
-        public bool daAggiornareDestinatari {
-            get {
-                return this.daAggiornareDestinatariField;
-            }
-            set {
-                this.daAggiornareDestinatariField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornareDestinatariConoscenza {
-            get {
-                return this.daAggiornareDestinatariConoscenzaField;
-            }
-            set {
-                this.daAggiornareDestinatariConoscenzaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornareMittente {
-            get {
-                return this.daAggiornareMittenteField;
-            }
-            set {
-                this.daAggiornareMittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Corrispondente mittente {
-            get {
-                return this.mittenteField;
-            }
-            set {
-                this.mittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Corrispondente ufficioReferente {
-            get {
-                return this.ufficioReferenteField;
-            }
-            set {
-                this.ufficioReferenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Corrispondente[] destinatari {
-            get {
-                return this.destinatariField;
-            }
-            set {
-                this.destinatariField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Corrispondente[] destinatariConoscenza {
-            get {
-                return this.destinatariConoscenzaField;
-            }
-            set {
-                this.destinatariConoscenzaField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ProtocolloInterno : ProtocolloUscita {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class SchedaDocumento {
-        
-        private string systemIdField;
-        
-        private string dataCreazioneField;
-        
-        private string oraCreazioneField;
-        
-        private string docNumberField;
-        
-        private string tipoProtoField;
-        
-        private string accessRightsField;
-        
-        private string idPeopleField;
-        
-        private string userIdField;
-        
-        private string typeIdField;
-        
-        private string appIdField;
-        
-        private string modOggettoField;
-        
-        private string assegnatoField;
-        
-        private string fascicolatoField;
-        
-        private string privatoField;
-        
-        private bool pubblicoField;
-        
-        private string personaleField;
-        
-        private string tipoSessoField;
-        
-        private string autoreField;
-        
-        private string numOggettoField;
-        
-        private string commissioneRefField;
-        
-        private int idFasciaEtaField;
-        
-        private string evidenzaField;
-        
-        private bool daAggiornareParoleChiaveField;
-        
-        private bool daAggiornarePrivatoField;
-        
-        private bool predisponiProtocollazioneField;
-        
-        private bool daAggiornareTipoAttoField;
-        
-        private Protocollo protocolloField;
-        
-        private Oggetto oggettoField;
-        
-        private TipologiaAtto tipologiaAttoField;
-        
-        private Registro registroField;
-        
-        private Protocollatore protocollatoreField;
-        
-        private CreatoreDocumento creatoreDocumentoField;
-        
-        private DocumentoDatiEmergenza datiEmergenzaField;
-        
-        private string interopField;
-        
-        private string dataScadenzaField;
-        
-        private string inCestinoField;
-        
-        private string inArchivioField;
-        
-        private string mezzoSpedizioneField;
-        
-        private string descMezzoSpedizioneField;
+        private string valoreField;
         
         private Templates templateField;
         
-        private string dtaArrivoDaStoricizzareField;
+        private SearchTextOptionsEnum searchTextOptionsField;
         
-        private bool pregressoField;
+        private FiltriTrasmissione listaFiltriTrasmissioneField;
         
-        private SpedizioneDocumento spedizioneDocumentoField;
+        private FiltriModelliTrasmissione listaFiltriModelliTrasmissioneField;
         
-        private Folder[] folderField;
+        private FiltriTrasmissioneNascosti listaFiltriTrasmissioneNascostiField;
         
-        private Documento[] documentiField;
+        private FiltriDocumento listaFiltriDocumentoField;
         
-        private Allegato[] allegatiField;
+        private FiltriFascicolazione listaFiltriFascicoloField;
         
-        private DocumentoParolaChiave[] paroleChiaveField;
+        private FiltriStampaRegistro listaFiltriStampaRegistroField;
         
-        private string[] destinatariModificatiField;
+        private FiltriConservazione listaFiltriConservazioneField;
         
-        private string[] destinatariCCModificatiField;
+        private FiltriReportSpedizioni listaFiltriSpedizioniField;
         
-        private CheckOutStatus checkOutStatusField;
-        
-        private InfoNota[] noteDocumentoField;
-        
-        private InfoDocumento documentoPrincipaleField;
-        
-        private bool modificaRispostaDocumentoField;
-        
-        private InfoDocumento rispostaDocumentoField;
-        
-        private string ereditaField;
-        
-        private string cod_rf_protField;
-        
-        private string id_rf_protField;
-        
-        private SessionRepositoryContext repositoryContextField;
-        
-        private string protocolloTitolarioField;
-        
-        private string numInFascField;
-        
-        private string idFascProtoTitField;
-        
-        private string numProtTitField;
-        
-        private string idTitolarioField;
-        
-        private string riferimentoMittenteField;
-        
-        private string id_rf_invio_ricevutaField;
-        
-        private string codiceFascicoloField;
-        
-        private string documento_da_pecField;
-        
-        private DocumentConsolidationStateInfo consolidationStateField;
-        
-        private bool previousVersionsHiddenField;
-        
-        private string codiceApplicazioneField;
-        
-        private InfoAtipicita infoAtipicitaField;
-        
-        private string inConservazioneField;
-        
-        private bool isRiprodottoField;
-        
-        private string lastForwardField;
+        private string nomeCampoField;
         
         /// <remarks/>
-        public string systemId {
+        public string argomento {
             get {
-                return this.systemIdField;
+                return this.argomentoField;
             }
             set {
-                this.systemIdField = value;
+                this.argomentoField = value;
             }
         }
         
         /// <remarks/>
-        public string dataCreazione {
+        public string valore {
             get {
-                return this.dataCreazioneField;
+                return this.valoreField;
             }
             set {
-                this.dataCreazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string oraCreazione {
-            get {
-                return this.oraCreazioneField;
-            }
-            set {
-                this.oraCreazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string docNumber {
-            get {
-                return this.docNumberField;
-            }
-            set {
-                this.docNumberField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipoProto {
-            get {
-                return this.tipoProtoField;
-            }
-            set {
-                this.tipoProtoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string accessRights {
-            get {
-                return this.accessRightsField;
-            }
-            set {
-                this.accessRightsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idPeople {
-            get {
-                return this.idPeopleField;
-            }
-            set {
-                this.idPeopleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string userId {
-            get {
-                return this.userIdField;
-            }
-            set {
-                this.userIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string typeId {
-            get {
-                return this.typeIdField;
-            }
-            set {
-                this.typeIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string appId {
-            get {
-                return this.appIdField;
-            }
-            set {
-                this.appIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string modOggetto {
-            get {
-                return this.modOggettoField;
-            }
-            set {
-                this.modOggettoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string assegnato {
-            get {
-                return this.assegnatoField;
-            }
-            set {
-                this.assegnatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string fascicolato {
-            get {
-                return this.fascicolatoField;
-            }
-            set {
-                this.fascicolatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string privato {
-            get {
-                return this.privatoField;
-            }
-            set {
-                this.privatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool pubblico {
-            get {
-                return this.pubblicoField;
-            }
-            set {
-                this.pubblicoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string personale {
-            get {
-                return this.personaleField;
-            }
-            set {
-                this.personaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipoSesso {
-            get {
-                return this.tipoSessoField;
-            }
-            set {
-                this.tipoSessoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string autore {
-            get {
-                return this.autoreField;
-            }
-            set {
-                this.autoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string numOggetto {
-            get {
-                return this.numOggettoField;
-            }
-            set {
-                this.numOggettoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string commissioneRef {
-            get {
-                return this.commissioneRefField;
-            }
-            set {
-                this.commissioneRefField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int idFasciaEta {
-            get {
-                return this.idFasciaEtaField;
-            }
-            set {
-                this.idFasciaEtaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string evidenza {
-            get {
-                return this.evidenzaField;
-            }
-            set {
-                this.evidenzaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornareParoleChiave {
-            get {
-                return this.daAggiornareParoleChiaveField;
-            }
-            set {
-                this.daAggiornareParoleChiaveField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornarePrivato {
-            get {
-                return this.daAggiornarePrivatoField;
-            }
-            set {
-                this.daAggiornarePrivatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool predisponiProtocollazione {
-            get {
-                return this.predisponiProtocollazioneField;
-            }
-            set {
-                this.predisponiProtocollazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool daAggiornareTipoAtto {
-            get {
-                return this.daAggiornareTipoAttoField;
-            }
-            set {
-                this.daAggiornareTipoAttoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Protocollo protocollo {
-            get {
-                return this.protocolloField;
-            }
-            set {
-                this.protocolloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Oggetto oggetto {
-            get {
-                return this.oggettoField;
-            }
-            set {
-                this.oggettoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TipologiaAtto tipologiaAtto {
-            get {
-                return this.tipologiaAttoField;
-            }
-            set {
-                this.tipologiaAttoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Registro registro {
-            get {
-                return this.registroField;
-            }
-            set {
-                this.registroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Protocollatore protocollatore {
-            get {
-                return this.protocollatoreField;
-            }
-            set {
-                this.protocollatoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public CreatoreDocumento creatoreDocumento {
-            get {
-                return this.creatoreDocumentoField;
-            }
-            set {
-                this.creatoreDocumentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public DocumentoDatiEmergenza datiEmergenza {
-            get {
-                return this.datiEmergenzaField;
-            }
-            set {
-                this.datiEmergenzaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string interop {
-            get {
-                return this.interopField;
-            }
-            set {
-                this.interopField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dataScadenza {
-            get {
-                return this.dataScadenzaField;
-            }
-            set {
-                this.dataScadenzaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string inCestino {
-            get {
-                return this.inCestinoField;
-            }
-            set {
-                this.inCestinoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string inArchivio {
-            get {
-                return this.inArchivioField;
-            }
-            set {
-                this.inArchivioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string mezzoSpedizione {
-            get {
-                return this.mezzoSpedizioneField;
-            }
-            set {
-                this.mezzoSpedizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descMezzoSpedizione {
-            get {
-                return this.descMezzoSpedizioneField;
-            }
-            set {
-                this.descMezzoSpedizioneField = value;
+                this.valoreField = value;
             }
         }
         
@@ -9783,348 +4875,108 @@ namespace ConservazioneWA.WSConservazioneLocale {
         }
         
         /// <remarks/>
-        public string dtaArrivoDaStoricizzare {
+        public SearchTextOptionsEnum searchTextOptions {
             get {
-                return this.dtaArrivoDaStoricizzareField;
+                return this.searchTextOptionsField;
             }
             set {
-                this.dtaArrivoDaStoricizzareField = value;
+                this.searchTextOptionsField = value;
             }
         }
         
         /// <remarks/>
-        public bool pregresso {
+        public FiltriTrasmissione listaFiltriTrasmissione {
             get {
-                return this.pregressoField;
+                return this.listaFiltriTrasmissioneField;
             }
             set {
-                this.pregressoField = value;
+                this.listaFiltriTrasmissioneField = value;
             }
         }
         
         /// <remarks/>
-        public SpedizioneDocumento spedizioneDocumento {
+        public FiltriModelliTrasmissione listaFiltriModelliTrasmissione {
             get {
-                return this.spedizioneDocumentoField;
+                return this.listaFiltriModelliTrasmissioneField;
             }
             set {
-                this.spedizioneDocumentoField = value;
+                this.listaFiltriModelliTrasmissioneField = value;
             }
         }
         
         /// <remarks/>
-        public Folder[] folder {
+        public FiltriTrasmissioneNascosti listaFiltriTrasmissioneNascosti {
             get {
-                return this.folderField;
+                return this.listaFiltriTrasmissioneNascostiField;
             }
             set {
-                this.folderField = value;
+                this.listaFiltriTrasmissioneNascostiField = value;
             }
         }
         
         /// <remarks/>
-        public Documento[] documenti {
+        public FiltriDocumento listaFiltriDocumento {
             get {
-                return this.documentiField;
+                return this.listaFiltriDocumentoField;
             }
             set {
-                this.documentiField = value;
+                this.listaFiltriDocumentoField = value;
             }
         }
         
         /// <remarks/>
-        public Allegato[] allegati {
+        public FiltriFascicolazione listaFiltriFascicolo {
             get {
-                return this.allegatiField;
+                return this.listaFiltriFascicoloField;
             }
             set {
-                this.allegatiField = value;
+                this.listaFiltriFascicoloField = value;
             }
         }
         
         /// <remarks/>
-        public DocumentoParolaChiave[] paroleChiave {
+        public FiltriStampaRegistro listaFiltriStampaRegistro {
             get {
-                return this.paroleChiaveField;
+                return this.listaFiltriStampaRegistroField;
             }
             set {
-                this.paroleChiaveField = value;
+                this.listaFiltriStampaRegistroField = value;
             }
         }
         
         /// <remarks/>
-        public string[] destinatariModificati {
+        public FiltriConservazione listaFiltriConservazione {
             get {
-                return this.destinatariModificatiField;
+                return this.listaFiltriConservazioneField;
             }
             set {
-                this.destinatariModificatiField = value;
+                this.listaFiltriConservazioneField = value;
             }
         }
         
         /// <remarks/>
-        public string[] destinatariCCModificati {
+        public FiltriReportSpedizioni listaFiltriSpedizioni {
             get {
-                return this.destinatariCCModificatiField;
+                return this.listaFiltriSpedizioniField;
             }
             set {
-                this.destinatariCCModificatiField = value;
+                this.listaFiltriSpedizioniField = value;
             }
         }
         
         /// <remarks/>
-        public CheckOutStatus checkOutStatus {
+        public string nomeCampo {
             get {
-                return this.checkOutStatusField;
+                return this.nomeCampoField;
             }
             set {
-                this.checkOutStatusField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public InfoNota[] noteDocumento {
-            get {
-                return this.noteDocumentoField;
-            }
-            set {
-                this.noteDocumentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public InfoDocumento documentoPrincipale {
-            get {
-                return this.documentoPrincipaleField;
-            }
-            set {
-                this.documentoPrincipaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool modificaRispostaDocumento {
-            get {
-                return this.modificaRispostaDocumentoField;
-            }
-            set {
-                this.modificaRispostaDocumentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public InfoDocumento rispostaDocumento {
-            get {
-                return this.rispostaDocumentoField;
-            }
-            set {
-                this.rispostaDocumentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string eredita {
-            get {
-                return this.ereditaField;
-            }
-            set {
-                this.ereditaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string cod_rf_prot {
-            get {
-                return this.cod_rf_protField;
-            }
-            set {
-                this.cod_rf_protField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string id_rf_prot {
-            get {
-                return this.id_rf_protField;
-            }
-            set {
-                this.id_rf_protField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public SessionRepositoryContext repositoryContext {
-            get {
-                return this.repositoryContextField;
-            }
-            set {
-                this.repositoryContextField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string protocolloTitolario {
-            get {
-                return this.protocolloTitolarioField;
-            }
-            set {
-                this.protocolloTitolarioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string numInFasc {
-            get {
-                return this.numInFascField;
-            }
-            set {
-                this.numInFascField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idFascProtoTit {
-            get {
-                return this.idFascProtoTitField;
-            }
-            set {
-                this.idFascProtoTitField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string numProtTit {
-            get {
-                return this.numProtTitField;
-            }
-            set {
-                this.numProtTitField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idTitolario {
-            get {
-                return this.idTitolarioField;
-            }
-            set {
-                this.idTitolarioField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string riferimentoMittente {
-            get {
-                return this.riferimentoMittenteField;
-            }
-            set {
-                this.riferimentoMittenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string id_rf_invio_ricevuta {
-            get {
-                return this.id_rf_invio_ricevutaField;
-            }
-            set {
-                this.id_rf_invio_ricevutaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceFascicolo {
-            get {
-                return this.codiceFascicoloField;
-            }
-            set {
-                this.codiceFascicoloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string documento_da_pec {
-            get {
-                return this.documento_da_pecField;
-            }
-            set {
-                this.documento_da_pecField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public DocumentConsolidationStateInfo ConsolidationState {
-            get {
-                return this.consolidationStateField;
-            }
-            set {
-                this.consolidationStateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool previousVersionsHidden {
-            get {
-                return this.previousVersionsHiddenField;
-            }
-            set {
-                this.previousVersionsHiddenField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceApplicazione {
-            get {
-                return this.codiceApplicazioneField;
-            }
-            set {
-                this.codiceApplicazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public InfoAtipicita InfoAtipicita {
-            get {
-                return this.infoAtipicitaField;
-            }
-            set {
-                this.infoAtipicitaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string inConservazione {
-            get {
-                return this.inConservazioneField;
-            }
-            set {
-                this.inConservazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool isRiprodotto {
-            get {
-                return this.isRiprodottoField;
-            }
-            set {
-                this.isRiprodottoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string LastForward {
-            get {
-                return this.lastForwardField;
-            }
-            set {
-                this.lastForwardField = value;
+                this.nomeCampoField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10186,10 +5038,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         private string cODICE_CLASSIFICAField;
         
         private StoricoProfilatiOldValue[] oLD_OGG_CUSTOMField;
-        
-        private string iD_TEMPLATE_STRUTTURAField;
-        
-        private string iD_CONTESTO_PROCEDURALEField;
         
         private string pATH_MODELLO_1_EXTField;
         
@@ -10476,26 +5324,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         }
         
         /// <remarks/>
-        public string ID_TEMPLATE_STRUTTURA {
-            get {
-                return this.iD_TEMPLATE_STRUTTURAField;
-            }
-            set {
-                this.iD_TEMPLATE_STRUTTURAField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ID_CONTESTO_PROCEDURALE {
-            get {
-                return this.iD_CONTESTO_PROCEDURALEField;
-            }
-            set {
-                this.iD_CONTESTO_PROCEDURALEField = value;
-            }
-        }
-        
-        /// <remarks/>
         public string PATH_MODELLO_1_EXT {
             get {
                 return this.pATH_MODELLO_1_EXTField;
@@ -10517,7 +5345,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11138,7 +5966,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11171,966 +5999,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ValoreOggetto {
-        
-        private int sYSTEM_IDField;
-        
-        private string dESCRIZIONE_VALOREField;
-        
-        private string vALOREField;
-        
-        private string vALORE_DI_DEFAULTField;
-        
-        private string cOLOR_BGField;
-        
-        private int aBILITATOField;
-        
-        public ValoreOggetto() {
-            this.aBILITATOField = 1;
-        }
-        
-        /// <remarks/>
-        public int SYSTEM_ID {
-            get {
-                return this.sYSTEM_IDField;
-            }
-            set {
-                this.sYSTEM_IDField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DESCRIZIONE_VALORE {
-            get {
-                return this.dESCRIZIONE_VALOREField;
-            }
-            set {
-                this.dESCRIZIONE_VALOREField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string VALORE {
-            get {
-                return this.vALOREField;
-            }
-            set {
-                this.vALOREField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string VALORE_DI_DEFAULT {
-            get {
-                return this.vALORE_DI_DEFAULTField;
-            }
-            set {
-                this.vALORE_DI_DEFAULTField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string COLOR_BG {
-            get {
-                return this.cOLOR_BGField;
-            }
-            set {
-                this.cOLOR_BGField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.ComponentModel.DefaultValueAttribute(1)]
-        public int ABILITATO {
-            get {
-                return this.aBILITATOField;
-            }
-            set {
-                this.aBILITATOField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum TipoRicercaStringaEnum {
-        
-        /// <remarks/>
-        PARTE_DELLA_PAROLA,
-        
-        /// <remarks/>
-        PAROLA_INTERA,
-        
-        /// <remarks/>
-        PAROLA_INIZIA_CON,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum OperatoriRicercaOggettiCustomEnum {
-        
-        /// <remarks/>
-        And,
-        
-        /// <remarks/>
-        Or,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class StoricoProfilatiOldValue {
-        
-        private string iDTemplateField;
-        
-        private string iD_Doc_FascField;
-        
-        private string valoreField;
-        
-        private string tipo_Ogg_CustomField;
-        
-        private string iD_OggettoField;
-        
-        private string iD_PeopleField;
-        
-        private string iD_Ruolo_In_UOField;
-        
-        /// <remarks/>
-        public string IDTemplate {
-            get {
-                return this.iDTemplateField;
-            }
-            set {
-                this.iDTemplateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ID_Doc_Fasc {
-            get {
-                return this.iD_Doc_FascField;
-            }
-            set {
-                this.iD_Doc_FascField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Valore {
-            get {
-                return this.valoreField;
-            }
-            set {
-                this.valoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Tipo_Ogg_Custom {
-            get {
-                return this.tipo_Ogg_CustomField;
-            }
-            set {
-                this.tipo_Ogg_CustomField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ID_Oggetto {
-            get {
-                return this.iD_OggettoField;
-            }
-            set {
-                this.iD_OggettoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ID_People {
-            get {
-                return this.iD_PeopleField;
-            }
-            set {
-                this.iD_PeopleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ID_Ruolo_In_UO {
-            get {
-                return this.iD_Ruolo_In_UOField;
-            }
-            set {
-                this.iD_Ruolo_In_UOField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Folder {
-        
-        private Folder[] childsField;
-        
-        private string systemIDField;
-        
-        private string idFascicoloField;
-        
-        private string idParentField;
-        
-        private string descrizioneField;
-        
-        private string dtaAperturaField;
-        
-        private string livelloField;
-        
-        private string codicelivelloField;
-        
-        /// <remarks/>
-        public Folder[] childs {
-            get {
-                return this.childsField;
-            }
-            set {
-                this.childsField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string systemID {
-            get {
-                return this.systemIDField;
-            }
-            set {
-                this.systemIDField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idFascicolo {
-            get {
-                return this.idFascicoloField;
-            }
-            set {
-                this.idFascicoloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idParent {
-            get {
-                return this.idParentField;
-            }
-            set {
-                this.idParentField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string dtaApertura {
-            get {
-                return this.dtaAperturaField;
-            }
-            set {
-                this.dtaAperturaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string livello {
-            get {
-                return this.livelloField;
-            }
-            set {
-                this.livelloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codicelivello {
-            get {
-                return this.codicelivelloField;
-            }
-            set {
-                this.codicelivelloField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class InfoNota {
-        
-        private string idField;
-        
-        private TipiVisibilitaNotaEnum tipoVisibilitaField;
-        
-        private string testoField;
-        
-        private System.DateTime dataCreazioneField;
-        
-        private InfoUtenteCreatoreNota utenteCreatoreField;
-        
-        private bool solaLetturaField;
-        
-        private bool daRimuovereField;
-        
-        private bool daInserireField;
-        
-        private string idPeopleDelegatoField;
-        
-        private string descrPeopleDelegatoField;
-        
-        private string idRfAssociatoField;
-        
-        public InfoNota() {
-            this.tipoVisibilitaField = TipiVisibilitaNotaEnum.Tutti;
-        }
-        
-        /// <remarks/>
-        public string Id {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.ComponentModel.DefaultValueAttribute(TipiVisibilitaNotaEnum.Tutti)]
-        public TipiVisibilitaNotaEnum TipoVisibilita {
-            get {
-                return this.tipoVisibilitaField;
-            }
-            set {
-                this.tipoVisibilitaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Testo {
-            get {
-                return this.testoField;
-            }
-            set {
-                this.testoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public System.DateTime DataCreazione {
-            get {
-                return this.dataCreazioneField;
-            }
-            set {
-                this.dataCreazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public InfoUtenteCreatoreNota UtenteCreatore {
-            get {
-                return this.utenteCreatoreField;
-            }
-            set {
-                this.utenteCreatoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool SolaLettura {
-            get {
-                return this.solaLetturaField;
-            }
-            set {
-                this.solaLetturaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool DaRimuovere {
-            get {
-                return this.daRimuovereField;
-            }
-            set {
-                this.daRimuovereField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool DaInserire {
-            get {
-                return this.daInserireField;
-            }
-            set {
-                this.daInserireField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IdPeopleDelegato {
-            get {
-                return this.idPeopleDelegatoField;
-            }
-            set {
-                this.idPeopleDelegatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DescrPeopleDelegato {
-            get {
-                return this.descrPeopleDelegatoField;
-            }
-            set {
-                this.descrPeopleDelegatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IdRfAssociato {
-            get {
-                return this.idRfAssociatoField;
-            }
-            set {
-                this.idRfAssociatoField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum TipiVisibilitaNotaEnum {
-        
-        /// <remarks/>
-        Tutti,
-        
-        /// <remarks/>
-        RF,
-        
-        /// <remarks/>
-        Ruolo,
-        
-        /// <remarks/>
-        Personale,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class InfoUtenteCreatoreNota {
-        
-        private string idUtenteField;
-        
-        private string descrizioneUtenteField;
-        
-        private string idRuoloField;
-        
-        private string descrizioneRuoloField;
-        
-        /// <remarks/>
-        public string IdUtente {
-            get {
-                return this.idUtenteField;
-            }
-            set {
-                this.idUtenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DescrizioneUtente {
-            get {
-                return this.descrizioneUtenteField;
-            }
-            set {
-                this.descrizioneUtenteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IdRuolo {
-            get {
-                return this.idRuoloField;
-            }
-            set {
-                this.idRuoloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DescrizioneRuolo {
-            get {
-                return this.descrizioneRuoloField;
-            }
-            set {
-                this.descrizioneRuoloField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class InfoAtipicita {
-        
-        private string idDocFascField;
-        
-        private string codiceAtipicitaField;
-        
-        private TipoOggettoAtipico tipoOggettoField;
-        
-        private string descrizioneAtipicitaField;
-        
-        /// <remarks/>
-        public string IdDocFasc {
-            get {
-                return this.idDocFascField;
-            }
-            set {
-                this.idDocFascField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string CodiceAtipicita {
-            get {
-                return this.codiceAtipicitaField;
-            }
-            set {
-                this.codiceAtipicitaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TipoOggettoAtipico TipoOggetto {
-            get {
-                return this.tipoOggettoField;
-            }
-            set {
-                this.tipoOggettoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string DescrizioneAtipicita {
-            get {
-                return this.descrizioneAtipicitaField;
-            }
-            set {
-                this.descrizioneAtipicitaField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum TipoOggettoAtipico {
-        
-        /// <remarks/>
-        DOCUMENTO,
-        
-        /// <remarks/>
-        FASCICOLO,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ContatoriEsibizione {
-        
-        private int nuove_CertificataField;
-        
-        private int nuoveField;
-        
-        private int chiuse_CertificataField;
-        
-        private int chiuseField;
-        
-        private int rifiutate_CertificataField;
-        
-        private int rifiutateField;
-        
-        private int inAttesaDiCertificazione_CertificataField;
-        
-        private int inAttesaDiCertificazioneField;
-        
-        private int transizione_CertificataField;
-        
-        private int transizioneField;
-        
-        /// <remarks/>
-        public int Nuove_Certificata {
-            get {
-                return this.nuove_CertificataField;
-            }
-            set {
-                this.nuove_CertificataField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Nuove {
-            get {
-                return this.nuoveField;
-            }
-            set {
-                this.nuoveField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Chiuse_Certificata {
-            get {
-                return this.chiuse_CertificataField;
-            }
-            set {
-                this.chiuse_CertificataField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Chiuse {
-            get {
-                return this.chiuseField;
-            }
-            set {
-                this.chiuseField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Rifiutate_Certificata {
-            get {
-                return this.rifiutate_CertificataField;
-            }
-            set {
-                this.rifiutate_CertificataField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Rifiutate {
-            get {
-                return this.rifiutateField;
-            }
-            set {
-                this.rifiutateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int InAttesaDiCertificazione_Certificata {
-            get {
-                return this.inAttesaDiCertificazione_CertificataField;
-            }
-            set {
-                this.inAttesaDiCertificazione_CertificataField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int InAttesaDiCertificazione {
-            get {
-                return this.inAttesaDiCertificazioneField;
-            }
-            set {
-                this.inAttesaDiCertificazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Transizione_Certificata {
-            get {
-                return this.transizione_CertificataField;
-            }
-            set {
-                this.transizione_CertificataField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Transizione {
-            get {
-                return this.transizioneField;
-            }
-            set {
-                this.transizioneField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class InfoEsibizione {
-        
-        private string systemIDField;
-        
-        private string idAmmField;
-        
-        private string idPeopleField;
-        
-        private string idRuoloInUoField;
-        
-        private string statoEsibizioneField;
-        
-        private string noteField;
-        
-        private string descrizioneField;
-        
-        private string noteRifiutoField;
-        
-        private string data_CreazioneField;
-        
-        private string data_CertificazioneField;
-        
-        private string data_ChiusuraField;
-        
-        private string data_RifiutoField;
-        
-        private string marcaTemporaleField;
-        
-        private string firmaResponsabileField;
-        
-        private bool isCertificataField;
-        
-        private bool isRichiestaCertificazioneField;
-        
-        private string idProfileCertificazioneField;
-        
-        private string richiedenteField;
-        
-        /// <remarks/>
-        public string SystemID {
-            get {
-                return this.systemIDField;
-            }
-            set {
-                this.systemIDField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IdAmm {
-            get {
-                return this.idAmmField;
-            }
-            set {
-                this.idAmmField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IdPeople {
-            get {
-                return this.idPeopleField;
-            }
-            set {
-                this.idPeopleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IdRuoloInUo {
-            get {
-                return this.idRuoloInUoField;
-            }
-            set {
-                this.idRuoloInUoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string statoEsibizione {
-            get {
-                return this.statoEsibizioneField;
-            }
-            set {
-                this.statoEsibizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Note {
-            get {
-                return this.noteField;
-            }
-            set {
-                this.noteField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string NoteRifiuto {
-            get {
-                return this.noteRifiutoField;
-            }
-            set {
-                this.noteRifiutoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Data_Creazione {
-            get {
-                return this.data_CreazioneField;
-            }
-            set {
-                this.data_CreazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Data_Certificazione {
-            get {
-                return this.data_CertificazioneField;
-            }
-            set {
-                this.data_CertificazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Data_Chiusura {
-            get {
-                return this.data_ChiusuraField;
-            }
-            set {
-                this.data_ChiusuraField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Data_Rifiuto {
-            get {
-                return this.data_RifiutoField;
-            }
-            set {
-                this.data_RifiutoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string MarcaTemporale {
-            get {
-                return this.marcaTemporaleField;
-            }
-            set {
-                this.marcaTemporaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string FirmaResponsabile {
-            get {
-                return this.firmaResponsabileField;
-            }
-            set {
-                this.firmaResponsabileField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool isCertificata {
-            get {
-                return this.isCertificataField;
-            }
-            set {
-                this.isCertificataField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool isRichiestaCertificazione {
-            get {
-                return this.isRichiestaCertificazioneField;
-            }
-            set {
-                this.isRichiestaCertificazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idProfileCertificazione {
-            get {
-                return this.idProfileCertificazioneField;
-            }
-            set {
-                this.idProfileCertificazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string richiedente {
-            get {
-                return this.richiedenteField;
-            }
-            set {
-                this.richiedenteField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12283,7 +6152,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12364,7 +6233,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum RubricaCallType {
@@ -12596,539 +6465,1142 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Marca {
+    public partial class InfoUtente {
         
-        private byte[] contentField;
+        private string idCorrGlobaliField;
         
-        private int lengthField;
+        private string idPeopleField;
         
-        private string contentTypeField;
+        private string userIdField;
+        
+        private string dstField;
+        
+        private string idGruppoField;
+        
+        private string idAmministrazioneField;
+        
+        private string sedeField;
+        
+        private string urlWAField;
+        
+        private InfoUtente delegatoField;
+        
+        private object[] extApplicationsField;
+        
+        private string codWorkingApplicationField;
+        
+        private string matricolaField;
+        
+        private string diSistemaField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
-        public byte[] content {
+        public string idCorrGlobali {
             get {
-                return this.contentField;
+                return this.idCorrGlobaliField;
             }
             set {
-                this.contentField = value;
+                this.idCorrGlobaliField = value;
             }
         }
         
         /// <remarks/>
-        public int length {
+        public string idPeople {
             get {
-                return this.lengthField;
+                return this.idPeopleField;
             }
             set {
-                this.lengthField = value;
+                this.idPeopleField = value;
             }
         }
         
         /// <remarks/>
-        public string contentType {
+        public string userId {
             get {
-                return this.contentTypeField;
+                return this.userIdField;
             }
             set {
-                this.contentTypeField = value;
+                this.userIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dst {
+            get {
+                return this.dstField;
+            }
+            set {
+                this.dstField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idGruppo {
+            get {
+                return this.idGruppoField;
+            }
+            set {
+                this.idGruppoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idAmministrazione {
+            get {
+                return this.idAmministrazioneField;
+            }
+            set {
+                this.idAmministrazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string sede {
+            get {
+                return this.sedeField;
+            }
+            set {
+                this.sedeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string urlWA {
+            get {
+                return this.urlWAField;
+            }
+            set {
+                this.urlWAField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public InfoUtente delegato {
+            get {
+                return this.delegatoField;
+            }
+            set {
+                this.delegatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public object[] extApplications {
+            get {
+                return this.extApplicationsField;
+            }
+            set {
+                this.extApplicationsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codWorkingApplication {
+            get {
+                return this.codWorkingApplicationField;
+            }
+            set {
+                this.codWorkingApplicationField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string matricola {
+            get {
+                return this.matricolaField;
+            }
+            set {
+                this.matricolaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string diSistema {
+            get {
+                return this.diSistemaField;
+            }
+            set {
+                this.diSistemaField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class TSARFC2253 {
+    public partial class Ruolo : Corrispondente {
         
-        private string tSARFC2253NameField;
+        private string livelloField;
         
-        private string cnField;
+        private string codiceField;
         
-        private string ouField;
+        private string idGruppoField;
         
-        private string oField;
+        private string codiceIstatField;
         
-        private string cField;
+        private bool selezionatoField;
+        
+        private TipoRuolo tipoRuoloField;
+        
+        private UnitaOrganizzativa uoField;
+        
+        private Funzione[] funzioniField;
+        
+        private Registro[] registriField;
+        
+        private bool responsabileField;
+        
+        private bool segretarioField;
+        
+        private string ruoloDiSistemaField;
+        
+        private string showHistoryField;
         
         /// <remarks/>
-        public string TSARFC2253Name {
+        public string livello {
             get {
-                return this.tSARFC2253NameField;
+                return this.livelloField;
             }
             set {
-                this.tSARFC2253NameField = value;
+                this.livelloField = value;
             }
         }
         
         /// <remarks/>
-        public string CN {
+        public string codice {
             get {
-                return this.cnField;
+                return this.codiceField;
             }
             set {
-                this.cnField = value;
+                this.codiceField = value;
             }
         }
         
         /// <remarks/>
-        public string OU {
+        public string idGruppo {
             get {
-                return this.ouField;
+                return this.idGruppoField;
             }
             set {
-                this.ouField = value;
+                this.idGruppoField = value;
             }
         }
         
         /// <remarks/>
-        public string O {
+        public string codiceIstat {
             get {
-                return this.oField;
+                return this.codiceIstatField;
             }
             set {
-                this.oField = value;
+                this.codiceIstatField = value;
             }
         }
         
         /// <remarks/>
-        public string C {
+        public bool selezionato {
             get {
-                return this.cField;
+                return this.selezionatoField;
             }
             set {
-                this.cField = value;
+                this.selezionatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TipoRuolo tipoRuolo {
+            get {
+                return this.tipoRuoloField;
+            }
+            set {
+                this.tipoRuoloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public UnitaOrganizzativa uo {
+            get {
+                return this.uoField;
+            }
+            set {
+                this.uoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Funzione[] funzioni {
+            get {
+                return this.funzioniField;
+            }
+            set {
+                this.funzioniField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Registro[] registri {
+            get {
+                return this.registriField;
+            }
+            set {
+                this.registriField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool Responsabile {
+            get {
+                return this.responsabileField;
+            }
+            set {
+                this.responsabileField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool Segretario {
+            get {
+                return this.segretarioField;
+            }
+            set {
+                this.segretarioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string RuoloDiSistema {
+            get {
+                return this.ruoloDiSistemaField;
+            }
+            set {
+                this.ruoloDiSistemaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ShowHistory {
+            get {
+                return this.showHistoryField;
+            }
+            set {
+                this.showHistoryField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class OutputResponseMarca {
+    public partial class TipoRuolo {
         
-        private string descrizioneErroreField;
+        private string systemIdField;
         
-        private string docmField;
+        private string id_AmmField;
         
-        private string docm_dateField;
+        private string codiceField;
         
-        private string dsmField;
+        private string descrizioneField;
         
-        private string fromDateField;
+        private string livelloField;
         
-        private string esitoField;
+        private bool abilitatoField;
         
-        private string fhashField;
-        
-        private string marcaField;
-        
-        private string sernumField;
-        
-        private TSARFC2253 tSAField;
-        
-        private Marca decryptedTSRField;
-        
-        private string timestampedDocField;
-        
-        private string snCertificatoField;
-        
-        private string algCertificatoField;
-        
-        private string algHashField;
+        private TipoRuolo parentField;
         
         /// <remarks/>
-        public string descrizioneErrore {
+        public string systemId {
             get {
-                return this.descrizioneErroreField;
+                return this.systemIdField;
             }
             set {
-                this.descrizioneErroreField = value;
+                this.systemIdField = value;
             }
         }
         
         /// <remarks/>
-        public string docm {
+        public string id_Amm {
             get {
-                return this.docmField;
+                return this.id_AmmField;
             }
             set {
-                this.docmField = value;
+                this.id_AmmField = value;
             }
         }
         
         /// <remarks/>
-        public string docm_date {
+        public string codice {
             get {
-                return this.docm_dateField;
+                return this.codiceField;
             }
             set {
-                this.docm_dateField = value;
+                this.codiceField = value;
             }
         }
         
         /// <remarks/>
-        public string dsm {
+        public string descrizione {
             get {
-                return this.dsmField;
+                return this.descrizioneField;
             }
             set {
-                this.dsmField = value;
+                this.descrizioneField = value;
             }
         }
         
         /// <remarks/>
-        public string fromDate {
+        public string livello {
             get {
-                return this.fromDateField;
+                return this.livelloField;
             }
             set {
-                this.fromDateField = value;
+                this.livelloField = value;
             }
         }
         
         /// <remarks/>
-        public string esito {
+        public bool abilitato {
             get {
-                return this.esitoField;
+                return this.abilitatoField;
             }
             set {
-                this.esitoField = value;
+                this.abilitatoField = value;
             }
         }
         
         /// <remarks/>
-        public string fhash {
+        public TipoRuolo Parent {
             get {
-                return this.fhashField;
+                return this.parentField;
             }
             set {
-                this.fhashField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string marca {
-            get {
-                return this.marcaField;
-            }
-            set {
-                this.marcaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string sernum {
-            get {
-                return this.sernumField;
-            }
-            set {
-                this.sernumField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TSARFC2253 TSA {
-            get {
-                return this.tSAField;
-            }
-            set {
-                this.tSAField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public Marca DecryptedTSR {
-            get {
-                return this.decryptedTSRField;
-            }
-            set {
-                this.decryptedTSRField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string timestampedDoc {
-            get {
-                return this.timestampedDocField;
-            }
-            set {
-                this.timestampedDocField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string snCertificato {
-            get {
-                return this.snCertificatoField;
-            }
-            set {
-                this.snCertificatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string algCertificato {
-            get {
-                return this.algCertificatoField;
-            }
-            set {
-                this.algCertificatoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string algHash {
-            get {
-                return this.algHashField;
-            }
-            set {
-                this.algHashField = value;
+                this.parentField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class TSInfo {
+    public partial class UnitaOrganizzativa : Corrispondente {
         
-        private string tSANameIssuerField;
+        private string codiceField;
         
-        private string tSANameSubjectField;
+        private string livelloField;
         
-        private System.DateTime tSdateTimeField;
+        private bool interoperanteField;
         
-        private string tSimprintField;
+        private string codiceIstatField;
         
-        private string tSserialNumberField;
+        private UnitaOrganizzativa parentField;
         
-        private System.DateTime dataFineValiditaCertField;
+        private Registro[] registriField;
         
-        private System.DateTime dataInizioValiditaCertField;
-        
-        private TsType tSTypeField;
+        private string classificaUOField;
         
         /// <remarks/>
-        public string TSANameIssuer {
+        public string codice {
             get {
-                return this.tSANameIssuerField;
+                return this.codiceField;
             }
             set {
-                this.tSANameIssuerField = value;
+                this.codiceField = value;
             }
         }
         
         /// <remarks/>
-        public string TSANameSubject {
+        public string livello {
             get {
-                return this.tSANameSubjectField;
+                return this.livelloField;
             }
             set {
-                this.tSANameSubjectField = value;
+                this.livelloField = value;
             }
         }
         
         /// <remarks/>
-        public System.DateTime TSdateTime {
+        public bool interoperante {
             get {
-                return this.tSdateTimeField;
+                return this.interoperanteField;
             }
             set {
-                this.tSdateTimeField = value;
+                this.interoperanteField = value;
             }
         }
         
         /// <remarks/>
-        public string TSimprint {
+        public string codiceIstat {
             get {
-                return this.tSimprintField;
+                return this.codiceIstatField;
             }
             set {
-                this.tSimprintField = value;
+                this.codiceIstatField = value;
             }
         }
         
         /// <remarks/>
-        public string TSserialNumber {
+        public UnitaOrganizzativa parent {
             get {
-                return this.tSserialNumberField;
+                return this.parentField;
             }
             set {
-                this.tSserialNumberField = value;
+                this.parentField = value;
             }
         }
         
         /// <remarks/>
-        public System.DateTime dataFineValiditaCert {
+        public Registro[] registri {
             get {
-                return this.dataFineValiditaCertField;
+                return this.registriField;
             }
             set {
-                this.dataFineValiditaCertField = value;
+                this.registriField = value;
             }
         }
         
         /// <remarks/>
-        public System.DateTime dataInizioValiditaCert {
+        public string classificaUO {
             get {
-                return this.dataInizioValiditaCertField;
+                return this.classificaUOField;
             }
             set {
-                this.dataInizioValiditaCertField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TsType TSType {
-            get {
-                return this.tSTypeField;
-            }
-            set {
-                this.tSTypeField = value;
+                this.classificaUOField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum TsType {
-        
-        /// <remarks/>
-        UNKNOWN,
-        
-        /// <remarks/>
-        TSR,
-        
-        /// <remarks/>
-        TSD,
-        
-        /// <remarks/>
-        M7M,
-        
-        /// <remarks/>
-        PADES,
-        
-        /// <remarks/>
-        PKCS,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class SubjectInfo {
+    public partial class Registro {
         
-        private string commonNameField;
+        private string systemIdField;
         
-        private string certIdField;
+        private string codRegistroField;
         
-        private string codiceFiscaleField;
+        private string codiceField;
         
-        private string dataDiNascitaField;
+        private string descrizioneField;
         
-        private string organizzazioneField;
+        private string emailField;
         
-        private string ruoloField;
+        private string statoField;
         
-        private string cognomeField;
+        private string dataAperturaField;
+        
+        private string dataChiusuraField;
+        
+        private string idAmministrazioneField;
+        
+        private string codAmministrazioneField;
+        
+        private string dataUltimoProtocolloField;
+        
+        private string ultimoNumeroProtocolloField;
+        
+        private string ruoloRiferimentoField;
+        
+        private string idRuoloAOOField;
+        
+        private string idUtenteAOOField;
+        
+        private string autoInteropField;
+        
+        private string chaRFField;
+        
+        private string idAOOCollegataField;
+        
+        private string rfDisabledField;
+        
+        private string diritto_Ruolo_AOOField;
+        
+        private bool sospesoField;
+        
+        private string idRuoloRespField;
+        
+        private string invioRicevutaManualeField;
+        
+        private string flagWspiaField;
+        
+        private bool flag_pregressoField;
+        
+        private string anno_pregressoField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codRegistro {
+            get {
+                return this.codRegistroField;
+            }
+            set {
+                this.codRegistroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codice {
+            get {
+                return this.codiceField;
+            }
+            set {
+                this.codiceField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string email {
+            get {
+                return this.emailField;
+            }
+            set {
+                this.emailField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string stato {
+            get {
+                return this.statoField;
+            }
+            set {
+                this.statoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataApertura {
+            get {
+                return this.dataAperturaField;
+            }
+            set {
+                this.dataAperturaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataChiusura {
+            get {
+                return this.dataChiusuraField;
+            }
+            set {
+                this.dataChiusuraField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idAmministrazione {
+            get {
+                return this.idAmministrazioneField;
+            }
+            set {
+                this.idAmministrazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codAmministrazione {
+            get {
+                return this.codAmministrazioneField;
+            }
+            set {
+                this.codAmministrazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataUltimoProtocollo {
+            get {
+                return this.dataUltimoProtocolloField;
+            }
+            set {
+                this.dataUltimoProtocolloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ultimoNumeroProtocollo {
+            get {
+                return this.ultimoNumeroProtocolloField;
+            }
+            set {
+                this.ultimoNumeroProtocolloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ruoloRiferimento {
+            get {
+                return this.ruoloRiferimentoField;
+            }
+            set {
+                this.ruoloRiferimentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idRuoloAOO {
+            get {
+                return this.idRuoloAOOField;
+            }
+            set {
+                this.idRuoloAOOField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idUtenteAOO {
+            get {
+                return this.idUtenteAOOField;
+            }
+            set {
+                this.idUtenteAOOField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string autoInterop {
+            get {
+                return this.autoInteropField;
+            }
+            set {
+                this.autoInteropField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string chaRF {
+            get {
+                return this.chaRFField;
+            }
+            set {
+                this.chaRFField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idAOOCollegata {
+            get {
+                return this.idAOOCollegataField;
+            }
+            set {
+                this.idAOOCollegataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string rfDisabled {
+            get {
+                return this.rfDisabledField;
+            }
+            set {
+                this.rfDisabledField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Diritto_Ruolo_AOO {
+            get {
+                return this.diritto_Ruolo_AOOField;
+            }
+            set {
+                this.diritto_Ruolo_AOOField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool Sospeso {
+            get {
+                return this.sospesoField;
+            }
+            set {
+                this.sospesoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idRuoloResp {
+            get {
+                return this.idRuoloRespField;
+            }
+            set {
+                this.idRuoloRespField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string invioRicevutaManuale {
+            get {
+                return this.invioRicevutaManualeField;
+            }
+            set {
+                this.invioRicevutaManualeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string FlagWspia {
+            get {
+                return this.flagWspiaField;
+            }
+            set {
+                this.flagWspiaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool flag_pregresso {
+            get {
+                return this.flag_pregressoField;
+            }
+            set {
+                this.flag_pregressoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string anno_pregresso {
+            get {
+                return this.anno_pregressoField;
+            }
+            set {
+                this.anno_pregressoField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UnitaOrganizzativa))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Ruolo))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Corrispondente {
+        
+        private string systemIdField;
+        
+        private string descrizioneField;
+        
+        private string codiceCorrispondenteField;
+        
+        private string codiceRubricaField;
+        
+        private string idAmministrazioneField;
+        
+        private string tipoCorrispondenteField;
+        
+        private string tipoIEField;
+        
+        private string idRegistroField;
+        
+        private Canale canalePrefField;
+        
+        private bool dettagliField;
+        
+        private System.Data.DataSet infoField;
+        
+        private ServerPosta serverPostaField;
+        
+        private string idOldField;
+        
+        private string emailField;
+        
+        private string fromEmailField;
+        
+        private bool notificaConAllegatoField;
+        
+        private string erroreField;
+        
+        private string codiceAOOField;
+        
+        private string codiceAmmField;
+        
+        private string dta_fineField;
         
         private string nomeField;
         
-        private string countryField;
+        private string cognomeField;
         
-        private string serialNumberField;
+        private string indirizzoField;
+        
+        private string cittaField;
+        
+        private string capField;
+        
+        private string provField;
+        
+        private string nazionalitaField;
+        
+        private string telefono1Field;
+        
+        private string telefono2Field;
+        
+        private string faxField;
+        
+        private string codfiscField;
+        
+        private string partitaivaField;
+        
+        private string noteField;
+        
+        private bool inRubricaComuneField;
+        
+        private ProtocolloDestinatario protocolloDestinatarioField;
+        
+        private string codDescAmministrizazioneField;
+        
+        private string localitaField;
+        
+        private string luogoDINascitaField;
+        
+        private string dataNascitaField;
+        
+        private string titoloField;
+        
+        private string oldDescrizioneField;
+        
+        private bool disabledTrasmField;
+        
+        private UrlInfo[] urlField;
+        
+        private MailCorrispondente[] emailsField;
         
         /// <remarks/>
-        public string CommonName {
+        public string systemId {
             get {
-                return this.commonNameField;
+                return this.systemIdField;
             }
             set {
-                this.commonNameField = value;
+                this.systemIdField = value;
             }
         }
         
         /// <remarks/>
-        public string CertId {
+        public string descrizione {
             get {
-                return this.certIdField;
+                return this.descrizioneField;
             }
             set {
-                this.certIdField = value;
+                this.descrizioneField = value;
             }
         }
         
         /// <remarks/>
-        public string CodiceFiscale {
+        public string codiceCorrispondente {
             get {
-                return this.codiceFiscaleField;
+                return this.codiceCorrispondenteField;
             }
             set {
-                this.codiceFiscaleField = value;
+                this.codiceCorrispondenteField = value;
             }
         }
         
         /// <remarks/>
-        public string DataDiNascita {
+        public string codiceRubrica {
             get {
-                return this.dataDiNascitaField;
+                return this.codiceRubricaField;
             }
             set {
-                this.dataDiNascitaField = value;
+                this.codiceRubricaField = value;
             }
         }
         
         /// <remarks/>
-        public string Organizzazione {
+        public string idAmministrazione {
             get {
-                return this.organizzazioneField;
+                return this.idAmministrazioneField;
             }
             set {
-                this.organizzazioneField = value;
+                this.idAmministrazioneField = value;
             }
         }
         
         /// <remarks/>
-        public string Ruolo {
+        public string tipoCorrispondente {
             get {
-                return this.ruoloField;
+                return this.tipoCorrispondenteField;
             }
             set {
-                this.ruoloField = value;
+                this.tipoCorrispondenteField = value;
             }
         }
         
         /// <remarks/>
-        public string Cognome {
+        public string tipoIE {
             get {
-                return this.cognomeField;
+                return this.tipoIEField;
             }
             set {
-                this.cognomeField = value;
+                this.tipoIEField = value;
             }
         }
         
         /// <remarks/>
-        public string Nome {
+        public string idRegistro {
+            get {
+                return this.idRegistroField;
+            }
+            set {
+                this.idRegistroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Canale canalePref {
+            get {
+                return this.canalePrefField;
+            }
+            set {
+                this.canalePrefField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool dettagli {
+            get {
+                return this.dettagliField;
+            }
+            set {
+                this.dettagliField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.Data.DataSet info {
+            get {
+                return this.infoField;
+            }
+            set {
+                this.infoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public ServerPosta serverPosta {
+            get {
+                return this.serverPostaField;
+            }
+            set {
+                this.serverPostaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idOld {
+            get {
+                return this.idOldField;
+            }
+            set {
+                this.idOldField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string email {
+            get {
+                return this.emailField;
+            }
+            set {
+                this.emailField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fromEmail {
+            get {
+                return this.fromEmailField;
+            }
+            set {
+                this.fromEmailField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool notificaConAllegato {
+            get {
+                return this.notificaConAllegatoField;
+            }
+            set {
+                this.notificaConAllegatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string errore {
+            get {
+                return this.erroreField;
+            }
+            set {
+                this.erroreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codiceAOO {
+            get {
+                return this.codiceAOOField;
+            }
+            set {
+                this.codiceAOOField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codiceAmm {
+            get {
+                return this.codiceAmmField;
+            }
+            set {
+                this.codiceAmmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dta_fine {
+            get {
+                return this.dta_fineField;
+            }
+            set {
+                this.dta_fineField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string nome {
             get {
                 return this.nomeField;
             }
@@ -13138,962 +7610,700 @@ namespace ConservazioneWA.WSConservazioneLocale {
         }
         
         /// <remarks/>
-        public string Country {
+        public string cognome {
             get {
-                return this.countryField;
+                return this.cognomeField;
             }
             set {
-                this.countryField = value;
+                this.cognomeField = value;
             }
         }
         
         /// <remarks/>
-        public string SerialNumber {
+        public string indirizzo {
             get {
-                return this.serialNumberField;
+                return this.indirizzoField;
             }
             set {
-                this.serialNumberField = value;
+                this.indirizzoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string citta {
+            get {
+                return this.cittaField;
+            }
+            set {
+                this.cittaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string cap {
+            get {
+                return this.capField;
+            }
+            set {
+                this.capField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string prov {
+            get {
+                return this.provField;
+            }
+            set {
+                this.provField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string nazionalita {
+            get {
+                return this.nazionalitaField;
+            }
+            set {
+                this.nazionalitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string telefono1 {
+            get {
+                return this.telefono1Field;
+            }
+            set {
+                this.telefono1Field = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string telefono2 {
+            get {
+                return this.telefono2Field;
+            }
+            set {
+                this.telefono2Field = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fax {
+            get {
+                return this.faxField;
+            }
+            set {
+                this.faxField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codfisc {
+            get {
+                return this.codfiscField;
+            }
+            set {
+                this.codfiscField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string partitaiva {
+            get {
+                return this.partitaivaField;
+            }
+            set {
+                this.partitaivaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string note {
+            get {
+                return this.noteField;
+            }
+            set {
+                this.noteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool inRubricaComune {
+            get {
+                return this.inRubricaComuneField;
+            }
+            set {
+                this.inRubricaComuneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public ProtocolloDestinatario protocolloDestinatario {
+            get {
+                return this.protocolloDestinatarioField;
+            }
+            set {
+                this.protocolloDestinatarioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codDescAmministrizazione {
+            get {
+                return this.codDescAmministrizazioneField;
+            }
+            set {
+                this.codDescAmministrizazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string localita {
+            get {
+                return this.localitaField;
+            }
+            set {
+                this.localitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string luogoDINascita {
+            get {
+                return this.luogoDINascitaField;
+            }
+            set {
+                this.luogoDINascitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataNascita {
+            get {
+                return this.dataNascitaField;
+            }
+            set {
+                this.dataNascitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string titolo {
+            get {
+                return this.titoloField;
+            }
+            set {
+                this.titoloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string oldDescrizione {
+            get {
+                return this.oldDescrizioneField;
+            }
+            set {
+                this.oldDescrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool disabledTrasm {
+            get {
+                return this.disabledTrasmField;
+            }
+            set {
+                this.disabledTrasmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public UrlInfo[] Url {
+            get {
+                return this.urlField;
+            }
+            set {
+                this.urlField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public MailCorrispondente[] Emails {
+            get {
+                return this.emailsField;
+            }
+            set {
+                this.emailsField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class CertificateInfo {
+    public partial class Canale {
         
-        private int revocationStatusField;
+        private string systemIdField;
         
-        private string revocationStatusDescriptionField;
+        private string descrizioneField;
         
-        private string serialNumberField;
+        private string typeIdField;
         
-        private string signatureAlgorithmField;
-        
-        private System.DateTime validFromDateField;
-        
-        private System.DateTime validToDateField;
-        
-        private System.DateTime revocationDateField;
-        
-        private string subjectNameField;
-        
-        private string issuerNameField;
-        
-        private string thumbPrintField;
-        
-        private byte[] x509CertificateField;
-        
-        private string validFromDateStrField;
-        
-        private string validToDateStrField;
+        private string tipoCanaleField;
         
         /// <remarks/>
-        public int RevocationStatus {
+        public string systemId {
             get {
-                return this.revocationStatusField;
+                return this.systemIdField;
             }
             set {
-                this.revocationStatusField = value;
+                this.systemIdField = value;
             }
         }
         
         /// <remarks/>
-        public string RevocationStatusDescription {
+        public string descrizione {
             get {
-                return this.revocationStatusDescriptionField;
+                return this.descrizioneField;
             }
             set {
-                this.revocationStatusDescriptionField = value;
+                this.descrizioneField = value;
             }
         }
         
         /// <remarks/>
-        public string SerialNumber {
+        public string typeId {
             get {
-                return this.serialNumberField;
+                return this.typeIdField;
             }
             set {
-                this.serialNumberField = value;
+                this.typeIdField = value;
             }
         }
         
         /// <remarks/>
-        public string SignatureAlgorithm {
+        public string tipoCanale {
             get {
-                return this.signatureAlgorithmField;
+                return this.tipoCanaleField;
             }
             set {
-                this.signatureAlgorithmField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public System.DateTime ValidFromDate {
-            get {
-                return this.validFromDateField;
-            }
-            set {
-                this.validFromDateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public System.DateTime ValidToDate {
-            get {
-                return this.validToDateField;
-            }
-            set {
-                this.validToDateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public System.DateTime RevocationDate {
-            get {
-                return this.revocationDateField;
-            }
-            set {
-                this.revocationDateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string SubjectName {
-            get {
-                return this.subjectNameField;
-            }
-            set {
-                this.subjectNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string IssuerName {
-            get {
-                return this.issuerNameField;
-            }
-            set {
-                this.issuerNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ThumbPrint {
-            get {
-                return this.thumbPrintField;
-            }
-            set {
-                this.thumbPrintField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
-        public byte[] X509Certificate {
-            get {
-                return this.x509CertificateField;
-            }
-            set {
-                this.x509CertificateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ValidFromDateStr {
-            get {
-                return this.validFromDateStrField;
-            }
-            set {
-                this.validFromDateStrField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ValidToDateStr {
-            get {
-                return this.validToDateStrField;
-            }
-            set {
-                this.validToDateStrField = value;
+                this.tipoCanaleField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class SignerInfo {
+    public partial class ServerPosta {
         
-        private string parentSignerCertSNField;
+        private string systemIdField;
         
-        private CertificateInfo certificateInfoField;
+        private string descrizioneField;
         
-        private string signatureAlgorithmField;
+        private string serverPOPField;
         
-        private SubjectInfo subjectInfoField;
+        private string portaPOPField;
         
-        private TSInfo[] signatureTimeStampInfoField;
+        private string serverSMTPField;
         
-        private bool isCountersignerField;
+        private string portaSMTPField;
         
-        private SignerInfo[] counterSignaturesField;
-        
-        private System.DateTime signingTimeField;
+        private string dominioField;
         
         /// <remarks/>
-        public string ParentSignerCertSN {
+        public string systemId {
             get {
-                return this.parentSignerCertSNField;
+                return this.systemIdField;
             }
             set {
-                this.parentSignerCertSNField = value;
+                this.systemIdField = value;
             }
         }
         
         /// <remarks/>
-        public CertificateInfo CertificateInfo {
+        public string descrizione {
             get {
-                return this.certificateInfoField;
+                return this.descrizioneField;
             }
             set {
-                this.certificateInfoField = value;
+                this.descrizioneField = value;
             }
         }
         
         /// <remarks/>
-        public string SignatureAlgorithm {
+        public string serverPOP {
             get {
-                return this.signatureAlgorithmField;
+                return this.serverPOPField;
             }
             set {
-                this.signatureAlgorithmField = value;
+                this.serverPOPField = value;
             }
         }
         
         /// <remarks/>
-        public SubjectInfo SubjectInfo {
+        public string portaPOP {
             get {
-                return this.subjectInfoField;
+                return this.portaPOPField;
             }
             set {
-                this.subjectInfoField = value;
+                this.portaPOPField = value;
             }
         }
         
         /// <remarks/>
-        public TSInfo[] SignatureTimeStampInfo {
+        public string serverSMTP {
             get {
-                return this.signatureTimeStampInfoField;
+                return this.serverSMTPField;
             }
             set {
-                this.signatureTimeStampInfoField = value;
+                this.serverSMTPField = value;
             }
         }
         
         /// <remarks/>
-        public bool isCountersigner {
+        public string portaSMTP {
             get {
-                return this.isCountersignerField;
+                return this.portaSMTPField;
             }
             set {
-                this.isCountersignerField = value;
+                this.portaSMTPField = value;
             }
         }
         
         /// <remarks/>
-        public SignerInfo[] counterSignatures {
+        public string dominio {
             get {
-                return this.counterSignaturesField;
+                return this.dominioField;
             }
             set {
-                this.counterSignaturesField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public System.DateTime SigningTime {
-            get {
-                return this.signingTimeField;
-            }
-            set {
-                this.signingTimeField = value;
+                this.dominioField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class PKCS7Document {
+    public partial class ProtocolloDestinatario {
         
-        private int levelField;
+        private string systemIdField;
         
-        private string documentFileNameField;
+        private string codiceAOOField;
         
-        private string signAlgorithmField;
+        private string protocolloDestinatarioField;
         
-        private string signHashField;
+        private string dataProtocolloDestinatarioField;
         
-        private SignerInfo[] signersInfoField;
+        private string codiceAmmField;
         
-        private SignType signatureTypeField;
+        private string descrizioneCorrField;
+        
+        private string documentTypeField;
+        
+        private string dta_spedizioneField;
+        
+        private string annullatoField;
+        
+        private string motivoField;
+        
+        private string provvedimentoField;
         
         /// <remarks/>
-        public int Level {
+        public string systemId {
             get {
-                return this.levelField;
+                return this.systemIdField;
             }
             set {
-                this.levelField = value;
+                this.systemIdField = value;
             }
         }
         
         /// <remarks/>
-        public string DocumentFileName {
+        public string codiceAOO {
             get {
-                return this.documentFileNameField;
+                return this.codiceAOOField;
             }
             set {
-                this.documentFileNameField = value;
+                this.codiceAOOField = value;
             }
         }
         
         /// <remarks/>
-        public string SignAlgorithm {
+        public string protocolloDestinatario {
             get {
-                return this.signAlgorithmField;
+                return this.protocolloDestinatarioField;
             }
             set {
-                this.signAlgorithmField = value;
+                this.protocolloDestinatarioField = value;
             }
         }
         
         /// <remarks/>
-        public string SignHash {
+        public string dataProtocolloDestinatario {
             get {
-                return this.signHashField;
+                return this.dataProtocolloDestinatarioField;
             }
             set {
-                this.signHashField = value;
+                this.dataProtocolloDestinatarioField = value;
             }
         }
         
         /// <remarks/>
-        public SignerInfo[] SignersInfo {
+        public string codiceAmm {
             get {
-                return this.signersInfoField;
+                return this.codiceAmmField;
             }
             set {
-                this.signersInfoField = value;
+                this.codiceAmmField = value;
             }
         }
         
         /// <remarks/>
-        public SignType SignatureType {
+        public string descrizioneCorr {
             get {
-                return this.signatureTypeField;
+                return this.descrizioneCorrField;
             }
             set {
-                this.signatureTypeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum SignType {
-        
-        /// <remarks/>
-        UNKNOWN,
-        
-        /// <remarks/>
-        CADES,
-        
-        /// <remarks/>
-        PADES,
-        
-        /// <remarks/>
-        XADES,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class VerifySignatureResult {
-        
-        private int statusCodeField;
-        
-        private string statusDescriptionField;
-        
-        private string finalDocumentNameField;
-        
-        private bool cRLOnlineCheckField;
-        
-        private PKCS7Document[] pKCS7DocumentsField;
-        
-        private TSInfo[] documentTimeStampInfoField;
-        
-        private string[] errorMessagesField;
-        
-        /// <remarks/>
-        public int StatusCode {
-            get {
-                return this.statusCodeField;
-            }
-            set {
-                this.statusCodeField = value;
+                this.descrizioneCorrField = value;
             }
         }
         
         /// <remarks/>
-        public string StatusDescription {
+        public string documentType {
             get {
-                return this.statusDescriptionField;
+                return this.documentTypeField;
             }
             set {
-                this.statusDescriptionField = value;
+                this.documentTypeField = value;
             }
         }
         
         /// <remarks/>
-        public string FinalDocumentName {
+        public string dta_spedizione {
             get {
-                return this.finalDocumentNameField;
+                return this.dta_spedizioneField;
             }
             set {
-                this.finalDocumentNameField = value;
+                this.dta_spedizioneField = value;
             }
         }
         
         /// <remarks/>
-        public bool CRLOnlineCheck {
+        public string annullato {
             get {
-                return this.cRLOnlineCheckField;
+                return this.annullatoField;
             }
             set {
-                this.cRLOnlineCheckField = value;
+                this.annullatoField = value;
             }
         }
         
         /// <remarks/>
-        public PKCS7Document[] PKCS7Documents {
+        public string motivo {
             get {
-                return this.pKCS7DocumentsField;
+                return this.motivoField;
             }
             set {
-                this.pKCS7DocumentsField = value;
+                this.motivoField = value;
             }
         }
         
         /// <remarks/>
-        public TSInfo[] DocumentTimeStampInfo {
+        public string provvedimento {
             get {
-                return this.documentTimeStampInfoField;
+                return this.provvedimentoField;
             }
             set {
-                this.documentTimeStampInfoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string[] ErrorMessages {
-            get {
-                return this.errorMessagesField;
-            }
-            set {
-                this.errorMessagesField = value;
+                this.provvedimentoField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class labelPdfDigitalSignInfo {
+    public partial class UrlInfo {
         
-        private bool printOnFirstPageField;
-        
-        private bool printOnLastPageField;
-        
-        private TypePrintFormatSign printFormatSignField;
+        private string urlField;
         
         /// <remarks/>
-        public bool printOnFirstPage {
+        public string Url {
             get {
-                return this.printOnFirstPageField;
+                return this.urlField;
             }
             set {
-                this.printOnFirstPageField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool printOnLastPage {
-            get {
-                return this.printOnLastPageField;
-            }
-            set {
-                this.printOnLastPageField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public TypePrintFormatSign printFormatSign {
-            get {
-                return this.printFormatSignField;
-            }
-            set {
-                this.printFormatSignField = value;
+                this.urlField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum TypePrintFormatSign {
-        
-        /// <remarks/>
-        Sign_Extended,
-        
-        /// <remarks/>
-        Sign_Short,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class position {
+    public partial class MailCorrispondente {
         
-        private string posNameField;
+        private string systemIdField;
         
-        private string posXField;
+        private string emailField;
         
-        private string posYField;
+        private string noteField;
+        
+        private string principaleField;
         
         /// <remarks/>
-        public string posName {
+        public string systemId {
             get {
-                return this.posNameField;
+                return this.systemIdField;
             }
             set {
-                this.posNameField = value;
+                this.systemIdField = value;
             }
         }
         
         /// <remarks/>
-        public string PosX {
+        public string Email {
             get {
-                return this.posXField;
+                return this.emailField;
             }
             set {
-                this.posXField = value;
+                this.emailField = value;
             }
         }
         
         /// <remarks/>
-        public string PosY {
+        public string Note {
             get {
-                return this.posYField;
+                return this.noteField;
             }
             set {
-                this.posYField = value;
+                this.noteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Principale {
+            get {
+                return this.principaleField;
+            }
+            set {
+                this.principaleField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class labelPdf {
+    public partial class Funzione {
         
-        private string font_typeField;
+        private string systemIdField;
         
-        private string font_colorField;
+        private string codiceField;
         
-        private string font_sizeField;
+        private string descrizioneField;
         
-        private string default_positionField;
+        private string idTipoFunzioneField;
         
-        private string label_rotationField;
+        private string codTipoFunzioneField;
         
-        private position[] positionsField;
+        private string descTipoFunzioneField;
         
-        private string pdfWidthField;
-        
-        private string pdfHeightField;
-        
-        private string orientamentoField;
-        
-        private bool tipoLabelField;
-        
-        private bool notimbroField;
-        
-        private string positionField;
-        
-        private string sel_fontField;
-        
-        private string sel_colorField;
-        
-        private labelPdfDigitalSignInfo digitalSignInfoField;
+        private string idParentField;
         
         /// <remarks/>
-        public string font_type {
+        public string systemId {
             get {
-                return this.font_typeField;
+                return this.systemIdField;
             }
             set {
-                this.font_typeField = value;
+                this.systemIdField = value;
             }
         }
         
         /// <remarks/>
-        public string font_color {
+        public string codice {
             get {
-                return this.font_colorField;
+                return this.codiceField;
             }
             set {
-                this.font_colorField = value;
+                this.codiceField = value;
             }
         }
         
         /// <remarks/>
-        public string font_size {
+        public string descrizione {
             get {
-                return this.font_sizeField;
+                return this.descrizioneField;
             }
             set {
-                this.font_sizeField = value;
+                this.descrizioneField = value;
             }
         }
         
         /// <remarks/>
-        public string default_position {
+        public string idTipoFunzione {
             get {
-                return this.default_positionField;
+                return this.idTipoFunzioneField;
             }
             set {
-                this.default_positionField = value;
+                this.idTipoFunzioneField = value;
             }
         }
         
         /// <remarks/>
-        public string label_rotation {
+        public string codTipoFunzione {
             get {
-                return this.label_rotationField;
+                return this.codTipoFunzioneField;
             }
             set {
-                this.label_rotationField = value;
+                this.codTipoFunzioneField = value;
             }
         }
         
         /// <remarks/>
-        public position[] positions {
+        public string descTipoFunzione {
             get {
-                return this.positionsField;
+                return this.descTipoFunzioneField;
             }
             set {
-                this.positionsField = value;
+                this.descTipoFunzioneField = value;
             }
         }
         
         /// <remarks/>
-        public string pdfWidth {
+        public string idParent {
             get {
-                return this.pdfWidthField;
+                return this.idParentField;
             }
             set {
-                this.pdfWidthField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string pdfHeight {
-            get {
-                return this.pdfHeightField;
-            }
-            set {
-                this.pdfHeightField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string orientamento {
-            get {
-                return this.orientamentoField;
-            }
-            set {
-                this.orientamentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool tipoLabel {
-            get {
-                return this.tipoLabelField;
-            }
-            set {
-                this.tipoLabelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool notimbro {
-            get {
-                return this.notimbroField;
-            }
-            set {
-                this.notimbroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string position {
-            get {
-                return this.positionField;
-            }
-            set {
-                this.positionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string sel_font {
-            get {
-                return this.sel_fontField;
-            }
-            set {
-                this.sel_fontField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string sel_color {
-            get {
-                return this.sel_colorField;
-            }
-            set {
-                this.sel_colorField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public labelPdfDigitalSignInfo digitalSignInfo {
-            get {
-                return this.digitalSignInfoField;
-            }
-            set {
-                this.digitalSignInfoField = value;
+                this.idParentField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class FileDocumento {
-        
-        private string nameField;
-        
-        private string pathField;
-        
-        private string fullNameField;
-        
-        private byte[] contentField;
-        
-        private int lengthField;
-        
-        private string contentTypeField;
-        
-        private string estensioneFileField;
-        
-        private string nomeOriginaleField;
-        
-        private labelPdf labelPdfField;
-        
-        private VerifySignatureResult signatureResultField;
-        
-        private string msgErrField;
-        
-        private bool cartaceoField;
-        
-        private OutputResponseMarca timestampResultField;
-        
-        private bool bypassFileContentValidationField;
-        
-        /// <remarks/>
-        public string name {
-            get {
-                return this.nameField;
-            }
-            set {
-                this.nameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string path {
-            get {
-                return this.pathField;
-            }
-            set {
-                this.pathField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string fullName {
-            get {
-                return this.fullNameField;
-            }
-            set {
-                this.fullNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
-        public byte[] content {
-            get {
-                return this.contentField;
-            }
-            set {
-                this.contentField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int length {
-            get {
-                return this.lengthField;
-            }
-            set {
-                this.lengthField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string contentType {
-            get {
-                return this.contentTypeField;
-            }
-            set {
-                this.contentTypeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string estensioneFile {
-            get {
-                return this.estensioneFileField;
-            }
-            set {
-                this.estensioneFileField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string nomeOriginale {
-            get {
-                return this.nomeOriginaleField;
-            }
-            set {
-                this.nomeOriginaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public labelPdf LabelPdf {
-            get {
-                return this.labelPdfField;
-            }
-            set {
-                this.labelPdfField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public VerifySignatureResult signatureResult {
-            get {
-                return this.signatureResultField;
-            }
-            set {
-                this.signatureResultField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string msgErr {
-            get {
-                return this.msgErrField;
-            }
-            set {
-                this.msgErrField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool cartaceo {
-            get {
-                return this.cartaceoField;
-            }
-            set {
-                this.cartaceoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public OutputResponseMarca timestampResult {
-            get {
-                return this.timestampResultField;
-            }
-            set {
-                this.timestampResultField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool bypassFileContentValidation {
-            get {
-                return this.bypassFileContentValidationField;
-            }
-            set {
-                this.bypassFileContentValidationField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14150,7 +8360,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14195,7 +8405,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14240,7 +8450,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14285,7 +8495,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14342,7 +8552,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14387,7 +8597,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14453,8 +8663,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         private string formatoProtTitolarioField;
         
         private string tipologiaDocumentoObbligatoriaField;
-        
-        private string bannerField;
         
         private int idClientSideModelProcessorField;
         
@@ -14767,16 +8975,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         }
         
         /// <remarks/>
-        public string Banner {
-            get {
-                return this.bannerField;
-            }
-            set {
-                this.bannerField = value;
-            }
-        }
-        
-        /// <remarks/>
         public int IdClientSideModelProcessor {
             get {
                 return this.idClientSideModelProcessorField;
@@ -14829,7 +9027,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14922,7 +9120,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14991,7 +9189,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15156,7 +9354,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15369,7 +9567,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum OrgStatiTitolarioEnum {
@@ -15385,7 +9583,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15418,7 +9616,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15475,7 +9673,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15508,7 +9706,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15613,7 +9811,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15646,7 +9844,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15679,7 +9877,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15712,7 +9910,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15781,7 +9979,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15886,7 +10084,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16243,7 +10441,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16312,7 +10510,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16346,7 +10544,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ItemsEsibizione))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16823,7 +11021,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16976,7 +11174,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum EsitoValidazioneFirmaEnum {
@@ -17007,7 +11205,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17040,7 +11238,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17085,7 +11283,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17466,7 +11664,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17499,7 +11697,4044 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class DocumentConsolidationStateInfo {
+        
+        private DocumentConsolidationStateEnum stateField;
+        
+        private string authorField;
+        
+        private string roleField;
+        
+        private string dateField;
+        
+        /// <remarks/>
+        public DocumentConsolidationStateEnum State {
+            get {
+                return this.stateField;
+            }
+            set {
+                this.stateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Author {
+            get {
+                return this.authorField;
+            }
+            set {
+                this.authorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Role {
+            get {
+                return this.roleField;
+            }
+            set {
+                this.roleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Date {
+            get {
+                return this.dateField;
+            }
+            set {
+                this.dateField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum DocumentConsolidationStateEnum {
+        
+        /// <remarks/>
+        None,
+        
+        /// <remarks/>
+        Step1,
+        
+        /// <remarks/>
+        Step2,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class InfoDocumento {
+        
+        private string idProfileField;
+        
+        private string docNumberField;
+        
+        private string numProtField;
+        
+        private string oggettoField;
+        
+        private string dataAperturaField;
+        
+        private string tipoProtoField;
+        
+        private string codRegistroField;
+        
+        private string idRegistroField;
+        
+        private string segnaturaField;
+        
+        private string daProtocollareField;
+        
+        private string evidenzaField;
+        
+        private string dataAnnullamentoField;
+        
+        private string mittDocField;
+        
+        private string acquisitaImmagineField;
+        
+        private string privatoField;
+        
+        private string personaleField;
+        
+        private string noteCestinoField;
+        
+        private string autoreField;
+        
+        private string inCestinoField;
+        
+        private string inADLField;
+        
+        private string idTipoAttoField;
+        
+        private string tipoAttoField;
+        
+        private string isRimovibileField;
+        
+        private string inConservazioneField;
+        
+        private string inArchivioField;
+        
+        private string numSerieField;
+        
+        private string ultimaNotaField;
+        
+        private string[] mittDestField;
+        
+        private string dataArchiviazioneField;
+        
+        private bool allegatoField;
+        
+        private string protocolloTitolarioField;
+        
+        private string cha_firmatoField;
+        
+        private string contatoreField;
+        
+        private string codiceApplicazioneField;
+        
+        private string isCatenaTrasversaleField;
+        
+        private string[] mittentiField;
+        
+        private string[] destinatariField;
+        
+        /// <remarks/>
+        public string idProfile {
+            get {
+                return this.idProfileField;
+            }
+            set {
+                this.idProfileField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string docNumber {
+            get {
+                return this.docNumberField;
+            }
+            set {
+                this.docNumberField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string numProt {
+            get {
+                return this.numProtField;
+            }
+            set {
+                this.numProtField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string oggetto {
+            get {
+                return this.oggettoField;
+            }
+            set {
+                this.oggettoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataApertura {
+            get {
+                return this.dataAperturaField;
+            }
+            set {
+                this.dataAperturaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string tipoProto {
+            get {
+                return this.tipoProtoField;
+            }
+            set {
+                this.tipoProtoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codRegistro {
+            get {
+                return this.codRegistroField;
+            }
+            set {
+                this.codRegistroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idRegistro {
+            get {
+                return this.idRegistroField;
+            }
+            set {
+                this.idRegistroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string segnatura {
+            get {
+                return this.segnaturaField;
+            }
+            set {
+                this.segnaturaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string daProtocollare {
+            get {
+                return this.daProtocollareField;
+            }
+            set {
+                this.daProtocollareField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string evidenza {
+            get {
+                return this.evidenzaField;
+            }
+            set {
+                this.evidenzaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataAnnullamento {
+            get {
+                return this.dataAnnullamentoField;
+            }
+            set {
+                this.dataAnnullamentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string mittDoc {
+            get {
+                return this.mittDocField;
+            }
+            set {
+                this.mittDocField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string acquisitaImmagine {
+            get {
+                return this.acquisitaImmagineField;
+            }
+            set {
+                this.acquisitaImmagineField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string privato {
+            get {
+                return this.privatoField;
+            }
+            set {
+                this.privatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string personale {
+            get {
+                return this.personaleField;
+            }
+            set {
+                this.personaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string noteCestino {
+            get {
+                return this.noteCestinoField;
+            }
+            set {
+                this.noteCestinoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string autore {
+            get {
+                return this.autoreField;
+            }
+            set {
+                this.autoreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string inCestino {
+            get {
+                return this.inCestinoField;
+            }
+            set {
+                this.inCestinoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string inADL {
+            get {
+                return this.inADLField;
+            }
+            set {
+                this.inADLField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idTipoAtto {
+            get {
+                return this.idTipoAttoField;
+            }
+            set {
+                this.idTipoAttoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string tipoAtto {
+            get {
+                return this.tipoAttoField;
+            }
+            set {
+                this.tipoAttoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string isRimovibile {
+            get {
+                return this.isRimovibileField;
+            }
+            set {
+                this.isRimovibileField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string inConservazione {
+            get {
+                return this.inConservazioneField;
+            }
+            set {
+                this.inConservazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string inArchivio {
+            get {
+                return this.inArchivioField;
+            }
+            set {
+                this.inArchivioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string numSerie {
+            get {
+                return this.numSerieField;
+            }
+            set {
+                this.numSerieField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ultimaNota {
+            get {
+                return this.ultimaNotaField;
+            }
+            set {
+                this.ultimaNotaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string[] mittDest {
+            get {
+                return this.mittDestField;
+            }
+            set {
+                this.mittDestField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataArchiviazione {
+            get {
+                return this.dataArchiviazioneField;
+            }
+            set {
+                this.dataArchiviazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool allegato {
+            get {
+                return this.allegatoField;
+            }
+            set {
+                this.allegatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string protocolloTitolario {
+            get {
+                return this.protocolloTitolarioField;
+            }
+            set {
+                this.protocolloTitolarioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string cha_firmato {
+            get {
+                return this.cha_firmatoField;
+            }
+            set {
+                this.cha_firmatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string contatore {
+            get {
+                return this.contatoreField;
+            }
+            set {
+                this.contatoreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codiceApplicazione {
+            get {
+                return this.codiceApplicazioneField;
+            }
+            set {
+                this.codiceApplicazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string isCatenaTrasversale {
+            get {
+                return this.isCatenaTrasversaleField;
+            }
+            set {
+                this.isCatenaTrasversaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string[] Mittenti {
+            get {
+                return this.mittentiField;
+            }
+            set {
+                this.mittentiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string[] Destinatari {
+            get {
+                return this.destinatariField;
+            }
+            set {
+                this.destinatariField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class CheckOutStatus {
+        
+        private string idField;
+        
+        private System.DateTime checkOutDateField;
+        
+        private string documentLocationField;
+        
+        private string machineNameField;
+        
+        private string iDUserField;
+        
+        private string userNameField;
+        
+        private string iDRoleField;
+        
+        private string roleNameField;
+        
+        private string iDDocumentField;
+        
+        private string documentNumberField;
+        
+        private string segnatureField;
+        
+        private bool inConversionePdfField;
+        
+        private bool isAllegatoField;
+        
+        /// <remarks/>
+        public string ID {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime CheckOutDate {
+            get {
+                return this.checkOutDateField;
+            }
+            set {
+                this.checkOutDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DocumentLocation {
+            get {
+                return this.documentLocationField;
+            }
+            set {
+                this.documentLocationField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string MachineName {
+            get {
+                return this.machineNameField;
+            }
+            set {
+                this.machineNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IDUser {
+            get {
+                return this.iDUserField;
+            }
+            set {
+                this.iDUserField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string UserName {
+            get {
+                return this.userNameField;
+            }
+            set {
+                this.userNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IDRole {
+            get {
+                return this.iDRoleField;
+            }
+            set {
+                this.iDRoleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string RoleName {
+            get {
+                return this.roleNameField;
+            }
+            set {
+                this.roleNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IDDocument {
+            get {
+                return this.iDDocumentField;
+            }
+            set {
+                this.iDDocumentField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DocumentNumber {
+            get {
+                return this.documentNumberField;
+            }
+            set {
+                this.documentNumberField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Segnature {
+            get {
+                return this.segnatureField;
+            }
+            set {
+                this.segnatureField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool InConversionePdf {
+            get {
+                return this.inConversionePdfField;
+            }
+            set {
+                this.inConversionePdfField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsAllegato {
+            get {
+                return this.isAllegatoField;
+            }
+            set {
+                this.isAllegatoField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class DocumentoParolaChiave {
+        
+        private string systemIdField;
+        
+        private string descrizioneField;
+        
+        private string idAmministrazioneField;
+        
+        private string idRegistroField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idAmministrazione {
+            get {
+                return this.idAmministrazioneField;
+            }
+            set {
+                this.idAmministrazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idRegistro {
+            get {
+                return this.idRegistroField;
+            }
+            set {
+                this.idRegistroField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class TipologiaCanale {
+        
+        private string systemIdField;
+        
+        private string codiceField;
+        
+        private string descrizioneField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codice {
+            get {
+                return this.codiceField;
+            }
+            set {
+                this.codiceField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class SessionRepositoryContext {
+        
+        private InfoUtente ownerField;
+        
+        private string tokenField;
+        
+        private bool isDocumentoGrigioField;
+        
+        /// <remarks/>
+        public InfoUtente Owner {
+            get {
+                return this.ownerField;
+            }
+            set {
+                this.ownerField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Token {
+            get {
+                return this.tokenField;
+            }
+            set {
+                this.tokenField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsDocumentoGrigio {
+            get {
+                return this.isDocumentoGrigioField;
+            }
+            set {
+                this.isDocumentoGrigioField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Firmatario {
+        
+        private string systemIdField;
+        
+        private string nomeField;
+        
+        private string cognomeField;
+        
+        private string codiceFiscaleField;
+        
+        private string dataNascitaField;
+        
+        private string identificativoCAField;
+        
+        private int livelloField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string nome {
+            get {
+                return this.nomeField;
+            }
+            set {
+                this.nomeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string cognome {
+            get {
+                return this.cognomeField;
+            }
+            set {
+                this.cognomeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codiceFiscale {
+            get {
+                return this.codiceFiscaleField;
+            }
+            set {
+                this.codiceFiscaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataNascita {
+            get {
+                return this.dataNascitaField;
+            }
+            set {
+                this.dataNascitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string identificativoCA {
+            get {
+                return this.identificativoCAField;
+            }
+            set {
+                this.identificativoCAField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int livello {
+            get {
+                return this.livelloField;
+            }
+            set {
+                this.livelloField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Applicazione {
+        
+        private string systemIdField;
+        
+        private string estensioneField;
+        
+        private string descrizioneField;
+        
+        private string applicationField;
+        
+        private string mimeTypeField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string estensione {
+            get {
+                return this.estensioneField;
+            }
+            set {
+                this.estensioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string application {
+            get {
+                return this.applicationField;
+            }
+            set {
+                this.applicationField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string mimeType {
+            get {
+                return this.mimeTypeField;
+            }
+            set {
+                this.mimeTypeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Allegato))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Documento))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class FileRequest {
+        
+        private string dataInserimentoField;
+        
+        private string descrizioneField;
+        
+        private string docNumberField;
+        
+        private string docServerLocField;
+        
+        private string pathField;
+        
+        private string fileNameField;
+        
+        private string idPeopleField;
+        
+        private string versionIdField;
+        
+        private string fNversionIdField;
+        
+        private string versionField;
+        
+        private string subVersionField;
+        
+        private string versionLabelField;
+        
+        private string fileSizeField;
+        
+        private string autoreField;
+        
+        private string autoreFileField;
+        
+        private string dataAcquisizioneField;
+        
+        private string firmatoField;
+        
+        private string idPeopleDelegatoField;
+        
+        private bool daAggiornareFirmatariField;
+        
+        private Applicazione applicazioneField;
+        
+        private string msgErrField;
+        
+        private bool inLibroFirmaField;
+        
+        private bool cartaceoField;
+        
+        private Firmatario[] firmatariField;
+        
+        private SessionRepositoryContext repositoryContextField;
+        
+        /// <remarks/>
+        public string dataInserimento {
+            get {
+                return this.dataInserimentoField;
+            }
+            set {
+                this.dataInserimentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string docNumber {
+            get {
+                return this.docNumberField;
+            }
+            set {
+                this.docNumberField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string docServerLoc {
+            get {
+                return this.docServerLocField;
+            }
+            set {
+                this.docServerLocField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string path {
+            get {
+                return this.pathField;
+            }
+            set {
+                this.pathField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fileName {
+            get {
+                return this.fileNameField;
+            }
+            set {
+                this.fileNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idPeople {
+            get {
+                return this.idPeopleField;
+            }
+            set {
+                this.idPeopleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string versionId {
+            get {
+                return this.versionIdField;
+            }
+            set {
+                this.versionIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fNversionId {
+            get {
+                return this.fNversionIdField;
+            }
+            set {
+                this.fNversionIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string version {
+            get {
+                return this.versionField;
+            }
+            set {
+                this.versionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string subVersion {
+            get {
+                return this.subVersionField;
+            }
+            set {
+                this.subVersionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string versionLabel {
+            get {
+                return this.versionLabelField;
+            }
+            set {
+                this.versionLabelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fileSize {
+            get {
+                return this.fileSizeField;
+            }
+            set {
+                this.fileSizeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string autore {
+            get {
+                return this.autoreField;
+            }
+            set {
+                this.autoreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string autoreFile {
+            get {
+                return this.autoreFileField;
+            }
+            set {
+                this.autoreFileField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataAcquisizione {
+            get {
+                return this.dataAcquisizioneField;
+            }
+            set {
+                this.dataAcquisizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string firmato {
+            get {
+                return this.firmatoField;
+            }
+            set {
+                this.firmatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idPeopleDelegato {
+            get {
+                return this.idPeopleDelegatoField;
+            }
+            set {
+                this.idPeopleDelegatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornareFirmatari {
+            get {
+                return this.daAggiornareFirmatariField;
+            }
+            set {
+                this.daAggiornareFirmatariField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Applicazione applicazione {
+            get {
+                return this.applicazioneField;
+            }
+            set {
+                this.applicazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string msgErr {
+            get {
+                return this.msgErrField;
+            }
+            set {
+                this.msgErrField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool inLibroFirma {
+            get {
+                return this.inLibroFirmaField;
+            }
+            set {
+                this.inLibroFirmaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool cartaceo {
+            get {
+                return this.cartaceoField;
+            }
+            set {
+                this.cartaceoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Firmatario[] firmatari {
+            get {
+                return this.firmatariField;
+            }
+            set {
+                this.firmatariField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SessionRepositoryContext repositoryContext {
+            get {
+                return this.repositoryContextField;
+            }
+            set {
+                this.repositoryContextField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Allegato : FileRequest {
+        
+        private int numeroPagineField;
+        
+        private int positionField;
+        
+        private string forwardingSourceField;
+        
+        private int typeAttachmentField;
+        
+        /// <remarks/>
+        public int numeroPagine {
+            get {
+                return this.numeroPagineField;
+            }
+            set {
+                this.numeroPagineField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int position {
+            get {
+                return this.positionField;
+            }
+            set {
+                this.positionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ForwardingSource {
+            get {
+                return this.forwardingSourceField;
+            }
+            set {
+                this.forwardingSourceField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int TypeAttachment {
+            get {
+                return this.typeAttachmentField;
+            }
+            set {
+                this.typeAttachmentField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Documento : FileRequest {
+        
+        private string daInviareField;
+        
+        private string dataArrivoField;
+        
+        private TipologiaCanale tipologiaField;
+        
+        private string dataArchiviazioneField;
+        
+        /// <remarks/>
+        public string daInviare {
+            get {
+                return this.daInviareField;
+            }
+            set {
+                this.daInviareField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataArrivo {
+            get {
+                return this.dataArrivoField;
+            }
+            set {
+                this.dataArrivoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TipologiaCanale tipologia {
+            get {
+                return this.tipologiaField;
+            }
+            set {
+                this.tipologiaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataArchiviazione {
+            get {
+                return this.dataArchiviazioneField;
+            }
+            set {
+                this.dataArchiviazioneField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class StatoSpedizioneDocumento {
+        
+        private StatiSpedizioneDocumentoEnum statoField;
+        
+        private string descrizioneField;
+        
+        /// <remarks/>
+        public StatiSpedizioneDocumentoEnum Stato {
+            get {
+                return this.statoField;
+            }
+            set {
+                this.statoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum StatiSpedizioneDocumentoEnum {
+        
+        /// <remarks/>
+        DisabilitatoTrasmissioni,
+        
+        /// <remarks/>
+        DaSpedire,
+        
+        /// <remarks/>
+        Spedito,
+        
+        /// <remarks/>
+        ErroreInSpedizione,
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinatarioEsterno))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DestinatarioInterno))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public abstract partial class Destinatario {
+        
+        private string idField;
+        
+        private string dataUltimaSpedizioneField;
+        
+        private string emailField;
+        
+        private bool includiInSpedizioneField;
+        
+        private StatoSpedizioneDocumento statoSpedizioneField;
+        
+        /// <remarks/>
+        public string Id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DataUltimaSpedizione {
+            get {
+                return this.dataUltimaSpedizioneField;
+            }
+            set {
+                this.dataUltimaSpedizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Email {
+            get {
+                return this.emailField;
+            }
+            set {
+                this.emailField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IncludiInSpedizione {
+            get {
+                return this.includiInSpedizioneField;
+            }
+            set {
+                this.includiInSpedizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public StatoSpedizioneDocumento StatoSpedizione {
+            get {
+                return this.statoSpedizioneField;
+            }
+            set {
+                this.statoSpedizioneField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class DestinatarioEsterno : Destinatario {
+        
+        private bool interoperanteField;
+        
+        private Corrispondente[] datiDestinatariField;
+        
+        /// <remarks/>
+        public bool Interoperante {
+            get {
+                return this.interoperanteField;
+            }
+            set {
+                this.interoperanteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Corrispondente[] DatiDestinatari {
+            get {
+                return this.datiDestinatariField;
+            }
+            set {
+                this.datiDestinatariField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class DestinatarioInterno : Destinatario {
+        
+        private Corrispondente datiDestinatarioField;
+        
+        private bool disabledTrasmField;
+        
+        /// <remarks/>
+        public Corrispondente DatiDestinatario {
+            get {
+                return this.datiDestinatarioField;
+            }
+            set {
+                this.datiDestinatarioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool DisabledTrasm {
+            get {
+                return this.disabledTrasmField;
+            }
+            set {
+                this.disabledTrasmField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class SpedizioneDocumento {
+        
+        private string idDocumentoField;
+        
+        private bool speditoField;
+        
+        private string idRegistroRfMittenteField;
+        
+        private string mailAddressField;
+        
+        private DestinatarioInterno[] destinatariInterniField;
+        
+        private DestinatarioEsterno[] destinatariEsterniField;
+        
+        private string[] listaDestinatariNonRaggiungibiliField;
+        
+        /// <remarks/>
+        public string IdDocumento {
+            get {
+                return this.idDocumentoField;
+            }
+            set {
+                this.idDocumentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool Spedito {
+            get {
+                return this.speditoField;
+            }
+            set {
+                this.speditoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IdRegistroRfMittente {
+            get {
+                return this.idRegistroRfMittenteField;
+            }
+            set {
+                this.idRegistroRfMittenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string mailAddress {
+            get {
+                return this.mailAddressField;
+            }
+            set {
+                this.mailAddressField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public DestinatarioInterno[] DestinatariInterni {
+            get {
+                return this.destinatariInterniField;
+            }
+            set {
+                this.destinatariInterniField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public DestinatarioEsterno[] DestinatariEsterni {
+            get {
+                return this.destinatariEsterniField;
+            }
+            set {
+                this.destinatariEsterniField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string[] listaDestinatariNonRaggiungibili {
+            get {
+                return this.listaDestinatariNonRaggiungibiliField;
+            }
+            set {
+                this.listaDestinatariNonRaggiungibiliField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class DocumentoDatiEmergenza {
+        
+        private string protocolloEmergenzaField;
+        
+        private string dataProtocollazioneEmergenzaField;
+        
+        private string nomeProtocollatoreEmergenzaField;
+        
+        private string cognomeProtocollatoreEmergenzaField;
+        
+        /// <remarks/>
+        public string protocolloEmergenza {
+            get {
+                return this.protocolloEmergenzaField;
+            }
+            set {
+                this.protocolloEmergenzaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataProtocollazioneEmergenza {
+            get {
+                return this.dataProtocollazioneEmergenzaField;
+            }
+            set {
+                this.dataProtocollazioneEmergenzaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string nomeProtocollatoreEmergenza {
+            get {
+                return this.nomeProtocollatoreEmergenzaField;
+            }
+            set {
+                this.nomeProtocollatoreEmergenzaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string cognomeProtocollatoreEmergenza {
+            get {
+                return this.cognomeProtocollatoreEmergenzaField;
+            }
+            set {
+                this.cognomeProtocollatoreEmergenzaField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class CreatoreDocumento {
+        
+        private string idPeopleField;
+        
+        private string idCorrGlob_RuoloField;
+        
+        private string idCorrGlob_UOField;
+        
+        private string uo_codiceCorrGlobaliField;
+        
+        private string idPeopleDelegatoField;
+        
+        /// <remarks/>
+        public string idPeople {
+            get {
+                return this.idPeopleField;
+            }
+            set {
+                this.idPeopleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idCorrGlob_Ruolo {
+            get {
+                return this.idCorrGlob_RuoloField;
+            }
+            set {
+                this.idCorrGlob_RuoloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idCorrGlob_UO {
+            get {
+                return this.idCorrGlob_UOField;
+            }
+            set {
+                this.idCorrGlob_UOField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string uo_codiceCorrGlobali {
+            get {
+                return this.uo_codiceCorrGlobaliField;
+            }
+            set {
+                this.uo_codiceCorrGlobaliField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idPeopleDelegato {
+            get {
+                return this.idPeopleDelegatoField;
+            }
+            set {
+                this.idPeopleDelegatoField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Protocollatore {
+        
+        private string utente_idPeopleField;
+        
+        private string ruolo_idCorrGlobaliField;
+        
+        private string uo_idCorrGlobaliField;
+        
+        private string uo_codiceCorrGlobaliField;
+        
+        /// <remarks/>
+        public string utente_idPeople {
+            get {
+                return this.utente_idPeopleField;
+            }
+            set {
+                this.utente_idPeopleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ruolo_idCorrGlobali {
+            get {
+                return this.ruolo_idCorrGlobaliField;
+            }
+            set {
+                this.ruolo_idCorrGlobaliField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string uo_idCorrGlobali {
+            get {
+                return this.uo_idCorrGlobaliField;
+            }
+            set {
+                this.uo_idCorrGlobaliField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string uo_codiceCorrGlobali {
+            get {
+                return this.uo_codiceCorrGlobaliField;
+            }
+            set {
+                this.uo_codiceCorrGlobaliField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class TipologiaAtto {
+        
+        private string systemIdField;
+        
+        private string descrizioneField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Oggetto {
+        
+        private string systemIdField;
+        
+        private string descrizioneField;
+        
+        private bool daAggiornareField;
+        
+        private string idRegistroField;
+        
+        private string codRegistroField;
+        
+        private string codOggettoField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornare {
+            get {
+                return this.daAggiornareField;
+            }
+            set {
+                this.daAggiornareField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idRegistro {
+            get {
+                return this.idRegistroField;
+            }
+            set {
+                this.idRegistroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codRegistro {
+            get {
+                return this.codRegistroField;
+            }
+            set {
+                this.codRegistroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codOggetto {
+            get {
+                return this.codOggettoField;
+            }
+            set {
+                this.codOggettoField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class ProtocolloAnnullato {
+        
+        private string autorizzazioneField;
+        
+        private string dataAnnullamentoField;
+        
+        /// <remarks/>
+        public string autorizzazione {
+            get {
+                return this.autorizzazioneField;
+            }
+            set {
+                this.autorizzazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataAnnullamento {
+            get {
+                return this.dataAnnullamentoField;
+            }
+            set {
+                this.dataAnnullamentoField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProtocolloEntrata))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProtocolloUscita))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProtocolloInterno))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Protocollo {
+        
+        private string numeroField;
+        
+        private string dataProtocollazioneField;
+        
+        private string annoField;
+        
+        private string segnaturaField;
+        
+        private string daProtocollareField;
+        
+        private string invioConfermaField;
+        
+        private string modMittDestField;
+        
+        private string modMittIntField;
+        
+        private bool modUffRefField;
+        
+        private ProtocolloAnnullato protocolloAnnullatoField;
+        
+        private string descMezzoSpedizioneField;
+        
+        private int mezzoSpedizioneField;
+        
+        private string stampeEffettuateField;
+        
+        /// <remarks/>
+        public string numero {
+            get {
+                return this.numeroField;
+            }
+            set {
+                this.numeroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataProtocollazione {
+            get {
+                return this.dataProtocollazioneField;
+            }
+            set {
+                this.dataProtocollazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string anno {
+            get {
+                return this.annoField;
+            }
+            set {
+                this.annoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string segnatura {
+            get {
+                return this.segnaturaField;
+            }
+            set {
+                this.segnaturaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string daProtocollare {
+            get {
+                return this.daProtocollareField;
+            }
+            set {
+                this.daProtocollareField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string invioConferma {
+            get {
+                return this.invioConfermaField;
+            }
+            set {
+                this.invioConfermaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string modMittDest {
+            get {
+                return this.modMittDestField;
+            }
+            set {
+                this.modMittDestField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string modMittInt {
+            get {
+                return this.modMittIntField;
+            }
+            set {
+                this.modMittIntField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool ModUffRef {
+            get {
+                return this.modUffRefField;
+            }
+            set {
+                this.modUffRefField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public ProtocolloAnnullato protocolloAnnullato {
+            get {
+                return this.protocolloAnnullatoField;
+            }
+            set {
+                this.protocolloAnnullatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descMezzoSpedizione {
+            get {
+                return this.descMezzoSpedizioneField;
+            }
+            set {
+                this.descMezzoSpedizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int mezzoSpedizione {
+            get {
+                return this.mezzoSpedizioneField;
+            }
+            set {
+                this.mezzoSpedizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string stampeEffettuate {
+            get {
+                return this.stampeEffettuateField;
+            }
+            set {
+                this.stampeEffettuateField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class ProtocolloEntrata : Protocollo {
+        
+        private Corrispondente mittenteField;
+        
+        private Corrispondente mittenteIntermedioField;
+        
+        private Corrispondente ufficioReferenteField;
+        
+        private string descrizioneProtocolloMittenteField;
+        
+        private string dataProtocolloMittenteField;
+        
+        private bool daAggiornareMittenteField;
+        
+        private bool daAggiornareMittenteIntermedioField;
+        
+        private Corrispondente[] mittentiField;
+        
+        private bool daAggiornareMittentiMultipliField;
+        
+        /// <remarks/>
+        public Corrispondente mittente {
+            get {
+                return this.mittenteField;
+            }
+            set {
+                this.mittenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Corrispondente mittenteIntermedio {
+            get {
+                return this.mittenteIntermedioField;
+            }
+            set {
+                this.mittenteIntermedioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Corrispondente ufficioReferente {
+            get {
+                return this.ufficioReferenteField;
+            }
+            set {
+                this.ufficioReferenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizioneProtocolloMittente {
+            get {
+                return this.descrizioneProtocolloMittenteField;
+            }
+            set {
+                this.descrizioneProtocolloMittenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataProtocolloMittente {
+            get {
+                return this.dataProtocolloMittenteField;
+            }
+            set {
+                this.dataProtocolloMittenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornareMittente {
+            get {
+                return this.daAggiornareMittenteField;
+            }
+            set {
+                this.daAggiornareMittenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornareMittenteIntermedio {
+            get {
+                return this.daAggiornareMittenteIntermedioField;
+            }
+            set {
+                this.daAggiornareMittenteIntermedioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Corrispondente[] mittenti {
+            get {
+                return this.mittentiField;
+            }
+            set {
+                this.mittentiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornareMittentiMultipli {
+            get {
+                return this.daAggiornareMittentiMultipliField;
+            }
+            set {
+                this.daAggiornareMittentiMultipliField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ProtocolloInterno))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class ProtocolloUscita : Protocollo {
+        
+        private bool daAggiornareDestinatariField;
+        
+        private bool daAggiornareDestinatariConoscenzaField;
+        
+        private bool daAggiornareMittenteField;
+        
+        private Corrispondente mittenteField;
+        
+        private Corrispondente ufficioReferenteField;
+        
+        private Corrispondente[] destinatariField;
+        
+        private Corrispondente[] destinatariConoscenzaField;
+        
+        /// <remarks/>
+        public bool daAggiornareDestinatari {
+            get {
+                return this.daAggiornareDestinatariField;
+            }
+            set {
+                this.daAggiornareDestinatariField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornareDestinatariConoscenza {
+            get {
+                return this.daAggiornareDestinatariConoscenzaField;
+            }
+            set {
+                this.daAggiornareDestinatariConoscenzaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornareMittente {
+            get {
+                return this.daAggiornareMittenteField;
+            }
+            set {
+                this.daAggiornareMittenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Corrispondente mittente {
+            get {
+                return this.mittenteField;
+            }
+            set {
+                this.mittenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Corrispondente ufficioReferente {
+            get {
+                return this.ufficioReferenteField;
+            }
+            set {
+                this.ufficioReferenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Corrispondente[] destinatari {
+            get {
+                return this.destinatariField;
+            }
+            set {
+                this.destinatariField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Corrispondente[] destinatariConoscenza {
+            get {
+                return this.destinatariConoscenzaField;
+            }
+            set {
+                this.destinatariConoscenzaField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class ProtocolloInterno : ProtocolloUscita {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class SchedaDocumento {
+        
+        private string systemIdField;
+        
+        private string dataCreazioneField;
+        
+        private string oraCreazioneField;
+        
+        private string docNumberField;
+        
+        private string tipoProtoField;
+        
+        private string accessRightsField;
+        
+        private string idPeopleField;
+        
+        private string userIdField;
+        
+        private string typeIdField;
+        
+        private string appIdField;
+        
+        private string modOggettoField;
+        
+        private string assegnatoField;
+        
+        private string fascicolatoField;
+        
+        private string privatoField;
+        
+        private string personaleField;
+        
+        private string tipoSessoField;
+        
+        private string autoreField;
+        
+        private string numOggettoField;
+        
+        private string commissioneRefField;
+        
+        private int idFasciaEtaField;
+        
+        private string evidenzaField;
+        
+        private bool daAggiornareParoleChiaveField;
+        
+        private bool daAggiornarePrivatoField;
+        
+        private bool predisponiProtocollazioneField;
+        
+        private bool daAggiornareTipoAttoField;
+        
+        private Protocollo protocolloField;
+        
+        private Oggetto oggettoField;
+        
+        private TipologiaAtto tipologiaAttoField;
+        
+        private Registro registroField;
+        
+        private Protocollatore protocollatoreField;
+        
+        private CreatoreDocumento creatoreDocumentoField;
+        
+        private DocumentoDatiEmergenza datiEmergenzaField;
+        
+        private string interopField;
+        
+        private string dataScadenzaField;
+        
+        private string inCestinoField;
+        
+        private string inArchivioField;
+        
+        private string mezzoSpedizioneField;
+        
+        private string descMezzoSpedizioneField;
+        
+        private Templates templateField;
+        
+        private string dtaArrivoDaStoricizzareField;
+        
+        private bool pregressoField;
+        
+        private SpedizioneDocumento spedizioneDocumentoField;
+        
+        private Folder[] folderField;
+        
+        private Documento[] documentiField;
+        
+        private Allegato[] allegatiField;
+        
+        private DocumentoParolaChiave[] paroleChiaveField;
+        
+        private string[] destinatariModificatiField;
+        
+        private string[] destinatariCCModificatiField;
+        
+        private CheckOutStatus checkOutStatusField;
+        
+        private InfoNota[] noteDocumentoField;
+        
+        private InfoDocumento documentoPrincipaleField;
+        
+        private bool modificaRispostaDocumentoField;
+        
+        private InfoDocumento rispostaDocumentoField;
+        
+        private string ereditaField;
+        
+        private string cod_rf_protField;
+        
+        private string id_rf_protField;
+        
+        private SessionRepositoryContext repositoryContextField;
+        
+        private string protocolloTitolarioField;
+        
+        private string numInFascField;
+        
+        private string idFascProtoTitField;
+        
+        private string numProtTitField;
+        
+        private string idTitolarioField;
+        
+        private string riferimentoMittenteField;
+        
+        private string id_rf_invio_ricevutaField;
+        
+        private string codiceFascicoloField;
+        
+        private string documento_da_pecField;
+        
+        private DocumentConsolidationStateInfo consolidationStateField;
+        
+        private bool previousVersionsHiddenField;
+        
+        private string codiceApplicazioneField;
+        
+        private InfoAtipicita infoAtipicitaField;
+        
+        private string inConservazioneField;
+        
+        private bool isRiprodottoField;
+        
+        private string lastForwardField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataCreazione {
+            get {
+                return this.dataCreazioneField;
+            }
+            set {
+                this.dataCreazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string oraCreazione {
+            get {
+                return this.oraCreazioneField;
+            }
+            set {
+                this.oraCreazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string docNumber {
+            get {
+                return this.docNumberField;
+            }
+            set {
+                this.docNumberField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string tipoProto {
+            get {
+                return this.tipoProtoField;
+            }
+            set {
+                this.tipoProtoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string accessRights {
+            get {
+                return this.accessRightsField;
+            }
+            set {
+                this.accessRightsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idPeople {
+            get {
+                return this.idPeopleField;
+            }
+            set {
+                this.idPeopleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string userId {
+            get {
+                return this.userIdField;
+            }
+            set {
+                this.userIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string typeId {
+            get {
+                return this.typeIdField;
+            }
+            set {
+                this.typeIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string appId {
+            get {
+                return this.appIdField;
+            }
+            set {
+                this.appIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string modOggetto {
+            get {
+                return this.modOggettoField;
+            }
+            set {
+                this.modOggettoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string assegnato {
+            get {
+                return this.assegnatoField;
+            }
+            set {
+                this.assegnatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fascicolato {
+            get {
+                return this.fascicolatoField;
+            }
+            set {
+                this.fascicolatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string privato {
+            get {
+                return this.privatoField;
+            }
+            set {
+                this.privatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string personale {
+            get {
+                return this.personaleField;
+            }
+            set {
+                this.personaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string tipoSesso {
+            get {
+                return this.tipoSessoField;
+            }
+            set {
+                this.tipoSessoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string autore {
+            get {
+                return this.autoreField;
+            }
+            set {
+                this.autoreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string numOggetto {
+            get {
+                return this.numOggettoField;
+            }
+            set {
+                this.numOggettoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string commissioneRef {
+            get {
+                return this.commissioneRefField;
+            }
+            set {
+                this.commissioneRefField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int idFasciaEta {
+            get {
+                return this.idFasciaEtaField;
+            }
+            set {
+                this.idFasciaEtaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string evidenza {
+            get {
+                return this.evidenzaField;
+            }
+            set {
+                this.evidenzaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornareParoleChiave {
+            get {
+                return this.daAggiornareParoleChiaveField;
+            }
+            set {
+                this.daAggiornareParoleChiaveField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornarePrivato {
+            get {
+                return this.daAggiornarePrivatoField;
+            }
+            set {
+                this.daAggiornarePrivatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool predisponiProtocollazione {
+            get {
+                return this.predisponiProtocollazioneField;
+            }
+            set {
+                this.predisponiProtocollazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool daAggiornareTipoAtto {
+            get {
+                return this.daAggiornareTipoAttoField;
+            }
+            set {
+                this.daAggiornareTipoAttoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Protocollo protocollo {
+            get {
+                return this.protocolloField;
+            }
+            set {
+                this.protocolloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Oggetto oggetto {
+            get {
+                return this.oggettoField;
+            }
+            set {
+                this.oggettoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TipologiaAtto tipologiaAtto {
+            get {
+                return this.tipologiaAttoField;
+            }
+            set {
+                this.tipologiaAttoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Registro registro {
+            get {
+                return this.registroField;
+            }
+            set {
+                this.registroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Protocollatore protocollatore {
+            get {
+                return this.protocollatoreField;
+            }
+            set {
+                this.protocollatoreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public CreatoreDocumento creatoreDocumento {
+            get {
+                return this.creatoreDocumentoField;
+            }
+            set {
+                this.creatoreDocumentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public DocumentoDatiEmergenza datiEmergenza {
+            get {
+                return this.datiEmergenzaField;
+            }
+            set {
+                this.datiEmergenzaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string interop {
+            get {
+                return this.interopField;
+            }
+            set {
+                this.interopField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dataScadenza {
+            get {
+                return this.dataScadenzaField;
+            }
+            set {
+                this.dataScadenzaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string inCestino {
+            get {
+                return this.inCestinoField;
+            }
+            set {
+                this.inCestinoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string inArchivio {
+            get {
+                return this.inArchivioField;
+            }
+            set {
+                this.inArchivioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string mezzoSpedizione {
+            get {
+                return this.mezzoSpedizioneField;
+            }
+            set {
+                this.mezzoSpedizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descMezzoSpedizione {
+            get {
+                return this.descMezzoSpedizioneField;
+            }
+            set {
+                this.descMezzoSpedizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Templates template {
+            get {
+                return this.templateField;
+            }
+            set {
+                this.templateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dtaArrivoDaStoricizzare {
+            get {
+                return this.dtaArrivoDaStoricizzareField;
+            }
+            set {
+                this.dtaArrivoDaStoricizzareField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool pregresso {
+            get {
+                return this.pregressoField;
+            }
+            set {
+                this.pregressoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SpedizioneDocumento spedizioneDocumento {
+            get {
+                return this.spedizioneDocumentoField;
+            }
+            set {
+                this.spedizioneDocumentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Folder[] folder {
+            get {
+                return this.folderField;
+            }
+            set {
+                this.folderField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Documento[] documenti {
+            get {
+                return this.documentiField;
+            }
+            set {
+                this.documentiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Allegato[] allegati {
+            get {
+                return this.allegatiField;
+            }
+            set {
+                this.allegatiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public DocumentoParolaChiave[] paroleChiave {
+            get {
+                return this.paroleChiaveField;
+            }
+            set {
+                this.paroleChiaveField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string[] destinatariModificati {
+            get {
+                return this.destinatariModificatiField;
+            }
+            set {
+                this.destinatariModificatiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string[] destinatariCCModificati {
+            get {
+                return this.destinatariCCModificatiField;
+            }
+            set {
+                this.destinatariCCModificatiField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public CheckOutStatus checkOutStatus {
+            get {
+                return this.checkOutStatusField;
+            }
+            set {
+                this.checkOutStatusField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public InfoNota[] noteDocumento {
+            get {
+                return this.noteDocumentoField;
+            }
+            set {
+                this.noteDocumentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public InfoDocumento documentoPrincipale {
+            get {
+                return this.documentoPrincipaleField;
+            }
+            set {
+                this.documentoPrincipaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool modificaRispostaDocumento {
+            get {
+                return this.modificaRispostaDocumentoField;
+            }
+            set {
+                this.modificaRispostaDocumentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public InfoDocumento rispostaDocumento {
+            get {
+                return this.rispostaDocumentoField;
+            }
+            set {
+                this.rispostaDocumentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string eredita {
+            get {
+                return this.ereditaField;
+            }
+            set {
+                this.ereditaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string cod_rf_prot {
+            get {
+                return this.cod_rf_protField;
+            }
+            set {
+                this.cod_rf_protField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string id_rf_prot {
+            get {
+                return this.id_rf_protField;
+            }
+            set {
+                this.id_rf_protField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SessionRepositoryContext repositoryContext {
+            get {
+                return this.repositoryContextField;
+            }
+            set {
+                this.repositoryContextField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string protocolloTitolario {
+            get {
+                return this.protocolloTitolarioField;
+            }
+            set {
+                this.protocolloTitolarioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string numInFasc {
+            get {
+                return this.numInFascField;
+            }
+            set {
+                this.numInFascField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idFascProtoTit {
+            get {
+                return this.idFascProtoTitField;
+            }
+            set {
+                this.idFascProtoTitField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string numProtTit {
+            get {
+                return this.numProtTitField;
+            }
+            set {
+                this.numProtTitField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idTitolario {
+            get {
+                return this.idTitolarioField;
+            }
+            set {
+                this.idTitolarioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string riferimentoMittente {
+            get {
+                return this.riferimentoMittenteField;
+            }
+            set {
+                this.riferimentoMittenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string id_rf_invio_ricevuta {
+            get {
+                return this.id_rf_invio_ricevutaField;
+            }
+            set {
+                this.id_rf_invio_ricevutaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codiceFascicolo {
+            get {
+                return this.codiceFascicoloField;
+            }
+            set {
+                this.codiceFascicoloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string documento_da_pec {
+            get {
+                return this.documento_da_pecField;
+            }
+            set {
+                this.documento_da_pecField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public DocumentConsolidationStateInfo ConsolidationState {
+            get {
+                return this.consolidationStateField;
+            }
+            set {
+                this.consolidationStateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool previousVersionsHidden {
+            get {
+                return this.previousVersionsHiddenField;
+            }
+            set {
+                this.previousVersionsHiddenField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codiceApplicazione {
+            get {
+                return this.codiceApplicazioneField;
+            }
+            set {
+                this.codiceApplicazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public InfoAtipicita InfoAtipicita {
+            get {
+                return this.infoAtipicitaField;
+            }
+            set {
+                this.infoAtipicitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string inConservazione {
+            get {
+                return this.inConservazioneField;
+            }
+            set {
+                this.inConservazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isRiprodotto {
+            get {
+                return this.isRiprodottoField;
+            }
+            set {
+                this.isRiprodottoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string LastForward {
+            get {
+                return this.lastForwardField;
+            }
+            set {
+                this.lastForwardField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Folder {
+        
+        private Folder[] childsField;
+        
+        private string systemIDField;
+        
+        private string idFascicoloField;
+        
+        private string idParentField;
+        
+        private string descrizioneField;
+        
+        private string dtaAperturaField;
+        
+        /// <remarks/>
+        public Folder[] childs {
+            get {
+                return this.childsField;
+            }
+            set {
+                this.childsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string systemID {
+            get {
+                return this.systemIDField;
+            }
+            set {
+                this.systemIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idFascicolo {
+            get {
+                return this.idFascicoloField;
+            }
+            set {
+                this.idFascicoloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idParent {
+            get {
+                return this.idParentField;
+            }
+            set {
+                this.idParentField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dtaApertura {
+            get {
+                return this.dtaAperturaField;
+            }
+            set {
+                this.dtaAperturaField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class InfoNota {
+        
+        private string idField;
+        
+        private TipiVisibilitaNotaEnum tipoVisibilitaField;
+        
+        private string testoField;
+        
+        private System.DateTime dataCreazioneField;
+        
+        private InfoUtenteCreatoreNota utenteCreatoreField;
+        
+        private bool solaLetturaField;
+        
+        private bool daRimuovereField;
+        
+        private bool daInserireField;
+        
+        private string idPeopleDelegatoField;
+        
+        private string descrPeopleDelegatoField;
+        
+        private string idRfAssociatoField;
+        
+        public InfoNota() {
+            this.tipoVisibilitaField = TipiVisibilitaNotaEnum.Tutti;
+        }
+        
+        /// <remarks/>
+        public string Id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.ComponentModel.DefaultValueAttribute(TipiVisibilitaNotaEnum.Tutti)]
+        public TipiVisibilitaNotaEnum TipoVisibilita {
+            get {
+                return this.tipoVisibilitaField;
+            }
+            set {
+                this.tipoVisibilitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Testo {
+            get {
+                return this.testoField;
+            }
+            set {
+                this.testoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime DataCreazione {
+            get {
+                return this.dataCreazioneField;
+            }
+            set {
+                this.dataCreazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public InfoUtenteCreatoreNota UtenteCreatore {
+            get {
+                return this.utenteCreatoreField;
+            }
+            set {
+                this.utenteCreatoreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool SolaLettura {
+            get {
+                return this.solaLetturaField;
+            }
+            set {
+                this.solaLetturaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool DaRimuovere {
+            get {
+                return this.daRimuovereField;
+            }
+            set {
+                this.daRimuovereField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool DaInserire {
+            get {
+                return this.daInserireField;
+            }
+            set {
+                this.daInserireField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IdPeopleDelegato {
+            get {
+                return this.idPeopleDelegatoField;
+            }
+            set {
+                this.idPeopleDelegatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DescrPeopleDelegato {
+            get {
+                return this.descrPeopleDelegatoField;
+            }
+            set {
+                this.descrPeopleDelegatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IdRfAssociato {
+            get {
+                return this.idRfAssociatoField;
+            }
+            set {
+                this.idRfAssociatoField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum TipiVisibilitaNotaEnum {
+        
+        /// <remarks/>
+        Tutti,
+        
+        /// <remarks/>
+        RF,
+        
+        /// <remarks/>
+        Ruolo,
+        
+        /// <remarks/>
+        Personale,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class InfoUtenteCreatoreNota {
+        
+        private string idUtenteField;
+        
+        private string descrizioneUtenteField;
+        
+        private string idRuoloField;
+        
+        private string descrizioneRuoloField;
+        
+        /// <remarks/>
+        public string IdUtente {
+            get {
+                return this.idUtenteField;
+            }
+            set {
+                this.idUtenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DescrizioneUtente {
+            get {
+                return this.descrizioneUtenteField;
+            }
+            set {
+                this.descrizioneUtenteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IdRuolo {
+            get {
+                return this.idRuoloField;
+            }
+            set {
+                this.idRuoloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DescrizioneRuolo {
+            get {
+                return this.descrizioneRuoloField;
+            }
+            set {
+                this.descrizioneRuoloField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class InfoAtipicita {
+        
+        private string idDocFascField;
+        
+        private string codiceAtipicitaField;
+        
+        private TipoOggettoAtipico tipoOggettoField;
+        
+        private string descrizioneAtipicitaField;
+        
+        /// <remarks/>
+        public string IdDocFasc {
+            get {
+                return this.idDocFascField;
+            }
+            set {
+                this.idDocFascField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string CodiceAtipicita {
+            get {
+                return this.codiceAtipicitaField;
+            }
+            set {
+                this.codiceAtipicitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TipoOggettoAtipico TipoOggetto {
+            get {
+                return this.tipoOggettoField;
+            }
+            set {
+                this.tipoOggettoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DescrizioneAtipicita {
+            get {
+                return this.descrizioneAtipicitaField;
+            }
+            set {
+                this.descrizioneAtipicitaField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum TipoOggettoAtipico {
+        
+        /// <remarks/>
+        DOCUMENTO,
+        
+        /// <remarks/>
+        FASCICOLO,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class ContatoriEsibizione {
+        
+        private int nuove_CertificataField;
+        
+        private int nuoveField;
+        
+        private int chiuse_CertificataField;
+        
+        private int chiuseField;
+        
+        private int rifiutate_CertificataField;
+        
+        private int rifiutateField;
+        
+        private int inAttesaDiCertificazione_CertificataField;
+        
+        private int inAttesaDiCertificazioneField;
+        
+        private int transizione_CertificataField;
+        
+        private int transizioneField;
+        
+        /// <remarks/>
+        public int Nuove_Certificata {
+            get {
+                return this.nuove_CertificataField;
+            }
+            set {
+                this.nuove_CertificataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Nuove {
+            get {
+                return this.nuoveField;
+            }
+            set {
+                this.nuoveField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Chiuse_Certificata {
+            get {
+                return this.chiuse_CertificataField;
+            }
+            set {
+                this.chiuse_CertificataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Chiuse {
+            get {
+                return this.chiuseField;
+            }
+            set {
+                this.chiuseField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Rifiutate_Certificata {
+            get {
+                return this.rifiutate_CertificataField;
+            }
+            set {
+                this.rifiutate_CertificataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Rifiutate {
+            get {
+                return this.rifiutateField;
+            }
+            set {
+                this.rifiutateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int InAttesaDiCertificazione_Certificata {
+            get {
+                return this.inAttesaDiCertificazione_CertificataField;
+            }
+            set {
+                this.inAttesaDiCertificazione_CertificataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int InAttesaDiCertificazione {
+            get {
+                return this.inAttesaDiCertificazioneField;
+            }
+            set {
+                this.inAttesaDiCertificazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Transizione_Certificata {
+            get {
+                return this.transizione_CertificataField;
+            }
+            set {
+                this.transizione_CertificataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Transizione {
+            get {
+                return this.transizioneField;
+            }
+            set {
+                this.transizioneField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class InfoEsibizione {
+        
+        private string systemIDField;
+        
+        private string idAmmField;
+        
+        private string idPeopleField;
+        
+        private string idRuoloInUoField;
+        
+        private string statoEsibizioneField;
+        
+        private string noteField;
+        
+        private string descrizioneField;
+        
+        private string noteRifiutoField;
+        
+        private string data_CreazioneField;
+        
+        private string data_CertificazioneField;
+        
+        private string data_ChiusuraField;
+        
+        private string data_RifiutoField;
+        
+        private string marcaTemporaleField;
+        
+        private string firmaResponsabileField;
+        
+        private bool isCertificataField;
+        
+        private bool isRichiestaCertificazioneField;
+        
+        private string idProfileCertificazioneField;
+        
+        private string richiedenteField;
+        
+        /// <remarks/>
+        public string SystemID {
+            get {
+                return this.systemIDField;
+            }
+            set {
+                this.systemIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IdAmm {
+            get {
+                return this.idAmmField;
+            }
+            set {
+                this.idAmmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IdPeople {
+            get {
+                return this.idPeopleField;
+            }
+            set {
+                this.idPeopleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IdRuoloInUo {
+            get {
+                return this.idRuoloInUoField;
+            }
+            set {
+                this.idRuoloInUoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string statoEsibizione {
+            get {
+                return this.statoEsibizioneField;
+            }
+            set {
+                this.statoEsibizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Note {
+            get {
+                return this.noteField;
+            }
+            set {
+                this.noteField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string NoteRifiuto {
+            get {
+                return this.noteRifiutoField;
+            }
+            set {
+                this.noteRifiutoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Data_Creazione {
+            get {
+                return this.data_CreazioneField;
+            }
+            set {
+                this.data_CreazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Data_Certificazione {
+            get {
+                return this.data_CertificazioneField;
+            }
+            set {
+                this.data_CertificazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Data_Chiusura {
+            get {
+                return this.data_ChiusuraField;
+            }
+            set {
+                this.data_ChiusuraField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Data_Rifiuto {
+            get {
+                return this.data_RifiutoField;
+            }
+            set {
+                this.data_RifiutoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string MarcaTemporale {
+            get {
+                return this.marcaTemporaleField;
+            }
+            set {
+                this.marcaTemporaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string FirmaResponsabile {
+            get {
+                return this.firmaResponsabileField;
+            }
+            set {
+                this.firmaResponsabileField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isCertificata {
+            get {
+                return this.isCertificataField;
+            }
+            set {
+                this.isCertificataField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isRichiestaCertificazione {
+            get {
+                return this.isRichiestaCertificazioneField;
+            }
+            set {
+                this.isRichiestaCertificazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idProfileCertificazione {
+            get {
+                return this.idProfileCertificazioneField;
+            }
+            set {
+                this.idProfileCertificazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string richiedente {
+            get {
+                return this.richiedenteField;
+            }
+            set {
+                this.richiedenteField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17677,7 +15912,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum MaxFileSizeAlertModeEnum {
@@ -17693,7 +15928,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum DocumentTypeEnum {
@@ -17709,7 +15944,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -18426,7 +16661,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -18495,7 +16730,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -18564,7 +16799,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -18649,8 +16884,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         
         private string isFascConsentitaField;
         
-        private bool isFascicolazioneConsentitaField;
-        
         private InfoNota[] noteFascicoloField;
         
         private Folder folderSelezionatoField;
@@ -18668,10 +16901,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         private string nodoRiclassificazione_SystemIDField;
         
         private string nodoRiclassificazione_CodiceField;
-        
-        private bool hasStrutturaTemplateField;
-        
-        private bool pubblicoField;
         
         /// <remarks/>
         public string idClassificazione {
@@ -19064,16 +17293,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
         }
         
         /// <remarks/>
-        public bool isFascicolazioneConsentita {
-            get {
-                return this.isFascicolazioneConsentitaField;
-            }
-            set {
-                this.isFascicolazioneConsentitaField = value;
-            }
-        }
-        
-        /// <remarks/>
         public InfoNota[] noteFascicolo {
             get {
                 return this.noteFascicoloField;
@@ -19164,30 +17383,61 @@ namespace ConservazioneWA.WSConservazioneLocale {
                 this.nodoRiclassificazione_CodiceField = value;
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class AssociazioneNota {
+        
+        private OggettiAssociazioniNotaEnum tipoOggettoField;
+        
+        private string idField;
+        
+        public AssociazioneNota() {
+            this.tipoOggettoField = OggettiAssociazioniNotaEnum.Documento;
+        }
         
         /// <remarks/>
-        public bool HasStrutturaTemplate {
+        [System.ComponentModel.DefaultValueAttribute(OggettiAssociazioniNotaEnum.Documento)]
+        public OggettiAssociazioniNotaEnum TipoOggetto {
             get {
-                return this.hasStrutturaTemplateField;
+                return this.tipoOggettoField;
             }
             set {
-                this.hasStrutturaTemplateField = value;
+                this.tipoOggettoField = value;
             }
         }
         
         /// <remarks/>
-        public bool pubblico {
+        public string Id {
             get {
-                return this.pubblicoField;
+                return this.idField;
             }
             set {
-                this.pubblicoField = value;
+                this.idField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum OggettiAssociazioniNotaEnum {
+        
+        /// <remarks/>
+        Documento,
+        
+        /// <remarks/>
+        Fascicolo,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19237,58 +17487,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class AssociazioneNota {
-        
-        private OggettiAssociazioniNotaEnum tipoOggettoField;
-        
-        private string idField;
-        
-        public AssociazioneNota() {
-            this.tipoOggettoField = OggettiAssociazioniNotaEnum.Documento;
-        }
-        
-        /// <remarks/>
-        [System.ComponentModel.DefaultValueAttribute(OggettiAssociazioniNotaEnum.Documento)]
-        public OggettiAssociazioniNotaEnum TipoOggetto {
-            get {
-                return this.tipoOggettoField;
-            }
-            set {
-                this.tipoOggettoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Id {
-            get {
-                return this.idField;
-            }
-            set {
-                this.idField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public enum OggettiAssociazioniNotaEnum {
-        
-        /// <remarks/>
-        Documento,
-        
-        /// <remarks/>
-        Fascicolo,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19333,7 +17532,2032 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class FieldValue {
+        
+        private string valueField;
+        
+        private string colorBGField;
+        
+        /// <remarks/>
+        public string Value {
+            get {
+                return this.valueField;
+            }
+            set {
+                this.valueField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ColorBG {
+            get {
+                return this.colorBGField;
+            }
+            set {
+                this.colorBGField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Field {
+        
+        private string fieldIdField;
+        
+        private string originalLabelField;
+        
+        private string labelField;
+        
+        private bool canAssumeMultiValuesField;
+        
+        private bool isTruncableField;
+        
+        private int maxLengthField;
+        
+        private int widthField;
+        
+        private bool visibleField;
+        
+        private int positionField;
+        
+        private int customObjectIdField;
+        
+        private string associatedTemplateNameField;
+        
+        private string associatedTemplateIdField;
+        
+        private FieldValue[] valuesField;
+        
+        private string oracleDbColumnNameField;
+        
+        private string sqlServerDbColumnNameField;
+        
+        private bool lockedField;
+        
+        private bool isCommonFieldField;
+        
+        private bool isNumberField;
+        
+        /// <remarks/>
+        public string FieldId {
+            get {
+                return this.fieldIdField;
+            }
+            set {
+                this.fieldIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string OriginalLabel {
+            get {
+                return this.originalLabelField;
+            }
+            set {
+                this.originalLabelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool CanAssumeMultiValues {
+            get {
+                return this.canAssumeMultiValuesField;
+            }
+            set {
+                this.canAssumeMultiValuesField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsTruncable {
+            get {
+                return this.isTruncableField;
+            }
+            set {
+                this.isTruncableField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int MaxLength {
+            get {
+                return this.maxLengthField;
+            }
+            set {
+                this.maxLengthField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Width {
+            get {
+                return this.widthField;
+            }
+            set {
+                this.widthField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool Visible {
+            get {
+                return this.visibleField;
+            }
+            set {
+                this.visibleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int Position {
+            get {
+                return this.positionField;
+            }
+            set {
+                this.positionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int CustomObjectId {
+            get {
+                return this.customObjectIdField;
+            }
+            set {
+                this.customObjectIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string AssociatedTemplateName {
+            get {
+                return this.associatedTemplateNameField;
+            }
+            set {
+                this.associatedTemplateNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string AssociatedTemplateId {
+            get {
+                return this.associatedTemplateIdField;
+            }
+            set {
+                this.associatedTemplateIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public FieldValue[] Values {
+            get {
+                return this.valuesField;
+            }
+            set {
+                this.valuesField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string OracleDbColumnName {
+            get {
+                return this.oracleDbColumnNameField;
+            }
+            set {
+                this.oracleDbColumnNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string SqlServerDbColumnName {
+            get {
+                return this.sqlServerDbColumnNameField;
+            }
+            set {
+                this.sqlServerDbColumnNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool Locked {
+            get {
+                return this.lockedField;
+            }
+            set {
+                this.lockedField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsCommonField {
+            get {
+                return this.isCommonFieldField;
+            }
+            set {
+                this.isCommonFieldField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsNumber {
+            get {
+                return this.isNumberField;
+            }
+            set {
+                this.isNumberField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class InfoElementoRubricaComune {
+        
+        private int idRubricaComuneField;
+        
+        /// <remarks/>
+        public int IdRubricaComune {
+            get {
+                return this.idRubricaComuneField;
+            }
+            set {
+                this.idRubricaComuneField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class ElementoRubrica {
+        
+        private string systemIdField;
+        
+        private string codiceField;
+        
+        private string descrizioneField;
+        
+        private string tipoField;
+        
+        private string canaleField;
+        
+        private bool internoField;
+        
+        private bool has_childrenField;
+        
+        private bool isVisibileField;
+        
+        private bool isRubricaComuneField;
+        
+        private InfoElementoRubricaComune rubricaComuneField;
+        
+        private string idRegistroField;
+        
+        private string codiceRegistroField;
+        
+        private bool disabledTrasmField;
+        
+        private bool disabledField;
+        
+        private string nomeField;
+        
+        private string cognomeField;
+        
+        private string cf_pivaField;
+        
+        private string codiceFiscaleField;
+        
+        private string partitaIvaField;
+        
+        private string idPeopleField;
+        
+        private string idPeopleListaField;
+        
+        private string idGruppoListaField;
+        
+        /// <remarks/>
+        public string systemId {
+            get {
+                return this.systemIdField;
+            }
+            set {
+                this.systemIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codice {
+            get {
+                return this.codiceField;
+            }
+            set {
+                this.codiceField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string descrizione {
+            get {
+                return this.descrizioneField;
+            }
+            set {
+                this.descrizioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string tipo {
+            get {
+                return this.tipoField;
+            }
+            set {
+                this.tipoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string canale {
+            get {
+                return this.canaleField;
+            }
+            set {
+                this.canaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool interno {
+            get {
+                return this.internoField;
+            }
+            set {
+                this.internoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool has_children {
+            get {
+                return this.has_childrenField;
+            }
+            set {
+                this.has_childrenField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isVisibile {
+            get {
+                return this.isVisibileField;
+            }
+            set {
+                this.isVisibileField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isRubricaComune {
+            get {
+                return this.isRubricaComuneField;
+            }
+            set {
+                this.isRubricaComuneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public InfoElementoRubricaComune rubricaComune {
+            get {
+                return this.rubricaComuneField;
+            }
+            set {
+                this.rubricaComuneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idRegistro {
+            get {
+                return this.idRegistroField;
+            }
+            set {
+                this.idRegistroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codiceRegistro {
+            get {
+                return this.codiceRegistroField;
+            }
+            set {
+                this.codiceRegistroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool disabledTrasm {
+            get {
+                return this.disabledTrasmField;
+            }
+            set {
+                this.disabledTrasmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool disabled {
+            get {
+                return this.disabledField;
+            }
+            set {
+                this.disabledField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string nome {
+            get {
+                return this.nomeField;
+            }
+            set {
+                this.nomeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string cognome {
+            get {
+                return this.cognomeField;
+            }
+            set {
+                this.cognomeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string cf_piva {
+            get {
+                return this.cf_pivaField;
+            }
+            set {
+                this.cf_pivaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string codiceFiscale {
+            get {
+                return this.codiceFiscaleField;
+            }
+            set {
+                this.codiceFiscaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string partitaIva {
+            get {
+                return this.partitaIvaField;
+            }
+            set {
+                this.partitaIvaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idPeople {
+            get {
+                return this.idPeopleField;
+            }
+            set {
+                this.idPeopleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idPeopleLista {
+            get {
+                return this.idPeopleListaField;
+            }
+            set {
+                this.idPeopleListaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string idGruppoLista {
+            get {
+                return this.idGruppoListaField;
+            }
+            set {
+                this.idGruppoListaField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class Marca {
+        
+        private byte[] contentField;
+        
+        private int lengthField;
+        
+        private string contentTypeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
+        public byte[] content {
+            get {
+                return this.contentField;
+            }
+            set {
+                this.contentField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int length {
+            get {
+                return this.lengthField;
+            }
+            set {
+                this.lengthField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string contentType {
+            get {
+                return this.contentTypeField;
+            }
+            set {
+                this.contentTypeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class TSARFC2253 {
+        
+        private string tSARFC2253NameField;
+        
+        private string cnField;
+        
+        private string ouField;
+        
+        private string oField;
+        
+        private string cField;
+        
+        /// <remarks/>
+        public string TSARFC2253Name {
+            get {
+                return this.tSARFC2253NameField;
+            }
+            set {
+                this.tSARFC2253NameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string CN {
+            get {
+                return this.cnField;
+            }
+            set {
+                this.cnField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string OU {
+            get {
+                return this.ouField;
+            }
+            set {
+                this.ouField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string O {
+            get {
+                return this.oField;
+            }
+            set {
+                this.oField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string C {
+            get {
+                return this.cField;
+            }
+            set {
+                this.cField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class OutputResponseMarca {
+        
+        private string descrizioneErroreField;
+        
+        private string docmField;
+        
+        private string docm_dateField;
+        
+        private string dsmField;
+        
+        private string fromDateField;
+        
+        private string esitoField;
+        
+        private string fhashField;
+        
+        private string marcaField;
+        
+        private string sernumField;
+        
+        private TSARFC2253 tSAField;
+        
+        private Marca decryptedTSRField;
+        
+        private string timestampedDocField;
+        
+        private string snCertificatoField;
+        
+        private string algCertificatoField;
+        
+        private string algHashField;
+        
+        /// <remarks/>
+        public string descrizioneErrore {
+            get {
+                return this.descrizioneErroreField;
+            }
+            set {
+                this.descrizioneErroreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string docm {
+            get {
+                return this.docmField;
+            }
+            set {
+                this.docmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string docm_date {
+            get {
+                return this.docm_dateField;
+            }
+            set {
+                this.docm_dateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string dsm {
+            get {
+                return this.dsmField;
+            }
+            set {
+                this.dsmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fromDate {
+            get {
+                return this.fromDateField;
+            }
+            set {
+                this.fromDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string esito {
+            get {
+                return this.esitoField;
+            }
+            set {
+                this.esitoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fhash {
+            get {
+                return this.fhashField;
+            }
+            set {
+                this.fhashField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string marca {
+            get {
+                return this.marcaField;
+            }
+            set {
+                this.marcaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string sernum {
+            get {
+                return this.sernumField;
+            }
+            set {
+                this.sernumField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TSARFC2253 TSA {
+            get {
+                return this.tSAField;
+            }
+            set {
+                this.tSAField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Marca DecryptedTSR {
+            get {
+                return this.decryptedTSRField;
+            }
+            set {
+                this.decryptedTSRField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string timestampedDoc {
+            get {
+                return this.timestampedDocField;
+            }
+            set {
+                this.timestampedDocField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string snCertificato {
+            get {
+                return this.snCertificatoField;
+            }
+            set {
+                this.snCertificatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string algCertificato {
+            get {
+                return this.algCertificatoField;
+            }
+            set {
+                this.algCertificatoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string algHash {
+            get {
+                return this.algHashField;
+            }
+            set {
+                this.algHashField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class TSInfo {
+        
+        private string tSANameIssuerField;
+        
+        private string tSANameSubjectField;
+        
+        private System.DateTime tSdateTimeField;
+        
+        private string tSimprintField;
+        
+        private string tSserialNumberField;
+        
+        private System.DateTime dataFineValiditaCertField;
+        
+        private System.DateTime dataInizioValiditaCertField;
+        
+        private TsType tSTypeField;
+        
+        /// <remarks/>
+        public string TSANameIssuer {
+            get {
+                return this.tSANameIssuerField;
+            }
+            set {
+                this.tSANameIssuerField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string TSANameSubject {
+            get {
+                return this.tSANameSubjectField;
+            }
+            set {
+                this.tSANameSubjectField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime TSdateTime {
+            get {
+                return this.tSdateTimeField;
+            }
+            set {
+                this.tSdateTimeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string TSimprint {
+            get {
+                return this.tSimprintField;
+            }
+            set {
+                this.tSimprintField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string TSserialNumber {
+            get {
+                return this.tSserialNumberField;
+            }
+            set {
+                this.tSserialNumberField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime dataFineValiditaCert {
+            get {
+                return this.dataFineValiditaCertField;
+            }
+            set {
+                this.dataFineValiditaCertField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime dataInizioValiditaCert {
+            get {
+                return this.dataInizioValiditaCertField;
+            }
+            set {
+                this.dataInizioValiditaCertField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TsType TSType {
+            get {
+                return this.tSTypeField;
+            }
+            set {
+                this.tSTypeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum TsType {
+        
+        /// <remarks/>
+        UNKNOWN,
+        
+        /// <remarks/>
+        TSR,
+        
+        /// <remarks/>
+        TSD,
+        
+        /// <remarks/>
+        M7M,
+        
+        /// <remarks/>
+        PADES,
+        
+        /// <remarks/>
+        PKCS,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class SubjectInfo {
+        
+        private string commonNameField;
+        
+        private string certIdField;
+        
+        private string codiceFiscaleField;
+        
+        private string dataDiNascitaField;
+        
+        private string organizzazioneField;
+        
+        private string ruoloField;
+        
+        private string cognomeField;
+        
+        private string nomeField;
+        
+        private string countryField;
+        
+        private string serialNumberField;
+        
+        /// <remarks/>
+        public string CommonName {
+            get {
+                return this.commonNameField;
+            }
+            set {
+                this.commonNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string CertId {
+            get {
+                return this.certIdField;
+            }
+            set {
+                this.certIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string CodiceFiscale {
+            get {
+                return this.codiceFiscaleField;
+            }
+            set {
+                this.codiceFiscaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DataDiNascita {
+            get {
+                return this.dataDiNascitaField;
+            }
+            set {
+                this.dataDiNascitaField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Organizzazione {
+            get {
+                return this.organizzazioneField;
+            }
+            set {
+                this.organizzazioneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Ruolo {
+            get {
+                return this.ruoloField;
+            }
+            set {
+                this.ruoloField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Cognome {
+            get {
+                return this.cognomeField;
+            }
+            set {
+                this.cognomeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Nome {
+            get {
+                return this.nomeField;
+            }
+            set {
+                this.nomeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Country {
+            get {
+                return this.countryField;
+            }
+            set {
+                this.countryField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string SerialNumber {
+            get {
+                return this.serialNumberField;
+            }
+            set {
+                this.serialNumberField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class CertificateInfo {
+        
+        private int revocationStatusField;
+        
+        private string revocationStatusDescriptionField;
+        
+        private string serialNumberField;
+        
+        private string signatureAlgorithmField;
+        
+        private System.DateTime validFromDateField;
+        
+        private System.DateTime validToDateField;
+        
+        private System.DateTime revocationDateField;
+        
+        private string subjectNameField;
+        
+        private string issuerNameField;
+        
+        private string thumbPrintField;
+        
+        private byte[] x509CertificateField;
+        
+        /// <remarks/>
+        public int RevocationStatus {
+            get {
+                return this.revocationStatusField;
+            }
+            set {
+                this.revocationStatusField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string RevocationStatusDescription {
+            get {
+                return this.revocationStatusDescriptionField;
+            }
+            set {
+                this.revocationStatusDescriptionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string SerialNumber {
+            get {
+                return this.serialNumberField;
+            }
+            set {
+                this.serialNumberField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string SignatureAlgorithm {
+            get {
+                return this.signatureAlgorithmField;
+            }
+            set {
+                this.signatureAlgorithmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime ValidFromDate {
+            get {
+                return this.validFromDateField;
+            }
+            set {
+                this.validFromDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime ValidToDate {
+            get {
+                return this.validToDateField;
+            }
+            set {
+                this.validToDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime RevocationDate {
+            get {
+                return this.revocationDateField;
+            }
+            set {
+                this.revocationDateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string SubjectName {
+            get {
+                return this.subjectNameField;
+            }
+            set {
+                this.subjectNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IssuerName {
+            get {
+                return this.issuerNameField;
+            }
+            set {
+                this.issuerNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ThumbPrint {
+            get {
+                return this.thumbPrintField;
+            }
+            set {
+                this.thumbPrintField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
+        public byte[] X509Certificate {
+            get {
+                return this.x509CertificateField;
+            }
+            set {
+                this.x509CertificateField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class SignerInfo {
+        
+        private string parentSignerCertSNField;
+        
+        private CertificateInfo certificateInfoField;
+        
+        private string signatureAlgorithmField;
+        
+        private SubjectInfo subjectInfoField;
+        
+        private TSInfo[] signatureTimeStampInfoField;
+        
+        private bool isCountersignerField;
+        
+        private SignerInfo[] counterSignaturesField;
+        
+        private System.DateTime signingTimeField;
+        
+        /// <remarks/>
+        public string ParentSignerCertSN {
+            get {
+                return this.parentSignerCertSNField;
+            }
+            set {
+                this.parentSignerCertSNField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public CertificateInfo CertificateInfo {
+            get {
+                return this.certificateInfoField;
+            }
+            set {
+                this.certificateInfoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string SignatureAlgorithm {
+            get {
+                return this.signatureAlgorithmField;
+            }
+            set {
+                this.signatureAlgorithmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SubjectInfo SubjectInfo {
+            get {
+                return this.subjectInfoField;
+            }
+            set {
+                this.subjectInfoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TSInfo[] SignatureTimeStampInfo {
+            get {
+                return this.signatureTimeStampInfoField;
+            }
+            set {
+                this.signatureTimeStampInfoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool isCountersigner {
+            get {
+                return this.isCountersignerField;
+            }
+            set {
+                this.isCountersignerField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SignerInfo[] counterSignatures {
+            get {
+                return this.counterSignaturesField;
+            }
+            set {
+                this.counterSignaturesField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public System.DateTime SigningTime {
+            get {
+                return this.signingTimeField;
+            }
+            set {
+                this.signingTimeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class PKCS7Document {
+        
+        private int levelField;
+        
+        private string documentFileNameField;
+        
+        private string signAlgorithmField;
+        
+        private string signHashField;
+        
+        private SignerInfo[] signersInfoField;
+        
+        private SignType signatureTypeField;
+        
+        /// <remarks/>
+        public int Level {
+            get {
+                return this.levelField;
+            }
+            set {
+                this.levelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DocumentFileName {
+            get {
+                return this.documentFileNameField;
+            }
+            set {
+                this.documentFileNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string SignAlgorithm {
+            get {
+                return this.signAlgorithmField;
+            }
+            set {
+                this.signAlgorithmField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string SignHash {
+            get {
+                return this.signHashField;
+            }
+            set {
+                this.signHashField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SignerInfo[] SignersInfo {
+            get {
+                return this.signersInfoField;
+            }
+            set {
+                this.signersInfoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SignType SignatureType {
+            get {
+                return this.signatureTypeField;
+            }
+            set {
+                this.signatureTypeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum SignType {
+        
+        /// <remarks/>
+        UNKNOWN,
+        
+        /// <remarks/>
+        CADES,
+        
+        /// <remarks/>
+        PADES,
+        
+        /// <remarks/>
+        XADES,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class VerifySignatureResult {
+        
+        private int statusCodeField;
+        
+        private string statusDescriptionField;
+        
+        private string finalDocumentNameField;
+        
+        private bool cRLOnlineCheckField;
+        
+        private PKCS7Document[] pKCS7DocumentsField;
+        
+        private TSInfo[] documentTimeStampInfoField;
+        
+        private string[] errorMessagesField;
+        
+        /// <remarks/>
+        public int StatusCode {
+            get {
+                return this.statusCodeField;
+            }
+            set {
+                this.statusCodeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string StatusDescription {
+            get {
+                return this.statusDescriptionField;
+            }
+            set {
+                this.statusDescriptionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string FinalDocumentName {
+            get {
+                return this.finalDocumentNameField;
+            }
+            set {
+                this.finalDocumentNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool CRLOnlineCheck {
+            get {
+                return this.cRLOnlineCheckField;
+            }
+            set {
+                this.cRLOnlineCheckField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public PKCS7Document[] PKCS7Documents {
+            get {
+                return this.pKCS7DocumentsField;
+            }
+            set {
+                this.pKCS7DocumentsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TSInfo[] DocumentTimeStampInfo {
+            get {
+                return this.documentTimeStampInfoField;
+            }
+            set {
+                this.documentTimeStampInfoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string[] ErrorMessages {
+            get {
+                return this.errorMessagesField;
+            }
+            set {
+                this.errorMessagesField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class labelPdfDigitalSignInfo {
+        
+        private bool printOnFirstPageField;
+        
+        private bool printOnLastPageField;
+        
+        private TypePrintFormatSign printFormatSignField;
+        
+        /// <remarks/>
+        public bool printOnFirstPage {
+            get {
+                return this.printOnFirstPageField;
+            }
+            set {
+                this.printOnFirstPageField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool printOnLastPage {
+            get {
+                return this.printOnLastPageField;
+            }
+            set {
+                this.printOnLastPageField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public TypePrintFormatSign printFormatSign {
+            get {
+                return this.printFormatSignField;
+            }
+            set {
+                this.printFormatSignField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum TypePrintFormatSign {
+        
+        /// <remarks/>
+        Sign_Extended,
+        
+        /// <remarks/>
+        Sign_Short,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class position {
+        
+        private string posNameField;
+        
+        private string posXField;
+        
+        private string posYField;
+        
+        /// <remarks/>
+        public string posName {
+            get {
+                return this.posNameField;
+            }
+            set {
+                this.posNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string PosX {
+            get {
+                return this.posXField;
+            }
+            set {
+                this.posXField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string PosY {
+            get {
+                return this.posYField;
+            }
+            set {
+                this.posYField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class labelPdf {
+        
+        private string font_typeField;
+        
+        private string font_colorField;
+        
+        private string font_sizeField;
+        
+        private string default_positionField;
+        
+        private string label_rotationField;
+        
+        private position[] positionsField;
+        
+        private string pdfWidthField;
+        
+        private string pdfHeightField;
+        
+        private string orientamentoField;
+        
+        private bool tipoLabelField;
+        
+        private bool notimbroField;
+        
+        private string positionField;
+        
+        private string sel_fontField;
+        
+        private string sel_colorField;
+        
+        private labelPdfDigitalSignInfo digitalSignInfoField;
+        
+        /// <remarks/>
+        public string font_type {
+            get {
+                return this.font_typeField;
+            }
+            set {
+                this.font_typeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string font_color {
+            get {
+                return this.font_colorField;
+            }
+            set {
+                this.font_colorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string font_size {
+            get {
+                return this.font_sizeField;
+            }
+            set {
+                this.font_sizeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string default_position {
+            get {
+                return this.default_positionField;
+            }
+            set {
+                this.default_positionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string label_rotation {
+            get {
+                return this.label_rotationField;
+            }
+            set {
+                this.label_rotationField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public position[] positions {
+            get {
+                return this.positionsField;
+            }
+            set {
+                this.positionsField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string pdfWidth {
+            get {
+                return this.pdfWidthField;
+            }
+            set {
+                this.pdfWidthField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string pdfHeight {
+            get {
+                return this.pdfHeightField;
+            }
+            set {
+                this.pdfHeightField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string orientamento {
+            get {
+                return this.orientamentoField;
+            }
+            set {
+                this.orientamentoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool tipoLabel {
+            get {
+                return this.tipoLabelField;
+            }
+            set {
+                this.tipoLabelField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool notimbro {
+            get {
+                return this.notimbroField;
+            }
+            set {
+                this.notimbroField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string position {
+            get {
+                return this.positionField;
+            }
+            set {
+                this.positionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string sel_font {
+            get {
+                return this.sel_fontField;
+            }
+            set {
+                this.sel_fontField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string sel_color {
+            get {
+                return this.sel_colorField;
+            }
+            set {
+                this.sel_colorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public labelPdfDigitalSignInfo digitalSignInfo {
+            get {
+                return this.digitalSignInfoField;
+            }
+            set {
+                this.digitalSignInfoField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class FileDocumento {
+        
+        private string nameField;
+        
+        private string pathField;
+        
+        private string fullNameField;
+        
+        private byte[] contentField;
+        
+        private int lengthField;
+        
+        private string contentTypeField;
+        
+        private string estensioneFileField;
+        
+        private string nomeOriginaleField;
+        
+        private labelPdf labelPdfField;
+        
+        private VerifySignatureResult signatureResultField;
+        
+        private string msgErrField;
+        
+        private bool cartaceoField;
+        
+        private OutputResponseMarca timestampResultField;
+        
+        private bool bypassFileContentValidationField;
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string path {
+            get {
+                return this.pathField;
+            }
+            set {
+                this.pathField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string fullName {
+            get {
+                return this.fullNameField;
+            }
+            set {
+                this.fullNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
+        public byte[] content {
+            get {
+                return this.contentField;
+            }
+            set {
+                this.contentField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int length {
+            get {
+                return this.lengthField;
+            }
+            set {
+                this.lengthField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string contentType {
+            get {
+                return this.contentTypeField;
+            }
+            set {
+                this.contentTypeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string estensioneFile {
+            get {
+                return this.estensioneFileField;
+            }
+            set {
+                this.estensioneFileField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string nomeOriginale {
+            get {
+                return this.nomeOriginaleField;
+            }
+            set {
+                this.nomeOriginaleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public labelPdf LabelPdf {
+            get {
+                return this.labelPdfField;
+            }
+            set {
+                this.labelPdfField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public VerifySignatureResult signatureResult {
+            get {
+                return this.signatureResultField;
+            }
+            set {
+                this.signatureResultField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string msgErr {
+            get {
+                return this.msgErrField;
+            }
+            set {
+                this.msgErrField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool cartaceo {
+            get {
+                return this.cartaceoField;
+            }
+            set {
+                this.cartaceoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public OutputResponseMarca timestampResult {
+            get {
+                return this.timestampResultField;
+            }
+            set {
+                this.timestampResultField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool bypassFileContentValidation {
+            get {
+                return this.bypassFileContentValidationField;
+            }
+            set {
+                this.bypassFileContentValidationField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19570,7 +19794,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum TipoFiltroData {
@@ -19592,7 +19816,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum TipoVisibilitaDocumenti {
@@ -19605,51 +19829,49 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class FiltroRicerca {
+    public partial class StoricoProfilatiOldValue {
         
-        private string argomentoField;
+        private string iDTemplateField;
+        
+        private string iD_Doc_FascField;
         
         private string valoreField;
         
-        private Templates templateField;
+        private string tipo_Ogg_CustomField;
         
-        private SearchTextOptionsEnum searchTextOptionsField;
+        private string iD_OggettoField;
         
-        private FiltriTrasmissione listaFiltriTrasmissioneField;
+        private string iD_PeopleField;
         
-        private FiltriModelliTrasmissione listaFiltriModelliTrasmissioneField;
-        
-        private FiltriTrasmissioneNascosti listaFiltriTrasmissioneNascostiField;
-        
-        private FiltriDocumento listaFiltriDocumentoField;
-        
-        private FiltriFascicolazione listaFiltriFascicoloField;
-        
-        private FiltriStampaRegistro listaFiltriStampaRegistroField;
-        
-        private FiltriConservazione listaFiltriConservazioneField;
-        
-        private FiltriReportSpedizioni listaFiltriSpedizioniField;
-        
-        private string nomeCampoField;
+        private string iD_Ruolo_In_UOField;
         
         /// <remarks/>
-        public string argomento {
+        public string IDTemplate {
             get {
-                return this.argomentoField;
+                return this.iDTemplateField;
             }
             set {
-                this.argomentoField = value;
+                this.iDTemplateField = value;
             }
         }
         
         /// <remarks/>
-        public string valore {
+        public string ID_Doc_Fasc {
+            get {
+                return this.iD_Doc_FascField;
+            }
+            set {
+                this.iD_Doc_FascField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Valore {
             get {
                 return this.valoreField;
             }
@@ -19659,118 +19881,163 @@ namespace ConservazioneWA.WSConservazioneLocale {
         }
         
         /// <remarks/>
-        public Templates template {
+        public string Tipo_Ogg_Custom {
             get {
-                return this.templateField;
+                return this.tipo_Ogg_CustomField;
             }
             set {
-                this.templateField = value;
+                this.tipo_Ogg_CustomField = value;
             }
         }
         
         /// <remarks/>
-        public SearchTextOptionsEnum searchTextOptions {
+        public string ID_Oggetto {
             get {
-                return this.searchTextOptionsField;
+                return this.iD_OggettoField;
             }
             set {
-                this.searchTextOptionsField = value;
+                this.iD_OggettoField = value;
             }
         }
         
         /// <remarks/>
-        public FiltriTrasmissione listaFiltriTrasmissione {
+        public string ID_People {
             get {
-                return this.listaFiltriTrasmissioneField;
+                return this.iD_PeopleField;
             }
             set {
-                this.listaFiltriTrasmissioneField = value;
+                this.iD_PeopleField = value;
             }
         }
         
         /// <remarks/>
-        public FiltriModelliTrasmissione listaFiltriModelliTrasmissione {
+        public string ID_Ruolo_In_UO {
             get {
-                return this.listaFiltriModelliTrasmissioneField;
+                return this.iD_Ruolo_In_UOField;
             }
             set {
-                this.listaFiltriModelliTrasmissioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public FiltriTrasmissioneNascosti listaFiltriTrasmissioneNascosti {
-            get {
-                return this.listaFiltriTrasmissioneNascostiField;
-            }
-            set {
-                this.listaFiltriTrasmissioneNascostiField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public FiltriDocumento listaFiltriDocumento {
-            get {
-                return this.listaFiltriDocumentoField;
-            }
-            set {
-                this.listaFiltriDocumentoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public FiltriFascicolazione listaFiltriFascicolo {
-            get {
-                return this.listaFiltriFascicoloField;
-            }
-            set {
-                this.listaFiltriFascicoloField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public FiltriStampaRegistro listaFiltriStampaRegistro {
-            get {
-                return this.listaFiltriStampaRegistroField;
-            }
-            set {
-                this.listaFiltriStampaRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public FiltriConservazione listaFiltriConservazione {
-            get {
-                return this.listaFiltriConservazioneField;
-            }
-            set {
-                this.listaFiltriConservazioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public FiltriReportSpedizioni listaFiltriSpedizioni {
-            get {
-                return this.listaFiltriSpedizioniField;
-            }
-            set {
-                this.listaFiltriSpedizioniField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string nomeCampo {
-            get {
-                return this.nomeCampoField;
-            }
-            set {
-                this.nomeCampoField = value;
+                this.iD_Ruolo_In_UOField = value;
             }
         }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public partial class ValoreOggetto {
+        
+        private int sYSTEM_IDField;
+        
+        private string dESCRIZIONE_VALOREField;
+        
+        private string vALOREField;
+        
+        private string vALORE_DI_DEFAULTField;
+        
+        private string cOLOR_BGField;
+        
+        private int aBILITATOField;
+        
+        public ValoreOggetto() {
+            this.aBILITATOField = 1;
+        }
+        
+        /// <remarks/>
+        public int SYSTEM_ID {
+            get {
+                return this.sYSTEM_IDField;
+            }
+            set {
+                this.sYSTEM_IDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DESCRIZIONE_VALORE {
+            get {
+                return this.dESCRIZIONE_VALOREField;
+            }
+            set {
+                this.dESCRIZIONE_VALOREField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string VALORE {
+            get {
+                return this.vALOREField;
+            }
+            set {
+                this.vALOREField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string VALORE_DI_DEFAULT {
+            get {
+                return this.vALORE_DI_DEFAULTField;
+            }
+            set {
+                this.vALORE_DI_DEFAULTField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string COLOR_BG {
+            get {
+                return this.cOLOR_BGField;
+            }
+            set {
+                this.cOLOR_BGField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.ComponentModel.DefaultValueAttribute(1)]
+        public int ABILITATO {
+            get {
+                return this.aBILITATOField;
+            }
+            set {
+                this.aBILITATOField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum TipoRicercaStringaEnum {
+        
+        /// <remarks/>
+        PARTE_DELLA_PAROLA,
+        
+        /// <remarks/>
+        PAROLA_INTERA,
+        
+        /// <remarks/>
+        PAROLA_INIZIA_CON,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
+    public enum OperatoriRicercaOggettiCustomEnum {
+        
+        /// <remarks/>
+        And,
+        
+        /// <remarks/>
+        Or,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum SearchTextOptionsEnum {
@@ -19786,7 +20053,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum FiltriTrasmissione {
@@ -19829,7 +20096,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum FiltriModelliTrasmissione {
@@ -19872,7 +20139,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum FiltriTrasmissioneNascosti {
@@ -20155,7 +20422,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum FiltriDocumento {
@@ -20729,40 +20996,10 @@ namespace ConservazioneWA.WSConservazioneLocale {
         
         /// <remarks/>
         DOC_MAI_TRASMESSI_DA_RUOLO,
-        
-        /// <remarks/>
-        DOC_REPERTORIATO,
-        
-        /// <remarks/>
-        NUM_REPERTORIO,
-        
-        /// <remarks/>
-        NUM_REPERTORIO_DAL,
-        
-        /// <remarks/>
-        NUM_REPERTORIO_AL,
-        
-        /// <remarks/>
-        DATA_REPERTORIO_IL,
-        
-        /// <remarks/>
-        DATA_REPERTORIO_SUCCESSIVA_AL,
-        
-        /// <remarks/>
-        DATA_REPERTORIO_PRECEDENTE_IL,
-        
-        /// <remarks/>
-        DATA_REPERTORIO_TODAY,
-        
-        /// <remarks/>
-        DATA_REPERTORIO_MC,
-        
-        /// <remarks/>
-        DATA_REPERTORIO_SC,
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum FiltriFascicolazione {
@@ -20997,7 +21234,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum FiltriStampaRegistro {
@@ -21061,7 +21298,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum FiltriConservazione {
@@ -21221,559 +21458,7 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class FieldValue {
-        
-        private string valueField;
-        
-        private string colorBGField;
-        
-        /// <remarks/>
-        public string Value {
-            get {
-                return this.valueField;
-            }
-            set {
-                this.valueField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string ColorBG {
-            get {
-                return this.colorBGField;
-            }
-            set {
-                this.colorBGField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class Field {
-        
-        private string fieldIdField;
-        
-        private string originalLabelField;
-        
-        private string labelField;
-        
-        private bool canAssumeMultiValuesField;
-        
-        private bool isTruncableField;
-        
-        private int maxLengthField;
-        
-        private int widthField;
-        
-        private bool visibleField;
-        
-        private int positionField;
-        
-        private int customObjectIdField;
-        
-        private string associatedTemplateNameField;
-        
-        private string associatedTemplateIdField;
-        
-        private FieldValue[] valuesField;
-        
-        private string oracleDbColumnNameField;
-        
-        private string sqlServerDbColumnNameField;
-        
-        private bool lockedField;
-        
-        private bool isCommonFieldField;
-        
-        private bool isNumberField;
-        
-        /// <remarks/>
-        public string FieldId {
-            get {
-                return this.fieldIdField;
-            }
-            set {
-                this.fieldIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string OriginalLabel {
-            get {
-                return this.originalLabelField;
-            }
-            set {
-                this.originalLabelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Label {
-            get {
-                return this.labelField;
-            }
-            set {
-                this.labelField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool CanAssumeMultiValues {
-            get {
-                return this.canAssumeMultiValuesField;
-            }
-            set {
-                this.canAssumeMultiValuesField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool IsTruncable {
-            get {
-                return this.isTruncableField;
-            }
-            set {
-                this.isTruncableField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int MaxLength {
-            get {
-                return this.maxLengthField;
-            }
-            set {
-                this.maxLengthField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Width {
-            get {
-                return this.widthField;
-            }
-            set {
-                this.widthField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool Visible {
-            get {
-                return this.visibleField;
-            }
-            set {
-                this.visibleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int Position {
-            get {
-                return this.positionField;
-            }
-            set {
-                this.positionField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int CustomObjectId {
-            get {
-                return this.customObjectIdField;
-            }
-            set {
-                this.customObjectIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string AssociatedTemplateName {
-            get {
-                return this.associatedTemplateNameField;
-            }
-            set {
-                this.associatedTemplateNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string AssociatedTemplateId {
-            get {
-                return this.associatedTemplateIdField;
-            }
-            set {
-                this.associatedTemplateIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public FieldValue[] Values {
-            get {
-                return this.valuesField;
-            }
-            set {
-                this.valuesField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string OracleDbColumnName {
-            get {
-                return this.oracleDbColumnNameField;
-            }
-            set {
-                this.oracleDbColumnNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string SqlServerDbColumnName {
-            get {
-                return this.sqlServerDbColumnNameField;
-            }
-            set {
-                this.sqlServerDbColumnNameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool Locked {
-            get {
-                return this.lockedField;
-            }
-            set {
-                this.lockedField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool IsCommonField {
-            get {
-                return this.isCommonFieldField;
-            }
-            set {
-                this.isCommonFieldField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool IsNumber {
-            get {
-                return this.isNumberField;
-            }
-            set {
-                this.isNumberField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class InfoElementoRubricaComune {
-        
-        private int idRubricaComuneField;
-        
-        /// <remarks/>
-        public int IdRubricaComune {
-            get {
-                return this.idRubricaComuneField;
-            }
-            set {
-                this.idRubricaComuneField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
-    public partial class ElementoRubrica {
-        
-        private string systemIdField;
-        
-        private string codiceField;
-        
-        private string descrizioneField;
-        
-        private string tipoField;
-        
-        private string canaleField;
-        
-        private bool internoField;
-        
-        private bool has_childrenField;
-        
-        private bool isVisibileField;
-        
-        private bool isRubricaComuneField;
-        
-        private InfoElementoRubricaComune rubricaComuneField;
-        
-        private string idRegistroField;
-        
-        private string codiceRegistroField;
-        
-        private bool disabledTrasmField;
-        
-        private bool disabledField;
-        
-        private string nomeField;
-        
-        private string cognomeField;
-        
-        private string cf_pivaField;
-        
-        private string codiceFiscaleField;
-        
-        private string partitaIvaField;
-        
-        private string idPeopleField;
-        
-        private string idPeopleListaField;
-        
-        private string idGruppoListaField;
-        
-        /// <remarks/>
-        public string systemId {
-            get {
-                return this.systemIdField;
-            }
-            set {
-                this.systemIdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codice {
-            get {
-                return this.codiceField;
-            }
-            set {
-                this.codiceField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string descrizione {
-            get {
-                return this.descrizioneField;
-            }
-            set {
-                this.descrizioneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string tipo {
-            get {
-                return this.tipoField;
-            }
-            set {
-                this.tipoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string canale {
-            get {
-                return this.canaleField;
-            }
-            set {
-                this.canaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool interno {
-            get {
-                return this.internoField;
-            }
-            set {
-                this.internoField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool has_children {
-            get {
-                return this.has_childrenField;
-            }
-            set {
-                this.has_childrenField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool isVisibile {
-            get {
-                return this.isVisibileField;
-            }
-            set {
-                this.isVisibileField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool isRubricaComune {
-            get {
-                return this.isRubricaComuneField;
-            }
-            set {
-                this.isRubricaComuneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public InfoElementoRubricaComune rubricaComune {
-            get {
-                return this.rubricaComuneField;
-            }
-            set {
-                this.rubricaComuneField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idRegistro {
-            get {
-                return this.idRegistroField;
-            }
-            set {
-                this.idRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceRegistro {
-            get {
-                return this.codiceRegistroField;
-            }
-            set {
-                this.codiceRegistroField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool disabledTrasm {
-            get {
-                return this.disabledTrasmField;
-            }
-            set {
-                this.disabledTrasmField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public bool disabled {
-            get {
-                return this.disabledField;
-            }
-            set {
-                this.disabledField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string nome {
-            get {
-                return this.nomeField;
-            }
-            set {
-                this.nomeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string cognome {
-            get {
-                return this.cognomeField;
-            }
-            set {
-                this.cognomeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string cf_piva {
-            get {
-                return this.cf_pivaField;
-            }
-            set {
-                this.cf_pivaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string codiceFiscale {
-            get {
-                return this.codiceFiscaleField;
-            }
-            set {
-                this.codiceFiscaleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string partitaIva {
-            get {
-                return this.partitaIvaField;
-            }
-            set {
-                this.partitaIvaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idPeople {
-            get {
-                return this.idPeopleField;
-            }
-            set {
-                this.idPeopleField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idPeopleLista {
-            get {
-                return this.idPeopleListaField;
-            }
-            set {
-                this.idPeopleListaField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string idGruppoLista {
-            get {
-                return this.idGruppoListaField;
-            }
-            set {
-                this.idGruppoListaField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2102.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://localhost")]
     public enum Esito {
@@ -21786,15 +21471,853 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void setPolicyVerificataLiteCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void getSegnatura_ID_DocCompletedEventHandler(object sender, getSegnatura_ID_DocCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class getSegnatura_ID_DocCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal getSegnatura_ID_DocCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void createReportConservazioneCompletedEventHandler(object sender, createReportConservazioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class createReportConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal createReportConservazioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public FileDocumento Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((FileDocumento)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetListNonConfPolicyCompletedEventHandler(object sender, GetListNonConfPolicyCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetListNonConfPolicyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetListNonConfPolicyCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetInfoEsibizioneCompletedEventHandler(object sender, GetInfoEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetInfoEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetInfoEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public InfoEsibizione[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((InfoEsibizione[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetItemsEsibizioneCompletedEventHandler(object sender, GetItemsEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetItemsEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetItemsEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public ItemsEsibizione[] Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((ItemsEsibizione[])(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void RemoveItemsEsibizioneCompletedEventHandler(object sender, RemoveItemsEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class RemoveItemsEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal RemoveItemsEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void RemoveIstanzaEsibizioneCompletedEventHandler(object sender, RemoveIstanzaEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class RemoveIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal RemoveIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void SaveFieldsEsibizioneCompletedEventHandler(object sender, SaveFieldsEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class SaveFieldsEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal SaveFieldsEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void RichiediCertificazioneIstanzaEsibizioneCompletedEventHandler(object sender, RichiediCertificazioneIstanzaEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class RichiediCertificazioneIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal RichiediCertificazioneIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void MarcaCertificazioneIstanzaEsibizioneCompletedEventHandler(object sender, MarcaCertificazioneIstanzaEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class MarcaCertificazioneIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal MarcaCertificazioneIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void UpdateCertificazioneIstanzaEsibizioneCompletedEventHandler(object sender, UpdateCertificazioneIstanzaEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class UpdateCertificazioneIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal UpdateCertificazioneIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void RifiutaCertificazioneIstanzaEsibizioneCompletedEventHandler(object sender, RifiutaCertificazioneIstanzaEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class RifiutaCertificazioneIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal RifiutaCertificazioneIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void RiabilitaIstanzaEsibizioneCompletedEventHandler(object sender, RiabilitaIstanzaEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class RiabilitaIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal RiabilitaIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void ChiudiIstanzaEsibizioneAsyncCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetEsibizioneDownloadUrlCompletedEventHandler(object sender, GetEsibizioneDownloadUrlCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetEsibizioneDownloadUrlCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetEsibizioneDownloadUrlCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetAbilitatoCentroServiziCompletedEventHandler(object sender, GetAbilitatoCentroServiziCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetAbilitatoCentroServiziCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetAbilitatoCentroServiziCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetAbilitatoEsibizioneCompletedEventHandler(object sender, GetAbilitatoEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetAbilitatoEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetAbilitatoEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetContatoriEsibizioneCompletedEventHandler(object sender, GetContatoriEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetContatoriEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetContatoriEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public ContatoriEsibizione Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((ContatoriEsibizione)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetContatoriEsibizioneConservazioneCompletedEventHandler(object sender, GetContatoriEsibizioneConservazioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetContatoriEsibizioneConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetContatoriEsibizioneConservazioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public ContatoriEsibizione Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((ContatoriEsibizione)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void CreateAndAddDocInAreaEsibizioneCompletedEventHandler(object sender, CreateAndAddDocInAreaEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class CreateAndAddDocInAreaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal CreateAndAddDocInAreaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+        
+        /// <remarks/>
+        public SchedaDocumento sd {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((SchedaDocumento)(this.results[1]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void SerializeSchedaEsibCompletedEventHandler(object sender, SerializeSchedaEsibCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class SerializeSchedaEsibCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal SerializeSchedaEsibCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public int Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((int)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void UpdateSizeItemEsibCompletedEventHandler(object sender, UpdateSizeItemEsibCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class UpdateSizeItemEsibCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal UpdateSizeItemEsibCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void updateItemsEsibCompletedEventHandler(object sender, updateItemsEsibCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class updateItemsEsibCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal updateItemsEsibCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventHandler(object sender, checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void isLocalStoreCompletedEventHandler(object sender, isLocalStoreCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class isLocalStoreCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal isLocalStoreCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetIdCorrGlobaliEsibizioneCompletedEventHandler(object sender, GetIdCorrGlobaliEsibizioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetIdCorrGlobaliEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetIdCorrGlobaliEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void rigeneraIstanzaCompletedEventHandler(object sender, rigeneraIstanzaCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class rigeneraIstanzaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal rigeneraIstanzaCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+        
+        /// <remarks/>
+        public string message {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[1]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void isIstanzaRigenerataCompletedEventHandler(object sender, isIstanzaRigenerataCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class isIstanzaRigenerataCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal isIstanzaRigenerataCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetChiaveConfigurazioneCompletedEventHandler(object sender, GetChiaveConfigurazioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetChiaveConfigurazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetChiaveConfigurazioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void IsAlertConservazioneAttivoCompletedEventHandler(object sender, IsAlertConservazioneAttivoCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class IsAlertConservazioneAttivoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal IsAlertConservazioneAttivoCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void GetParametriAlertConservazioneCompletedEventHandler(object sender, GetParametriAlertConservazioneCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetParametriAlertConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetParametriAlertConservazioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void InvioAlertAsyncCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    public delegate void IsVerificaLeggibilitaAnticipataCompletedEventHandler(object sender, IsVerificaLeggibilitaAnticipataCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class IsVerificaLeggibilitaAnticipataCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal IsVerificaLeggibilitaAnticipataCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public bool Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void MettiInLavorazioneAsyncCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void IsInPreparazioneAsyncCompletedEventHandler(object sender, IsInPreparazioneAsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class IsInPreparazioneAsyncCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -21816,11 +22339,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void avviaConservazioneCompletedEventHandler(object sender, avviaConservazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class avviaConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -21842,11 +22365,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getAllInfoConservazioneCompletedEventHandler(object sender, getAllInfoConservazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getAllInfoConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -21868,11 +22391,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getInfoConservazioneCompletedEventHandler(object sender, getInfoConservazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getInfoConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -21894,11 +22417,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getItemsConservazioneCompletedEventHandler(object sender, getItemsConservazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getItemsConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -21920,11 +22443,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getItemsConservazioneWithSecurityCompletedEventHandler(object sender, getItemsConservazioneWithSecurityCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getItemsConservazioneWithSecurityCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -21946,37 +22469,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void getItemsConservazioneLiteCompletedEventHandler(object sender, getItemsConservazioneLiteCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class getItemsConservazioneLiteCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal getItemsConservazioneLiteCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public ItemsConservazione[] Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((ItemsConservazione[])(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void validateIstanzaConservazioneCompletedEventHandler(object sender, validateIstanzaConservazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class validateIstanzaConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -21998,11 +22495,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void RicercaInfoConservazioneCompletedEventHandler(object sender, RicercaInfoConservazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class RicercaInfoConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22024,11 +22521,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void RicercaStampaConservazioneCompletedEventHandler(object sender, RicercaStampaConservazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class RicercaStampaConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22050,11 +22547,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void RicercaInfoSupportoCompletedEventHandler(object sender, RicercaInfoSupportoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class RicercaInfoSupportoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22076,11 +22573,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void InsertInfoSupportoCompletedEventHandler(object sender, InsertInfoSupportoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class InsertInfoSupportoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22102,11 +22599,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void UpdateInfoSupportoCompletedEventHandler(object sender, UpdateInfoSupportoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class UpdateInfoSupportoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22128,11 +22625,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void UpdateInfoConservazioneCompletedEventHandler(object sender, UpdateInfoConservazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class UpdateInfoConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22154,11 +22651,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void SetDpaSupportoCompletedEventHandler(object sender, SetDpaSupportoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class SetDpaSupportoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22188,11 +22685,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void downloadSignedXmlCompletedEventHandler(object sender, downloadSignedXmlCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class downloadSignedXmlCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22214,11 +22711,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void uploadSignedXmlCompletedEventHandler(object sender, uploadSignedXmlCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class uploadSignedXmlCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22240,11 +22737,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getTSRCompletedEventHandler(object sender, getTSRCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getTSRCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22266,15 +22763,15 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void createZipFileCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void SubmitToRemoteFolderCompletedEventHandler(object sender, SubmitToRemoteFolderCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class SubmitToRemoteFolderCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22296,11 +22793,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void trasmettiNotificaCompletedEventHandler(object sender, trasmettiNotificaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class trasmettiNotificaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22322,11 +22819,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void trasmettiNotificaRifiutoCompletedEventHandler(object sender, trasmettiNotificaRifiutoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class trasmettiNotificaRifiutoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22348,11 +22845,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getDbTypeCompletedEventHandler(object sender, getDbTypeCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getDbTypeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22374,11 +22871,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void consXmlPrefixNameCompletedEventHandler(object sender, consXmlPrefixNameCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class consXmlPrefixNameCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22400,11 +22897,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void calcolaImprontaFileCompletedEventHandler(object sender, calcolaImprontaFileCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class calcolaImprontaFileCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22426,11 +22923,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void verificaFirmaCompletedEventHandler(object sender, verificaFirmaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class verificaFirmaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22452,11 +22949,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void verificaMarcaM7MCompletedEventHandler(object sender, verificaMarcaM7MCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class verificaMarcaM7MCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22478,11 +22975,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void verifyMarcaCompletedEventHandler(object sender, verifyMarcaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class verifyMarcaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22504,11 +23001,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void insertConsVerificaCompletedEventHandler(object sender, insertConsVerificaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class insertConsVerificaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22530,11 +23027,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void conservazioneGetReportVerificheCompletedEventHandler(object sender, conservazioneGetReportVerificheCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class conservazioneGetReportVerificheCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22556,15 +23053,15 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void deleteDirectoryIstanzaConsCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ValidaFileFirmatiCompletedEventHandler(object sender, ValidaFileFirmatiCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ValidaFileFirmatiCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22610,11 +23107,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ValidaFormatoFileCompletedEventHandler(object sender, ValidaFormatoFileCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ValidaFormatoFileCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22636,11 +23133,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getItemsConservazioneWithContentValidationCompletedEventHandler(object sender, getItemsConservazioneWithContentValidationCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getItemsConservazioneWithContentValidationCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22662,11 +23159,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ValidaFileMarcatiCompletedEventHandler(object sender, ValidaFileMarcatiCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ValidaFileMarcatiCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22712,15 +23209,15 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void IniziaVerificaSupportoRemotoCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetStatoVerificaSupportoRemotoCompletedEventHandler(object sender, GetStatoVerificaSupportoRemotoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetStatoVerificaSupportoRemotoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22742,11 +23239,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetTipiSupportoCompletedEventHandler(object sender, GetTipiSupportoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetTipiSupportoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22768,11 +23265,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetListaPolicyCompletedEventHandler(object sender, GetListaPolicyCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetListaPolicyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22794,11 +23291,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ValidateIstanzaConservazioneConPolicyCompletedEventHandler(object sender, ValidateIstanzaConservazioneConPolicyCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ValidateIstanzaConservazioneConPolicyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22820,11 +23317,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void DeleteValidateIstanzaConservazioneConPolicyCompletedEventHandler(object sender, DeleteValidateIstanzaConservazioneConPolicyCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class DeleteValidateIstanzaConservazioneConPolicyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22846,19 +23343,19 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void RegistraSupportoRimovibileCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void RegistraEsitoVerificaSupportoRegistratoCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetStatiSupportoCompletedEventHandler(object sender, GetStatiSupportoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetStatiSupportoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22880,11 +23377,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetTipiIstanzaCompletedEventHandler(object sender, GetTipiIstanzaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetTipiIstanzaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22906,11 +23403,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetStatiIstanzaCompletedEventHandler(object sender, GetStatiIstanzaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetStatiIstanzaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22932,11 +23429,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetContatoriCompletedEventHandler(object sender, GetContatoriCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetContatoriCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22958,11 +23455,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetPolicyIstanzaCompletedEventHandler(object sender, GetPolicyIstanzaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetPolicyIstanzaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -22984,11 +23481,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetRfByIdAmmCompletedEventHandler(object sender, GetRfByIdAmmCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetRfByIdAmmCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23010,11 +23507,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetFascicoloDaCodiceNoSecurityCompletedEventHandler(object sender, GetFascicoloDaCodiceNoSecurityCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetFascicoloDaCodiceNoSecurityCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23036,11 +23533,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetFascicoloByIdCompletedEventHandler(object sender, GetFascicoloByIdCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetFascicoloByIdCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23062,11 +23559,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void FascicolazioneGetFolderCompletedEventHandler(object sender, FascicolazioneGetFolderCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class FascicolazioneGetFolderCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23088,11 +23585,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetTypeDocumentsWithDiagramByIdAmmCompletedEventHandler(object sender, GetTypeDocumentsWithDiagramByIdAmmCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetTypeDocumentsWithDiagramByIdAmmCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23114,11 +23611,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getListaExtFileAcquisitiCompletedEventHandler(object sender, getListaExtFileAcquisitiCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getListaExtFileAcquisitiCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23140,11 +23637,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void DocumentoGetQueryDocumentoPagingCustomCompletedEventHandler(object sender, DocumentoGetQueryDocumentoPagingCustomCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class DocumentoGetQueryDocumentoPagingCustomCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23190,11 +23687,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getTitolariUtilizzabiliCompletedEventHandler(object sender, getTitolariUtilizzabiliCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getTitolariUtilizzabiliCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23216,11 +23713,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void FascicolazioneGetListaFascicoliPagingCustomCompletedEventHandler(object sender, FascicolazioneGetListaFascicoliPagingCustomCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class FascicolazioneGetListaFascicoliPagingCustomCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23266,11 +23763,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void IsIstanzaConservazioneInternaCompletedEventHandler(object sender, IsIstanzaConservazioneInternaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class IsIstanzaConservazioneInternaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23292,11 +23789,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetNotificheCompletedEventHandler(object sender, GetNotificheCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetNotificheCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23318,11 +23815,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetLogsCompletedEventHandler(object sender, GetLogsCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetLogsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23344,11 +23841,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetListAzioniLogCompletedEventHandler(object sender, GetListAzioniLogCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetListAzioniLogCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23370,11 +23867,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void AmmGetInfoAmmCorrenteCompletedEventHandler(object sender, AmmGetInfoAmmCorrenteCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class AmmGetInfoAmmCorrenteCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23396,11 +23893,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetFileDocumentoNotificaCompletedEventHandler(object sender, GetFileDocumentoNotificaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetFileDocumentoNotificaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23422,11 +23919,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void GetFileDocumentoFirmatoCompletedEventHandler(object sender, GetFileDocumentoFirmatoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class GetFileDocumentoFirmatoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23448,11 +23945,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getTemplateFascByIdCompletedEventHandler(object sender, getTemplateFascByIdCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getTemplateFascByIdCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23474,11 +23971,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getTemplateFascCampiComuniByIdCompletedEventHandler(object sender, getTemplateFascCampiComuniByIdCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getTemplateFascCampiComuniByIdCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23500,11 +23997,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getTemplateByIdCompletedEventHandler(object sender, getTemplateByIdCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getTemplateByIdCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23526,11 +24023,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getTemplateCampiComuniByIdCompletedEventHandler(object sender, getTemplateCampiComuniByIdCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getTemplateCampiComuniByIdCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23552,11 +24049,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void AddressbookGetCorrispondenteBySystemIdCompletedEventHandler(object sender, AddressbookGetCorrispondenteBySystemIdCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class AddressbookGetCorrispondenteBySystemIdCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23578,11 +24075,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void AddressbookGetCorrispondenteByCodRubricaCompletedEventHandler(object sender, AddressbookGetCorrispondenteByCodRubricaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class AddressbookGetCorrispondenteByCodRubricaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23604,11 +24101,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void rubricaGetElementoRubricaCompletedEventHandler(object sender, rubricaGetElementoRubricaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class rubricaGetElementoRubricaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23630,11 +24127,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void rubricaGetElementoRubricaSimpleBySystemIdCompletedEventHandler(object sender, rubricaGetElementoRubricaSimpleBySystemIdCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class rubricaGetElementoRubricaSimpleBySystemIdCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23656,11 +24153,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void abilitaLavorazioneCompletedEventHandler(object sender, abilitaLavorazioneCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class abilitaLavorazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23682,11 +24179,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getIstanzeNonVerificateCompletedEventHandler(object sender, getIstanzeNonVerificateCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getIstanzeNonVerificateCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23708,11 +24205,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void policyVerificataCompletedEventHandler(object sender, policyVerificataCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class policyVerificataCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23734,11 +24231,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getValidationMaskCompletedEventHandler(object sender, getValidationMaskCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getValidationMaskCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23760,23 +24257,23 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void inserimentoInRegistroControlliCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void inserimentoInRegistroConsCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void inserimentoInDpaLogCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getFileFromStoreCompletedEventHandler(object sender, getFileFromStoreCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getFileFromStoreCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23798,11 +24295,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getFileHashFromStoreCompletedEventHandler(object sender, getFileHashFromStoreCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getFileHashFromStoreCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23824,11 +24321,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void esitoLeggibilitaCompletedEventHandler(object sender, esitoLeggibilitaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class esitoLeggibilitaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23850,11 +24347,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void sbustaFileFirmatoCompletedEventHandler(object sender, sbustaFileFirmatoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class sbustaFileFirmatoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23876,11 +24373,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void supportiRimovibiliVerificabiliCompletedEventHandler(object sender, supportiRimovibiliVerificabiliCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class supportiRimovibiliVerificabiliCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23902,11 +24399,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void httpStorageRemoteUrlAddressCompletedEventHandler(object sender, httpStorageRemoteUrlAddressCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class httpStorageRemoteUrlAddressCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23928,11 +24425,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ctrlDimensioniIstanzaCompletedEventHandler(object sender, ctrlDimensioniIstanzaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ctrlDimensioniIstanzaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23954,11 +24451,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ctrlDimensioniIstanzaUtCompletedEventHandler(object sender, ctrlDimensioniIstanzaUtCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ctrlDimensioniIstanzaUtCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -23980,11 +24477,11 @@ namespace ConservazioneWA.WSConservazioneLocale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void getMaxDimensioniIstanzaCompletedEventHandler(object sender, getMaxDimensioniIstanzaCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class getMaxDimensioniIstanzaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -24001,844 +24498,6 @@ namespace ConservazioneWA.WSConservazioneLocale {
             get {
                 this.RaiseExceptionIfNecessary();
                 return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void setPolicyVerificataLiteCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void getSegnatura_ID_DocCompletedEventHandler(object sender, getSegnatura_ID_DocCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class getSegnatura_ID_DocCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal getSegnatura_ID_DocCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void createReportConservazioneCompletedEventHandler(object sender, createReportConservazioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class createReportConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal createReportConservazioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public FileDocumento Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((FileDocumento)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetListNonConfPolicyCompletedEventHandler(object sender, GetListNonConfPolicyCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetListNonConfPolicyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetListNonConfPolicyCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetInfoEsibizioneCompletedEventHandler(object sender, GetInfoEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetInfoEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetInfoEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public InfoEsibizione[] Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((InfoEsibizione[])(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetItemsEsibizioneCompletedEventHandler(object sender, GetItemsEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetItemsEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetItemsEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public ItemsEsibizione[] Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((ItemsEsibizione[])(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void RemoveItemsEsibizioneCompletedEventHandler(object sender, RemoveItemsEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class RemoveItemsEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal RemoveItemsEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void RemoveIstanzaEsibizioneCompletedEventHandler(object sender, RemoveIstanzaEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class RemoveIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal RemoveIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void SaveFieldsEsibizioneCompletedEventHandler(object sender, SaveFieldsEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class SaveFieldsEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal SaveFieldsEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void RichiediCertificazioneIstanzaEsibizioneCompletedEventHandler(object sender, RichiediCertificazioneIstanzaEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class RichiediCertificazioneIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal RichiediCertificazioneIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void MarcaCertificazioneIstanzaEsibizioneCompletedEventHandler(object sender, MarcaCertificazioneIstanzaEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class MarcaCertificazioneIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal MarcaCertificazioneIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void UpdateCertificazioneIstanzaEsibizioneCompletedEventHandler(object sender, UpdateCertificazioneIstanzaEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class UpdateCertificazioneIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal UpdateCertificazioneIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void RifiutaCertificazioneIstanzaEsibizioneCompletedEventHandler(object sender, RifiutaCertificazioneIstanzaEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class RifiutaCertificazioneIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal RifiutaCertificazioneIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void RiabilitaIstanzaEsibizioneCompletedEventHandler(object sender, RiabilitaIstanzaEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class RiabilitaIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal RiabilitaIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void ChiudiIstanzaEsibizioneAsyncCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetEsibizioneDownloadUrlCompletedEventHandler(object sender, GetEsibizioneDownloadUrlCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetEsibizioneDownloadUrlCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetEsibizioneDownloadUrlCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetAbilitatoCentroServiziCompletedEventHandler(object sender, GetAbilitatoCentroServiziCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetAbilitatoCentroServiziCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetAbilitatoCentroServiziCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetAbilitatoEsibizioneCompletedEventHandler(object sender, GetAbilitatoEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetAbilitatoEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetAbilitatoEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetContatoriEsibizioneCompletedEventHandler(object sender, GetContatoriEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetContatoriEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetContatoriEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public ContatoriEsibizione Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((ContatoriEsibizione)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetContatoriEsibizioneConservazioneCompletedEventHandler(object sender, GetContatoriEsibizioneConservazioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetContatoriEsibizioneConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetContatoriEsibizioneConservazioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public ContatoriEsibizione Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((ContatoriEsibizione)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void CreateAndAddDocInAreaEsibizioneCompletedEventHandler(object sender, CreateAndAddDocInAreaEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class CreateAndAddDocInAreaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal CreateAndAddDocInAreaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public SchedaDocumento sd {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SchedaDocumento)(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void SerializeSchedaEsibCompletedEventHandler(object sender, SerializeSchedaEsibCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class SerializeSchedaEsibCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal SerializeSchedaEsibCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public int Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((int)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void UpdateSizeItemEsibCompletedEventHandler(object sender, UpdateSizeItemEsibCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class UpdateSizeItemEsibCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal UpdateSizeItemEsibCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void updateItemsEsibCompletedEventHandler(object sender, updateItemsEsibCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class updateItemsEsibCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal updateItemsEsibCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventHandler(object sender, checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal checkItemEsibizionePresenteInIstanzaEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void isLocalStoreCompletedEventHandler(object sender, isLocalStoreCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class isLocalStoreCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal isLocalStoreCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetIdCorrGlobaliEsibizioneCompletedEventHandler(object sender, GetIdCorrGlobaliEsibizioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetIdCorrGlobaliEsibizioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetIdCorrGlobaliEsibizioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void rigeneraIstanzaCompletedEventHandler(object sender, rigeneraIstanzaCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class rigeneraIstanzaCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal rigeneraIstanzaCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public string message {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void isIstanzaRigenerataCompletedEventHandler(object sender, isIstanzaRigenerataCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class isIstanzaRigenerataCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal isIstanzaRigenerataCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetChiaveConfigurazioneCompletedEventHandler(object sender, GetChiaveConfigurazioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetChiaveConfigurazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetChiaveConfigurazioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void IsAlertConservazioneAttivoCompletedEventHandler(object sender, IsAlertConservazioneAttivoCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class IsAlertConservazioneAttivoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal IsAlertConservazioneAttivoCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void GetParametriAlertConservazioneCompletedEventHandler(object sender, GetParametriAlertConservazioneCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetParametriAlertConservazioneCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal GetParametriAlertConservazioneCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void InvioAlertAsyncCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void RegistraEsitoVerificaLeggibilitaSupportoRegistratoCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    public delegate void IsVerificaLeggibilitaAnticipataCompletedEventHandler(object sender, IsVerificaLeggibilitaAnticipataCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1087.0")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class IsVerificaLeggibilitaAnticipataCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal IsVerificaLeggibilitaAnticipataCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public bool Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
             }
         }
     }

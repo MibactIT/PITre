@@ -541,7 +541,7 @@ namespace VtDocsWS.Manager
                         }
                     }
                 }
-                ArrayList listaIdDestinatari = new ArrayList();
+
                 ///CASO PROTOCOLLO IN ARRIVO (ANCHE PREDISPOSTO)
                 if (request.Document != null && !string.IsNullOrEmpty(request.Document.DocumentType) && request.Document.DocumentType.ToUpper().Equals("A"))
                 {
@@ -597,8 +597,7 @@ namespace VtDocsWS.Manager
                         DateTime dateVal;
 
                         // Pattern di validità per una data valida
-                        string pattern = "dd/MM/yyyy HH:mm:ss";
-                        string pattern2 = "dd/MM/yyyy HH:mm";
+                        string pattern = "dd/MM/yyyy HH:mm";
 
                         try
                         {
@@ -612,10 +611,7 @@ namespace VtDocsWS.Manager
 
                             if (!DateTime.TryParseExact(request.Document.ArrivalDate, pattern, null, System.Globalization.DateTimeStyles.None, out dateVal))
                             {
-                                if (!DateTime.TryParseExact(request.Document.ArrivalDate, pattern2, null, System.Globalization.DateTimeStyles.None, out dateVal))
-                                {
-                                    throw new Exception("Formato Data non corretto");
-                                }
+                                throw new Exception("Formato Data non corretto");
                             }
 
                             valid = true;
@@ -632,7 +628,7 @@ namespace VtDocsWS.Manager
                             // Variabile Booleana per il controllo di validità della data DateTime.Now trasformato nel formato dd/MM/yyyy;
                             bool dateNow = true;
 
-                            if (!DateTime.TryParseExact(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), pattern, null, System.Globalization.DateTimeStyles.None, out dateVal2))
+                            if (!DateTime.TryParseExact(DateTime.Now.ToString("dd/MM/yyyy HH:mm"), pattern, null, System.Globalization.DateTimeStyles.None, out dateVal2))
                             {
                                 // Non dovrebbe entrare mai in questo controllo.
                                 dateNow = false;
@@ -727,7 +723,6 @@ namespace VtDocsWS.Manager
                                 ArrayList corrByRF = BusinessLogic.Rubrica.RF.getCorrispondentiByCodRF(corrBySys.codiceRubrica);
                                 foreach (DocsPaVO.utente.Corrispondente c2 in corrByRF)
                                 {
-                                    listaIdDestinatari.Add(c2.systemId);
                                     ((ProtocolloUscita)schedaDoc.protocollo).destinatari.Add(c2);
                                 }
                             }
@@ -736,13 +731,11 @@ namespace VtDocsWS.Manager
                                 ArrayList corrByLista = BusinessLogic.Rubrica.ListeDistribuzione.getCorrispondentiByCodLista(corrBySys.codiceRubrica, infoUtente.idAmministrazione, infoUtente);
                                 foreach (DocsPaVO.utente.Corrispondente c3 in corrByLista)
                                 {
-                                    listaIdDestinatari.Add(c3.systemId);                                    
                                     ((ProtocolloUscita)schedaDoc.protocollo).destinatari.Add(c3);
                                 }
                             }
                             else
                             {
-                                listaIdDestinatari.Add(corrBySys.systemId);
                                 ((ProtocolloUscita)schedaDoc.protocollo).destinatari.Add(corrBySys);
                             }
                         }
@@ -774,8 +767,7 @@ namespace VtDocsWS.Manager
                                 ArrayList corrByRF = BusinessLogic.Rubrica.RF.getCorrispondentiByCodRF(corrBySys.codiceRubrica);
                                 foreach (DocsPaVO.utente.Corrispondente c2 in corrByRF)
                                 {
-                                    if(listaIdDestinatari== null || listaIdDestinatari.Count <1 || !listaIdDestinatari.Contains(c2.systemId))
-                                        ((ProtocolloUscita)schedaDoc.protocollo).destinatariConoscenza.Add(c2);
+                                    ((ProtocolloUscita)schedaDoc.protocollo).destinatariConoscenza.Add(c2);
                                 }
                             }
                             else if (corrBySys.tipoCorrispondente != null && corrBySys.tipoCorrispondente == "L" && corrBySys.tipoIE == null)
@@ -783,14 +775,12 @@ namespace VtDocsWS.Manager
                                 ArrayList corrByLista = BusinessLogic.Rubrica.ListeDistribuzione.getCorrispondentiByCodLista(corrBySys.codiceRubrica, infoUtente.idAmministrazione, infoUtente);
                                 foreach (DocsPaVO.utente.Corrispondente c3 in corrByLista)
                                 {
-                                    if (listaIdDestinatari == null || listaIdDestinatari.Count < 1 || !listaIdDestinatari.Contains(c3.systemId))
-                                        ((ProtocolloUscita)schedaDoc.protocollo).destinatariConoscenza.Add(c3);
+                                    ((ProtocolloUscita)schedaDoc.protocollo).destinatariConoscenza.Add(c3);
                                 }
                             }
                             else
                             {
-                                if (listaIdDestinatari == null || listaIdDestinatari.Count < 1 || !listaIdDestinatari.Contains(corrBySys.systemId))
-                                    ((ProtocolloUscita)schedaDoc.protocollo).destinatariConoscenza.Add(corrBySys);
+                                ((ProtocolloUscita)schedaDoc.protocollo).destinatariConoscenza.Add(corrBySys);
                             }
 
                             //((ProtocolloUscita)schedaDoc.protocollo).destinatariConoscenza.Add(corrBySys);
@@ -827,47 +817,13 @@ namespace VtDocsWS.Manager
                         ((ProtocolloInterno)schedaDoc.protocollo).destinatari = new ArrayList();
                         foreach (Domain.Correspondent corrTemp in request.Document.Recipients)
                         {
-                            DocsPaVO.utente.Corrispondente corrBySys = null;
-
-                            // Verifica se occasionale
-                            if (corrTemp != null && !string.IsNullOrEmpty(corrTemp.CorrespondentType) && corrTemp.CorrespondentType.Equals("O"))
+                            DocsPaVO.utente.Corrispondente corrBySys = Utils.RisolviCorrispondente(corrTemp.Id, infoUtente);
+                            if (corrBySys == null)
                             {
-                                corrBySys = Utils.GetCorrespondentFromPis(corrTemp, infoUtente);
+                                //Destinatario non trovato
+                                throw new PisException("RECIPIENT_NOT_FOUND");
                             }
-                            else
-                            {
-                                // Se non è occasionale, lo risolve sulla rubrica
-                                corrBySys = Utils.RisolviCorrispondente(corrTemp.Id, infoUtente);
-                                if (corrBySys == null)
-                                {
-                                    //Destinatario non trovato
-                                    throw new PisException("RECIPIENT_NOT_FOUND");
-                                }
-
-                            }
-                            if (corrBySys.tipoCorrispondente != null && corrBySys.tipoCorrispondente == "F" && corrBySys.tipoIE == null)
-                            {
-                                ArrayList corrByRF = BusinessLogic.Rubrica.RF.getCorrispondentiByCodRF(corrBySys.codiceRubrica);
-                                foreach (DocsPaVO.utente.Corrispondente c2 in corrByRF)
-                                {
-                                    listaIdDestinatari.Add(c2.systemId);
-                                    ((ProtocolloInterno)schedaDoc.protocollo).destinatari.Add(c2);
-                                }
-                            }
-                            else if (corrBySys.tipoCorrispondente != null && corrBySys.tipoCorrispondente == "L" && corrBySys.tipoIE == null)
-                            {
-                                ArrayList corrByLista = BusinessLogic.Rubrica.ListeDistribuzione.getCorrispondentiByCodLista(corrBySys.codiceRubrica, infoUtente.idAmministrazione, infoUtente);
-                                foreach (DocsPaVO.utente.Corrispondente c3 in corrByLista)
-                                {
-                                    listaIdDestinatari.Add(c3.systemId);
-                                    ((ProtocolloInterno)schedaDoc.protocollo).destinatari.Add(c3);
-                                }
-                            }
-                            else
-                            {
-                                listaIdDestinatari.Add(corrBySys.systemId);
-                                ((ProtocolloInterno)schedaDoc.protocollo).destinatari.Add(corrBySys);
-                            }
+                            ((ProtocolloInterno)schedaDoc.protocollo).destinatari.Add(corrBySys);
                         }
                     }
 
@@ -876,47 +832,13 @@ namespace VtDocsWS.Manager
                         ((ProtocolloInterno)schedaDoc.protocollo).destinatariConoscenza = new ArrayList();
                         foreach (Domain.Correspondent corrTemp in request.Document.RecipientsCC)
                         {
-                            DocsPaVO.utente.Corrispondente corrBySys = null;
-
-                            // Verifica se occasionale
-                            if (corrTemp != null && !string.IsNullOrEmpty(corrTemp.CorrespondentType) && corrTemp.CorrespondentType.Equals("O"))
+                            DocsPaVO.utente.Corrispondente corrBySys = Utils.RisolviCorrispondente(corrTemp.Id, infoUtente);
+                            if (corrBySys == null)
                             {
-                                corrBySys = Utils.GetCorrespondentFromPis(corrTemp, infoUtente);
+                                //Destinatario non trovato
+                                throw new PisException("RECIPIENT_NOT_FOUND");
                             }
-                            else
-                            {
-                                corrBySys = Utils.RisolviCorrispondente(corrTemp.Id, infoUtente);
-                                if (corrBySys == null)
-                                {
-                                    //Destinatario non trovato
-                                    throw new PisException("RECIPIENT_NOT_FOUND");
-                                }
-                            }
-                            if (corrBySys.tipoCorrispondente != null && corrBySys.tipoCorrispondente == "F" && corrBySys.tipoIE == null)
-                            {
-                                ArrayList corrByRF = BusinessLogic.Rubrica.RF.getCorrispondentiByCodRF(corrBySys.codiceRubrica);
-                                foreach (DocsPaVO.utente.Corrispondente c2 in corrByRF)
-                                {
-                                    if (listaIdDestinatari == null || listaIdDestinatari.Count < 1 || !listaIdDestinatari.Contains(c2.systemId))
-                                        ((ProtocolloInterno)schedaDoc.protocollo).destinatariConoscenza.Add(c2);
-                                }
-                            }
-                            else if (corrBySys.tipoCorrispondente != null && corrBySys.tipoCorrispondente == "L" && corrBySys.tipoIE == null)
-                            {
-                                ArrayList corrByLista = BusinessLogic.Rubrica.ListeDistribuzione.getCorrispondentiByCodLista(corrBySys.codiceRubrica, infoUtente.idAmministrazione, infoUtente);
-                                foreach (DocsPaVO.utente.Corrispondente c3 in corrByLista)
-                                {
-                                    if (listaIdDestinatari == null || listaIdDestinatari.Count < 1 || !listaIdDestinatari.Contains(c3.systemId))
-                                        ((ProtocolloInterno)schedaDoc.protocollo).destinatariConoscenza.Add(c3);
-                                }
-                            }
-                            else
-                            {
-                                if (listaIdDestinatari == null || listaIdDestinatari.Count < 1 || !listaIdDestinatari.Contains(corrBySys.systemId))
-                                    ((ProtocolloInterno)schedaDoc.protocollo).destinatariConoscenza.Add(corrBySys);
-                            }
-
-                            //((ProtocolloUscita)schedaDoc.protocollo).destinatariConoscenza.Add(corrBySys);
+                            ((ProtocolloInterno)schedaDoc.protocollo).destinatariConoscenza.Add(corrBySys);
                         }
                     }
 
@@ -1105,7 +1027,6 @@ namespace VtDocsWS.Manager
                                             {
                                                 BusinessLogic.DiagrammiStato.DiagrammiStato.salvaModificaStato(documento.docNumber, stato.SYSTEM_ID.ToString(), diagramma, infoUtente.idPeople, infoUtente, string.Empty);
                                                 result = true;
-                                                Utils.ExecAutoTrasmByIdStatus(infoUtente, documento, stato, documento.template.SYSTEM_ID.ToString());
                                                 break;
                                             }
                                         }
@@ -1123,7 +1044,6 @@ namespace VtDocsWS.Manager
                                                     {
                                                         BusinessLogic.DiagrammiStato.DiagrammiStato.salvaModificaStato(documento.docNumber, ((DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[j]).SYSTEM_ID.ToString(), diagramma, infoUtente.idPeople, infoUtente, string.Empty);
                                                         result = true;
-                                                        Utils.ExecAutoTrasmByIdStatus(infoUtente, documento, (DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[j], documento.template.SYSTEM_ID.ToString());
                                                         break;
                                                     }
                                                 }
@@ -1462,8 +1382,7 @@ namespace VtDocsWS.Manager
                         DateTime dateVal;
 
                         // Pattern di validità per una data valida
-                        string pattern = "dd/MM/yyyy HH:mm:ss";
-                        string pattern2 = "dd/MM/yyyy HH:mm";
+                        string pattern = "dd/MM/yyyy HH:mm";
 
                         try
                         {
@@ -1477,10 +1396,7 @@ namespace VtDocsWS.Manager
 
                             if (!DateTime.TryParseExact(request.Document.ArrivalDate, pattern, null, System.Globalization.DateTimeStyles.None, out dateVal))
                             {
-                                if (!DateTime.TryParseExact(request.Document.ArrivalDate, pattern2, null, System.Globalization.DateTimeStyles.None, out dateVal))
-                                {
-                                    throw new Exception("Formato Data non corretto");
-                                }
+                                throw new Exception("Formato Data non corretto");
                             }
 
                             valid = true;
@@ -1497,7 +1413,7 @@ namespace VtDocsWS.Manager
                             // Variabile Booleana per il controllo di validità della data DateTime.Now trasformato nel formato dd/MM/yyyy;
                             bool dateNow = true;
 
-                            if (!DateTime.TryParseExact(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), pattern, null, System.Globalization.DateTimeStyles.None, out dateVal2))
+                            if (!DateTime.TryParseExact(DateTime.Now.ToString("dd/MM/yyyy HH:mm"), pattern, null, System.Globalization.DateTimeStyles.None, out dateVal2))
                             {
                                 // Non dovrebbe entrare mai in questo controllo.
                                 dateNow = false;
@@ -1640,27 +1556,6 @@ namespace VtDocsWS.Manager
                     schedaDocResult = BusinessLogic.Documenti.DocSave.save(infoUtente, documento, false, out daAggiornareUffRef, ruolo);
                 else
                 {
-                    // controllo se presente un RF
-                    if (request.Document.Register != null && !string.IsNullOrEmpty(request.Document.Register.Code))
-                    {
-                        DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistroByCode(request.Document.Register.Code);
-                        if (reg != null )
-                        {
-                            // solo se è un rf e non è chiuso aggiungo le informazioni di protocollazione RF
-                            if (reg.chaRF == "1" && reg.stato != "C")
-                            {
-                                documento.id_rf_prot = reg.systemId;
-                                documento.id_rf_invio_ricevuta = reg.systemId;
-                                documento.cod_rf_prot = reg.codRegistro;
-                            }
-                        }
-                        else
-                        {
-                            //RF non trovato
-                            throw new PisException("RF_NOT_FOUND");
-                        }
-                    }
-
                     DocsPaVO.documento.ResultProtocollazione resultProto = new ResultProtocollazione();
                     schedaDocResult = BusinessLogic.Documenti.ProtoManager.protocolla(documento, ruolo, infoUtente, out resultProto);
                 }
@@ -1923,9 +1818,9 @@ namespace VtDocsWS.Manager
                                 responseDocument.DataProtocolSender = ((ProtocolloEntrata)documento.protocollo).dataProtocolloMittente;
                             }
 
-                            if (documento.descMezzoSpedizione != null)
+                            if (((ProtocolloEntrata)documento.protocollo).descMezzoSpedizione != null)
                             {
-                                responseDocument.MeansOfSending = documento.descMezzoSpedizione;
+                                responseDocument.MeansOfSending = ((ProtocolloEntrata)documento.protocollo).descMezzoSpedizione;
                             }
 
                             if (((ProtocolloEntrata)documento.protocollo) != null && string.IsNullOrEmpty(((ProtocolloEntrata)documento.protocollo).dataProtocolloMittente))
@@ -3633,17 +3528,10 @@ namespace VtDocsWS.Manager
                                     docNumber = request.IdDocument,
                                     descrizione = request.Description
                                 };
-                                try
-                                {
-                                    // Acquisizione dell'allegato
-                                    allegato = BusinessLogic.Documenti.AllegatiManager.aggiungiAllegato(infoUtente, ((DocsPaVO.documento.Allegato)allegato));
-                                }
-                                catch (Exception exallegato)
-                                {
-                                    logger.Error(exallegato);
-                                    throw new PisException("ERROR_ADD_ATTACHMENT");
-                                }
-                                    //definisco l'allegato come esterno
+
+                                // Acquisizione dell'allegato
+                                allegato = BusinessLogic.Documenti.AllegatiManager.aggiungiAllegato(infoUtente, ((DocsPaVO.documento.Allegato)allegato));
+                                //definisco l'allegato come esterno
                                 try
                                 {
                                     if (!string.IsNullOrEmpty(request.AttachmentType) && request.AttachmentType == "E")
@@ -3972,16 +3860,11 @@ namespace VtDocsWS.Manager
 
                 VtDocsWS.Services.Projects.GetProject.GetProjectResponse getProjectResponse = ProjectsManager.GetProject(getProjectRequest);
 
-                //if (getProjectResponse != null && getProjectResponse.Success && getProjectResponse.Project != null && !getProjectResponse.Project.Open)
-                //{
-                //    throw new PisException("PROJECT_NOT_FOUND");
-                //}
-
                 if (!getProjectResponse.Success)
                     throw new PisException(getProjectResponse.Error.Code);
 
-                    // Se il fascicolo esiste, crea il documento e lo inserisce nel fascicolo
-                    //
+                // Se il fascicolo esiste, crea il documento e lo inserisce nel fascicolo
+                //
                 if (getProjectResponse != null && getProjectResponse.Success && getProjectResponse.Project != null)
                 {
                     // Crea il documento

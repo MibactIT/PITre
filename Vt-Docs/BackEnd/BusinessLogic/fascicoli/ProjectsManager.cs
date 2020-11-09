@@ -327,9 +327,9 @@ namespace BusinessLogic.Fascicoli
                 {
                     dirittoOggetto.soggetto = utente;
                     if (soggettoPropr!=null)
-                        dirittoOggetto.soggetto.descrizione = utente.descrizione + " sostituto di " + soggettoPropr.descrizione;
+                        dirittoOggetto.soggetto.descrizione = utente.descrizione + " delegato da " + soggettoPropr.descrizione;
                     else
-                        dirittoOggetto.soggetto.descrizione = utente.descrizione + " sostituto di " + delegante;
+                        dirittoOggetto.soggetto.descrizione = utente.descrizione + " delegato da " + delegante;
                 }
                 else
                     dirittoOggetto.soggetto = utente;
@@ -709,7 +709,7 @@ namespace BusinessLogic.Fascicoli
                 if (dirittoOggetto.tipoDiritto.Equals(DocsPaVO.fascicolazione.TipoDiritto.TIPO_DELEGATO))
                 {
                     dirittoOggetto.soggetto = utenteTemp;
-                    dirittoOggetto.soggetto.descrizione = utenteTemp.descrizione + " sostituto di " + utenteTemp.descrizione;
+                    dirittoOggetto.soggetto.descrizione = utenteTemp.descrizione + " delegato da " + utenteTemp.descrizione;
                 }
                 else
                     dirittoOggetto.soggetto = utenteTemp;
@@ -840,7 +840,7 @@ namespace BusinessLogic.Fascicoli
                     if (dirittoOggetto.tipoDiritto.Equals(DocsPaVO.fascicolazione.TipoDiritto.TIPO_DELEGATO))
                     {
                         dirittoOggetto.soggetto = utenteTemp;
-                        dirittoOggetto.soggetto.descrizione = utenteTemp.descrizione + " sostituto di " + utenteTemp.descrizione;
+                        dirittoOggetto.soggetto.descrizione = utenteTemp.descrizione + " delegato da " + utenteTemp.descrizione;
                     }
                     else
                         dirittoOggetto.soggetto = utenteTemp;

@@ -73,7 +73,7 @@ namespace DocsPa_TSAuthority_InfoTN
                     KeepAliveEnabled = true,
                     ProxyAuthenticationScheme = System.Net.AuthenticationSchemes.Anonymous,
                     Realm = "",
-                    TransferMode = System.ServiceModel.TransferMode.Buffered,
+                    TransferMode = System.ServiceModel.TransferMode.Streamed,
                     UnsafeConnectionNtlmAuthentication = false,
                     UseDefaultWebProxy = false,
                     RequireClientCertificate = true
@@ -116,7 +116,7 @@ namespace DocsPa_TSAuthority_InfoTN
 
             OutputResponseMarca retval = new OutputResponseMarca();
             retval.TSA = new TSARFC2253();
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             MarcaturaTemporale.MarcaturaTemporalePortTypeClient client = createClient(svcUrl);
             try
             {
@@ -163,7 +163,7 @@ namespace DocsPa_TSAuthority_InfoTN
            
             OutputResponseMarca retval = new OutputResponseMarca();
             retval.TSA = new TSARFC2253();
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             MarcaturaTemporale.MarcaturaTemporalePortTypeClient client = createClient(svcUrl);
 
             try
@@ -219,7 +219,7 @@ namespace DocsPa_TSAuthority_InfoTN
             logger.DebugFormat("INIZIO {0}", svcUrl);
             OutputResponseMarca retval = new OutputResponseMarca();
             retval.TSA = new TSARFC2253();
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             MarcaturaTemporale.MarcaturaTemporalePortTypeClient client = createClient(svcUrl);
             try
             {
@@ -262,7 +262,7 @@ namespace DocsPa_TSAuthority_InfoTN
         public string getMarcheDisponibili(string svcUrl)
         {
             string retval = string.Empty;
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             MarcaturaTemporale.MarcaturaTemporalePortTypeClient client = createClient(svcUrl);
             try
             {

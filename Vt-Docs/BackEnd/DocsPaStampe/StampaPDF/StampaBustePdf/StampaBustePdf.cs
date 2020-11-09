@@ -43,7 +43,7 @@ namespace StampaPDF.StampaBustePdf
 					myPdfTable.SetColumnsWidth(new int[]{100});
 			
 					myPdfTable.VisibleHeaders=false;
-					myPdfTable.SetContentAlignment(ContentAlignment.MiddleRight);
+					myPdfTable.SetContentAlignment(ContentAlignment.MiddleLeft);
 		
 					while (!myPdfTable.AllTablePagesCreated)
 					{

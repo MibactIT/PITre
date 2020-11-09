@@ -143,14 +143,11 @@ namespace Amministrazione.Gestione_Registri
         protected System.Web.UI.WebControls.CheckBox cbx_invioAuto;
         protected System.Web.UI.WebControls.TextBox txt_anno_reg_pre;
 
+        /* 11/02/19 Conservazione - MEV Reportistica */
         protected System.Web.UI.WebControls.Label lbl_utRespStampa;
         protected System.Web.UI.WebControls.DropDownList ddl_user;
-
-        protected System.Web.UI.WebControls.TextBox txt_msg_posta_in_uscita;
-        protected System.Web.UI.WebControls.CheckBox cbx_sovrascrivi_messaggio;
+        
         protected System.Web.UI.WebControls.Button btn_SbloccaCasella;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_ReturnValueProcessiFirmaRegistroRF;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_ReturnValueProcessiFirmaRegistro;
 
         #region Repertori
         /// <summary>
@@ -218,18 +215,6 @@ namespace Amministrazione.Gestione_Registri
             }
             // ---------------------------------------------------------------
 
-            if (!String.IsNullOrEmpty(this.hd_ReturnValueProcessiFirmaRegistro.Value)
-                && this.hd_ReturnValueProcessiFirmaRegistro.Value != "undefined")
-            {
-                this.hd_ReturnValueProcessiFirmaRegistro.Value = string.Empty;
-                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                DocsPAWA.DocsPaWR.OrgRegistro registro = new DocsPAWA.DocsPaWR.OrgRegistro();
-                this.RefreshRegistroFromUI(ref registro);
-                DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                theManager.InvalidaProcessiFirmaByIdRegistroAndEmailRegistro(registro.IDRegistro, string.Empty, sessionManager.getUserAmmSession());
-                UpdateRegistro(registro);
-            }
-
             this.RegisterScrollKeeper("DivDGList");
 
             // Inizializzazione hashtable businessrules
@@ -254,24 +239,6 @@ namespace Amministrazione.Gestione_Registri
             if (Session["selRuoloRespReg"] != null)
             {
                 addRuoloRespReg((DocsPAWA.DocsPaWR.ElementoRubrica[])Session["selRuoloRespReg"]);
-            }
-
-            if (!String.IsNullOrEmpty(this.hd_ReturnValueProcessiFirmaRegistroRF.Value)
-                && this.hd_ReturnValueProcessiFirmaRegistroRF.Value != "undefined")
-            {
-                this.hd_ReturnValueProcessiFirmaRegistroRF.Value = string.Empty;
-                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                //this.InvalidaProcessiFirmaRegistriCoinvolti();
-                foreach (DocsPAWA.DocsPaWR.CasellaRegistro c in Caselle)
-                {
-                    if (c.EmailRegistro.Equals(ddl_caselle.SelectedValue))
-                    {
-                        DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                        theManager.InvalidaProcessiFirmaByIdRegistroAndEmailRegistro(c.IdRegistro, c.EmailRegistro, sessionManager.getUserAmmSession());
-                        EliminaCasella(c);
-                        break;
-                    }
-                }
             }
 
             if (ws.getValueInteropNoMail())
@@ -487,9 +454,10 @@ namespace Amministrazione.Gestione_Registri
                     this.btn_RubricaRuoloResp.Enabled = false;
                     this.img_delRuoloResp.Enabled = false;
                     this.ddl_DirittoResp.Enabled = false;
+
+                    /* 11/02/19 Conservazione - MEV Reportistica */
                     this.ddl_user.Enabled = false;
-                    
-                    
+
                 }
                 else
                 {
@@ -505,7 +473,6 @@ namespace Amministrazione.Gestione_Registri
                     this.btn_RubricaRuoloResp.Enabled = true;
                     this.img_delRuoloResp.Enabled = true;
                     this.ddl_DirittoResp.Enabled = true;
-
                 }
                 //End Andrea De Marco
 
@@ -521,6 +488,7 @@ namespace Amministrazione.Gestione_Registri
                     DocsPAWA.DocsPaWR.Ruolo rr = ws.getRuoloById(registro.idRuoloResp);
                     this.ruoloRespReg.Text = rr.descrizione;
 
+                    /* 11/02/19 Conservazione - MEV Reportistica */
                     this.PopolaDdlUtenti();
                     this.ddl_user.Enabled = true;
                     if (!string.IsNullOrEmpty(registro.idUtenteResp))
@@ -588,14 +556,8 @@ namespace Amministrazione.Gestione_Registri
                 this.CurrentIDRegistro = registro.IDRegistro;
                 //salvo le informazioni sulle caselle associate al Registro corrente
                 this.SetCaselleRegistro(this.CurrentIDRegistro);
-                if (Caselle != null && Caselle.Length > 0)
-                {// aggiorno le note della casella di default
+                if (Caselle != null && Caselle.Length > 0) // aggiorno le note della casella di default
                     this.txt_note.Text = Caselle[0].Note;
-
-                    //Aggiorno il messaggio
-                    this.txt_msg_posta_in_uscita.Text = Caselle[0].MessageSendMail;
-                    this.cbx_sovrascrivi_messaggio.Checked = Caselle[0].OverwriteMessageAmm;
-                }
 
                 if (System.Configuration.ConfigurationManager.AppSettings["PROTO_SEMPLIFICATO_ENABLED"] != null &&
                     System.Configuration.ConfigurationManager.AppSettings["PROTO_SEMPLIFICATO_ENABLED"].ToUpper() == "TRUE")
@@ -790,13 +752,13 @@ namespace Amministrazione.Gestione_Registri
                 DocsPAWA.DocsPaWR.Ruolo rr = ws.getRuoloById(registro.idRuoloResp);
                 this.ruoloRespReg.Text = rr.descrizione;
 
+                /* 11/02/19 Conservazione - MEV Reportistica */
                 this.PopolaDdlUtenti();
                 this.ddl_user.Enabled = true;
                 if (!string.IsNullOrEmpty(registro.idUtenteResp))
                 {
                     this.ddl_user.SelectedValue = registro.idUtenteResp;
                 }
-
             }
             this.ddl_DirittoResp.SelectedIndex = this.ddl_DirittoResp.Items.IndexOf(ddl_DirittoResp.Items.FindByValue(registro.Diritto_Ruolo_AOO));
 
@@ -959,11 +921,13 @@ namespace Amministrazione.Gestione_Registri
             }
 
             //Se l'utente è super-amministratore abilito il pulsante sblocco casella
+            /*
             DocsPAWA.DocsPaWR.InfoUtenteAmministratore _datiAmministratore = new DocsPAWA.DocsPaWR.InfoUtenteAmministratore();
             DocsPAWA.AdminTool.Manager.SessionManager session = new DocsPAWA.AdminTool.Manager.SessionManager();
             _datiAmministratore = session.getUserAmmSession();
             if (_datiAmministratore.tipoAmministratore.Equals("1"))
-                this.btn_SbloccaCasella.Visible = true;
+            */
+            this.btn_SbloccaCasella.Visible = true;
         }
 
         /// <summary>
@@ -997,8 +961,8 @@ namespace Amministrazione.Gestione_Registri
             registro.ID_RUOLO_AOO = this.txt_IdHiddenRuoloNomail.Text;
             registro.Diritto_Ruolo_AOO = this.ddl_DirittoResp.SelectedItem.Value;
 
+            /* 11/02/19 Conservazione - MEV Reportistica */
             registro.idUtenteResp = this.ddl_user.SelectedValue;
-
         }
 
 
@@ -1142,15 +1106,9 @@ namespace Amministrazione.Gestione_Registri
             }
             else
             {
-                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
                 if (registro.Sospeso && !ws.AmmPredispostiInRegistro(ref registro))
                 {
                     RegisterClientScript("alertPredInReg", "alert('Ci sono documenti predisposti alla protocollazione nel registro che si intende sospendere!');");
-                    return;
-                }
-                else if(registro.Sospeso && theManager.ExistsPassiFirmaByIdRegistroAndEmailRegistro(registro.IDRegistro, string.Empty))
-                {
-                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "AvvisoPresenzaProcessiFirmaRegistro", "<script>AvvisoPresenzaProcessiFirmaRegistro();</script>", false);
                     return;
                 }
                 else
@@ -1213,52 +1171,6 @@ namespace Amministrazione.Gestione_Registri
 
         }
 
-        private void UpdateRegistro(DocsPAWA.DocsPaWR.OrgRegistro registro)
-        {
-            DocsPAWA.DocsPaWR.ValidationResultInfo result = this.UpdateRegistro(ref registro);
-            if (result.Value && Caselle != null && Caselle.Length > 0)
-                result = DocsPAWA.utils.MultiCasellaManager.UpdateMailRegistro(registro.IDRegistro, Caselle);
-
-            if (result.Value)
-            {
-                try
-                {
-                    this.isRegistrySettings.SaveSettings();
-                }
-                catch (Exception e)
-                {
-                    result.Value = false;
-                    result.BrokenRules = new BrokenRule[]
-                        {
-                            new BrokenRule()
-                            {
-                                ID = "CONTROLLO_IS",
-                                Level = BrokenRuleLevelEnum.Error,
-                                Description = e.Message
-                            }
-                        };
-                }
-            }
-
-            if (!result.Value)
-            {
-                this.ShowValidationMessage(result);
-            }
-            else 
-            {
-                // Aggiornamento
-                pnl_info.Visible = false;
-
-                this.ClearData();
-
-                // Aggiornamento elemento griglia corrente
-                this.RefreshGridItem(registro);
-
-                dg_Registri.SelectedIndex = -1;
-            }
-        
-        }
-
         /// <summary>
         /// Rimozione dati controlli UI
         /// </summary>
@@ -1299,12 +1211,9 @@ namespace Amministrazione.Gestione_Registri
             // Per gestione pendenti tramite PEC
             ChkMailRicevutePendenti.Checked = false;
             ChkMailRicevutePendenti.Enabled = true;
-            this.txt_msg_posta_in_uscita.Text = string.Empty;
-            this.cbx_sovrascrivi_messaggio.Checked = false;
 
+            /* 11/02/19 Conservazione - MEV Reportistica */
             this.ddl_user.Items.Clear();
-
-
 
             Session.Remove("REG_SEL");
         }
@@ -1701,8 +1610,9 @@ namespace Amministrazione.Gestione_Registri
             this.codRuoloRespReg.Text = corr.systemId;
             this.ruoloRespReg.Text = corr.descrizione;
 
+            /* 11/02/19 Conservazione - MEV Reportistica */
             // Popolamento ddl_user
-            this.PopolaDdlUtenti();           
+            this.PopolaDdlUtenti();
 
             Session.Remove("selRuoloRespReg");
         }
@@ -1980,6 +1890,7 @@ namespace Amministrazione.Gestione_Registri
                     ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "warningSbloccoCasella", "<script>alert('Sblocco della casella effettuato con successo.');</script>", false);
                     return;
                 }
+
             }
         }
 
@@ -1993,7 +1904,9 @@ namespace Amministrazione.Gestione_Registri
             {
                 case "Select":
                     // Apertura della pagina di modifica impostazioni
-                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "openSettings", DocsPAWA.popup.ModifyRepertorioSettings.GetOpenScript(((HiddenField)e.Item.FindControl("hfRegistryId")).Value), true);
+                    string counterId = ((HiddenField)e.Item.FindControl("hfRegistryId")).Value;
+                    string myUrl = String.Format("window.showModalDialog('../../popup/ModifyRepertorioSettings.aspx?counterId={0}', '', 'dialogWidth:588px;dialogHeight:450px; resizable: no;status:no;scroll:yes;help:no;close:no;center:yes;');", counterId);
+                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "openSettings", myUrl, true);
                     break;
 
                 default:
@@ -2412,8 +2325,6 @@ namespace Amministrazione.Gestione_Registri
                 this.ddl_ricevutaPec.SelectedIndex = ddl_ricevutaPec.Items.IndexOf(ddl_ricevutaPec.Items.FindByValue(tipoPec));
             }
             this.txt_note.Text = casella.Note;
-            this.txt_msg_posta_in_uscita.Text = casella.MessageSendMail;
-            this.cbx_sovrascrivi_messaggio.Checked = casella.OverwriteMessageAmm;
         }
 
         /// <summary>
@@ -2725,8 +2636,6 @@ namespace Amministrazione.Gestione_Registri
                         c.SmtpSta = (this.ChkBoxsmtpSTA.Checked == true) ? "1" : "0";
                         c.RicevutaPEC = this.ddl_ricevutaPec.SelectedValue;
                         c.Note = txt_note.Text;
-                        c.MessageSendMail = txt_msg_posta_in_uscita.Text;
-                        c.OverwriteMessageAmm = this.cbx_sovrascrivi_messaggio.Checked;
                     }
                     catch (Exception e)
                     {
@@ -2908,13 +2817,30 @@ namespace Amministrazione.Gestione_Registri
                                     ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "warningElim2", "<script>alert('Prima di eliminare la casella è necessario salvare la nuova casella principale');</script>", false);
                                     return;
                                 }
-                                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                                if (!theManager.ExistsPassiFirmaByIdRegistroAndEmailRegistro(c.IdRegistro, c.EmailRegistro))
-                                    EliminaCasella(c);
+                                DocsPAWA.DocsPaWR.ValidationResultInfo result = ws.AmmDeleteMailRegistro(this.CurrentIDRegistro, c.EmailRegistro);
+                                if (result.Value)
+                                {
+                                    //elimino i diritti sulla nuova casella per tutti i ruoli dell'RF
+                                    Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
+                                    //Cerco solo i ruoli della AOO COLLEGATA: idReg 
+                                    theManager.GetListaRuoliAOO(this.CurrentIDRegistro);
+                                    if (theManager.getListaRuoliAOO() != null && theManager.getListaRuoliAOO().Count > 0)
+                                    {
+                                        foreach (DocsPAWA.DocsPaWR.OrgRuolo ruolo in theManager.getListaRuoliAOO())
+                                        {
+                                            ws.AmmDelRightMailRegistro(this.CurrentIDRegistro, ruolo.IDCorrGlobale, c.EmailRegistro);
+                                        }
+                                    } //end aggiornamento diritti ruoli
+                                    SetCaselleRegistro(this.CurrentIDRegistro);
+                                    if (Caselle.Length > 0)
+                                    {
+                                        RefreshCasella(Caselle[0]);
+                                    }
+                                    FillListRegistri();
+                                }
                                 else
                                 {
-                                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "AvvisoPresenzaProcessiFirmaEmail", "<script>AvvisoPresenzaProcessiFirmaEmail();</script>", false);
-                                    return;
+                                    this.ShowValidationMessage(result);
                                 }
                             }
 
@@ -2931,35 +2857,6 @@ namespace Amministrazione.Gestione_Registri
                     this.img_aggiungiCasella.Enabled = true;
                     this.ddl_caselle.Enabled = true;
                 }
-            }
-        }
-
-        private void EliminaCasella(DocsPAWA.DocsPaWR.CasellaRegistro c)
-        {
-            DocsPAWA.DocsPaWR.ValidationResultInfo result = ws.AmmDeleteMailRegistro(this.CurrentIDRegistro, c.EmailRegistro);
-            if (result.Value)
-            {
-                //elimino i diritti sulla nuova casella per tutti i ruoli dell'RF
-                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                //Cerco solo i ruoli della AOO COLLEGATA: idReg 
-                theManager.GetListaRuoliAOO(this.CurrentIDRegistro);
-                if (theManager.getListaRuoliAOO() != null && theManager.getListaRuoliAOO().Count > 0)
-                {
-                    foreach (DocsPAWA.DocsPaWR.OrgRuolo ruolo in theManager.getListaRuoliAOO())
-                    {
-                        ws.AmmDelRightMailRegistro(this.CurrentIDRegistro, ruolo.IDCorrGlobale, c.EmailRegistro);
-                    }
-                } //end aggiornamento diritti ruoli
-                SetCaselleRegistro(this.CurrentIDRegistro);
-                if (Caselle.Length > 0)
-                {
-                    RefreshCasella(Caselle[0]);
-                }
-                FillListRegistri();
-            }
-            else
-            {
-                this.ShowValidationMessage(result);
             }
         }
         #endregion
@@ -3039,8 +2936,6 @@ namespace Amministrazione.Gestione_Registri
                 }
             }
         }
-
-
 
     }
 }

@@ -20,6 +20,12 @@ namespace BusinessLogic.Interoperabilità
 		/// <returns></returns>
         public static bool processaXmlConferma(string path, string filename, DocsPaVO.utente.Registro reg, string mailId, string mailAddress, out string moreError)
 		{
+            //Verifico la validità della segnatura con Xsd
+
+            bool isSignatureValid = interoperabilita.InteroperabilitaEccezioni.isSignatureValid(System.IO.Path.Combine(path, filename));
+            if (!isSignatureValid)
+                throw new System.Xml.Schema.XmlSchemaException();
+
 			XmlDocument doc =new XmlDocument();
 			InteropResolver my = new InteropResolver();
             XmlTextReader xtr = new XmlTextReader(System.IO.Path.Combine(path, filename)) { Namespaces = false };
@@ -31,12 +37,8 @@ namespace BusinessLogic.Interoperabilità
             moreError = string.Empty;
 
 			try
-			{
-                //Verifico la validità della segnatura con Xsd
-                bool isSignatureValid = interoperabilita.InteroperabilitaEccezioni.isSignatureValid(System.IO.Path.Combine(path, filename));
-                if (!isSignatureValid)
-                    throw new System.Xml.Schema.XmlSchemaException();
-                doc.Load(xvr);
+			{ 
+				doc.Load(xvr);
 			}
 			catch(System.Xml.Schema.XmlSchemaException e)
 			{
@@ -84,79 +86,88 @@ namespace BusinessLogic.Interoperabilità
 				string[] formati={"yyyy-MM-dd"};
 
                 XmlElement elIdentificatore, elIdentificatoreMitt;
-                string codiceAmministrazione, codiceAOO, numeroRegistrazione, codiceAmministrazioneMitt, codiceAOOMitt, numeroRegistrazioneMitt, descrizioneMessaggioMitt;
-                codiceAOOMitt = string.Empty;
-                numeroRegistrazioneMitt = string.Empty;
-                descrizioneMessaggioMitt = string.Empty;
+                string codiceAmministrazione, codiceAOO, numeroRegistrazione, codiceAmministrazioneMitt, codiceAOOMitt, numeroRegistrazioneMitt;
                 DateTime dataRegistrazione, dataRegistrazioneMitt;
-                dataRegistrazioneMitt = System.DateTime.MinValue;
-                string idProf = string.Empty;
 
                 if (!string.IsNullOrEmpty(doc.DocumentElement.NamespaceURI))
                 {
-                    XmlNamespaceManager xmlnsManager = new XmlNamespaceManager(doc.NameTable);
-                    xmlnsManager.AddNamespace("p", doc.DocumentElement.NamespaceURI);
-
-                     elIdentificatore = (XmlElement)doc.DocumentElement.SelectSingleNode("p:Identificatore", xmlnsManager);
-                     codiceAmministrazione = elIdentificatore.SelectSingleNode("p:CodiceAmministrazione", xmlnsManager).InnerText.Trim();
-                     codiceAOO = elIdentificatore.SelectSingleNode("p:CodiceAOO", xmlnsManager).InnerText.Trim();
-                     numeroRegistrazione = elIdentificatore.SelectSingleNode("p:NumeroRegistrazione", xmlnsManager).InnerText.Trim();
-                     dataRegistrazione = DateTime.ParseExact(elIdentificatore.SelectSingleNode("p:DataRegistrazione", xmlnsManager).InnerText.Trim(), formati, ci.DateTimeFormat, DateTimeStyles.AllowWhiteSpaces);
-
-                    //info sul messaggio
-                    elIdentificatoreMitt = (XmlElement)doc.DocumentElement.SelectSingleNode("p:MessaggioRicevuto/p:Identificatore", xmlnsManager);
-                    if (elIdentificatoreMitt != null)
+                    try
                     {
+                        XmlNamespaceManager xmlnsManager = new XmlNamespaceManager(doc.NameTable);
+                        xmlnsManager.AddNamespace("p", doc.DocumentElement.NamespaceURI);
+
+                        elIdentificatore = (XmlElement)doc.DocumentElement.SelectSingleNode("p:Identificatore", xmlnsManager);
+                        codiceAmministrazione = elIdentificatore.SelectSingleNode("p:CodiceAmministrazione", xmlnsManager).InnerText.Trim();
+                        codiceAOO = elIdentificatore.SelectSingleNode("p:CodiceAOO", xmlnsManager).InnerText.Trim();
+                        numeroRegistrazione = elIdentificatore.SelectSingleNode("p:NumeroRegistrazione", xmlnsManager).InnerText.Trim();
+                        dataRegistrazione = DateTime.ParseExact(elIdentificatore.SelectSingleNode("p:DataRegistrazione", xmlnsManager).InnerText.Trim(), formati, ci.DateTimeFormat, DateTimeStyles.AllowWhiteSpaces);
+
+                        //info sul messaggio
+                        elIdentificatoreMitt = (XmlElement)doc.DocumentElement.SelectSingleNode("p:MessaggioRicevuto/p:Identificatore", xmlnsManager);
                         codiceAmministrazioneMitt = elIdentificatoreMitt.SelectSingleNode("p:CodiceAmministrazione", xmlnsManager).InnerText.Trim();
                         codiceAOOMitt = elIdentificatoreMitt.SelectSingleNode("p:CodiceAOO", xmlnsManager).InnerText.Trim();
                         numeroRegistrazioneMitt = elIdentificatoreMitt.SelectSingleNode("p:NumeroRegistrazione", xmlnsManager).InnerText.Trim();
                         dataRegistrazioneMitt = DateTime.ParseExact(elIdentificatore.SelectSingleNode("p:DataRegistrazione", xmlnsManager).InnerText, formati, ci.DateTimeFormat, DateTimeStyles.AllowWhiteSpaces);
                     }
-                    else
+                    catch(Exception ex)
                     {
-                        descrizioneMessaggioMitt = doc.DocumentElement.SelectSingleNode("p:MessaggioRicevuto/DescrizioneMessaggio").InnerText;
+                        codiceAmministrazione = string.Empty;
+                        codiceAOO = string.Empty;
+                        numeroRegistrazione = string.Empty;
+                        codiceAmministrazioneMitt = string.Empty;
+                        codiceAOOMitt = string.Empty;
+                        numeroRegistrazioneMitt = string.Empty;
+                        dataRegistrazione = new DateTime();
+                        dataRegistrazioneMitt = new DateTime();
+                        logger.Error("La mail viene scartata. ");
+                        moreError = "La mail viene scartata.";
+                        logger.Debug("La mail viene scartata. Il formato del file conferma.xml non è valido. Non è possibile associarlo al documento.");
+                        return false;
                     }
 
                 }
                 else
                 {
-                     elIdentificatore = (XmlElement)doc.DocumentElement.SelectSingleNode("Identificatore");
-                     codiceAmministrazione = elIdentificatore.SelectSingleNode("CodiceAmministrazione").InnerText.Trim();
-                     codiceAOO = elIdentificatore.SelectSingleNode("CodiceAOO").InnerText.Trim();
-                     numeroRegistrazione = elIdentificatore.SelectSingleNode("NumeroRegistrazione").InnerText.Trim();
-                     dataRegistrazione = DateTime.ParseExact(elIdentificatore.SelectSingleNode("DataRegistrazione").InnerText.Trim(), formati, ci.DateTimeFormat, DateTimeStyles.AllowWhiteSpaces);
-
-                    //info sul messaggio
-                    elIdentificatoreMitt = (XmlElement)doc.DocumentElement.SelectSingleNode("MessaggioRicevuto/Identificatore");
-                    if (elIdentificatoreMitt != null)
+                    try
                     {
+                        elIdentificatore = (XmlElement)doc.DocumentElement.SelectSingleNode("Identificatore");
+                        codiceAmministrazione = elIdentificatore.SelectSingleNode("CodiceAmministrazione").InnerText.Trim();
+                        codiceAOO = elIdentificatore.SelectSingleNode("CodiceAOO").InnerText.Trim();
+                        numeroRegistrazione = elIdentificatore.SelectSingleNode("NumeroRegistrazione").InnerText.Trim();
+                        dataRegistrazione = DateTime.ParseExact(elIdentificatore.SelectSingleNode("DataRegistrazione").InnerText.Trim(), formati, ci.DateTimeFormat, DateTimeStyles.AllowWhiteSpaces);
 
+                        //info sul messaggio
+                        elIdentificatoreMitt = (XmlElement)doc.DocumentElement.SelectSingleNode("MessaggioRicevuto/Identificatore");
                         codiceAmministrazioneMitt = elIdentificatoreMitt.SelectSingleNode("CodiceAmministrazione").InnerText.Trim();
                         codiceAOOMitt = elIdentificatoreMitt.SelectSingleNode("CodiceAOO").InnerText.Trim();
                         numeroRegistrazioneMitt = elIdentificatoreMitt.SelectSingleNode("NumeroRegistrazione").InnerText.Trim();
                         dataRegistrazioneMitt = DateTime.ParseExact(elIdentificatore.SelectSingleNode("DataRegistrazione").InnerText, formati, ci.DateTimeFormat, DateTimeStyles.AllowWhiteSpaces);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        descrizioneMessaggioMitt = doc.DocumentElement.SelectSingleNode("MessaggioRicevuto/DescrizioneMessaggio").InnerText;
-                    }  
+                        codiceAmministrazione = string.Empty;
+                        codiceAOO = string.Empty;
+                        numeroRegistrazione = string.Empty;
+                        codiceAmministrazioneMitt = string.Empty;
+                        codiceAOOMitt = string.Empty;
+                        numeroRegistrazioneMitt = string.Empty;
+                        dataRegistrazione = new DateTime();
+                        dataRegistrazioneMitt = new DateTime();
+                        logger.Error("La mail viene scartata. Il formato del file conferma.xml non è valido. Non è possibile associarlo al documento.");
+                        moreError = "La mail viene scartata. Il formato del file conferma.xml non è valido. Non è possibile associarlo al documento.";
+                        logger.Debug("La mail viene scartata. Il formato del file conferma.xml non è valido. Non è possibile associarlo al documento.");
+                        return false;
+                    }
+
                 }
 				
 				//si trova il numero del documento
 				logger.Debug("Ricerca id del profilo...");
-                if (!string.IsNullOrEmpty(numeroRegistrazioneMitt))
-                {
-                    idProf = Interoperabilità.InteroperabilitaUtils.findIdProfile(codiceAOOMitt, numeroRegistrazioneMitt, dataRegistrazioneMitt.Year);
-                }
-                else if(!string.IsNullOrEmpty(descrizioneMessaggioMitt))
-                {
-                    int start = descrizioneMessaggioMitt.IndexOf("#") + 1;
-                    int end = descrizioneMessaggioMitt.LastIndexOf("#");
-                    idProf = descrizioneMessaggioMitt.Substring(start, end - start);
-                }
+
+                string idProf = Interoperabilità.InteroperabilitaUtils.findIdProfile(codiceAOOMitt, numeroRegistrazioneMitt, dataRegistrazioneMitt.Year);
 				logger.Debug("idProfile="+idProf);
 
-				if(string.IsNullOrEmpty(idProf))
+				if(idProf==null)
 				{
                     logger.Debug("La mail viene sospesa: il documento indicato non è stato trovato");
                     moreError = "La mail viene sospesa: il documento indicato non è stato trovato";

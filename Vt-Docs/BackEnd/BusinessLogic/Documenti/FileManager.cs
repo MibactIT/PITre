@@ -14,10 +14,10 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using DocsPaVO.documento;
-using PDFLinearizator;
 using DocsPaUtils.Security;
 using DocsPaVO.utente;
 using InfoCertSignerConnector;
+using DocsPaVO.ExternalServices;
 
 namespace BusinessLogic.Documenti
 {
@@ -104,7 +104,6 @@ namespace BusinessLogic.Documenti
         {
             logger.Info("BEGIN");
             bool isAttachment = ((sch.documenti.ToArray())[0] as DocsPaVO.documento.Documento).docNumber.Equals(objFileRequest.docNumber) ? false : true;
-            if (sch.documentoPrincipale != null) isAttachment = true;
             DocsPaVO.documento.FileDocumento fileDoc = new DocsPaVO.documento.FileDocumento();
             fileDoc.path = objFileRequest.docServerLoc + objFileRequest.path;
             fileDoc.name = objFileRequest.fileName;
@@ -368,6 +367,22 @@ namespace BusinessLogic.Documenti
                 }
                 file.LabelPdf.label_rotation = Amm.Timbro_rotazione;
 
+                //Carico le impostazioi di defalult per il timbro
+                if (string.IsNullOrEmpty(file.LabelPdf.orientamento) && !file.LabelPdf.notimbro)
+                {
+                    file.LabelPdf.tipoLabel = false;
+                    file.LabelPdf.orientamento = "false";
+                    if (!string.IsNullOrEmpty(Amm.Timbro_orientamento) && !Amm.Timbro_orientamento.Equals("false"))
+                    {
+                        file.LabelPdf.tipoLabel = true;
+                        file.LabelPdf.orientamento = Amm.Timbro_orientamento;
+                    }
+                    if (string.IsNullOrEmpty(Amm.Timbro_orientamento))
+                    {
+                        file.LabelPdf.notimbro = true;
+                    }
+                }
+
                 #region LoadDefaulPosition
                 // carico le 4 posizioni
                 string default_pos = string.Empty;
@@ -565,8 +580,6 @@ namespace BusinessLogic.Documenti
             if (info.IsSigned && info.IsPdfA)
                 isPades = false;
 
-            //isPades = false;
-
             // se sono presenti i dati biometrici ritorno il fileinfo senza modificare il file
 
             bool disabled = false;
@@ -608,6 +621,10 @@ namespace BusinessLogic.Documenti
             {
                 file.LabelPdf.sel_color = labelPdf.sel_color;
             }
+            if(!string.IsNullOrEmpty(labelPdf.orientamento))
+            {
+                file.LabelPdf.orientamento = labelPdf.orientamento;
+            }
 
             DocsPaVO.amministrazione.InfoAmministrazione currAmm = Amministrazione.AmministraManager.AmmGetInfoAmmCorrente(utente.idAmministrazione);
 
@@ -637,6 +654,14 @@ namespace BusinessLogic.Documenti
                 {
                     //caricamento preferenze di default di LabelPDF
                     loadXmlLabelProperties(file, null, currAmm);
+
+                    //Se è un documento Grigio, indipendentemente dall'impostazione di default mostro la segnatura
+                    if (sch.tipoProto.Equals("G") || sch.tipoProto.Equals("R"))
+                    {
+                        file.LabelPdf.tipoLabel = false;
+                        file.LabelPdf.orientamento = string.Empty;
+                    }
+                    labelPdf = file.LabelPdf;
                 }
                 else
                 {
@@ -733,11 +758,19 @@ namespace BusinessLogic.Documenti
                 }
 
                 //ABBATANGELI - CODICE DISGUSTOSO IMPOSTO DAL GRUPPO PANZERA-LUCIANI
-                for (int i=0;i<rTimbro.Length; i++)
+                for (int i = 0; i < rTimbro.Length; i++)
                 {
-                    if (rTimbro[i].ToUpper().StartsWith("MIBACT|MIBACT_"))
+                    if (rTimbro[i].ToUpper().StartsWith("MIBAC|MIBAC_"))
                     {
-                        rTimbro[i] = rTimbro[i].Substring(0, 7) + rTimbro[i].Substring(14);
+                        if (sch.protocollo != null && !string.IsNullOrEmpty(sch.protocollo.segnatura)
+                            && sch.protocollo.segnatura.ToUpper().Contains("MIBACT"))
+                        {
+                            rTimbro[i] = rTimbro[i].Substring(0, 5) + "T|" + rTimbro[i].Substring(12);
+                        }
+                        else
+                        {
+                            rTimbro[i] = rTimbro[i].Substring(0, 6) + rTimbro[i].Substring(12);
+                        }
                     }
                 }
 
@@ -907,8 +940,9 @@ namespace BusinessLogic.Documenti
                     iTextSharp.text.Color colore = castFontColorPreferences(ref file);
                     //colore
                     cb.SetColorFill(colore);
+
                     bool showSignatureAsAnnotation = !string.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "VIEW_SIGNATURE_AS_ANNOTATION")) && DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "VIEW_SIGNATURE_AS_ANNOTATION").Equals("1");
-                    if (!isPades || !showSignatureAsAnnotation)//dimensione Font solo se non pades 
+                    if (!isPades || !showSignatureAsAnnotation)//dimensione Font solo se non pades  
                     {
                         cb.BeginText();
                         //font
@@ -1015,17 +1049,14 @@ namespace BusinessLogic.Documenti
                 }
 
                 //Rimuovo le pagine bianche generate nel PDF da itext
-                /*
-                 * TOLTO:SE PADES ANDAVA IN ERRORE
                 ArrayList pageToKeap = new ArrayList();
                 for (int i = 1; i <= prd.NumberOfPages; i++)
-                {
-                    if (!IsBlankPdfPage(prd, i))
+                { 
+                    if(!IsBlankPdfPage(prd, i))
                         pageToKeap.Add(i);
                 }
-                if (pageToKeap.Count > 0)
+                if(pageToKeap.Count > 0)
                     prd.SelectPages(pageToKeap);
-                */
 
                 prd.Close();
                 stamp.Close();
@@ -1566,6 +1597,8 @@ namespace BusinessLogic.Documenti
             string people = utente.idPeople;
             string gruppo = utente.idGruppo;
             //è l'ultimo valore sostituito nella fase di creazione del timbro
+            //string[] lastVal = { "COD_AMM", "COD_REG", "NUM_PROTO", "DATA_COMP", "ORA", "NUM_ALLEG", "CLASSIFICA", "IN_OUT", "COD_UO_PROT", "COD_UO_VIS", "COD_RF_PROT", "COD_RF_VIS" };
+            //ABBATANGELI - MIBACT - Tipo Atto in Segnatura
             string[] lastVal = { "COD_AMM", "COD_REG", "NUM_PROTO", "DATA_COMP", "ORA", "NUM_ALLEG", "CLASSIFICA", "IN_OUT", "COD_UO_PROT", "COD_UO_VIS", "COD_RF_PROT", "COD_RF_VIS" };
 
             //se da amministrazione ho selezionato il timbro devo abilitare la stampa del medesimo!!!
@@ -1839,7 +1872,7 @@ namespace BusinessLogic.Documenti
                                 }
                                 else
                                 {
-                                    Timbro = Timbro + padding + separatore + (i == 0 ? "[" : "; ") + fascicolo.codice + escape;
+                                    Timbro = Timbro + padding + separatore + fascicolo.codice + escape;
                                     //Nel caso di orientamento verticale replico il separatore letto in amministrazione
                                     //altrimenti uso il seguente separatore
                                     padding = " -";
@@ -1869,7 +1902,7 @@ namespace BusinessLogic.Documenti
                 if (datiTimbro.Contains("IN_OUT"))
                 {
                     string arrPart = "";
-                    if (sch.protocollatore != null)
+                    if (sch.protocollatore != null && sch.protocollo != null)
                     {
                         if (sch.protocollo.GetType() == typeof(DocsPaVO.documento.ProtocolloEntrata))
                         {
@@ -1997,10 +2030,22 @@ namespace BusinessLogic.Documenti
                         datiTimbro = datiTimbro.Replace("COD_RF_VIS", "");
                     }
                 }
-                // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+                //ABBATANGELI - MiBact (Tipo Atto in Segnatura)
+                if (datiTimbro.Contains("TIPOLOGIA"))
+                {
+                    string tipStr = "";
+                    if (sch.tipologiaAtto != null)
+                    {
+                        datiTimbro = datiTimbro.Replace("TIPOLOGIA", sch.tipologiaAtto.descrizione);
+                    }
+                }
 
 
-                Timbro = datiTimbro;
+                    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+                    Timbro = datiTimbro;
 
                 //nel caso di documento annullato stampo il timbro di annullamento come segue
                 if (sch.protocollo != null && sch.protocollo.protocolloAnnullato != null)
@@ -2074,7 +2119,34 @@ namespace BusinessLogic.Documenti
                         }
 
                         else
+                        {
+                            logger.Debug("PROTOCOLLO NULLO");
+                            //**********
+                            // Alessandro Aiello 18/10/2018
+                            // Segnatura Non Protocollati
+                            // ********* Inizio
+                            try
+                            {
+                                DocsPaDB.Query_DocsPAWS.Segnatura _segnaturaDB = new DocsPaDB.Query_DocsPAWS.Segnatura();
+                                // DocsPaVO.utente.Ruolo _ruolo = Utenti.UserManager.getRuoloByIdGruppo(utente.idGruppo);
+
+
+                                DettaglioSegnatura _segnaturaNpCalcolata = _segnaturaDB.DettaglioSegnatura_Select(sch.docNumber);
+                                if (_segnaturaNpCalcolata == null)
+                                {
+                                    _segnaturaNpCalcolata = BusinessLogic.Documenti.SegnaturaManager.CalcolaDettaglioSegnatura(sch, utente);
+                                }
+                                retValue = _segnaturaNpCalcolata.SegnaturaNP;
+                            }
+                            catch(Exception ex)
+                            {
+                                logger.Error(ex.Message, ex);
+                                // vecchio sistema di calcolo
                             retValue = string.IsNullOrEmpty(version_label_allegato) ? sch.docNumber + "  " + sch.dataCreazione.ToString() : sch.docNumber + "  " + sch.dataCreazione.ToString() + " - " + version_label_allegato;
+
+                            }
+                            //*********** Fine
+                        }
                     //retValue = sch.docNumber + "  " + sch.dataCreazione.ToString();
 
                     //&& supportedType
@@ -2164,7 +2236,8 @@ namespace BusinessLogic.Documenti
                         // verifica se almeno un attributo tipo funzione è di tipo repertoriato
                         foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom objAttrib in sch.template.ELENCO_OGGETTI)
                             if (objAttrib.REPERTORIO == "1")
-                                return string.Format("{0} - {1}", getFormattedProtocolloDiRepertorio(objAttrib, codiceAmministrazione), sch.template.DESCRIZIONE);
+                                return getFormattedProtocolloDiRepertorio(objAttrib, codiceAmministrazione, (sch.template != null ? sch.template.DESCRIZIONE : ""));
+                                //return string.Format("{0} - {1}", getFormattedProtocolloDiRepertorio(objAttrib, codiceAmministrazione), sch.template.DESCRIZIONE);
                         return string.Empty;
                     }
                     else return string.Empty;
@@ -2183,7 +2256,7 @@ namespace BusinessLogic.Documenti
         /// </summary>
         /// <returns></returns>
         private static string getFormattedProtocolloDiRepertorio(DocsPaVO.ProfilazioneDinamica.OggettoCustom objAtt,
-                                                                 string codiceAmministrazione)
+                                                                 string codiceAmministrazione, string tipologiaDoc)
         {
             string ProtocolloFormattedResult = string.Empty;
             if (objAtt.VALORE_DATABASE != null && objAtt.VALORE_DATABASE != "")
@@ -2192,6 +2265,8 @@ namespace BusinessLogic.Documenti
                 ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("ANNO", objAtt.ANNO);
                 ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("CONTATORE", objAtt.VALORE_DATABASE);
                 ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("COD_AMM", codiceAmministrazione);
+                ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("TIPOLOGIA", tipologiaDoc);
+                
                 ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("COD_UO", objAtt.CODICE_DB);
                 if (!string.IsNullOrEmpty(objAtt.DATA_INSERIMENTO))
                 {
@@ -2206,26 +2281,8 @@ namespace BusinessLogic.Documenti
                     DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(objAtt.ID_AOO_RF);
                     if (reg != null)
                     {
-                        //ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("RF", reg.codRegistro);
-                        //ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("AOO", reg.codRegistro);
-                        if (!string.IsNullOrEmpty(reg.chaRF) && reg.chaRF == "1")
-                        {
-                            ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("RF", reg.codRegistro);
-
-                            if (!string.IsNullOrEmpty(reg.idAOOCollegata))
-                            {
-                                DocsPaVO.utente.Registro registro = new DocsPaVO.utente.Registro();
-                                DocsPaDB.Query_DocsPAWS.Utenti rub = new DocsPaDB.Query_DocsPAWS.Utenti();
-                                rub.GetRegistro(reg.idAOOCollegata, ref registro);
-                                if (registro != null)
-                                    ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("AOO", registro.codRegistro);
-                            }
-                        }
-                        else //se contatore di AOO non ho i dati per ricavare RF perchè non mi viene passato in input. 
-                        {
-                            ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("RF", reg.codRegistro);
-                            ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("AOO", reg.codRegistro);
-                        }
+                        ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("RF", reg.codRegistro);
+                        ProtocolloFormattedResult = ProtocolloFormattedResult.Replace("AOO", reg.codRegistro);
                     }
                 }
             }
@@ -2305,16 +2362,12 @@ namespace BusinessLogic.Documenti
                         sb.AppendFormat("{0}", FormatLabel("Documento firmato elettronicamente da:", maxCharsPerRow));
                         sb.AppendLine();
                         sb.AppendFormat("{0}", FormatLabel(sign.Firmatario, maxCharsPerRow));
-                        sb.AppendLine();
-                        sb.AppendFormat("il {0}", FormatLabel(sign.DataApposizione, maxCharsPerRow));
                         isFirstSigner = false;
                     }
                     else
                     {
                         sb.AppendLine();
                         sb.AppendFormat("{0}", FormatLabel(sign.Firmatario, maxCharsPerRow));
-                        sb.AppendLine();
-                        sb.AppendFormat("il {0}", FormatLabel(sign.DataApposizione, maxCharsPerRow));
                     }
                 }
             }
@@ -2372,9 +2425,8 @@ namespace BusinessLogic.Documenti
 
                             //MEV CONTRO-FIRMATARI:   aggiunta info sintetica controfirmatari
                             if (signer.counterSignatures != null && signer.counterSignatures.Count() > 0)
-                                sb.Append(GetDatiControFirmatari(signer));
-                                //foreach (DocsPaVO.documento.SignerInfo controfirmatari in signer.counterSignatures)
-                                //    sb.AppendFormat(", {0}", controfirmatari.SubjectInfo.CommonName);
+                                foreach (DocsPaVO.documento.SignerInfo controfirmatari in signer.counterSignatures)
+                                    sb.AppendFormat(", {0}", controfirmatari.SubjectInfo.CommonName);
                         }
                         else
                         {
@@ -2383,9 +2435,8 @@ namespace BusinessLogic.Documenti
                             //MEV CONTRO-FIRMATARI: aggiunta info completa controfirmatari
                             if (signer.counterSignatures != null && signer.counterSignatures.Count() > 0)
                             {
-                                //foreach (DocsPaVO.documento.SignerInfo controSigner in signer.counterSignatures)
-                                //    sb.AppendLine(GetDatiFirmaPerEtichettaInfoFirmaCompleta(controSigner,maxCharsPerRow));
-                                    sb.AppendLine(GetDatiControFirmatariCompleta(signer, maxCharsPerRow));
+                                foreach (DocsPaVO.documento.SignerInfo controSigner in signer.counterSignatures)
+                                    sb.AppendLine(GetDatiFirmaPerEtichettaInfoFirmaCompleta(controSigner,maxCharsPerRow));
                             }
                         }
                         //>
@@ -2402,35 +2453,6 @@ namespace BusinessLogic.Documenti
                 return string.Empty;
         }
 
-        private static string GetDatiControFirmatari(DocsPaVO.documento.SignerInfo signer)
-        {
-            string result = string.Empty;
-            if (signer.counterSignatures != null && signer.counterSignatures.Count() > 0)
-            {
-                foreach (DocsPaVO.documento.SignerInfo controfirmatari in signer.counterSignatures)
-                {
-                    result += string.Format(", {0}", controfirmatari.SubjectInfo.CommonName);
-                    result += GetDatiControFirmatari(controfirmatari);
-                }
-            }
-            return result;
-        }
-
-        private static string GetDatiControFirmatariCompleta(DocsPaVO.documento.SignerInfo signer, int maxCharsPerRow)
-        {
-            if (signer.counterSignatures != null && signer.counterSignatures.Count() > 0)
-            {
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                foreach (DocsPaVO.documento.SignerInfo controfirmatari in signer.counterSignatures)
-                {
-                    sb.AppendLine(GetDatiFirmaPerEtichettaInfoFirmaCompleta(controfirmatari, maxCharsPerRow));
-                    sb.AppendLine(GetDatiControFirmatariCompleta(controfirmatari, maxCharsPerRow));
-                }
-                return sb.ToString();
-            }
-            else
-                return string.Empty;
-        }
         /// <summary>
         /// Formatta le informazioni relative alla firma completa
         /// </summary>
@@ -2505,23 +2527,17 @@ namespace BusinessLogic.Documenti
             string enteCertCN = string.Empty;
             string enteCertO = string.Empty;
             string enteCertC = string.Empty;
-            try
-            {
-                if (string.IsNullOrEmpty(issuerName)) return string.Empty; //no issuesName
-                string[] issuerNamePars = issuerName.Split(',');
-                // recupera CN
-                if (issuerName.Contains("CN="))
-                    enteCertCN = issuerNamePars.Where(a => a.Contains("CN=")).SingleOrDefault().Split('=')[1];
-                // recupera O
-                if (issuerName.Contains("O="))
-                    enteCertO = string.Format("{0}{1}", (string.IsNullOrEmpty(enteCertCN) ? string.Empty : ", "), issuerNamePars.Where(a => a.Contains("O=")).SingleOrDefault().Split('=')[1]);
-                if (issuerName.Contains("C="))
-                    enteCertC = string.Format(", {0}", issuerNamePars.Where(a => a.Contains("C=")).SingleOrDefault().Split('=')[1]);
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in getEnteCertificatore: " + e.Message);
-            }
+            if (string.IsNullOrEmpty(issuerName)) return string.Empty; //no issuesName
+            string[] issuerNamePars = issuerName.Split(',');
+            // recupera CN
+            if (issuerName.Contains("CN="))
+                enteCertCN = issuerNamePars.Where(a => a.Contains("CN=")).SingleOrDefault().Split('=')[1];
+            // recupera O
+            if (issuerName.Contains("O="))
+                enteCertO = string.Format("{0}{1}", (string.IsNullOrEmpty(enteCertCN) ? string.Empty : ", "), issuerNamePars.Where(a => a.Contains("O=")).SingleOrDefault().Split('=')[1]);
+            if (issuerName.Contains("C="))
+                enteCertC = string.Format(", {0}", issuerNamePars.Where(a => a.Contains("C=")).SingleOrDefault().Split('=')[1]);
+
             return string.Format("{0}{1}{2}", enteCertCN, enteCertO, enteCertC);
         }
         //>
@@ -2729,7 +2745,7 @@ namespace BusinessLogic.Documenti
                 {
                     if (ordine[10] >= 0)
                     {
-                        start = GetStartIndex(dati, ordine, currTimbro, 10);
+                        start = currTimbro.IndexOf(dati[ordine[10]]) + dati[ordine[10]].Length;
                         count = currTimbro.IndexOf("COD_RF_PROT") - start;
                         currTimbro = currTimbro.Remove(start, count);
                     }
@@ -2765,23 +2781,6 @@ namespace BusinessLogic.Documenti
             }
             currTimbro = currTimbro.Replace(specialChar, currVal);
             return currTimbro;
-        }
-
-        private static int GetStartIndex(string[] dati, int[] ordine, string currTimbro, int index)
-        {
-            int start = 0;
-            if (ordine[index] >= 0)
-            {
-                if (currTimbro.IndexOf(dati[ordine[index]]) < 0)
-                {
-                    start = GetStartIndex(dati, ordine, currTimbro, ordine[index]);
-                }
-                else
-                {
-                    start = currTimbro.IndexOf(dati[ordine[index]]) + dati[ordine[index]].Length;
-                }
-            }
-            return start;
         }
 
         /// <summary>
@@ -2870,6 +2869,8 @@ namespace BusinessLogic.Documenti
                     timbro_iniziale = timbro_iniziale.Replace("COD_RF_VIS", "");
                     i = 11;
                 }
+
+
                 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
                 //se il timbro iniziale è rimasto invariato rimuovo un carattere ed inizio di nuovo la ricerca
@@ -3127,7 +3128,6 @@ namespace BusinessLogic.Documenti
             }
             return uo;
         }
-
 
         /// <summary>
         /// Restituisce RF, se esiste, relativo al'id in CorrGlob di un dato Ruolo
@@ -3596,190 +3596,6 @@ namespace BusinessLogic.Documenti
             return fd;
         }
 
-        #region Anteprime pdf
-
-        /// <summary>
-        /// Restituzione ed eventuale generazione anteprima file pdf
-        /// </summary>
-        /// <param name="objFileRequest"></param>
-        /// <param name="objSicurezza"></param>
-        /// <returns>FileDocumentoAnteprima</returns>
-        public static DocsPaVO.documento.FileDocumentoAnteprima getPreviewFilePdf(
-            DocsPaVO.documento.FileRequest objFileRequest, int pgFrom, int pgTo,
-            DocsPaVO.documento.SchedaDocumento sch, DocsPaVO.documento.labelPdf position, 
-            DocsPaVO.utente.InfoUtente objSicurezza
-            )
-        {
-            FileDocumentoAnteprima retVal = new FileDocumentoAnteprima();
-            AnteprimaPdf anteprima = null;
-
-            
-            int numberOfPages = (string.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PREVIEW_PG"))?3:int.Parse(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PREVIEW_PG"))); //= 3 ABBATANGELI - Caricare da chiavi di configurazione
-
-            DocsPaDB.Query_DocsPAWS.Documenti qsD = new DocsPaDB.Query_DocsPAWS.Documenti();
-            
-            //ABBATANGELI - Provo a caricare dal db l'anteprima relativa alla coppia versionId docNumber
-            List<AnteprimaPdf> antemprime = qsD.getPdfPreviews(objFileRequest.versionId, objFileRequest.docNumber);
-            if (antemprime.Count > 0)
-            {
-                if (pgTo == 0)
-                    anteprima = antemprime.FirstOrDefault(e => e.previewPageFrom == pgFrom);
-                else
-                    anteprima = antemprime.FirstOrDefault(e => e.previewPageNamber == pgTo);
-            }
-
-            retVal.inFileSystem = (anteprima != null && !string.IsNullOrEmpty(anteprima.pathFile));
-
-            //ABBATANGELI - Se non ho già creato l'alteprima o è stata cancellata, la genero
-            if (!retVal.inFileSystem || !File.Exists(anteprima.pathFile))
-            {
-                string newPreviewFileName = objFileRequest.versionId;
-                if (pgFrom == 0)
-                {
-                    if ((pgTo - numberOfPages) <= 0)
-                        newPreviewFileName = newPreviewFileName + "_1.pdf";
-                    else
-                        newPreviewFileName = newPreviewFileName + "_" + (pgTo - numberOfPages).ToString() + ".pdf";
-                }
-                else
-                {
-                    newPreviewFileName = newPreviewFileName + "_" + pgFrom.ToString() + ".pdf";
-                }
-
-                retVal.Import(getFile(objFileRequest, objSicurezza, true, false));
-                retVal.firstPg = pgFrom;
-                retVal.lastPg = (pgFrom + (numberOfPages - 1));
-
-                anteprima = MakePreview(ref retVal, newPreviewFileName, objSicurezza);
-                if (anteprima != null)
-                {
-                    anteprima.versionId = objFileRequest.versionId;
-                    anteprima.docNumber = objFileRequest.docNumber;
-                    qsD.insPdfPreviews(anteprima);
-
-                    retVal.lastPg = anteprima.previewPageNamber;
-                }
-            }
-            else
-            {
-                //ABBATANGELI - Carico l'anteprima utilizzando i dati provenienti da db
-                retVal.Import(getInfoFile(objFileRequest, objSicurezza));
-                retVal.firstPg = anteprima.previewPageFrom;
-                retVal.lastPg = anteprima.previewPageNamber;
-                retVal.totalPg = anteprima.totalPageNumber;
-                retVal.content = streamFileFromPath(anteprima.pathFile);
-                retVal.length = retVal.content.Length;
-            }
-
-            string version_label_allegato = string.Empty;
-
-            //if (retVal.firstPg == 1)
-            //{
-                FileDocumento fileDoc = new FileDocumento();
-                fileDoc.fullName = retVal.fullName;
-                fileDoc.path = anteprima.pathFile;
-                fileDoc.name = retVal.fullName;
-                fileDoc.LabelPdf = position;
-                fileDoc.content = retVal.content;
-
-                fileDoc = addEtic(ref fileDoc, sch, objSicurezza, position, version_label_allegato, objFileRequest.versionId);
-                if (fileDoc.content != null && fileDoc.content.Count() > 0)
-                    retVal.content = fileDoc.content;
-            //}
-            retVal.contentType = getContentType(fileDoc.name);
-
-            return retVal;
-        }
-
-        private static byte[] streamFileFromPath(string path)
-        {
-            byte[] stream = null;
-
-            try
-            {
-                if (!string.IsNullOrEmpty(path))
-                {
-                    string pathfile = path;
-                    if (!string.IsNullOrEmpty(pathfile))
-                    {
-                        FileInfo file = new FileInfo(pathfile);
-                        stream = new byte[file.Length];
-                        using (FileStream fs = new FileStream(pathfile, FileMode.Open, FileAccess.Read))
-                        {
-                            fs.Read(stream, 0, stream.Length);
-                            fs.Close();
-                        }
-
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Debug("errore nel metodo streamFileFromPath: " + e.Message);
-            }
-            return stream;
-        }
-
-        private static AnteprimaPdf MakePreview(ref FileDocumentoAnteprima fda, string previewFileName, DocsPaVO.utente.InfoUtente objSicurezza)
-        {
-            AnteprimaPdf anteprimaDB = new AnteprimaPdf();
-
-            string fullPathFileName = System.Configuration.ConfigurationManager.AppSettings["PREVIEWS_PATH"].Replace("%DATA", objSicurezza.idAmministrazione + @"\");
-            Directory.CreateDirectory(fullPathFileName);
-            anteprimaDB.pathFile = fullPathFileName + previewFileName;
-
-            FileStream fs = new FileStream(anteprimaDB.pathFile, System.IO.FileMode.Create);
-            //            stamper.FormFlattening = true;
-
-            PdfReader rPdf = new iTextSharp.text.pdf.PdfReader(fda.content);
-            anteprimaDB.totalPageNumber = rPdf.NumberOfPages;
-            fda.totalPg = anteprimaDB.totalPageNumber;
-
-            PdfImportedPage importedPage = null;
-
-            try
-            {
-                // For simplicity, I am assuming all the pages share the same size
-                // and rotation as the first page:
-                iTextSharp.text.Document sourceDocument = new iTextSharp.text.Document(rPdf.GetPageSizeWithRotation(fda.firstPg));
-
-                // Initialize an instance of the PdfCopyClass with the source 
-                // document and an output file stream:
-                PdfCopy pdfCopyProvider = new PdfCopy(sourceDocument, fs);
-                sourceDocument.Open();
-
-                // Walk the specified range and add the page copies to the output file:
-                int counter = 0;
-                int i = fda.firstPg;
-                while (i <= fda.lastPg && i <= fda.totalPg)
-                {
-                    importedPage = pdfCopyProvider.GetImportedPage(rPdf, i);
-                    pdfCopyProvider.AddPage(importedPage);
-                    i++;
-                    counter++;
-                }
-
-                rPdf.Close();
-                sourceDocument.Close();
-                //pdfCopyProvider.Flush();
-                pdfCopyProvider.Close();
-
-                fda.content = File.ReadAllBytes(anteprimaDB.pathFile);
-                fda.length = fda.content.Length;
-
-                anteprimaDB.previewPageFrom = fda.firstPg;
-                anteprimaDB.previewPageNamber = (fda.firstPg + (counter - 1));
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return anteprimaDB;
-        }
-
-        #endregion
-
         private static DocsPaVO.documento.FileDocumento getFile(
             DocsPaVO.documento.FileRequest objFileRequest,
             DocsPaVO.utente.InfoUtente objSicurezza,
@@ -3901,14 +3717,7 @@ namespace BusinessLogic.Documenti
             if (fileDoc != null && fileDoc.name.ToUpper().EndsWith(".P7M") && verificaFileFirmato)
             {
                 // Se file .P7M, viene fatta la verifica della firma digitale del file
-                try
-                {
-                    VerifyFileSignature(fileDoc, null);
-                }
-                catch (Exception ex)
-                {
-                    logger.Debug("Eroore in verifica Firma " + ex.Message);
-                }
+                VerifyFileSignature(fileDoc, null);
                 //logger.DebugFormat("Sbusto CADES nuova len{0}", fileDoc.length);
                 if (fileDoc.signatureResult != null)
                 {
@@ -3944,30 +3753,6 @@ namespace BusinessLogic.Documenti
                         {
                             BusinessLogic.Documenti.DigitalSignature.Pades_Utils.Pades.VerifyPadesSignature(fileDoc);
                             //E' una firma pades elaboriamo una VSR per il pades
-
-                            //ItextSharp in alcuni casi non restituisce tutte le firme PADES, in questo caso chiamo il servizio esterno
-                            if(!BusinessLogic.Documenti.DigitalSignature.Pades_Utils.Pades.CheckNumSignature(fileDoc) && verificaFileFirmato)
-                            {
-                                VerifySignatureResult resultTemp = VerifyFileSignaturePades_External(fileDoc, DateTime.Now);
-                                if (resultTemp != null && resultTemp.PKCS7Documents != null)
-                                {
-                                    if (resultTemp.PKCS7Documents.Count() > fileDoc.signatureResult.PKCS7Documents.Count())
-                                    {
-                                        fileDoc.signatureResult = resultTemp;
-                                    }
-                                    else if (resultTemp.PKCS7Documents.Count() == fileDoc.signatureResult.PKCS7Documents.Count())
-                                    {
-                                        for(int i =0; i < resultTemp.PKCS7Documents.Count(); i++)
-                                        {
-                                            if(resultTemp.PKCS7Documents[i].SignersInfo.Count() > fileDoc.signatureResult.PKCS7Documents[i].SignersInfo.Count())
-                                            {
-                                                fileDoc.signatureResult = resultTemp;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
                         }
                         catch (Exception ex)
                         {
@@ -3975,13 +3760,7 @@ namespace BusinessLogic.Documenti
                         }
                     }
                 }
-                else
-                {
-                    if (fileDoc.name.ToUpper().EndsWith(".XML") && verificaFileFirmato)
-                    {
-                        VerifyFileSignatureXADES(fileDoc, DateTime.MinValue);
-                    }
-                }
+
                 // verifico l'impronta, solamente se non si è in repository di sessione
                 string versionId = objFileRequest.versionId;
                 string impronta = "";
@@ -4231,40 +4010,6 @@ namespace BusinessLogic.Documenti
             return false;
         }
         */
-
-        public static bool VerifyFileSignatureXADES(DocsPaVO.documento.FileDocumento fileDoc, DateTime? dataDiRiferimento)
-        {
-            bool retval = false;
-            VerifySignature verifySignature = new VerifySignature();
-
-            string inputDirectory = verifySignature.GetPKCS7InputDirectory();
-
-            // Creazione cartella di appoggio nel caso non esista
-            if (!System.IO.Directory.Exists(inputDirectory))
-                System.IO.Directory.CreateDirectory(inputDirectory);
-
-            logger.Debug("PKCS7InputDirectory: " + inputDirectory);
-
-            string inputFile = string.Concat(inputDirectory, fileDoc.name);
-
-            // Copia del file firmato dalla cartella del documentale
-            // alla cartella di input utilizzata dal ws della verifica
-            CopySignedFileToInputFolder(fileDoc, inputFile);
-            fileDoc.signatureResult = verifySignature.VerifySignatureXADES_External(fileDoc, dataDiRiferimento.Value);
-            try
-            {
-                // Rimozione del file firmato dalla cartella di input
-                File.Delete(inputFile);
-            }
-            catch
-            {
-            }
-            if (fileDoc.signatureResult != null && fileDoc.signatureResult.StatusCode == 0) //Valido
-                retval = true;
-
-            return retval;
-        }
-
         /// <summary>
         /// Verifica firma digitale del file
         /// </summary>
@@ -4311,16 +4056,7 @@ namespace BusinessLogic.Documenti
             }
             else
             {
-                if (fileDoc.name.ToUpper().EndsWith(".XML"))               
-                    VerifyFileSignatureXADES(fileDoc, dataDiRiferimento.Value);                
-                else
-                {
-                    fileDoc.signatureResult = verifySignature.Verify_External(fileDoc, dataDiRiferimento.Value);
-                    //pezza verrastro
-                    fileDoc.name = Path.GetFileNameWithoutExtension(fileDoc.name);
-                }
-
-                   
+                fileDoc.signatureResult = verifySignature.Verify_External(fileDoc, dataDiRiferimento.Value);
             }
 
             try
@@ -4355,7 +4091,7 @@ namespace BusinessLogic.Documenti
                     // che ha estensione != da ".P7M"
                     DocsPaVO.documento.PKCS7Document innerDocument = fileDoc.signatureResult.PKCS7Documents[i];
 
-                    if (!string.IsNullOrEmpty(innerDocument.DocumentFileName) && !innerDocument.DocumentFileName.ToUpper().EndsWith(".P7M"))
+                    if (!innerDocument.DocumentFileName.ToUpper().EndsWith(".P7M"))
                     {
                         fileDoc.name = innerDocument.DocumentFileName;
                         outputFileName = string.Concat(outputDirectory, fileDoc.name);
@@ -4394,48 +4130,6 @@ namespace BusinessLogic.Documenti
             return retval;
         }
 
-        public static VerifySignatureResult VerifyFileSignaturePades_External(DocsPaVO.documento.FileDocumento fileDoc, DateTime? dataDiRiferimento)
-        {
-            bool retval = false;
-            VerifySignature verifySignature = new VerifySignature();
-            VerifySignatureResult signResult;
-
-
-            string inputDirectory = verifySignature.GetPKCS7InputDirectory();
-
-            // Creazione cartella di appoggio nel caso non esista
-            if (!System.IO.Directory.Exists(inputDirectory))
-                System.IO.Directory.CreateDirectory(inputDirectory);
-
-            logger.Debug("PKCS7InputDirectory: " + inputDirectory);
-
-            string inputFile = string.Concat(inputDirectory, fileDoc.name);
-
-            // Copia del file firmato dalla cartella del documentale
-            // alla cartella di input utilizzata dal ws della verifica
-            CopySignedFileToInputFolder(fileDoc, inputFile);
-            try
-            {
-                signResult = verifySignature.Verify_External(fileDoc, dataDiRiferimento.Value);
-                if (signResult != null && signResult.PKCS7Documents != null && signResult.PKCS7Documents.Count() > 0)
-                {
-                    signResult.PKCS7Documents[0].SignAlgorithm = "PADES" + signResult.PKCS7Documents[0].SignAlgorithm;
-                    signResult.PKCS7Documents[0].SignatureType = DocsPaVO.documento.SignType.PADES;
-                }
-                else
-                {
-                    signResult = fileDoc.signatureResult;
-                }
-            }
-            catch
-            {
-                // Rimozione del file firmato dalla cartella di input
-                File.Delete(inputFile);
-                signResult = fileDoc.signatureResult;
-            }
-            return signResult;
-        }
-
 
         /// <summary>
         ///  Copia fisica del file firmato (.P7M) nella cartella in cui viene
@@ -4444,7 +4138,7 @@ namespace BusinessLogic.Documenti
         /// <param name="inputFile"></param>
         private static void CopySignedFileToInputFolder(DocsPaVO.documento.FileDocumento fileDoc, string inputFile)
         {
-            FileStream stream = new FileStream(inputFile, FileMode.Create, FileAccess.Write);
+            FileStream stream = new FileStream(inputFile, FileMode.CreateNew, FileAccess.Write);
             stream.Write(fileDoc.content, 0, fileDoc.content.Length);
             stream.Flush();
             stream.Close();
@@ -4700,16 +4394,7 @@ namespace BusinessLogic.Documenti
 
             if (FormatiDocumento.Configurations.SupportedFileTypesEnabled)
             {
-                FileInfo fileInfo;
-                try
-                {
-                    fileInfo = new FileInfo(fileName);
-                }
-                catch (PathTooLongException)
-                {
-                    string name = Path.GetFileName(fileName);
-                    fileInfo = new FileInfo(name);
-                }
+                FileInfo fileInfo = new FileInfo(fileName);
                 string extension = fileInfo.Extension.Replace(".", string.Empty);
                 if (extension.Contains(" "))
                     extension = extension.Replace(" ", "");
@@ -4809,16 +4494,8 @@ namespace BusinessLogic.Documenti
                 fileName = fileDocument.fullName;
             else
                 fileName = fileDocument.name;
-            FileInfo fileInfo;
-            try
-            {
-                fileInfo = new FileInfo(fileName);
-            }
-            catch(PathTooLongException)
-            {
-                string name = Path.GetFileName(fileName);
-                fileInfo = new FileInfo(name);
-            }
+
+            FileInfo fileInfo = new FileInfo(fileName);
             string extension = fileInfo.Extension.Replace(".", string.Empty);
             //è un p7m? lo dovrei sbustare...
             //se trovate bachi, corregeteli senza troppa esitazione...
@@ -4853,9 +4530,9 @@ namespace BusinessLogic.Documenti
                         }
                     }
                 }
-                catch(Exception ex)
+                catch
                 {
-                    logger.Debug("Il documento firmato è danneggiato, non è più possibile verificarlo: " + ex.Message);
+                    throw new Exception("Il documento firmato è danneggiato, non è più possibile verificarlo");
                 }
                 fileName = verFileDocument.fullName;
                 content = verFileDocument.content;
@@ -5253,6 +4930,10 @@ namespace BusinessLogic.Documenti
                                     out string errorMessage, bool processFileInfo = true)
         {
             logger.Info("BEGIN");
+
+            DocsPaVO.amministrazione.InfoAmministrazione _infoAmministrazione = BusinessLogic.Amministrazione.AmministraManager.AmmGetInfoAmmCorrente(objSicurezza.idAmministrazione);
+
+
             bool retValue = true;
             errorMessage = string.Empty;
             String tipoFirma =  DocsPaVO.documento.TipoFirma.NESSUNA_FIRMA;
@@ -5274,13 +4955,6 @@ namespace BusinessLogic.Documenti
                 string incestino = string.Empty;
                 if (fileRequest != null && !string.IsNullOrEmpty(fileRequest.docNumber))
                     incestino = BusinessLogic.Documenti.DocManager.checkdocInCestino(fileRequest.docNumber);
-
-                //Verifico se non posso acquisire perchè è attivo un processo di firma per il documento principale o allegato e non sono il titolare del passo in esecuzione
-                if (!LibroFirma.LibroFirmaManager.CanExecuteAction(fileRequest, objSicurezza))
-                {
-                    errorMessage = "il documento principale o l'allegato è in libro firma.";
-                    throw new Exception("Non è possibile acquisire poichè il documento principale o l'allegato è in libro firma");
-                }
 
                 if (!string.IsNullOrEmpty(incestino) && incestino == "1")
                     throw new Exception("Il documento è stato rimosso, non è più possibile modificarlo");
@@ -5307,6 +4981,33 @@ namespace BusinessLogic.Documenti
                             fileDoc.length = fileDoc.content.Length;
                         }
                     }
+                    //else if (fileDoc.content != null && fileDoc.name.ToUpper().EndsWith("PDF"))
+                    //{
+                    //    // APPOSIZIONE SEGNATURA PERMANENTE
+                    //    // disattivato, l'apposizione delle segnatura deve avvenire esplicitamente dal pulsante nella pagina del documento
+                    //    DettaglioSegnatura _dettaglioSegnatura = BusinessLogic.Documenti.SegnaturaManager.GetDettaglioSegnaturaDocumento(fileRequest.docNumber);
+                    //    if(_dettaglioSegnatura == null)
+                    //    {
+                    //        // Se non è stato trovato nessun dettaglio, probabilemnte è un allegato ad un protocollo
+                    //        DocsPaVO.documento.SchedaDocumento _schedaDoc = _schedaDoc = BusinessLogic.Documenti.DocManager.getDettaglio(objSicurezza, fileRequest.docNumber, fileRequest.docNumber);
+                    //        DocsPaVO.documento.SchedaDocumento _schedaDocumentoPrincipale = null;
+                    //        if(_schedaDoc.documentoPrincipale != null)
+                    //        {
+                    //            _dettaglioSegnatura = BusinessLogic.Documenti.SegnaturaManager.GetDettaglioSegnaturaDocumento(_schedaDoc.documentoPrincipale.docNumber);
+                    //        }
+                    //    }
+
+                    //    if(_dettaglioSegnatura != null)
+                    //    {
+                    //        byte[] _newContent = BusinessLogic.Documenti.SegnaturaManager.ApponiSegnaturaPermanenteToFileContent(fileDoc.content, _dettaglioSegnatura, false);
+                    //        if(_newContent != null)
+                    //        {
+                    //            BusinessLogic.Documenti.SegnaturaManager.DettaglioSegnatura_Update_SetSegnato(_dettaglioSegnatura);
+                    //            fileDoc.content = _newContent;
+                    //            fileDoc.length = _newContent.Length;
+                    //        }
+                    //    }
+                    //}
 
                     // Verifica se il file è acquisito nell'ambito di un repository di sessione
                     if (fileRequest.repositoryContext != null)
@@ -5503,7 +5204,17 @@ namespace BusinessLogic.Documenti
                                     {
                                         if (estensione.ToUpper().EndsWith("PDF"))
                                         {
-                                            if (BusinessLogic.Documenti.DigitalSignature.Pades_Utils.Pades.IsPdfPades(fileDoc))
+                                            bool? _isSigned = BusinessLogic.Documenti.SegnaturaManager.CheckIfPdfDocumentIsSigned(fileDoc);
+                                            if (_isSigned.HasValue)
+                                            {
+                                                if (fileRequest.firmato.Equals("0"))
+                                                {
+                                                    fileRequest.firmato = _isSigned.Value ? "1" : "0";
+                                                    if (!signTypeChecked)
+                                                        tipoFirma = DocsPaVO.documento.TipoFirma.PADES;
+                                                }
+                                            }
+                                            else if (BusinessLogic.Documenti.DigitalSignature.Pades_Utils.Pades.IsPdfPades(fileDoc))
                                             {
                                                 fileRequest.firmato = "1";
                                                 if (!signTypeChecked)
@@ -7186,7 +6897,7 @@ namespace BusinessLogic.Documenti
                     DocsPaVO.documento.FileInformation fileInfo = DocsPaVO.documento.FileInformation.decodeMask(fileInfoMask);
 
                     //controllo già effettuato in precedenza, non lo rifaccio..
-                    if ((fileInfo.Signature != DocsPaVO.documento.FileInformation.VerifyStatus.Valid) ||
+                    if ((fileInfo.Signature != DocsPaVO.documento.FileInformation.VerifyStatus.Valid) &&
                         (fileInfo.CrlStatus != DocsPaVO.documento.FileInformation.VerifyStatus.Valid))
                     {
                         if (filedocfirmato.signatureResult.StatusCode == -100)
@@ -7232,8 +6943,8 @@ namespace BusinessLogic.Documenti
                         if (fileInfo.CheckRefDate == DateTime.MinValue)
                             fileInfo.CheckRefDate = DateTime.Now;
 
-                        //if (fileInfo.CrlRefDate == DateTime.MinValue)
-                        fileInfo.CrlRefDate = DataDiRiferimentoCRL;
+                        if (fileInfo.CrlRefDate == DateTime.MinValue)
+                            fileInfo.CrlRefDate = DataDiRiferimentoCRL;
 
 
                         fileInfoMask = DocsPaVO.documento.FileInformation.encodeMask(fileInfo);
@@ -7357,49 +7068,6 @@ namespace BusinessLogic.Documenti
 
         }
 
-        public static bool HSM_Sign(DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.documento.FileRequest fr, bool cofirma, bool timestamp, string tipoFirma, String AliasCertificato, String DominioCertificato, String OtpFirma, String PinCertificato, bool ConvertPdf, out FirmaResult firmaResult)
-        {
-            firmaResult = new FirmaResult();
-            try
-            {
-                RemoteSignature.SignType tipo = (RemoteSignature.SignType)Enum.Parse(typeof(RemoteSignature.SignType), tipoFirma);
-                BusinessLogic.Documenti.DigitalSignature.RemoteSignature rs = new RemoteSignature(AliasCertificato, DominioCertificato, PinCertificato, tipo, timestamp, cofirma);
-
-                DocsPaVO.documento.FileDocumento fd = BusinessLogic.Documenti.FileManager.getFileFirmato(fr, infoUtente, false);
-                if (ConvertPdf)
-                {
-                    fd = BusinessLogic.LiveCycle.LiveCycle.GeneratePDFInSyncMod(fd);
-                    fr.fileName = fd.name;
-                }
-
-                byte[] content = fd.content;
-                byte[] signed = rs.Sign(content, OtpFirma);
-                bool signResult = false;
-                if ((tipo == RemoteSignature.SignType.PADES))
-                    signResult = BusinessLogic.Documenti.SignedFileManager.AppendDocumentoFirmatoPades(signed, cofirma, ref fr, infoUtente, ConvertPdf);
-                else   //cades non cofirmato
-                    signResult = BusinessLogic.Documenti.SignedFileManager.AppendDocumentoFirmato(Convert.ToBase64String(signed), cofirma, ref fr, infoUtente);
-
-                return signResult;
-            }
-            catch (Exception ex)
-            {
-                string id = ExtractFromString(ex.Message, "#CODE", "#MESSAGE");
-                firmaResult.esito = GetEsitoFirma(id);
-                firmaResult.errore = ExtractFromString(ex.Message, "#MESSAGE", "#TYPE");
-                logger.ErrorFormat("Errore invocando il metodo RemoteSignature {0} {1}", ex.Message, ex.StackTrace);
-                return false;
-            }
-        }
-
-        private static EsitoFirma GetEsitoFirma(string id)
-        {
-            EsitoFirma esito = new EsitoFirma();
-            DocsPaDB.Query_DocsPAWS.Documenti documenti = new DocsPaDB.Query_DocsPAWS.Documenti();
-            esito = documenti.GetMessaggioEsitoFirma(id);              
-            return esito;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -7446,7 +7114,7 @@ namespace BusinessLogic.Documenti
             return signed;
         }
 
-        public static byte[] HSM_AutomaticSignature(InfoUtente infoUtente, String inputPath, String outputPath, bool timeStamp)
+        public static byte[] HSM_AutomaticSignature(InfoUtente infoUtente, String inputPath, String outputPath)
         {
             String memorizedDecryptedPin = null;
             CryptoString crypto = null;
@@ -7470,14 +7138,6 @@ namespace BusinessLogic.Documenti
 
                 if(hsmParameters == null)
                     throw new Exception("HSMPARAMETERS AMMINISTRATION NOT FOUND - idPeople: " + infoUtente.idPeople + " - idAmm: " + infoUtente.idAmministrazione + " - inputPath: " + inputPath);
-
-                if (!timeStamp)
-                {
-                    logger.Debug("Marcatura temporale NON ATTIVA");
-                    hsmParameters.tsaurl = string.Empty;
-                    hsmParameters.tsauser = string.Empty;
-                    hsmParameters.tsapassword = string.Empty;
-                }
 
                 int result = InfoCertSigner.CADESSingleSigner(hsmPin.alias, hsmParameters.dominio, memorizedDecryptedPin, hsmParameters.tsaurl, hsmParameters.tsauser, hsmParameters.tsapassword, hsmParameters.userapplicativa, hsmParameters.passwordapplicativa, inputPath, outputPath, hsmParameters.serverurl);
 
@@ -7597,7 +7257,6 @@ namespace BusinessLogic.Documenti
             //bool cofirma = ms.Cofirma;
             bool result;
             string error = string.Empty;
-            EsitoFirma esitoFirma;
             try
             {
                 result = ms.Sign(PinCertificato, OtpFirma);
@@ -7661,25 +7320,25 @@ namespace BusinessLogic.Documenti
                             }
                             else
                             {
-                                string method = "DOC_SIGNATURE";
-                                string description = "Il documento è stato firmato digitalmente HSM CADES";
-                                if (ms.TipoFirma == RemoteSignature.SignType.PADES)
-                                {
-                                    method = "DOC_SIGNATURE_P";
-                                    description = "Il documento è stato firmato digitalmente HSM PADES";
-                                }
-                                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, fr.docNumber,
-                                    description, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "0");
-
                                 firmres.errore = "true: Versione creata con successo";
-                             
+
                                 //MEV LIBRO FIRMA EMANUELA 12-06-2015: Se il documento è in libro firma aggiorno la data di esecuzione
                                 if (fr.inLibroFirma)
                                 {
                                     BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fr.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                                    BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(fr.docNumber, description, infoUtente);
                                 }
-                            }                       
+                            }
+
+                            string method = "DOC_SIGNATURE";
+                            string description = "Il documento è stato firmato digitalmente HSM CADES";
+                            if (ms.TipoFirma == RemoteSignature.SignType.PADES)
+                            {
+                                method = "DOC_SIGNATURE_P";
+                                description = "Il documento è stato firmato digitalmente HSM PADES";
+                            }
+
+                            BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, fr.docNumber,
+                                description, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "0");
                         }
                         else
                         {
@@ -7695,10 +7354,8 @@ namespace BusinessLogic.Documenti
                 //andato male.. CIAO CIAO
                 logger.Debug("La firma multipla è andata male... esco e chiudo la sessione");
                 ms.CloseSession();
-                string id = ExtractFromString(error, "#CODE", "#MESSAGE");
-                esitoFirma = GetEsitoFirma(id);
                 error = ExtractFromString(error, "#MESSAGE", "#TYPE");
-                retval.Add(new FirmaResult { errore = string.IsNullOrEmpty(error) ? "false: La firma multipla è fallita globalmente" : error, esito =  esitoFirma});
+                retval.Add(new FirmaResult { errore = string.IsNullOrEmpty(error) ? "false: La firma multipla è fallita globalmente" : error});
 
                 foreach (FileRequest fr in fileRequestList)
                 {
@@ -7820,28 +7477,6 @@ namespace BusinessLogic.Documenti
         }
 
         /// <summary>
-        /// Linearizza un file PDF nel caso non lo fosse già
-        /// </summary>
-        /// <param name="contentFile">byte[]</param>
-        /// /// <returns>byte[]</returns>
-        public static FileDocumentoAnteprima LinearizzePDFContent(FileDocumentoAnteprima contentFile)
-        {
-            FileDocumentoAnteprima tempFile = contentFile;
-
-            PDFLinearizator.ConvertedPDF cpdf = PDFLinearizator.PDFLinearizator.LinearizePDFfromContent(contentFile.content, contentFile.nomeOriginale);
-
-            if (cpdf != null && cpdf.ConvertedContent != null && cpdf.ConvertedContent.Length > 0)
-            {
-                tempFile.content = cpdf.ConvertedContent;
-                tempFile.length = tempFile.content.Length;
-            }
-            else
-                tempFile = contentFile;
-
-            return tempFile;
-        }
-
-        /// <summary>
         /// Controlla la firma pades
         /// </summary>
         /// <param name="objFileRequest"></param>
@@ -7860,6 +7495,58 @@ namespace BusinessLogic.Documenti
 
             return isPades;
         }
+
+
+        public static bool AppendDocumento(DocsPaVO.documento.FileRequest documento, DocsPaVO.utente.InfoUtente infoUtente, byte[] contenuto)
+        {
+            logger.Info("START");
+            bool _result = true;
+
+            DocsPaVO.documento.FileRequest _r2;
+            try
+            {
+                _r2 = new DocsPaVO.documento.FileRequest()
+                {
+                    docNumber = documento.docNumber,
+                    descrizione = "versione con segnatura"
+                };
+
+                string _extension = Path.GetExtension(documento.path);
+                
+
+                // crea contenitore per la nuova versione
+                DocsPaVO.documento.FileRequest _fileReq = Documenti.VersioniManager.addVersion(_r2, infoUtente, false);
+
+                if (_fileReq != null)
+                {
+                    // acquisisce il documento e lo inserisce nel documento
+                    DocsPaVO.documento.FileDocumento _fileDoc = new DocsPaVO.documento.FileDocumento()
+                    {
+                        content = contenuto,
+                        estensioneFile = _extension,
+                        length = contenuto.Length,
+                        name = documento.fileName,
+                        fullName = documento.fileName
+                    };
+                    logger.Debug("@@SEGNATURA filename: " + documento.fileName);
+                    FileManager.putFile(_fileReq, _fileDoc, infoUtente);
+                    _result = true;
+                }
+                else
+                {
+                    throw new Exception("Errore nella creazione del contenuitore per la nuova versione del file");
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Info(ex.Message, ex);
+            }
+
+            logger.Info("END");
+            return _result;
+        }
+
+
 
     }
 }

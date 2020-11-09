@@ -6,7 +6,7 @@
       <Value Profile="(Default)">http://localhost/CachingWS/CachingServices.asmx</Value>
     </Setting>
     <Setting Name="DocsPaWA_DocsPaWR_DocsPaWebService" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://localhost/pitre/BE/DocsPaWS.asmx</Value>
+      <Value Profile="(Default)">http://localhost/Giada1.1v4.5/DocsPaWS/DocsPaWS.asmx</Value>
     </Setting>
   </Settings>
 </SettingsFile>

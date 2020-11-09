@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data;
 using System.Web;
 using System.Web.Services;
 using VtDocsWS.WebServices;
@@ -25,21 +24,6 @@ namespace VtDocsWS.Manager
             {
                 DocsPaVO.utente.Utente utente = null;
                 DocsPaVO.utente.InfoUtente infoUtente = null;
-                DocsPaDB.Query_DocsPAWS.LibroFirma libroFirma = new DocsPaDB.Query_DocsPAWS.LibroFirma();
-
-
-                //Carico i dati del passo successivo dall'id ottenuto in request
-                DocsPaVO.LibroFirma.IstanzaPassoDiFirma passo = libroFirma.GetIstanzaPassoDiFirma(request.IdPasso);
-
-                //INC000001133628 APSS  in LF risulta la tx fatta da un ruolo diverso da quello dove è stata fatta la firma
-                //Alcune volte non viene passato il codice del ruolo che ha effettuato l'operazione, in questo caso vado ad estrarlo dal DB altrimenti
-                //il sistema va a prendere un ruolo a caso tra quelli dell'utente.
-                if (string.IsNullOrEmpty(request.CodeRoleLogin))
-                {
-                    DocsPaVO.utente.Ruolo ruolo = libroFirma.GetRuoloTitolarePasso(passo.idIstanzaProcesso, passo.numeroSequenza - 1);
-                    if (!string.IsNullOrEmpty(ruolo.codiceRubrica))
-                        request.CodeRoleLogin = ruolo.codiceRubrica;
-                }
 
                 //Inizio controllo autenticazione utente
                 infoUtente = Utils.CheckAuthentication(request, "AddDocInProject");
@@ -57,7 +41,9 @@ namespace VtDocsWS.Manager
                     infoUtente.delegato = new DocsPaVO.utente.InfoUtente(utenteDelegato, null);
                 }
 
-                
+                DocsPaDB.Query_DocsPAWS.LibroFirma libroFirma = new DocsPaDB.Query_DocsPAWS.LibroFirma();
+                //Carico i dati del passo successivo dall'id ottenuto in request
+                DocsPaVO.LibroFirma.IstanzaPassoDiFirma passo = libroFirma.GetIstanzaPassoDiFirma(request.IdPasso);
                 //Eseguo insert elemento in libro firma a partire dal passo inserito
 
                 if (!passo.Evento.TipoEvento.Equals("W"))//Se il passo è di tipo WAIT non inserisco in Libro Firma
@@ -132,8 +118,6 @@ namespace VtDocsWS.Manager
                 //Impoato il passo attuale a close
                 if (libroFirma.UpdateStatoIstanzaPasso(request.IdIstanzaPasso, request.IdVersione, DocsPaVO.LibroFirma.TipoStatoPasso.CLOSE.ToString(), infoUtente, request.DataEsecuzione))
                 {
-                    libroFirma.SetErroreIstanzaPassoFirma(string.Empty, request.IdIstanzaPasso, request.IdIstanzaProcesso, DocsPaVO.LibroFirma.TipoStatoProcesso.IN_EXEC);
-                    
                     //Prendo il passo successivo
                     DocsPaVO.LibroFirma.IstanzaPassoDiFirma nextPasso = libroFirma.GetNextIstanzaPasso(request.IdIstanzaProcesso, request.OrdinePasso, request.IdVersione);
 
@@ -174,33 +158,14 @@ namespace VtDocsWS.Manager
 
                                 string method2 = "CONCLUSIONE_PROCESSO_LF_DOCUMENTO";
                                 string description2 = "Conclusione del processo di firma per documento";
-                                if (libroFirma.IsIstanzaProcessoConPassiAutomatici(request.IdIstanzaProcesso))
+                                if (!string.IsNullOrEmpty(request.DocAll) && request.DocAll == "A")
                                 {
-                                    method2 = "CONCLUSIONE_PROCESSO_AUTOMATICO_LF";
-                                    description2 = "Conclusione del processo automatico di firma per documento";
+                                    method2 = "CONCLUSIONE_PROCESSO_LF_ALLEGATO";
+                                    description2 = "Conclusione del processo di firma per allegato";
                                 }
-                                else
-                                {
-                                    if (!string.IsNullOrEmpty(request.DocAll) && request.DocAll == "A")
-                                    {
-                                        method2 = "CONCLUSIONE_PROCESSO_LF_ALLEGATO";
-                                        description2 = "Conclusione del processo di firma per allegato";
-                                    }
-                                }
-                                BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirma(request.IdIstanzaProcesso, request.IdDocumento, description2, infoUtente);
 
                                 BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method2, request.IdDocumento,
                                 description2, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1", "", request.DataEsecuzione);
-
-                                //Nel caso di documento principale, se il processo è stato avviato per passaggio di stato e non ha subito troncamento, 
-                                //vado allo stato succesivo se presente.
-                                if (string.IsNullOrEmpty(request.DocAll) || request.DocAll != "A")
-                                {
-                                    if (BusinessLogic.LibroFirma.LibroFirmaManager.CheckCambioStatoDocDaLF(request.IdIstanzaProcesso))
-                                    {
-                                        BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStatoAutomaticoLF(request.IdDocumento, infoUtente);
-                                    }
-                                }
                             }
                         }
                     }
@@ -215,8 +180,12 @@ namespace VtDocsWS.Manager
                                 DocsPaVO.LibroFirma.WaitResponse waitStepResult = libroFirma.GetFreeWaitStep(request.IdIstanzaPasso);
                                 if (waitStepResult != null)
                                 {
-                                    DocsPaVO.LibroFirma.IstanzaPassoDiFirma istanzaPassoDocPrincipale = libroFirma.GetIstanzaPassoDiFirmaInAttesa(waitStepResult.idProcesso);
-                                    DocsPaVO.trasmissione.Trasmissione trasmWait = ExecuteTransmission(waitStepResult, istanzaPassoDocPrincipale.IsAutomatico);
+                                    DocsPaVO.trasmissione.Trasmissione trasmWait = null;
+                                    using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
+                                    {
+                                        trasmWait = ExecuteTransmission(waitStepResult);
+                                        transactionContext.Complete();
+                                    }
 
                                     string desc = string.Empty;
                                     string method = "TRASM_DOC_" + (trasmWait.trasmissioniSingole[0] as DocsPaVO.trasmissione.TrasmissioneSingola).ragione.descrizione.ToUpper().Replace(" ", "_");
@@ -234,12 +203,6 @@ namespace VtDocsWS.Manager
                                         BusinessLogic.UserLog.UserLog.WriteLog(trasmWait.utente.userId, trasmWait.utente.idPeople, trasmWait.ruolo.idGruppo, trasmWait.utente.idAmministrazione, method, trasmWait.infoDocumento.docNumber, desc, DocsPaVO.Logger.CodAzione.Esito.OK,
                                             (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), checkNotify, (trasmWait.trasmissioniSingole[0] as DocsPaVO.trasmissione.TrasmissioneSingola).systemId);
 
-                                        if (istanzaPassoDocPrincipale.IsAutomatico)
-                                        {
-                                            //Se il passo è un passo proseguo con la sua esecuzione
-                                            DocsPaVO.LibroFirma.IstanzaProcessoDiFirma istanzaProcesso = new DocsPaVO.LibroFirma.IstanzaProcessoDiFirma() { docNumber = trasmWait.infoDocumento.docNumber, statoProcesso = DocsPaVO.LibroFirma.TipoStatoProcesso.IN_EXEC };
-                                            BusinessLogic.LibroFirma.LibroFirmaManager.EseguiPassoAutomaticoAsync(istanzaPassoDocPrincipale, istanzaProcesso);
-                                        }
                                     }
                                     else
                                     {
@@ -256,32 +219,14 @@ namespace VtDocsWS.Manager
 
                         string method2 = "CONCLUSIONE_PROCESSO_LF_DOCUMENTO";
                         string description2 = "Conclusione del processo di firma per documento";
-                        if (libroFirma.IsIstanzaProcessoConPassiAutomatici(request.IdIstanzaProcesso))
+                        if (!string.IsNullOrEmpty(request.DocAll) && request.DocAll == "A")
                         {
-                            method2 = "CONCLUSIONE_PROCESSO_AUTOMATICO_LF";
-                            description2 = "Conclusione del processo automatico di firma per documento";
+                            method2 = "CONCLUSIONE_PROCESSO_LF_ALLEGATO";
+                            description2 = "Conclusione del processo di firma per allegato";
                         }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(request.DocAll) && request.DocAll == "A")
-                            {
-                                method2 = "CONCLUSIONE_PROCESSO_LF_ALLEGATO";
-                                description2 = "Conclusione del processo di firma per allegato";
-                            }
-                        }
-                        BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirma(request.IdIstanzaProcesso, request.IdDocumento, description2, infoUtente);
+
                         BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method2, request.IdDocumento,
                         description2, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1", "", request.DataEsecuzione);
-
-                        //Nel caso di documento principale, se il processo è stato avviato per passaggio di stato e non ha subito troncamento, 
-                        //vado allo stato succesivo se presente.
-                        if (string.IsNullOrEmpty(request.DocAll) || request.DocAll != "A")
-                        {
-                            if (BusinessLogic.LibroFirma.LibroFirmaManager.CheckCambioStatoDocDaLF(request.IdIstanzaProcesso))
-                            {
-                                BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStatoAutomaticoLF(request.IdDocumento, infoUtente);
-                            }
-                        }
 
                     }
                 }
@@ -303,7 +248,7 @@ namespace VtDocsWS.Manager
             return response;
         }
 
-        private static DocsPaVO.trasmissione.Trasmissione ExecuteTransmission(DocsPaVO.LibroFirma.WaitResponse waitStepResult, bool isAutomatico)
+        private static DocsPaVO.trasmissione.Trasmissione ExecuteTransmission(DocsPaVO.LibroFirma.WaitResponse waitStepResult)
         {
             //DocsPaVO.LibroFirma.IstanzaPassoDiFirma istanzaPasso;
 
@@ -331,9 +276,6 @@ namespace VtDocsWS.Manager
                 trasm.noteGenerali = notePasso;
                 tipoPasso = waitStepResult.codAzione;
             }
-
-            if (isAutomatico)
-                tipoPasso += "_AUTOMATICO";
 
             //INSERISCO LA RAGIONE DI TRASMISSIONE DI SISTEMA PER LIBRO FIRMA
             DocsPaDB.Query_DocsPAWS.Utenti utenti = new DocsPaDB.Query_DocsPAWS.Utenti();
@@ -409,598 +351,5 @@ namespace VtDocsWS.Manager
 
             return newPasso;
         }
-
-        public static Services.LibroFirma.GetSignatureProcesses.GetSignatureProcessesResponse GetSignatureProcesses(Services.LibroFirma.GetSignatureProcesses.GetSignatureProcessesRequest request)
-        {
-            Services.LibroFirma.GetSignatureProcesses.GetSignatureProcessesResponse response = new Services.LibroFirma.GetSignatureProcesses.GetSignatureProcessesResponse();
-            try
-            {
-                DocsPaVO.utente.Utente utente = null;
-                DocsPaVO.utente.InfoUtente infoUtente = null;
-
-                //Inizio controllo autenticazione utente
-                infoUtente = Utils.CheckAuthentication(request, "GetSignatureProcesses");
-
-                utente = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
-                if (utente == null)
-                {
-                    //Utente non trovato
-                    throw new PisException("USER_NO_EXIST");
-                }
-                //Fine controllo autenticazione utente
-
-                List<DocsPaVO.LibroFirma.ProcessoFirma> listaProc= BusinessLogic.LibroFirma.LibroFirmaManager.GetProcessesSignatureVisibleRole(true, true, infoUtente);
-                if (listaProc != null && listaProc.Count > 0)
-                {
-                    response.Processes = new Domain.SignBook.SignatureProcess[listaProc.Count];
-                    Domain.SignBook.SignatureProcess spD = null;
-                    int i = 0;
-                    foreach (DocsPaVO.LibroFirma.ProcessoFirma proc in listaProc)
-                    {
-                        spD = new Domain.SignBook.SignatureProcess(proc);
-                        response.Processes[i] = spD;
-                        i++;
-                    }
-                }
-                
-                response.Success = true;
-
-            }
-            catch (PisException pisEx)
-            {
-                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
-                response.Error = new Services.ResponseError
-                {
-                    Code = pisEx.ErrorCode,
-                    Description = pisEx.Description
-                };
-
-                response.Success = false;
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
-                response.Error = new Services.ResponseError
-                {
-                    Code = "APPLICATION_ERROR",
-                    Description = ex.Message
-                };
-
-                response.Success = false;
-            }
-
-            return response;
-        }
-
-        public static Services.LibroFirma.GetSignatureProcess.GetSignatureProcessResponse GetSignatureProcess(Services.LibroFirma.GetSignatureProcess.GetSignatureProcessRequest request)
-        {
-            Services.LibroFirma.GetSignatureProcess.GetSignatureProcessResponse response = new Services.LibroFirma.GetSignatureProcess.GetSignatureProcessResponse();
-            try
-            {
-                DocsPaVO.utente.Utente utente = null;
-                DocsPaVO.utente.InfoUtente infoUtente = null;
-
-                //Inizio controllo autenticazione utente
-                infoUtente = Utils.CheckAuthentication(request, "GetSignatureProcess");
-
-                utente = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
-                if (utente == null)
-                {
-                    //Utente non trovato
-                    throw new PisException("USER_NO_EXIST");
-                }
-                //Fine controllo autenticazione utente
-                DocsPaVO.LibroFirma.ProcessoFirma proc = BusinessLogic.LibroFirma.LibroFirmaManager.GetProcessoDiFirmaById(request.IdProcess, infoUtente);
-                if (proc != null)
-                {
-                    response.SignatureProcess = new Domain.SignBook.SignatureProcess(proc);
-                }
-                else { throw new Exception("Signature Process not found"); }
-
-                response.Success = true;
-
-            }
-            catch (PisException pisEx)
-            {
-                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
-                response.Error = new Services.ResponseError
-                {
-                    Code = pisEx.ErrorCode,
-                    Description = pisEx.Description
-                };
-
-                response.Success = false;
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
-                response.Error = new Services.ResponseError
-                {
-                    Code = "APPLICATION_ERROR",
-                    Description = ex.Message
-                };
-
-                response.Success = false;
-            }
-
-            return response;
-        }
-
-        public static Services.LibroFirma.GetSignProcessInstance.GetSignProcessInstanceResponse GetSignProcessInstance(Services.LibroFirma.GetSignProcessInstance.GetSignProcessInstanceRequest request)
-        {
-            Services.LibroFirma.GetSignProcessInstance.GetSignProcessInstanceResponse response = new Services.LibroFirma.GetSignProcessInstance.GetSignProcessInstanceResponse();
-            try
-            {
-                DocsPaVO.utente.Utente utente = null;
-                DocsPaVO.utente.InfoUtente infoUtente = null;
-
-                //Inizio controllo autenticazione utente
-                infoUtente = Utils.CheckAuthentication(request, "GetSignatureProcess");
-
-                utente = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
-                if (utente == null)
-                {
-                    //Utente non trovato
-                    throw new PisException("USER_NO_EXIST");
-                }
-                //Fine controllo autenticazione utente
-                DocsPaVO.LibroFirma.IstanzaProcessoDiFirma istpdf = BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzaProcessoDiFirmaByIdIstanzaProcesso(request.IdProcessInstance,infoUtente);
-                if (istpdf != null)
-                {
-                    response.ProcessInstance = new Domain.SignBook.SignatureProcessInstance(istpdf);
-                }
-                else { throw new Exception("Singature Process Instance not found"); }
-                
-                response.Success = true;
-
-            }
-            catch (PisException pisEx)
-            {
-                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
-                response.Error = new Services.ResponseError
-                {
-                    Code = pisEx.ErrorCode,
-                    Description = pisEx.Description
-                };
-
-                response.Success = false;
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
-                response.Error = new Services.ResponseError
-                {
-                    Code = "APPLICATION_ERROR",
-                    Description = ex.Message
-                };
-
-                response.Success = false;
-            }
-
-            return response;
-        }
-
-        public static Services.LibroFirma.SearchSignProcessInstances.SearchSignProcessInstancesResponse SearchSignProcessInstances(Services.LibroFirma.SearchSignProcessInstances.SearchSignProcessInstancesRequest request)
-        {
-            Services.LibroFirma.SearchSignProcessInstances.SearchSignProcessInstancesResponse response = new Services.LibroFirma.SearchSignProcessInstances.SearchSignProcessInstancesResponse();
-            try
-            {
-                DocsPaVO.utente.Utente utente = null;
-                DocsPaVO.utente.InfoUtente infoUtente = null;
-
-                //Inizio controllo autenticazione utente
-                infoUtente = Utils.CheckAuthentication(request, "GetSignatureProcess");
-
-                utente = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
-                if (utente == null)
-                {
-                    //Utente non trovato
-                    throw new PisException("USER_NO_EXIST");
-                }
-                //Fine controllo autenticazione utente
-
-                List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma> filtri = new List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma>();
-                DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma fTemp;
-                List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma> istanze = new List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma>();
-                int totnumpage = 0;
-                if (request.Filters != null && request.Filters.Length > 0)
-                {
-                    foreach (Domain.Filter fPis in request.Filters)
-                    {
-                        fTemp = new DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma();
-                        switch (fPis.Name)
-                        {
-                            case "PROCESS_ID":
-                                fTemp.Argomento = "ID_PROCESSO";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "DOC_NUMBER":
-                                fTemp.Argomento = "DOCNUMBER";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "NOTE":
-                                fTemp.Argomento = "NOTE";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "START_DATE":
-                                fTemp.Argomento = "DATA_AVVIO_IL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "START_DATE_FROM":
-                                fTemp.Argomento = "DATA_AVVIO_SUCCESSIVA_AL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "START_DATE_TO":
-                                fTemp.Argomento = "DATA_AVVIO_PRECEDENTE_IL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "START_NOTES":
-                                fTemp.Argomento = "NOTE_AVVIO";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "END_DATE":
-                                fTemp.Argomento = "DATA_CONCLUSIONE_IL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "END_DATE_FROM":
-                                fTemp.Argomento = "DATA_CONCLUSIONE_SUCCESSIVA_AL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "END_DATE_TO":
-                                fTemp.Argomento = "DATA_CONCLUSIONE_PRECEDENTE_IL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "INTERRUPTION_DATE":
-                                fTemp.Argomento = "DATA_INTERRUZIONE_IL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "INTERRUPTION_DATE_FROM":
-                                fTemp.Argomento = "DATA_INTERRUZIONE_SUCCESSIVA_AL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "INTERRUPTION_DATE_TO":
-                                fTemp.Argomento = "DATA_INTERRUZIONE_PRECEDENTE_IL";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "REFUSAL_NOTE":
-                                fTemp.Argomento = "NOTE_RESPINGIMENTO";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "IN_EXECUTION":
-                                fTemp.Argomento = "STATO_IN_ESECUZIONE";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "INTERRUPTED":
-                                fTemp.Argomento = "STATO_INTERROTTO";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "ENDED":
-                                fTemp.Argomento = "STATO_CONCLUSO";
-                                fTemp.Valore = fPis.Value;
-                                break;
-                            case "TRUNCATED":
-                                fTemp.Argomento = "TRONCATO";
-                                fTemp.Valore = fPis.Value;
-                                break;
-
-                        }
-                        filtri.Add(fTemp);
-                    }
-                    
-                int numpage= request.PageNumber ?? 1, numInPage= request.ElementsInPage ?? 20,  nrec;
-
-                    //List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma> istanze = GetIstanzaProcessiDiFirmaByFilter(List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma> filtro, int numPage, int pageSize, out int numTotPage, out int nRec, DocsPaVO.utente.InfoUtente infoUtente);
-                DataSet istanzeProcessi = null;
-                istanze = BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(filtri, numpage, numInPage, out totnumpage, out nrec, infoUtente, out istanzeProcessi);
-                
-                }
-                if(istanze!=null && istanze.Count>0)
-                {
-                    response.SignatureProcessInstances = new Domain.SignBook.SignatureProcessInstance[istanze.Count];
-                    int indice = 0;
-                    response.TotalNumber = istanze.Count;
-
-                    foreach(DocsPaVO.LibroFirma.IstanzaProcessoDiFirma iX in istanze) {
-                        response.SignatureProcessInstances[indice] = new Domain.SignBook.SignatureProcessInstance(iX);
-                        indice++;
-                    }
-                }
-
-                response.Success = true;
-
-
-            }
-            catch (PisException pisEx)
-            {
-                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
-                response.Error = new Services.ResponseError
-                {
-                    Code = pisEx.ErrorCode,
-                    Description = pisEx.Description
-                };
-
-                response.Success = false;
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
-                response.Error = new Services.ResponseError
-                {
-                    Code = "APPLICATION_ERROR",
-                    Description = ex.Message
-                };
-
-                response.Success = false;
-            }
-
-            return response;
-        }
-
-        public static Services.LibroFirma.GetInstanceSearchFilters.GetInstanceSearchFiltersResponse GetInstanceSearchFilters(Services.Request request)
-        {
-            Services.LibroFirma.GetInstanceSearchFilters.GetInstanceSearchFiltersResponse response = new Services.LibroFirma.GetInstanceSearchFilters.GetInstanceSearchFiltersResponse();
-            try
-            {
-                DocsPaVO.utente.Utente utente = null;
-                DocsPaVO.utente.InfoUtente infoUtente = null;
-
-                //Inizio controllo autenticazione utente
-                infoUtente = Utils.CheckAuthentication(request, "GetInstanceSearchFilters");
-
-                utente = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
-                if (utente == null)
-                {
-                    //Utente non trovato
-                    throw new PisException("USER_NO_EXIST");
-                }
-                //Fine controllo autenticazione utente
-                response.Success = true;
-
-                //TODO
-
-                List<Domain.Filter> listaFiltri = new List<Domain.Filter>();
-
-                listaFiltri.Add(new Domain.Filter() { Name = "PROCESS_ID", Description = "ID del processo associato all'istanza di firma", Type = Domain.FilterTypeEnum.Number });
-                listaFiltri.Add(new Domain.Filter() { Name = "DOC_NUMBER", Description = "ID del documento associato all'istanza di firma", Type = Domain.FilterTypeEnum.Number });
-                listaFiltri.Add(new Domain.Filter() { Name = "NOTE", Description = "Stringa contenuta nelle note dell'istanza", Type = Domain.FilterTypeEnum.String });
-                listaFiltri.Add(new Domain.Filter() { Name = "START_DATE", Description = "Data di avvio dell'istanza di firma", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "START_DATE_FROM", Description = "Data di avvio dell'istanza di firma successiva a", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "START_DATE_TO", Description = "Data di avvio dell'istanza di firma precedende il", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "START_NOTES", Description = "Stringa contenuta nelle note di avvio dell'istanza", Type = Domain.FilterTypeEnum.String });
-                listaFiltri.Add(new Domain.Filter() { Name = "END_DATE", Description = "Data di conclusione dell'istanza di firma", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "END_DATE_FROM", Description = "Data di conclusione dell'istanza di firma successiva a", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "END_DATE_TO", Description = "Data di conclusione dell'istanza di firma precedende il", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "INTERRUPTION_DATE", Description = "Data di interruzione dell'istanza di firma", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "INTERRUPTION_DATE_FROM", Description = "Data di interruzione dell'istanza di firma successiva a", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "INTERRUPTION_DATE_TO", Description = "Data di interruzione dell'istanza di firma precedende il", Type = Domain.FilterTypeEnum.Date });
-                listaFiltri.Add(new Domain.Filter() { Name = "REFUSAL_NOTE", Description = "Stringa contenuta nelle note di respingimento dell'istanza", Type = Domain.FilterTypeEnum.String });
-                listaFiltri.Add(new Domain.Filter() { Name = "IN_EXECUTION", Description = "Processo di firma in esecuzione", Type = Domain.FilterTypeEnum.Bool });
-                listaFiltri.Add(new Domain.Filter() { Name = "INTERRUPTED", Description = "Processo di firma interrotto", Type = Domain.FilterTypeEnum.Bool });
-                listaFiltri.Add(new Domain.Filter() { Name = "ENDED", Description = "Processo di firma concluso", Type = Domain.FilterTypeEnum.Bool });
-                listaFiltri.Add(new Domain.Filter() { Name = "TRUNCATED", Description = "Processo di firma troncato", Type = Domain.FilterTypeEnum.Bool });
-
-                response.Filters = listaFiltri.ToArray();
-
-
-            }
-            catch (PisException pisEx)
-            {
-                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
-                response.Error = new Services.ResponseError
-                {
-                    Code = pisEx.ErrorCode,
-                    Description = pisEx.Description
-                };
-
-                response.Success = false;
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
-                response.Error = new Services.ResponseError
-                {
-                    Code = "APPLICATION_ERROR",
-                    Description = ex.Message
-                };
-
-                response.Success = false;
-            }
-
-            return response;
-        }
-
-        public static Services.LibroFirma.InterruptSignatureProcess.InterruptSignatureProcessResponse InterruptSignatureProcess(Services.LibroFirma.InterruptSignatureProcess.InterruptSignatureProcessRequest request)
-        {
-            Services.LibroFirma.InterruptSignatureProcess.InterruptSignatureProcessResponse response = new Services.LibroFirma.InterruptSignatureProcess.InterruptSignatureProcessResponse();
-            try
-            {
-                DocsPaVO.utente.Utente utente = null;
-                DocsPaVO.utente.InfoUtente infoUtente = null;
-
-                //Inizio controllo autenticazione utente
-                infoUtente = Utils.CheckAuthentication(request, "GetInstanceSearchFilters");
-
-                utente = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
-                if (utente == null)
-                {
-                    //Utente non trovato
-                    throw new PisException("USER_NO_EXIST");
-                }
-                //Fine controllo autenticazione utente
-                response.Success = true;
-
-                //TODO
-                DocsPaVO.utente.Ruolo ruolo = BusinessLogic.Utenti.UserManager.getRuoloByIdGruppo(infoUtente.idGruppo);
-                DocsPaVO.LibroFirma.IstanzaProcessoDiFirma istpdf = BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzaProcessoDiFirmaByIdIstanzaProcesso(request.IdSignProcessInstance, infoUtente);
-                bool result = BusinessLogic.LibroFirma.LibroFirmaManager.InterruptionSignatureProcessByProponent(istpdf, request.InterruptionNote, ruolo, infoUtente);
-                string idDocPrincipale = "";
-                
-                //Se è andato a buon fine ed è un allegato
-                if (result && (istpdf.docAll.Equals("A")))
-                {
-                    DocsPaVO.documento.Allegato allX = new DocsPaVO.documento.Allegato();
-                    allX.docNumber= istpdf.docNumber;
-                    idDocPrincipale = BusinessLogic.Documenti.AllegatiManager.getIdDocumentoPrincipale(allX);
-                    BusinessLogic.LibroFirma.LibroFirmaManager.StopPassoWait(idDocPrincipale, infoUtente);
-                }
-
-
-            }
-            catch (PisException pisEx)
-            {
-                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
-                response.Error = new Services.ResponseError
-                {
-                    Code = pisEx.ErrorCode,
-                    Description = pisEx.Description
-                };
-
-                response.Success = false;
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
-                response.Error = new Services.ResponseError
-                {
-                    Code = "APPLICATION_ERROR",
-                    Description = ex.Message
-                };
-
-                response.Success = false;
-            }
-
-            return response;
-        }
-
-        public static Services.LibroFirma.StartSignatureProcess.StartSignatureProcessResponse StartSignatureProcess(Services.LibroFirma.StartSignatureProcess.StartSignatureProcessRequest request)
-        {
-            Services.LibroFirma.StartSignatureProcess.StartSignatureProcessResponse response = new Services.LibroFirma.StartSignatureProcess.StartSignatureProcessResponse();
-            try
-            {
-                DocsPaVO.utente.Utente utente = null;
-                DocsPaVO.utente.InfoUtente infoUtente = null;
-
-                //Inizio controllo autenticazione utente
-                infoUtente = Utils.CheckAuthentication(request, "GetInstanceSearchFilters");
-
-                utente = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
-                if (utente == null)
-                {
-                    //Utente non trovato
-                    throw new PisException("USER_NO_EXIST");
-                }
-                //Fine controllo autenticazione utente
-                response.Success = true;
-
-                //TODO
-                DocsPaVO.LibroFirma.ProcessoFirma procFirma;
-                DocsPaVO.documento.FileRequest frequest;
-                bool retBool = false;
-                string idDocPrincipale="", modalita = "A";
-                DocsPaVO.documento.SchedaDocumento documento = new DocsPaVO.documento.SchedaDocumento();
-                
-                if (!string.IsNullOrEmpty(request.IdDocument))
-                {
-                    documento= BusinessLogic.Documenti.DocManager.getDettaglio(infoUtente, request.IdDocument, request.IdDocument);
-                    if(documento!= null)
-                    {
-                        frequest= (DocsPaVO.documento.FileRequest)documento.documenti[0];
-                    }
-                    else
-                    {
-                        throw new PisException("DOCUMENT_NOT_FOUND");
-                    }
-                }
-                else
-                {
-                    throw new PisException("MISSING_PARAMETER");
-                }
-                if (string.IsNullOrEmpty(idDocPrincipale)) { }
-
-                DocsPaVO.LibroFirma.ResultProcessoFirma resultAvvio ;
-
-                if (request.SignatureProcess != null)
-                {
-                    procFirma = Utils.GetProcessoFirmaFromDomain(request.SignatureProcess);
-                }
-                else
-                {
-                    throw new PisException("MISSING_PARAMETER");
-                }
-                DocsPaVO.LibroFirma.OpzioniNotifica opzioniNotifica = new DocsPaVO.LibroFirma.OpzioniNotifica();
-                opzioniNotifica.Notifica_concluso = false;
-                opzioniNotifica.Notifica_interrotto = true;
-
-                retBool = BusinessLogic.LibroFirma.LibroFirmaManager.StartProcessoDiFirma(procFirma, 
-                    frequest, 
-                    infoUtente, 
-                    "A", request.Note, opzioniNotifica, 
-                    out resultAvvio);
-
-                if (retBool)
-                {
-                    string method = "AVVIATO_PROCESSO_DI_FIRMA_DOCUMENTO";
-                    string description = "Avviato processo di firma per la versione " + frequest.version;
-                    if (frequest.GetType().Equals(typeof(DocsPaVO.documento.Allegato)))
-                    {
-                        method = "AVVIATO_PROCESSO_DI_FIRMA_ALLEGATO";
-                    }
-
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, frequest.docNumber,
-                        description, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1");
-                }
-
-                switch (resultAvvio)
-                {
-                    case DocsPaVO.LibroFirma.ResultProcessoFirma.DOCUMENTO_BLOCCATO:
-                        throw new Exception("DOCUMENTO BLOCCATO");
-                        break;
-                    case DocsPaVO.LibroFirma.ResultProcessoFirma.DOCUMENTO_CONSOLIDATO:
-                        throw new Exception("DOCUMENTO CONSOLIDATO");
-                        break;
-                    case DocsPaVO.LibroFirma.ResultProcessoFirma.DOCUMENTO_GIA_IN_LIBRO_FIRMA:
-                        throw new Exception("DOCUMENTO GIA IN LIBRO FIRMA");
-                        break;
-                    case DocsPaVO.LibroFirma.ResultProcessoFirma.EXISTING_PROCESS_NAME:
-                        throw new Exception("ERRORE GENERICO");
-                        break;
-                    case DocsPaVO.LibroFirma.ResultProcessoFirma.FILE_NON_AMMESSO_ALLA_FIRMA:
-                        throw new Exception("FILE NON AMMESSO ALLA FIRMA");
-                        break;
-                    case DocsPaVO.LibroFirma.ResultProcessoFirma.KO:
-                        throw new Exception("ERRORE GENERICO");
-                        break;
-                }
-
-                
-            }
-            catch (PisException pisEx)
-            {
-                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
-                response.Error = new Services.ResponseError
-                {
-                    Code = pisEx.ErrorCode,
-                    Description = pisEx.Description
-                };
-
-                response.Success = false;
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
-                response.Error = new Services.ResponseError
-                {
-                    Code = "APPLICATION_ERROR",
-                    Description = ex.Message
-                };
-
-                response.Success = false;
-            }
-
-            return response;
-        }
-
-
-
     }
 }

@@ -438,16 +438,60 @@ namespace DocsPaDbManagement.Database.Oracle
 			return result;
 		}
 
-		/// <summary>
-		/// Esegue una query sul database riportando un subset dei record disponibili.
-		/// </summary>
-		/// <param name="dataSet">Oggetto DataSet da popolare. Se ci sono errori durante 
-		/// il caricamento dei dati l'oggetto DataSet ritorna 'null'.</param>		
-		/// <param name="startRecord">Posizione dalla quale iniziare a leggere i record</param>
-		/// <param name="recordsReturned">Numero di record da leggere</param>
-		/// <param name="command">Query da eseguire sul database</param>
-		/// <returns>true = OK; false = Errore durnte l'esecuzione della query</returns>
-		public bool ExecutePaging(out DataSet dataSet, int startRecord, int recordsReturned, string command)
+        public bool ExecuteQueryNewConn(out DataSet dataSet, string tableName, string command)
+        {
+            bool result = true; // Presume successo
+            dataSet = new DataSet();
+            DocsPaCommand docsPaCommand = null;
+            DocsPaDataAdapter docsPaDataAdapter = null;
+
+            //Esegui il comando
+            try
+            {
+                docsPaCommand = new DocsPaCommand(command, conn);
+                docsPaCommand.Transaction = transaction;
+                docsPaDataAdapter = new DocsPaDataAdapter();
+                docsPaDataAdapter.SelectCommand = docsPaCommand;
+#if TRACE_DB
+				DocsPaUtils.LogsManagement.PerformaceTracer pt = new DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_DB");
+#endif
+                docsPaDataAdapter.Fill(dataSet, tableName);
+#if TRACE_DB
+				pt.WriteLogTracer(command);
+#endif
+            }
+            catch (Exception exception)
+            {
+                result = false;
+                this.LastException = exception.ToString();
+                logger.Debug("Errore ORACLE: " + command, exception);
+            }
+            finally
+            {
+                if (docsPaCommand != null)
+                {
+                    docsPaCommand.Dispose();
+                }
+
+                if (docsPaDataAdapter != null)
+                {
+                    docsPaDataAdapter.Dispose();
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Esegue una query sul database riportando un subset dei record disponibili.
+        /// </summary>
+        /// <param name="dataSet">Oggetto DataSet da popolare. Se ci sono errori durante 
+        /// il caricamento dei dati l'oggetto DataSet ritorna 'null'.</param>		
+        /// <param name="startRecord">Posizione dalla quale iniziare a leggere i record</param>
+        /// <param name="recordsReturned">Numero di record da leggere</param>
+        /// <param name="command">Query da eseguire sul database</param>
+        /// <returns>true = OK; false = Errore durnte l'esecuzione della query</returns>
+        public bool ExecutePaging(out DataSet dataSet, int startRecord, int recordsReturned, string command)
 		{
 			bool result = true; // Presume successo
 

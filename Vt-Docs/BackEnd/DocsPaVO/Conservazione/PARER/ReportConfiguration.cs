@@ -13,19 +13,15 @@ namespace DocsPaVO.Conservazione.PARER
         private String _body;
         private String[] _recipients;
         private String[] _fixed_recipients;
-        private String[] _policy_recipients;
-        private String _policy_subject;
-        private String _policy_body;
         private Mailbox _mbox;
 
-
-        public String idAmm 
+        public String idAmm
         {
-            get 
+            get
             {
                 return _idAmm;
             }
-            set 
+            set
             {
                 _idAmm = value;
             }
@@ -67,6 +63,7 @@ namespace DocsPaVO.Conservazione.PARER
             }
         }
 
+
         public String[] FixedRecipients
         {
             get
@@ -76,42 +73,6 @@ namespace DocsPaVO.Conservazione.PARER
             set
             {
                 _fixed_recipients = value;
-            }
-        }
-
-        public String[] PolicyRecipients
-        {
-            get
-            {
-                return _policy_recipients;
-            }
-            set
-            {
-                _policy_recipients = value;
-            }
-        }
-
-        public String PolicySubject
-        {
-            get
-            {
-                return _policy_subject;
-            }
-            set
-            {
-                _policy_subject = value;
-            }
-        }
-
-        public String PolicyBody
-        {
-            get
-            {
-                return _policy_body;
-            }
-            set
-            {
-                _policy_body = value;
             }
         }
 

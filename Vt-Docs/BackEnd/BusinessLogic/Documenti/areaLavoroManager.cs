@@ -1,7 +1,6 @@
 using System;
 using System.Data;
 using log4net;
-using System.Collections.Generic;
 
 namespace BusinessLogic.Documenti
 {
@@ -81,72 +80,6 @@ namespace BusinessLogic.Documenti
 			}*/
 #endregion
 		}
-
-        /// <summary>
-        /// Aggiunge una lista di documenti/fascicoli in ADL
-        /// </summary>
-        /// <param name="objectArea"></param>
-        /// <param name="infoUtente"></param>
-        public static List<DocsPaVO.areaLavoro.ResultAddAreaLavoro> AddMassiveObjectInADL(List<DocsPaVO.areaLavoro.WorkingArea> listAreaLavoro, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            List<DocsPaVO.areaLavoro.ResultAddAreaLavoro> results = new List<DocsPaVO.areaLavoro.ResultAddAreaLavoro>();
-            DocsPaVO.fascicolazione.Fascicolo fascicolo = null;
-            try
-            {
-                DocsPaVO.areaLavoro.ResultAddAreaLavoro result = null;
-                if (listAreaLavoro.Count > 0)
-                {
-                    DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
-                    foreach (DocsPaVO.areaLavoro.WorkingArea a in listAreaLavoro)
-                    {
-                        result = new DocsPaVO.areaLavoro.ResultAddAreaLavoro();
-                        if (a.ObjectType == DocsPaVO.areaLavoro.TipoOggetto.DOCUMENTO)
-                        {
-                            result.idObject = a.IdObject;
-                            result.tipoOggetto = DocsPaVO.areaLavoro.TipoOggetto.DOCUMENTO;
-                            if (doc.IsDocInADL(a.IdObject, infoUtente.idPeople) != 0 || doc.IsDocInADLRole(a.IdObject, infoUtente.idCorrGlobali) != 0)
-                            {
-                                result.esito = DocsPaVO.areaLavoro.Esito.DOCUMENTO_IN_AREA_LAVORO;
-                            }
-                            if (!doc.ExeAddLavoro(a.IdObject, a.TipoDocumento, a.IdRegistro, infoUtente, null, a.Motivo))
-                            {
-                                result.esito = DocsPaVO.areaLavoro.Esito.KO;
-                                logger.Error("Errore nella gestione dell'area lavoro (execAddLavoroMethod)");
-                            }
-                            else
-                            {
-                                result.esito = DocsPaVO.areaLavoro.Esito.OK;
-                            }
-                        }
-                        if (a.ObjectType == DocsPaVO.areaLavoro.TipoOggetto.FASCICOLO)
-                        {
-                            fascicolo = new DocsPaVO.fascicolazione.Fascicolo();
-                            result.idObject = fascicolo.systemID;
-                            result.tipoOggetto = DocsPaVO.areaLavoro.TipoOggetto.FASCICOLO;
-                            if (fascicolo.InAreaLavoro.Equals("1") || doc.IsFascInADLRole(fascicolo.systemID, infoUtente.idCorrGlobali) != 0)
-                            {
-                                result.esito = DocsPaVO.areaLavoro.Esito.FASCICOLO_IN_AREA_LAVORO;
-                            }
-                            if (!doc.ExeAddLavoro("", "", fascicolo.idRegistro, infoUtente, fascicolo, a.Motivo))
-                            {
-                                result.esito = DocsPaVO.areaLavoro.Esito.KO;
-                                logger.Error("Errore nella gestione dell'area lavoro (execAddLavoroMethod)");
-                            }
-                            else
-                            {
-                                result.esito = DocsPaVO.areaLavoro.Esito.OK;
-                            }
-                        }
-                        results.Add(result);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nella gestione dell'area lavoro (AddMassiveObjectInADL)");
-            }
-            return results;
-        }
 
 		/// <summary>
 		/// </summary>

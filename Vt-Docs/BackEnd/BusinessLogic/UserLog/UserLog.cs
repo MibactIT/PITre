@@ -103,10 +103,10 @@ namespace BusinessLogic.UserLog
                 InfoOggetto = DocsPaDB.Query_DocsPAWS.Log.getInfoOggetto(WebMethodName, ID_Amministrazione);
 
                 // Intercetto eventi di firma per passaggi di stato
-                if (WebMethodName.ToUpper() == "DOC_SIGNATURE" || WebMethodName.ToUpper() == "DOC_SIGNATURE_P")
-                {
-                    Procedimenti.ProcedimentiManager.CheckEventiFirma(ID_Oggetto, ID_People_Operatore, ID_Gruppo_Operatore, ID_Amministrazione);
-                }
+                //if (WebMethodName.ToUpper() == "DOC_SIGNATURE" || WebMethodName.ToUpper() == "DOC_SIGNATURE_P")
+                //{
+                //    Procedimenti.ProcedimentiManager.CheckEventiFirma(ID_Oggetto, ID_People_Operatore, ID_Gruppo_Operatore, ID_Amministrazione);
+                //}
 
                 //Insert sulla DPA_LOG.
                 if (InfoOggetto.Attivo == 1)
@@ -119,7 +119,7 @@ namespace BusinessLogic.UserLog
                     result = DocsPaDB.Query_DocsPAWS.Log.InsertLog(UserID_Operatore, ID_People_Operatore, ID_Gruppo_Operatore, ID_Amministrazione,
                             InfoOggetto.Oggetto.Trim(), ID_Oggetto, Var_desc_Oggetto,
                             InfoOggetto.Codice.Trim(), InfoOggetto.Descrizione.Trim(), Cha_Esito, delegato, codWorkingApplication, checkNotify, id_trasm, dataAzione);
-                 
+
                     if (!result)
                         logger.Error(String.Format("L'inserimento del log ha dato esito negativo: {0} {1} {2}",
                                                         InfoOggetto.Codice, InfoOggetto.Descrizione, Var_desc_Oggetto));
@@ -132,17 +132,17 @@ namespace BusinessLogic.UserLog
                     if (InfoOggetto.Codice == null)
                         codice = "Var_codice_log null";
                     else codice = InfoOggetto.Codice;
-                   
-                   // logger.Error(String.Format("Il log non risulta attivo: {0}", codice.Trim()));
-                    
+
+                    // logger.Error(String.Format("Il log non risulta attivo: {0}", codice.Trim()));
+
                 }
- 
+
 
             }
             catch (Exception ex)
             {
                 result = false;
-                logger.Error(ex.Message.ToString()+" "+ex.StackTrace.ToString(), ex);
+                logger.Error(ex.Message.ToString() + " " + ex.StackTrace.ToString(), ex);
 
             }
 
@@ -162,11 +162,23 @@ namespace BusinessLogic.UserLog
                 //Reperisco le informazioni relative al WebMethod.
                 InfoOggetto = DocsPaDB.Query_DocsPAWS.Log.getInfoOggetto(WebMethodName, ID_Amministrazione);
                 //Insert sulla DPA_LOG.
-
-                result = DocsPaDB.Query_DocsPAWS.Log.InsertLog(UserID_Operatore, ID_People_Operatore, ID_Gruppo_Operatore, ID_Amministrazione,
+                if (InfoOggetto.Attivo == 1)
+                {
+                    result = DocsPaDB.Query_DocsPAWS.Log.InsertLog(UserID_Operatore, ID_People_Operatore, ID_Gruppo_Operatore, ID_Amministrazione,
                       InfoOggetto.Oggetto.Trim(), ID_Oggetto, Var_desc_Oggetto,
                       InfoOggetto.Codice.Trim(), InfoOggetto.Descrizione.Trim(), Cha_Esito, delegato, string.Empty);
+                }
+                else
+                {
+                    string codice = string.Empty;
+                    string desc = string.Empty;
+                    if (InfoOggetto.Codice == null)
+                        codice = "Var_codice_log null";
+                    else codice = InfoOggetto.Codice;
 
+                    // logger.Error(String.Format("Il log non risulta attivo: {0}", codice.Trim()));
+
+                }
             }
             catch (Exception ex)
             {
@@ -396,7 +408,7 @@ namespace BusinessLogic.UserLog
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("Errore in BusinessLogic.UserLog.UserLog.GetLogAttivi " + ex.Message);
                 listLog = null;
@@ -690,7 +702,7 @@ namespace BusinessLogic.UserLog
                 DocsPaDB.Query_DocsPAWS.AmministrazioneXml amm = new DocsPaDB.Query_DocsPAWS.AmministrazioneXml();
                 return amm.GetAdminByName(codAmm);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(ex.Message.ToString(), ex);
                 return string.Empty;
@@ -805,7 +817,7 @@ namespace BusinessLogic.UserLog
                     {
                         return false;
                     }
-                    
+
                     transactionContext.Complete();
                 }
                 #endregion

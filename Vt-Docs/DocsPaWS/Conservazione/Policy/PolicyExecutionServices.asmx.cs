@@ -75,15 +75,6 @@ namespace DocsPaWS.Conservazione.Policy
         }
 
         /// <summary>
-        /// Versamento in conservazione dei big files
-        /// </summary>
-        [WebMethod]
-        public void ExecuteVersamentoBigFiles()
-        {
-            new BusinessLogic.Conservazione.ConservazioneManager().ExecuteVersamentoBigFiles();
-        }
-
-        /// <summary>
         /// Esecuzione policy PARER configurate in amministrazione
         /// </summary>
         [WebMethod]

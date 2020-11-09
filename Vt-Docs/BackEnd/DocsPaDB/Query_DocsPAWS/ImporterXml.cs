@@ -41,7 +41,6 @@ namespace DocsPaDB.Query_DocsPAWS
 				if(corrispondente.numLivello == null || corrispondente.numLivello == "") corrispondente.numLivello = "NULL";
 				if(corrispondente.idParent == null || corrispondente.idParent == "")	  corrispondente.idParent = "NULL";
 
-
 				//inserisce record nella tabella DPA_CORR_GLOBALI
 				DocsPaUtils.Query q = DocsPaUtils.InitImportExportQuery.getInstance().getQuery("IMP_NEW_CORRISPONDENTE");
 				q.setParam("param1",  DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
@@ -68,9 +67,7 @@ namespace DocsPaDB.Query_DocsPAWS
 				string command = q.getSQL();
 				logger.Debug(command);
 				
-				if (!this.ExecuteNonQuery(command)) throw new Exception();
-
-
+				if(!this.ExecuteNonQuery(command)) throw new Exception();
 
 				// Legge l'ID del record appena creato ricercandolo per codice o codice rubrica
 				string codiceUtilizzato = null;
@@ -89,12 +86,12 @@ namespace DocsPaDB.Query_DocsPAWS
 
 				if(codiceUtilizzato != null && codiceUtilizzato != "")
 				{
-                    q = DocsPaUtils.InitImportExportQuery.getInstance().getQuery("IMP_GET_CORR_BY_CODE");
-                    q.setParam("param1", campoUtilizzato);
-                    q.setParam("param2", "'" + codiceUtilizzato + "'");
-                    command = q.getSQL();
-                    string systemId = String.Empty;
-                    logger.Debug(command);
+					q = DocsPaUtils.InitImportExportQuery.getInstance().getQuery("IMP_GET_CORR_BY_CODE");
+					q.setParam("param1", campoUtilizzato);
+					q.setParam("param2", "'" + codiceUtilizzato + "'");
+					command = q.getSQL();
+					string systemId = string.Empty;
+					logger.Debug(command);
 
                     using (DBProvider dbProvider = new DBProvider())
                     {
@@ -108,7 +105,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         }
                     }
 
-                    //if (!this.ExecuteScalar(out systemId,command)) throw new Exception();
+                    //if(!this.ExecuteScalar(out systemId,command)) throw new Exception();
 
                     //inserisce il record nella tabella DPA_DETT_GLOBALI
                     string test = corrispondente.cap + 
@@ -161,7 +158,6 @@ namespace DocsPaDB.Query_DocsPAWS
 				result = false;
 			}
 		
-
 			return result;
 		}
 

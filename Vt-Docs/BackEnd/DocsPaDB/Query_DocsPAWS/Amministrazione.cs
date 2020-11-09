@@ -252,6 +252,15 @@ namespace DocsPaDB.Query_DocsPAWS
 
             queryDef.setParam("VAR_MSG_BANNER", info.Banner.ToString().Replace("'", "''"));
 
+            //*******************
+            // Alessandro Aiello 15/10/2018
+            // gestione della segnatura permanente
+            queryDef.setParam("param28", info.SegnaturaNP);
+            queryDef.setParam("param29", info.Segnatura_IsPermanente);
+            queryDef.setParam("param30", info.SegnaturaNP_IsPermanente);
+            // Fine
+            //*************************
+
             //++++++++++++++++ FINE QUERY
 
             string commandText = queryDef.getSQL();
@@ -315,6 +324,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 else
                 {
                     errorMessage = "si è verificato un errore: modifica amministrazione";
+                    logger.Error(dbProvider.LastExceptionMessage);
                     retValue = false;
                 }
 
@@ -449,10 +459,17 @@ namespace DocsPaDB.Query_DocsPAWS
 
                     dbProvider.ExecuteScalar(out idNewAmm, commandText);
 
-                    // inserisce ragioni trasmissioni, prendendole dall'anagrafica...
-                    if (insertRagioniTrasm(idNewAmm, info.IDRagioneTO, info.IDRagioneCC, info.IDRagioneCompetenza, info.IDRagioneConoscenza))
+                    string idAmmRiferimento = string.Empty;
+                    string valoreChiave = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ID_AMM_DEFAULT");
+                    if (!string.IsNullOrEmpty(valoreChiave) && !valoreChiave.ToString().Equals("0"))
                     {
-                        if (!insertTipoFunzInAmm(idNewAmm))
+                        idAmmRiferimento = valoreChiave;
+                    }
+
+                    // inserisce ragioni trasmissioni, prendendole dall'anagrafica...
+                    if (insertRagioniTrasm(idNewAmm, info.IDRagioneTO, info.IDRagioneCC, info.IDRagioneCompetenza, info.IDRagioneConoscenza, idAmmRiferimento))
+                    {
+                        if (!insertTipoFunzInAmm(idNewAmm, idAmmRiferimento))
                         {
                             retValue = false;
                             errorMessage = "si è verificato un errore: inserimento tipo funzioni";
@@ -466,7 +483,15 @@ namespace DocsPaDB.Query_DocsPAWS
                                 errorMessage = "si è verificato un errore: inserimento chiavi configurazione";
                             }
                             else
-                                retValue = true;
+                            {
+                                if(!InsertLogAttivati(idNewAmm))
+                                {
+                                    retValue = false;
+                                    errorMessage = "si è verificato un errore: attivazione log";
+                                }
+                                else
+                                    retValue = true;
+                            }
                         }
                     }
                     else
@@ -474,6 +499,8 @@ namespace DocsPaDB.Query_DocsPAWS
                         retValue = false;
                         errorMessage = "si è verificato un errore: inserimento ragioni di trasmissione";
                     }
+
+                    this.InsertDefaultObjects_NewAmm(idNewAmm);
                 }
 
                 if (retValue)
@@ -490,7 +517,7 @@ namespace DocsPaDB.Query_DocsPAWS
             return retValue;
         }
 
-        private bool insertRagioniTrasm(string idNewAmministrazione, string idTo, string idCC, string idCompetenza, string idConoscenza)
+        private bool insertRagioniTrasm(string idNewAmministrazione, string idTo, string idCC, string idCompetenza, string idConoscenza, string idAmmRiferimento)
         {
             bool retValue = false;
 
@@ -499,6 +526,8 @@ namespace DocsPaDB.Query_DocsPAWS
             queryDef.setParam("param1", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
             queryDef.setParam("param2", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal(null));
             queryDef.setParam("param3", idNewAmministrazione);
+            queryDef.setParam("param4", (!string.IsNullOrEmpty(idAmmRiferimento) ? " ID_AMM=" + idAmmRiferimento : " ID_AMM is null"));
+
 
             string commandText = queryDef.getSQL();
             logger.Debug(commandText);
@@ -516,7 +545,7 @@ namespace DocsPaDB.Query_DocsPAWS
             return retValue;
         }
 
-        private bool insertTipoFunzInAmm(string idNewAmministrazione)
+        private bool insertTipoFunzInAmm(string idNewAmministrazione, string idAmmRiferimento)
         {
             bool retValue = false;
 
@@ -525,6 +554,7 @@ namespace DocsPaDB.Query_DocsPAWS
             queryDef.setParam("param1", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
             queryDef.setParam("param2", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal(null));
             queryDef.setParam("param3", idNewAmministrazione);
+            queryDef.setParam("param4", (!string.IsNullOrEmpty(idAmmRiferimento) ? " ID_AMM=" + idAmmRiferimento : " ID_AMM is null"));
 
             string commandText = queryDef.getSQL();
             logger.Debug(commandText);
@@ -536,13 +566,13 @@ namespace DocsPaDB.Query_DocsPAWS
 
             if (rowsAffected != 0)
             {
-                retValue = insertAssoc_TipoFunz_Funz(idNewAmministrazione);
+                retValue = insertAssoc_TipoFunz_Funz(idNewAmministrazione, idAmmRiferimento);
             }
 
             return retValue;
         }
 
-        private bool insertAssoc_TipoFunz_Funz(string idNewAmministrazione)
+        private bool insertAssoc_TipoFunz_Funz(string idNewAmministrazione, string idAmmRiferimento)
         {
             bool retValue = false;
 
@@ -551,6 +581,8 @@ namespace DocsPaDB.Query_DocsPAWS
             queryDef.setParam("param1", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
             queryDef.setParam("param2", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal(null));
             queryDef.setParam("param3", idNewAmministrazione);
+            queryDef.setParam("param4", (!string.IsNullOrEmpty(idAmmRiferimento) ? " c1.ID_AMM=" + idAmmRiferimento : " c1.ID_AMM is null"));
+            queryDef.setParam("param5", (!string.IsNullOrEmpty(idAmmRiferimento) ? " a1.ID_AMM=" + idAmmRiferimento : " a1.ID_AMM is null"));
 
             string commandText = queryDef.getSQL();
             logger.Debug(commandText);
@@ -4028,9 +4060,6 @@ namespace DocsPaDB.Query_DocsPAWS
                         // End MEV
                         //
 
-                        //utente automatico
-                        q.setParam("param27", (utente.Automatico ? "1" : "0"));
-
                         queryString = q.getSQL();
                         logger.Debug(queryString);
 
@@ -4295,10 +4324,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         //
                         // End Mev CS 1.4
 
-                        myParam += " MATRICOLA = '" + (utente.Matricola ?? string.Empty) + "',";
-
-                        //Utente automatico
-                        myParam += " CHA_AUTOMATICO= " + (utente.Automatico ? "'1'" : "'0'"); 
+                        myParam += " MATRICOLA = '" + (utente.Matricola ?? string.Empty) + "'";
 
                         q.setParam("param1", myParam);
                         q.setParam("param2", "SYSTEM_ID = " + utente.IDPeople);
@@ -5740,6 +5766,10 @@ namespace DocsPaDB.Query_DocsPAWS
                         q.setParam("param3", "AND UPPER(a.var_cognome) LIKE UPPER('" + descrizione + "%')");
                         break;
                 }
+            }
+            else
+            {
+                q.setParam("param3", "");
             }
 
             // Se bisogna cercare ruoli, e se è stato richiesto di ricercare anche fra i ruoli
@@ -8244,7 +8274,11 @@ namespace DocsPaDB.Query_DocsPAWS
             UnitaOrganizzativa uo = new UnitaOrganizzativa();
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPACorrGlobali");
             q.setParam("param1", "system_id, var_cod_rubrica, var_codice, num_livello");
-            q.setParam("param2", "upper(var_codice) = '" + codice.ToUpper() + "' and cha_tipo_urp = 'U'");
+            
+            //ABBATANGELI GIANLUIGI- MiBACT - Se presenti UO esterne con stesso codice rubrica, sbaglia il padre del nodo in inserimento
+            //q.setParam("param2", "upper(var_codice) = '" + codice.ToUpper() + "'");
+            q.setParam("param2", "upper(var_codice) = '" + codice.ToUpper() + "' and cha_tipo_urp = 'U' and cha_tipo_ie = 'I'");
+
             DataSet dataSet;
             this.ExecuteQuery(out dataSet, q.getSQL());
 
@@ -8741,6 +8775,55 @@ namespace DocsPaDB.Query_DocsPAWS
                 reg.codAmministrazione = DocsPaDB.Utils.Personalization.getInstance(reg.idAmministrazione).getCodiceAmministrazione();
                 reg.dataApertura = row[7].ToString();
                 reg.dataChiusura = row[8].ToString();
+                reg.dataUltimoProtocollo = row[9].ToString();
+
+                listaRegistri.Add(reg);
+            }
+
+            dataSet.Dispose();
+
+            return listaRegistri;
+        }
+
+        /// <summary>
+        /// Query per il metodo "getListaRegistri"
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="uOrg"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public ArrayList getListRegByIdAmm(DocsPaVO.utente.UnitaOrganizzativa uOrg)
+        {
+            ArrayList listaRegistri = new ArrayList();
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_EL_REGISTRI");
+
+            q.setParam("param1", ", " + DocsPaDbManagement.Functions.Functions.ToChar("A.DTA_OPEN", false));
+            //DocsPaWS.Utils.dbControl.toChar("A.DTA_OPEN",false) + " AS DTA_OPEN, ");
+            q.setParam("param2", ", " + DocsPaDbManagement.Functions.Functions.ToChar("A.DTA_CLOSE", false));
+            //DocsPaWS.Utils.dbControl.toChar("A.DTA_CLOSE",false) + " AS DTA_CLOSE, ");
+            q.setParam("param3", ", " + DocsPaDbManagement.Functions.Functions.ToChar("A.DTA_ULTIMO_PROTO", false));
+            //DocsPaWS.Utils.dbControl.toChar("A.DTA_ULTIMO_PROTO",false) + " AS DTA_ULTIMO_PROTO ");
+            q.setParam("param4", uOrg.systemId);
+
+            string queryString = q.getSQL();
+            logger.Debug(queryString);
+
+            DataSet dataSet;
+            this.ExecuteQuery(out dataSet, queryString);
+
+            foreach (DataRow row in dataSet.Tables[0].Rows)
+            {
+                DocsPaVO.utente.Registro reg = new DocsPaVO.utente.Registro();
+                reg.systemId             = row[0].ToString();
+                reg.codRegistro          = row[1].ToString();
+                reg.codice               = row[2].ToString();
+                reg.descrizione          = row[3].ToString();
+                reg.email                = row[4].ToString();
+                reg.stato                = row[5].ToString();
+                reg.idAmministrazione    = row[6].ToString();
+                reg.codAmministrazione   = DocsPaDB.Utils.Personalization.getInstance(reg.idAmministrazione).getCodiceAmministrazione();
+                reg.dataApertura         = row[7].ToString();
+                reg.dataChiusura         = row[8].ToString();
                 reg.dataUltimoProtocollo = row[9].ToString();
 
                 listaRegistri.Add(reg);
@@ -9863,11 +9946,12 @@ namespace DocsPaDB.Query_DocsPAWS
 
             Hashtable h = new Hashtable();
             ArrayList tmp = new ArrayList();
+            
 
             string cur_user = null;
             foreach (DataRow dr in ds.Tables["utenti_ruoli"].Rows)
             {
-                if ((string)dr["COD_UTENTE"] != cur_user)
+                if (((string)dr["COD_UTENTE"]) != cur_user)
                 {
                     if (cur_user != null && tmp.Count > 0)
                     {
@@ -9875,6 +9959,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         tmp.CopyTo(ruoli);
                         h[cur_user] = ruoli;
                         tmp.Clear();
+
                     }
                     cur_user = (string)dr["COD_UTENTE"];
                 }
@@ -10795,7 +10880,16 @@ namespace DocsPaDB.Query_DocsPAWS
                 queryMng.setParam("idAmm", idAmministrazione);
                 string commandText = queryMng.getSQL();
                 logger.Debug("Chiusura nodi di titolario QUERY : " + commandText);
+
                 dbProvider.ExecuteNonQuery(commandText);
+
+                #region CHIUSURA FASCICOLI E SOTTOCARTELLE
+                //Chiusura fascicoli e sottocartelle 
+                ArrayList parameters = new ArrayList();
+                parameters.Add(this.CreateParameter("id_amm", idAmministrazione));
+                dbProvider.ExecuteStoredProcedure("dpa_chiudi_fasc_titolario_storicizzato", parameters, null);
+                logger.Debug("Chiusura fascicoli e sottocartelle");
+                #endregion
 
                 //Chiusura titolario
                 queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("TITOLARIO_SET_CESSATO");
@@ -10810,6 +10904,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 commandText = queryMng.getSQL();
                 logger.Debug("Attivazione titolario QUERY : " + commandText);
                 dbProvider.ExecuteNonQuery(commandText);
+
 
                 // Momentaneo
                 titolario.Stato = DocsPaVO.amministrazione.OrgStatiTitolarioEnum.Attivo;
@@ -12666,6 +12761,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 else
                     queryDef.setParam("idRuoloResp", "NULL");
 
+                /* 11/02/19 Conservazione - MEV Reportistica */
                 if (!string.IsNullOrEmpty(registro.idUtenteResp))
                     queryDef.setParam("idUtenteResp", this.GetStringParameterValue(registro.idUtenteResp));
                 else
@@ -12963,6 +13059,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 else
                     queryMng.setParam("idRuoloResp", "NULL");
 
+                /* 11/02/19 Conservazione - MEV Reportistica */
                 if (!string.IsNullOrEmpty(registro.idUtenteResp))
                     queryMng.setParam("idUtenteResp", this.GetStringParameterValue(registro.idUtenteResp));
                 else
@@ -13358,6 +13455,47 @@ namespace DocsPaDB.Query_DocsPAWS
             finally
             {
             }
+
+            return retValue;
+        }
+
+        /// <summary>
+        /// Inserimento dei vari oggetti di default per nuova amministrazione
+        /// </summary>
+        /// <param name="idAmm"></param>
+        /// <returns></returns>
+        public bool InsertDefaultObjects_NewAmm(string idAmm)
+        {
+            bool retValue = false;
+
+            try
+            {
+                DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
+                dbProvider.BeginTransaction();
+
+                ArrayList parameters = new ArrayList();
+                parameters.Add(this.CreateParameter("idamm", idAmm));
+                int retProc = this.ExecuteStoreProcedure("SP_NEW_AMM_ADD_DEFAULT", parameters);
+
+                if (retProc > 0)
+                {
+                    this.CommitTransaction();
+                    logger.Debug("Chiama SP: 'SP_NEW_AMM_ADD_DEFAULT' - idamm = " + idAmm);
+                    retValue = true;
+                }
+                else
+                {
+                    logger.Debug("ERRORE - Eseguita Rollback sulle Stored Procedures SP_NEW_AMM_ADD_DEFAULT - idamm = " + idAmm);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore SP: " + ex.ToString());
+                this.RollbackTransaction();
+                retValue = false;
+            }
+
 
             return retValue;
         }
@@ -14416,93 +14554,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Error(e);
             }
 
-            return retval;
-        }
-
-        public ArrayList FattElAttive_getCodFornitore(string idAmm)
-        {
-            ArrayList retval = new ArrayList();
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("FATT_S_DPA_FATT_ATTIVE");
-                q.setParam("id_amm", idAmm);
-                string queryString = q.getSQL();
-                logger.Debug(queryString);
-                // Inserire oggetto Evento CDS
-                DataSet dataset = new DataSet();
-                DocsPaVO.ExternalServices.FornitoreFattAttiva fornitore = null;
-                this.ExecuteQuery(out dataset, "FORNITORI", queryString);
-                if (dataset.Tables["FORNITORI"] != null && dataset.Tables["FORNITORI"].Rows.Count > 0)
-                {
-                    foreach (DataRow r in dataset.Tables["FORNITORI"].Rows)
-                    {
-                        fornitore = new DocsPaVO.ExternalServices.FornitoreFattAttiva();
-                        fornitore.IdAmm = r["ID_AMM"].ToString();
-                        fornitore.IdRegistro = r["ID_REGISTRO"].ToString();
-                        fornitore.CodFornitore = r["COD_FORNITORE"].ToString();
-                        fornitore.CodFascicolo = r["COD_FASCICOLO"].ToString();
-                        fornitore.CodAmmIPA = r["CODICE_AMM_IPA"].ToString(); 
-
-                        retval.Add(fornitore);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex);
-                retval = null;
-
-            }
-            return retval;
-        }
-
-        public bool FattElAttive_InsertIntoLogPIS(string idProfile, string idUO, string codUo)
-        {
-            bool retval = false;
-            using (DocsPaDB.DBProvider dbProvider = new DBProvider())
-            {
-                try
-                {
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("FATT_I_FATT_ATT_LOG_PIS");
-                    q.setParam("id_profile", idProfile);
-                    q.setParam("id_uo", idUO);
-                    q.setParam("cod_uo", codUo);
-                    string querystring = q.getSQL();
-                    logger.Debug(querystring);
-                    retval = this.ExecuteNonQuery(querystring);
-                }
-                catch (Exception e)
-                {
-                    logger.Error(e);
-                }
-            }
-            return retval;
-        }
-
-        public bool FattElAttive_UpSecProprietario(string idProfile)
-        {
-            bool retval = false;
-            using (DocsPaDB.DBProvider dbProvider = new DBProvider())
-            {
-                try
-                {
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("FATT_U_SEC_FATT_ATT_1");
-                    q.setParam("id_profile", idProfile);                    
-                    string querystring = q.getSQL();
-                    logger.Debug(querystring);
-                    retval = this.ExecuteNonQuery(querystring);
-
-                    DocsPaUtils.Query q2 = DocsPaUtils.InitQuery.getInstance().getQuery("FATT_U_SEC_FATT_ATT_2");
-                    q2.setParam("id_profile", idProfile);
-                    querystring = q2.getSQL();
-                    logger.Debug(querystring);
-                    retval = this.ExecuteNonQuery(querystring);
-                }
-                catch (Exception e)
-                {
-                    logger.Error(e);
-                }
-            }
             return retval;
         }
         #endregion
@@ -15617,6 +15668,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             return result;
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -15649,6 +15701,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             return result;
         }
+
 
         /// <summary>
         /// Task di login per l'utente amministratore
@@ -16011,6 +16064,29 @@ namespace DocsPaDB.Query_DocsPAWS
             return retValue;
         }
 
+        private bool InsertLogAttivati(string idNewAmministrazione)
+        {
+            bool retValue = false;
+            try
+            {
+                using (DocsPaDB.DBProvider dbProvider = new DBProvider())
+                {
+                    DocsPaUtils.Query q;
+                    string queryString;
+                    q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_LOG_ATTIVATI_ALL");
+                    q.setParam("idAmm", idNewAmministrazione);
+                    queryString = q.getSQL();
+                    retValue = dbProvider.ExecuteNonQuery(queryString);
+                }
+            }
+            catch (Exception e)
+            {
+                retValue = false;
+                logger.Error("Errore in InsertLogAttivati " + e.Message);
+            }
+            return retValue;
+        }
+
         public void setEtichetteTitolario(DocsPaVO.amministrazione.OrgTitolario titolario)
         {
             DocsPaDB.DBProvider dbProvider = new DBProvider();
@@ -16170,7 +16246,16 @@ namespace DocsPaDB.Query_DocsPAWS
                 //NEW CODE
                             "A.SMART_CLIENT_PDF_CONV_ON_SCAN," +
                             "A.VAR_MSG_BANNER," +
-                            "A.TRASMISSIONE_AUTO_DOC";
+                            "A.TRASMISSIONE_AUTO_DOC," +
+                            //************************
+                            // Alessandro Aiello 15/10/2018
+                            // Segnatura permanente
+                            //************************
+                            "A.VAR_FORMATO_SEGNATURA_NP," +
+                            "A.CHA_SEGN_PERM_PROT," +
+                            "A.CHA_SEGN_PERM_NP";
+                            //***************
+                            
             //++++++++
 
 
@@ -16214,6 +16299,11 @@ namespace DocsPaDB.Query_DocsPAWS
                         amm.FromEmail = reader.GetValue(reader.GetOrdinal("FROM_EMAIL")).ToString();
                         amm.IDRagioneCompetenza = reader.GetValue(reader.GetOrdinal("RAGCOMP")).ToString();
                         amm.IDRagioneConoscenza = reader.GetValue(reader.GetOrdinal("RAGCONO")).ToString();
+                        //Segnatura permanente
+                        amm.SegnaturaNP  = reader.GetValue(reader.GetOrdinal("VAR_FORMATO_SEGNATURA_NP")).ToString();
+                        amm.SegnaturaNP_IsPermanente = reader.GetValue(reader.GetOrdinal("CHA_SEGN_PERM_NP")).ToString();
+                        amm.Segnatura_IsPermanente = reader.GetValue(reader.GetOrdinal("CHA_SEGN_PERM_PROT")).ToString();
+                        //fine segnatura permanente
                         //++++?
                         amm.Timbro_pdf = reader.GetValue(reader.GetOrdinal("TIMBRO")).ToString();
                         //MEV-Firma 1 - Aggiunto dettaglio firma
@@ -16322,7 +16412,15 @@ namespace DocsPaDB.Query_DocsPAWS
                 //"A.ID_DISPOSITIVO_STAMPA";
                 //NEW CODE
                             "A.ID_DISPOSITIVO_STAMPA," +
-                            "A.TRASMISSIONE_AUTO_DOC";
+                            "A.TRASMISSIONE_AUTO_DOC," +
+                            //************************
+                            // Alessandro Aiello 15/10/2018
+                            // Segnatura permanente
+                            //************************
+                            "A.VAR_FORMATO_SEGNATURA_NP," +
+                            "A.CHA_SEGN_PERM_PROT," +
+                            "A.CHA_SEGN_PERM_NP";
+                            //***************
             //++++++++
 
             queryDef.setParam("param1", fields);
@@ -16367,6 +16465,11 @@ namespace DocsPaDB.Query_DocsPAWS
                         amm.FromEmail = reader.GetValue(reader.GetOrdinal("FROM_EMAIL")).ToString();
                         amm.IDRagioneCompetenza = reader.GetValue(reader.GetOrdinal("RAGCOMP")).ToString();
                         amm.IDRagioneConoscenza = reader.GetValue(reader.GetOrdinal("RAGCONO")).ToString();
+                        //Segnatura permanente
+                        amm.SegnaturaNP = reader.GetValue(reader.GetOrdinal("VAR_FORMATO_SEGNATURA_NP")).ToString();
+                        amm.SegnaturaNP_IsPermanente = reader.GetValue(reader.GetOrdinal("CHA_SEGN_PERM_NP")).ToString();
+                        amm.Segnatura_IsPermanente = reader.GetValue(reader.GetOrdinal("CHA_SEGN_PERM_PROT")).ToString();
+                        //fine segnatura permanente
                         //++++
                         amm.Timbro_pdf = reader.GetValue(reader.GetOrdinal("TIMBRO")).ToString();
                         amm.Timbro_orientamento = reader.GetValue(reader.GetOrdinal("ORIENTAMENTO")).ToString();
@@ -17748,8 +17851,6 @@ namespace DocsPaDB.Query_DocsPAWS
                         queryDef.setParam("emailRegistro", this.GetStringParameterValue(c.EmailRegistro));
                         queryDef.setParam("note", this.GetStringParameterValue(c.Note));
                         queryDef.setParam("mailRicPendente", this.GetStringParameterValue(c.MailRicevutePendenti));
-                        queryDef.setParam("messageSendMail", this.GetStringParameterValue(c.MessageSendMail));
-                        queryDef.setParam("overwriteMessageAmm", c.OverwriteMessageAmm ? "1" : "0");
                         string commandText = queryDef.getSQL();
                         this.ExecuteNonQuery(commandText, out rowsAffected);
                         result = (rowsAffected == 1);
@@ -17804,14 +17905,14 @@ namespace DocsPaDB.Query_DocsPAWS
                         {
                             field.Append("ID_REGISTRO,VAR_EMAIL_REGISTRO,VAR_USER_MAIL,VAR_PWD_MAIL,VAR_SERVER_SMTP,CHA_SMTP_SSL,CHA_POP_SSL,NUM_PORTA_SMTP," +
                                 "CHA_SMTP_STA, VAR_SERVER_POP, NUM_PORTA_POP, VAR_USER_SMTP, VAR_PWD_SMTP, VAR_INBOX_IMAP, VAR_SERVER_IMAP, NUM_PORTA_IMAP," +
-                                "VAR_TIPO_CONNESSIONE, VAR_BOX_MAIL_ELABORATE, VAR_MAIL_NON_ELABORATE, CHA_IMAP_SSL, VAR_SOLO_MAIL_PEC, CHA_RICEVUTA_PEC, VAR_PRINCIPALE, VAR_NOTE, VAR_MAIL_RIC_PENDENTE, VAR_MESSAGE_SEND_MAIL, CHA_OVERWRITE_MESSAGE_AMM");
+                                "VAR_TIPO_CONNESSIONE, VAR_BOX_MAIL_ELABORATE, VAR_MAIL_NON_ELABORATE, CHA_IMAP_SSL, VAR_SOLO_MAIL_PEC, CHA_RICEVUTA_PEC, VAR_PRINCIPALE, VAR_NOTE, VAR_MAIL_RIC_PENDENTE");
 
                         }
                         else
                         {
                             field.Append("SYSTEM_ID,ID_REGISTRO,VAR_EMAIL_REGISTRO,VAR_USER_MAIL,VAR_PWD_MAIL,VAR_SERVER_SMTP,CHA_SMTP_SSL,CHA_POP_SSL,NUM_PORTA_SMTP," +
                                 "CHA_SMTP_STA, VAR_SERVER_POP, NUM_PORTA_POP, VAR_USER_SMTP, VAR_PWD_SMTP, VAR_INBOX_IMAP, VAR_SERVER_IMAP, NUM_PORTA_IMAP," +
-                                "VAR_TIPO_CONNESSIONE, VAR_BOX_MAIL_ELABORATE, VAR_MAIL_NON_ELABORATE, CHA_IMAP_SSL, VAR_SOLO_MAIL_PEC, CHA_RICEVUTA_PEC, VAR_PRINCIPALE, VAR_NOTE, VAR_MAIL_RIC_PENDENTE, VAR_MESSAGE_SEND_MAIL, CHA_OVERWRITE_MESSAGE_AMM");
+                                "VAR_TIPO_CONNESSIONE, VAR_BOX_MAIL_ELABORATE, VAR_MAIL_NON_ELABORATE, CHA_IMAP_SSL, VAR_SOLO_MAIL_PEC, CHA_RICEVUTA_PEC, VAR_PRINCIPALE, VAR_NOTE, VAR_MAIL_RIC_PENDENTE");
 
                         }
                         DocsPaUtils.Query queryDef = DocsPaUtils.InitQuery.getInstance().getQuery("AMM_I_INSERT_MAIL_REGISTRO");
@@ -17844,8 +17945,6 @@ namespace DocsPaDB.Query_DocsPAWS
                         values.Append("," + this.GetStringParameterValue(c.Note));
                         // Per gestione pendenti tramite PEC
                         values.Append("," + this.GetStringParameterValue(c.MailRicevutePendenti));
-                        values.Append("," + this.GetStringParameterValue(c.MessageSendMail));
-                        values.Append("," + (c.OverwriteMessageAmm ? "1" : "0"));
 
                         queryDef.setParam("param1", field.ToString());
                         queryDef.setParam("param2", values.ToString());
@@ -18167,7 +18266,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 queryDef.setParam("idRegistro", this.GetNumberParameterValue(Convert.ToInt32(idRegistro)));
                 queryDef.setParam("mailAddress", this.GetStringParameterValue(mailAddress));
                 string query = queryDef.getSQL();
-                result = this.ExecuteNonQuery(query);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    result = dbProvider.ExecuteNonQuery(query);
+                }
+                
                 return result;
             }
             catch (Exception e)
@@ -19498,6 +19602,84 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
+        public bool RimuoviVisibilitaImpostazioneRuoloPubblico(string idGruppo)
+        {
+            bool retVal = true;
+            try
+            {
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DELETED_SECURITY_3");
+                    q.setParam("param1", idGruppo);
+
+                    string command = q.getSQL();
+                    logger.Debug(command);
+
+                    if (!dbProvider.ExecuteNonQuery(command))
+                        retVal = false;
+
+                    if (retVal)
+                    {
+                        q = DocsPaUtils.InitQuery.getInstance().getQuery("D_SECURITY");
+                        q.setParam("param1", "personorgroup = " + idGruppo);
+
+                        command = q.getSQL();
+                        logger.Debug(command);
+
+                        if (!dbProvider.ExecuteNonQuery(command))
+                            retVal = false;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+
+            }
+            return retVal;
+        }
+
+        public bool ImpostaRuoloPubblico(string idCorrGlobali, string idGruppo, string idAmm)
+        {
+            bool retVal = true;
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                try
+                {
+                    Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_CHIAVI_CONFIGURAZIONE_VALORE");
+                    q.setParam("idAmm", idAmm);
+                    q.setParam("valore", idGruppo);
+                    q.setParam("codice", "ENABLE_FASCICOLO_PUBBLICO");
+
+                    string command = q.getSQL();
+                    logger.Debug(command);
+
+                    if (!dbProvider.ExecuteNonQuery(command))
+                        retVal = false;
+
+                    //Procedo con la disabilitazione del ruolo pubblico
+                    if(retVal)
+                    {
+                        string dataFine = DocsPaDbManagement.Functions.Functions.ToDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US")));
+                        q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPACorrGlobali2");
+                        q.setParam("param2", idCorrGlobali);
+                        q.setParam("param1", dataFine);
+
+                        command = q.getSQL();
+                        logger.Debug(command);
+
+                        if (!dbProvider.ExecuteNonQuery(command))
+                            retVal = false;
+                    }
+                }
+                catch(Exception ex)
+                {
+                    retVal = false;
+                    logger.Error("Errore in ImpostaRuoloPubblico " + ex.Message);
+                }
+            }
+            return retVal;
+        }
+
         public bool SbloccoCasella(string email, string idRegistro)
         {
             bool retValue = false;
@@ -19523,35 +19705,127 @@ namespace DocsPaDB.Query_DocsPAWS
             return retValue;
         }
 
-        #region Trasmissioni pendenti Utenti in Ruolo
-
-        public bool ExistsTrasmissioniPendentiConWorkflowUtente(string idRuoloInUO, string idPeople)
+        #region visualizzatore espi
+        /* Controllo se l'utente è abilitato alla visualizzazione di EsPIViewer */
+        public DocsPaVO.amministrazione.EsitoVerificaUtenteEspi CheckUtenteAbilitatoEspi(string idAmm, string userName)
         {
-            bool result = false;
-
+            EsitoVerificaUtenteEspi retValue = new EsitoVerificaUtenteEspi();
             try
             {
-                Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_PENDENTI_PEOPLE_COUNT");
-                query.setParam("idCorrGlobali", idRuoloInUO);
-                query.setParam("idPeople", idPeople);
-
-                string commandText = query.getSQL();
-                logger.Debug("QUERY - " + commandText);
-
-                using (DBProvider dbProvider = new DBProvider())
+                using (DocsPaDB.DBProvider dbProvider = new DBProvider())
                 {
-                    string field;
-                    if (dbProvider.ExecuteScalar(out field, commandText))
-                        if (field != "0") result = true;
+                    DocsPaUtils.Query q;
+                    string queryString;
+                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_VISUALIZZA_ESPI");
+                    q.setParam("idAmm", idAmm);
+                    q.setParam("userName", userName);
+                    queryString = q.getSQL();
+                    logger.Debug("QUERY " + queryString);
+
+                    using (IDataReader reader = dbProvider.ExecuteReader(queryString))
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader.GetValue(0).ToString() != String.Empty) //la riga esiste, quindi l'utente è abilitato alla visualizzazione di ESPI
+                            {
+
+                                retValue.idAmm = reader.GetValue(0).ToString();
+                                retValue.userName = reader.GetValue(1).ToString();
+                                retValue.abilitatoEspi = 1;
+                                retValue.abilitatoDocRiservati = Convert.ToInt32(reader.GetValue(2).ToString());
+                            }
+                        }
+
+                    }
                 }
             }
             catch (Exception e)
             {
-                logger.Error("Errore in ExistsTrasmissioniPendentiConWorkflowUtente: " + e);
+                retValue.Esito = "KO";
+                logger.Error("Errore in CheckUtenteAbilitatoEspi " + e.Message);
             }
+            return retValue;
+        }
 
-            return result;
-        }    
+        /* Abilita l'utente alla visualizzazione di EspiViewer */
+        public bool AbilitaEspi(string idAmm, string username, int abilitaRiservati)
+        {
+            bool retValue = false;
+            try
+            {
+                using (DocsPaDB.DBProvider dbProvider = new DBProvider())
+                {
+                    DocsPaUtils.Query q;
+                    string queryString;
+                    q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_VISUALIZZA_ESPI");
+                    q.setParam("idAmm", idAmm);
+                    q.setParam("username", username);
+                    q.setParam("visualizzaRiservati", abilitaRiservati.ToString());
+                    queryString = q.getSQL();
+                    logger.Debug("QUERY " + queryString);
+                    retValue = dbProvider.ExecuteNonQuery(queryString);
+                }
+            }
+            catch (Exception e)
+            {
+                retValue = false;
+                logger.Error("Errore in AbilitaEspi " + e.Message);
+            }
+            return retValue;
+        }
+
+        /* Disabilita l'utente alla visualizzazione di EspiViewer */
+        public bool DisabilitaEspi(string idAmm, string username)
+        {
+            bool retValue = false;
+            try
+            {
+                using (DocsPaDB.DBProvider dbProvider = new DBProvider())
+                {
+                    DocsPaUtils.Query q;
+                    string queryString;
+                    q = DocsPaUtils.InitQuery.getInstance().getQuery("D_DPA_VISUALIZZA_ESPI");
+                    q.setParam("idAmm", idAmm);
+                    q.setParam("username", username);
+                    queryString = q.getSQL();
+                    logger.Debug("QUERY " + queryString);
+                    retValue = dbProvider.ExecuteNonQuery(queryString);
+                }
+            }
+            catch (Exception e)
+            {
+                retValue = false;
+                logger.Error("Errore in DisabilitaEspi " + e.Message);
+            }
+            return retValue;
+        }
+
+        /* Disabilita l'utente alla visualizzazione di EspiViewer */
+        public bool UpdateRiservati(string idAmm, string username, int abilitaRiservati)
+        {
+            bool retValue = false;
+            try
+            {
+                using (DocsPaDB.DBProvider dbProvider = new DBProvider())
+                {
+                    DocsPaUtils.Query q;
+                    string queryString;
+                    q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_VISUALIZZA_ESPI_SET_RISERVATI");
+                    q.setParam("idAmm", idAmm);
+                    q.setParam("username", username);
+                    q.setParam("visualizzaRiservati", abilitaRiservati.ToString());
+                    queryString = q.getSQL();
+                    logger.Debug("QUERY " + queryString);
+                    retValue = dbProvider.ExecuteNonQuery(queryString);
+                }
+            }
+            catch (Exception e)
+            {
+                retValue = false;
+                logger.Error("Errore in UpdateRiservati " + e.Message);
+            }
+            return retValue;
+        }
 
 
         #endregion

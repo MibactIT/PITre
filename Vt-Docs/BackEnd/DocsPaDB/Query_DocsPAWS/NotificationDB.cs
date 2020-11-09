@@ -569,13 +569,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     if (InsertIntoHistoryMultiple(condition))
                     {
                         DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_DPA_NOTIFY_MULTIPLICITY_ONE");
-
-                        string idGruppo = string.Empty;
-                        if (!string.IsNullOrEmpty(idGroup))
-                            idGruppo = " AND ID_GROUP_RECEIVER = " + idGroup;
-
                         q.setParam("idEvent", idEvent);
-                        q.setParam("idGruppo", idGruppo);
                         query = q.getSQL();
                         if (this.ExecuteNonQuery(query))
                         {
@@ -1012,41 +1006,37 @@ namespace DocsPaDB.Query_DocsPAWS
                     return res;
                 }
 
+                this.BeginTransaction();
 
-                    this.BeginTransaction();
+                logger.Debug("INIZIO SP_FOLLOW_DOMAINOBJECT");
 
-                    logger.Debug("INIZIO SP_FOLLOW_DOMAINOBJECT");
-
-                    // Creazione parametri per la Store Procedure
-                    System.Collections.ArrayList parameters = new System.Collections.ArrayList();
-                    parameters.Add(new DocsPaUtils.Data.ParameterSP("idProject", !string.IsNullOrEmpty(followObject.IdProject) ? followObject.IdProject : "0"));
-                    parameters.Add(new DocsPaUtils.Data.ParameterSP("idProfile", !string.IsNullOrEmpty(followObject.IdProfile) ? followObject.IdProfile : "0"));
-                    parameters.Add(new DocsPaUtils.Data.ParameterSP("operation", Convert.ToInt32(followObject.Operation).ToString()));
-                    parameters.Add(new DocsPaUtils.Data.ParameterSP("idPeople", !string.IsNullOrEmpty(followObject.IdPeople) ? followObject.IdPeople : "0"));
-                    parameters.Add(new DocsPaUtils.Data.ParameterSP("idGroup", !string.IsNullOrEmpty(followObject.IdGroup) ? followObject.IdGroup : "0"));
-                    parameters.Add(new DocsPaUtils.Data.ParameterSP("idAmm", !string.IsNullOrEmpty(followObject.IdAmm) ? followObject.IdAmm : "0"));
-                    parameters.Add(new DocsPaUtils.Data.ParameterSP("application", !string.IsNullOrEmpty(followObject.App) ? followObject.App : string.Empty));
-                    int result = this.ExecuteStoreProcedure("SP_FOLLOW_DOMAINOBJECT", parameters);
-                    if (result == 0)
-                    {
-                        res = true;
-                        logger.Debug("STORE PROCEDURE SP_FOLLOW_DOMAINOBJECT: esito positivo");
-                    }
-                    else
-                    {
-                        logger.Debug("STORE PROCEDURE SP_FOLLOW_DOMAINOBJECT: esito negativo");
-                    }
-                    this.CommitTransaction();
-                
+                // Creazione parametri per la Store Procedure
+                System.Collections.ArrayList parameters = new System.Collections.ArrayList();
+                parameters.Add(new DocsPaUtils.Data.ParameterSP("idProject", !string.IsNullOrEmpty(followObject.IdProject) ? followObject.IdProject : "0"));
+                parameters.Add(new DocsPaUtils.Data.ParameterSP("idProfile", !string.IsNullOrEmpty(followObject.IdProfile) ? followObject.IdProfile : "0"));
+                parameters.Add(new DocsPaUtils.Data.ParameterSP("operation", Convert.ToInt32(followObject.Operation).ToString()));
+                parameters.Add(new DocsPaUtils.Data.ParameterSP("idPeople", !string.IsNullOrEmpty(followObject.IdPeople) ? followObject.IdPeople : "0"));
+                parameters.Add(new DocsPaUtils.Data.ParameterSP("idGroup", !string.IsNullOrEmpty(followObject.IdGroup) ? followObject.IdGroup : "0"));
+                parameters.Add(new DocsPaUtils.Data.ParameterSP("idAmm", !string.IsNullOrEmpty(followObject.IdAmm) ? followObject.IdAmm : "0"));
+                parameters.Add(new DocsPaUtils.Data.ParameterSP("application", !string.IsNullOrEmpty(followObject.App) ? followObject.App : string.Empty));
+                int result = this.ExecuteStoreProcedure("SP_FOLLOW_DOMAINOBJECT", parameters);
+                if (result == 0)
+                {
+                    res = true;
+                    logger.Debug("STORE PROCEDURE SP_FOLLOW_DOMAINOBJECT: esito positivo");
+                }
+                else
+                {
+                    logger.Debug("STORE PROCEDURE SP_FOLLOW_DOMAINOBJECT: esito negativo");
+                }
+                this.CommitTransaction();
             }
-
             catch (Exception exc)
             {
                 logger.Debug("Eccezione in DocsPaDB.Query_DocsPAWS.NotificationDB.FollowDomainObjectManager(...):\nStack trace:\n" + exc.StackTrace);
                 this.RollbackTransaction();
             }
             return res;
-        
         }
 
         #endregion

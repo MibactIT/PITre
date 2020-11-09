@@ -120,15 +120,13 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
             {
                 string id = ((Label)item.FindControl("lblPolicyID")).Text;
                 string attiva = ((CheckBox)item.FindControl("chk_attiva_policy")).Checked ? "1" : "0";
-                string notifica = ((CheckBox)item.FindControl("chk_notifica_mail")).Checked ? "1" : "0";
                 foreach (PolicyPARER policy in this.listaPolicy)
                 {
                     if (policy.id.Equals(id))
                     {
-                        if (policy.isAttiva != attiva || policy.notificaMail != notifica)
+                        if (policy.isAttiva != attiva)
                         {
                             policy.isAttiva = attiva;
-                            policy.notificaMail = notifica;
                             policy.tipo = "D";
                             policyToUpdate.Add(policy);
                         }
@@ -242,11 +240,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
         protected bool GetStatoAttivazionePolicy(PolicyPARER policy)
         {
             return (policy.isAttiva.Equals("1"));
-        }
-
-        protected bool GetStatoNotificaMail(PolicyPARER policy)
-        {
-            return (policy.notificaMail.Equals("1"));
         }
 
         protected InfoUtente GetInfoUser()

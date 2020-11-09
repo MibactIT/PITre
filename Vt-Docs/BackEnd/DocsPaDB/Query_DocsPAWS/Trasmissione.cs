@@ -641,7 +641,12 @@ namespace DocsPaDB.Query_DocsPAWS
             string cmdText = q.getSQL();
             logger.Debug(cmdText);
 
-            retValue = this.ExecuteNonQuery(cmdText);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                retValue = dbProvider.ExecuteNonQuery(cmdText);
+            }
+
+            ;
 
             return retValue;
         }
@@ -659,10 +664,15 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 //this.BeginTransaction();
                 //setSenderRigths(objTrasm);
-                for (int k = 0; k < executeQueries.Count; k++)
+
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    this.ExecuteNonQuery(executeQueries[k].ToString());
-                    logger.Debug("Eseguita query " + executeQueries[k]);
+                    for (int k = 0; k < executeQueries.Count; k++)
+                    {
+                        dbProvider.ExecuteNonQuery(executeQueries[k].ToString());
+                        logger.Debug("Eseguita query " + executeQueries[k]);
+                    }
+                     
                 }
                 // this.CommitTransaction();
             }
@@ -2234,7 +2244,11 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 checkString = "SELECT PERSONORGROUP, ACCESSRIGHTS, CHA_TIPO_DIRITTO FROM SECURITY WHERE THING = " + idObj + " AND PERSONORGROUP = " + idPeopleGroup;
                 logger.Debug(checkString);
-                this.ExecuteQuery(dataSet, "DIRITTI", checkString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(dataSet, "DIRITTI", checkString);
+                }
 
                 DataRow[] dirittiRuolo = dataSet.Tables["DIRITTI"].Select("PERSONORGROUP=" + idPeopleGroup);
                 if (dirittiRuolo.Length == 0)
@@ -6300,7 +6314,11 @@ namespace DocsPaDB.Query_DocsPAWS
                     DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_PROFILE_CHA_ASSEGNATO_1_NOT_CHA_ASSEGNATO");
                     q.setParam("param1", idProfile);
                     updateString = q.getSQL();
-                    this.ExecuteNonQuery(updateString);
+
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        dbProvider.ExecuteNonQuery(updateString);
+                    }
                     return;
                 }
             }
@@ -6314,7 +6332,12 @@ namespace DocsPaDB.Query_DocsPAWS
 
             sqlString = "delete from dpa_trasm_singola where id_trasmissione = " + objTrasmissione.systemId;
             logger.Debug(sqlString);
-            this.ExecuteNonQuery(sqlString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(sqlString);
+            }
+            
         }
 
         public void DeleteTrasmSingola(DocsPaVO.trasmissione.TrasmissioneSingola objTrasmSingola)
@@ -6334,7 +6357,11 @@ namespace DocsPaDB.Query_DocsPAWS
             qTrasmSingola.setParam("param1", objTrasmSingola.systemId);
             sqlString = qTrasmSingola.getSQL();
 
-            this.ExecuteNonQuery(sqlString);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(sqlString);
+            }
+            
         }
 
         /// <summary>
@@ -6349,7 +6376,12 @@ namespace DocsPaDB.Query_DocsPAWS
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_DPA_TRASMISSIONE_WHERE_SYSTEMID");
             q.setParam("param1", objTrasmissione.systemId);
             sqlString = q.getSQL();
-            this.ExecuteNonQuery(sqlString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(sqlString);
+            }
+            
         }
 
         /// <summary>
@@ -6490,7 +6522,13 @@ namespace DocsPaDB.Query_DocsPAWS
             else
                 q.setParam("cessione", "0");
 
-            this.ExecuteNonQuery(q.getSQL());
+
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(q.getSQL());
+            }
+            
             logger.Info("END");
             return objTrasm;
 
@@ -6615,7 +6653,9 @@ namespace DocsPaDB.Query_DocsPAWS
             String idTrasmissione;
             string mySql = q.getSQL();
             logger.Debug(mySql);
+
             this.InsertLocked(out idTrasmissione, mySql, "DPA_TRASMISSIONE");
+
             logger.Info("END");
             return idTrasmissione;
 
@@ -10263,7 +10303,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             //aggiungo il dato video concatenato
             if (!string.IsNullOrEmpty(myTodo.ut_delegato))
-                myTodo.videoMittRuolo = myTodo.ut_delegato + "<br>Sostituto di " + myTodo.utenteMittente + "<br>(" + myTodo.ruoloMittente + ")";
+                myTodo.videoMittRuolo = myTodo.ut_delegato + "<br>Delegato da " + myTodo.utenteMittente + "<br>(" + myTodo.ruoloMittente + ")";
             else
                 myTodo.videoMittRuolo = myTodo.utenteMittente + "<br>" + "(" + myTodo.ruoloMittente + ")";
 
@@ -10565,7 +10605,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             //aggiungo il dato video concatenato
             if (!string.IsNullOrEmpty(myTodo.ut_delegato))
-                myTodo.videoMittRuolo = myTodo.ut_delegato + "<br>Sostituto di " + myTodo.utenteMittente + "<br>(" + myTodo.ruoloMittente + ")";
+                myTodo.videoMittRuolo = myTodo.ut_delegato + "<br>Delegato da " + myTodo.utenteMittente + "<br>(" + myTodo.ruoloMittente + ")";
             else
                 myTodo.videoMittRuolo = myTodo.utenteMittente + "<br>" + "(" + myTodo.ruoloMittente + ")";
 
@@ -10675,7 +10715,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             //aggiungo il dato video concatenato
             if (!string.IsNullOrEmpty(myTodo.ut_delegato))
-                myTodo.videoMittRuolo = myTodo.ut_delegato + "<br>Sostituto di " + myTodo.utenteMittente + "<br>(" + myTodo.ruoloMittente + ")";
+                myTodo.videoMittRuolo = myTodo.ut_delegato + "<br>Delegato da " + myTodo.utenteMittente + "<br>(" + myTodo.ruoloMittente + ")";
             else
                 myTodo.videoMittRuolo = myTodo.utenteMittente + "<br>" + "(" + myTodo.ruoloMittente + ")";
 
@@ -11911,7 +11951,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 checkString += ") ORDER BY ACCESSRIGHTS DESC";
 
                 logger.Debug(checkString);
-                this.ExecuteQuery(dataSet, "DIRITTI", checkString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(dataSet, "DIRITTI", checkString);
+                }
 
                 //ArrayList ruoliConDiritti = new ArrayList();
                 Hashtable ruoliConDiritti = new Hashtable();
@@ -12246,7 +12290,7 @@ namespace DocsPaDB.Query_DocsPAWS
         {
             bool retValue = false;
 
-            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+            //DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
             DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("UPDATE_TRASM_UTENTE_TOGLIE_TODOLIST");
             queryMng.setParam("data_rimozione", DocsPaDbManagement.Functions.Functions.GetDate(true));
@@ -12254,8 +12298,12 @@ namespace DocsPaDB.Query_DocsPAWS
             queryMng.setParam("idoggetto", idOggetto);
             string commandText = queryMng.getSQL();
             logger.Debug(commandText);
-            retValue = dbProvider.ExecuteNonQuery(commandText);
 
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                retValue = dbProvider.ExecuteNonQuery(commandText);
+            }
+            
             return retValue;
         }
 
@@ -14483,260 +14531,6 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Info("Fine Metodo GetIdTrasmissioneByIdTrasmSingola in DocsPaDb.Query_DocsPAWS.LibroFirma");
 
             return idTrasmissione;
-        }
-
-        public bool AccettazioneMassivaInTdl_SP(string idGruppo, string idCorrGlobaliRuolo, string note)
-        {
-            bool result = false;
-            // Creazione parametri per la Store Procedure
-            ArrayList parameters = new ArrayList();
-            DocsPaUtils.Data.ParameterSP outParam;
-
-            try
-            {
-                outParam = new DocsPaUtils.Data.ParameterSP("resultValue", new Int32(), 10, DocsPaUtils.Data.DirectionParameter.ParamOutput, System.Data.DbType.Int32);
-                parameters.Add(CreateParameter("idGruppo", idGruppo));
-                parameters.Add(CreateParameter("idCorrGlobali", idCorrGlobaliRuolo));
-                parameters.Add(CreateParameter("note", note));
-                parameters.Add(outParam);
-
-                ExecuteStoredProcedure("SP_CleanToDoList", parameters, null);
-
-                if (outParam.Valore != null && outParam.Valore.ToString() != "")
-                {
-                    if (outParam.Valore.ToString() == "0")
-                    {
-                        result = true;
-                        logger.Debug("STORE PROCEDURE SP_CleanToDoList: esito positivo");
-                    }
-                    else
-                    {
-                        logger.Debug("STORE PROCEDURE SP_CleanToDoList: esito negativo:" + outParam.Valore.ToString());
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in AccettazioneMassivaInTdl_SP: " + e.StackTrace);
-                result = false;
-            }
-
-            return result;
-        }
-
-        public List<DocsPaVO.trasmissione.InfoTrasmissione> GetTrasmissioniPendentiConWorkflow(string idDocOrFasc, string docOrFasc, string idRuoloInUO, string idPeople, out List<string> idTrasmsSingola, ref DocsPaVO.ricerche.SearchPagingContext pagingContext)
-        {
-            idTrasmsSingola = new List<string>();
-            List<DocsPaVO.trasmissione.InfoTrasmissione> infoTrasmissioni = new List<DocsPaVO.trasmissione.InfoTrasmissione>();
-            DocsPaVO.trasmissione.InfoTrasmissione info;
-            try
-            {
-                pagingContext.SetRecordCount(this.CountTrasmissioniPendentiConWorkflow(idDocOrFasc, docOrFasc, idRuoloInUO, idPeople, out idTrasmsSingola));
-
-                if (pagingContext.RecordCount > 0)
-                {
-                    Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_PENDENTI");
-
-                    if (docOrFasc.Equals("D"))
-                    {
-                        query.setParam("idProfile", "AND a.id_profile = " + idDocOrFasc);
-                        query.setParam("idProject", string.Empty);
-                    }
-                    else
-                    {
-                        query.setParam("idProject", "AND a.id_project = " + idDocOrFasc);
-                        query.setParam("idProfile", string.Empty);
-                    }
-                    query.setParam("chaTipoOggetto", docOrFasc);
-                    query.setParam("idCorrGlobali", idRuoloInUO);
-                    query.setParam("idPeople", idPeople);
-                    query.setParam("dtaInvio", DocsPaDbManagement.Functions.Functions.ToChar("dta_invio", true));
-                    query.setParam("startRow", pagingContext.StartRow.ToString());
-                    query.setParam("endRow", pagingContext.EndRow.ToString());
-
-                    string commandText = query.getSQL();
-                    logger.Debug(commandText);
-
-                    using (DocsPaDB.DBProvider dbProvider = new DBProvider())
-                    {
-                        using (IDataReader reader = dbProvider.ExecuteReader(commandText))
-                        {
-                            while (reader.Read())
-                            {
-                                info = new DocsPaVO.trasmissione.InfoTrasmissione();
-
-                                info.IdTrasmissione = reader.GetValue(reader.GetOrdinal("system_id")).ToString();
-                                info.idTrasmSingola = reader.GetValue(reader.GetOrdinal("id_trasm_singola")).ToString();
-                                info.IdRuolo = reader.GetValue(reader.GetOrdinal("ruolo_system_id")).ToString();
-                                info.Ruolo = reader.GetValue(reader.GetOrdinal("ruolo")).ToString();
-                                info.IdUtente = reader.GetValue(reader.GetOrdinal("user_system_id")).ToString();
-                                info.Utente = reader.GetValue(reader.GetOrdinal("user_id")).ToString();
-                                info.Tipo = reader.GetValue(reader.GetOrdinal("cha_tipo_oggetto")).ToString();
-                                info.IdDocumento = reader.GetValue(reader.GetOrdinal("id_profile")).ToString();
-                                info.IdFascicolo = reader.GetValue(reader.GetOrdinal("id_project")).ToString();
-                                info.DataInvio = reader.GetValue(reader.GetOrdinal("dta_invio")).ToString();
-                                info.NoteGenerali = reader.GetValue(reader.GetOrdinal("var_note_generali")).ToString();
-                                info.SalvataConCessione = reader.GetValue(reader.GetOrdinal("cha_salvata_con_cessione")).ToString();
-                                string utDelegato = reader.GetValue(reader.GetOrdinal("id_people_delegato")).ToString();
-                                info.UtenteDelegato = "";
-                                if (!string.IsNullOrEmpty(utDelegato))
-                                {
-                                    Utenti utente = new Utenti();
-                                    DocsPaVO.utente.Utente delegato = utente.GetUtenteNoFiltroDisabled(utDelegato);
-                                    //Uso il metodo GetUtenteNoFiltroDisabled e non GetUtente perchè nel caso in cui il delegato è disabilitato non ritorna nulla
-                                    //info.UtenteDelegato = utente.GetUtente(utDelegato).descrizione;
-
-                                    info.UtenteDelegato = (delegato != null) ? delegato.descrizione : string.Empty;
-                                }
-
-                                infoTrasmissioni.Add(info);
-                            }
-                        }
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in GetTrasmissioniPendentiConWorkflow: " + e);
-            }
-
-            return infoTrasmissioni;
-        }
-
-        public int CountTrasmissioniPendentiConWorkflow(string idDocOrFasc, string docOrFasc, string idRuoloInUO, string idPeople, out List<string> idTrasmsSingola)
-        {
-            idTrasmsSingola = new List<string>();
-            int count = 0;
-            try
-            {
-                Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_PENDENTI_COUNT");
-                if (docOrFasc.Equals("D"))
-                {
-                    query.setParam("idProfile", "AND a.id_profile = " + idDocOrFasc);
-                    query.setParam("idProject", string.Empty);
-                }
-                else
-                {
-                    query.setParam("idProject", "AND a.id_project = " + idDocOrFasc);
-                    query.setParam("idProfile", string.Empty);
-                }
-                query.setParam("chaTipoOggetto", docOrFasc);
-                query.setParam("idCorrGlobali", idRuoloInUO);
-                query.setParam("idPeople", idPeople);
-
-                string commandText = query.getSQL();
-                logger.Debug("QUERY - " + commandText);
-
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    using (IDataReader reader = dbProvider.ExecuteReader(commandText))
-                    {
-                        while (reader.Read())
-                            idTrasmsSingola.Add(reader.GetValue(reader.GetOrdinal("ID_TRASM_SINGOLA")).ToString());
-                        count = idTrasmsSingola.Count;
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in CountTrasmissioniPendentiConWorkflow: " + e);
-            }
-            return count;
-        }
-
-        public List<DocsPaVO.trasmissione.Trasmissione> GetListTrasmissioniPendentiRuolo(string idRuoloInUO)
-        {
-            List<DocsPaVO.trasmissione.Trasmissione> listTrasmissioni = new List<DocsPaVO.trasmissione.Trasmissione>();
-            DocsPaVO.trasmissione.Trasmissione trasmissione;
-            DocsPaVO.trasmissione.TrasmissioneSingola trasmSingola;
-
-            Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_PENDENTI_RUOLO");
-            query.setParam("idCorrGlobali", idRuoloInUO);
-
-            string commandText = query.getSQL();
-            logger.Debug(commandText);
-
-            using (DocsPaDB.DBProvider dbProvider = new DBProvider())
-            {
-                using (IDataReader reader = dbProvider.ExecuteReader(commandText))
-                {
-                    while (reader.Read())
-                    {
-                        if (!listTrasmissioni.Any(t => t.systemId.Equals(reader.GetValue(reader.GetOrdinal("ID_TRASMISSIONE")).ToString())))
-                        {
-                            trasmissione = new DocsPaVO.trasmissione.Trasmissione();
-                            trasmissione.systemId = reader.GetValue(reader.GetOrdinal("ID_TRASMISSIONE")).ToString();
-                            trasmissione.trasmissioniSingole = new ArrayList();
-                            listTrasmissioni.Add(trasmissione);
-                        }
-
-                        trasmSingola = new DocsPaVO.trasmissione.TrasmissioneSingola();
-                        trasmSingola.systemId = reader.GetValue(reader.GetOrdinal("ID_TRASM_SINGOLA")).ToString();
-                        trasmSingola.tipoTrasm = reader.GetValue(reader.GetOrdinal("CHA_TIPO_TRASM")).ToString();
-                        trasmSingola.trasmissioneUtente.AddRange(getTrasmissioniUtenteDaSingola(trasmSingola.systemId));
-                        trasmSingola.ragione = new DocsPaVO.trasmissione.RagioneTrasmissione();
-                        trasmSingola.ragione.tipo = reader.GetValue(reader.GetOrdinal("CHA_TIPO_RAGIONE")).ToString();
-                        listTrasmissioni.First(a => a.systemId.Equals(reader.GetValue(reader.GetOrdinal("ID_TRASMISSIONE")).ToString())).trasmissioniSingole.Add(trasmSingola);
-                    }
-                }
-            }
-
-            return listTrasmissioni;
-        }
-
-        public List<DocsPaVO.trasmissione.Trasmissione> GetListTrasmissioniPendentiUtente(string idPeople, string idRuoloInUO)
-        {
-            List<DocsPaVO.trasmissione.Trasmissione> listTrasmissioni = new List<DocsPaVO.trasmissione.Trasmissione>();
-            DocsPaVO.trasmissione.Trasmissione trasmissione;
-            DocsPaVO.trasmissione.TrasmissioneSingola trasmSingola;
-            DocsPaVO.trasmissione.TrasmissioneUtente trasmUtente;
-
-            Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_PENDENTI_PEOPLE");
-            query.setParam("idCorrGlobali", idRuoloInUO);
-            query.setParam("idPeople", idPeople);
-
-            string commandText = query.getSQL();
-            logger.Debug(commandText);
-
-            using (DocsPaDB.DBProvider dbProvider = new DBProvider())
-            {
-                using (IDataReader reader = dbProvider.ExecuteReader(commandText))
-                {
-                    while (reader.Read())
-                    {
-                        trasmissione = new DocsPaVO.trasmissione.Trasmissione();
-                        trasmissione.systemId = reader.GetValue(reader.GetOrdinal("ID_TRASMISSIONE")).ToString();
-
-                        trasmissione.trasmissioniSingole = new ArrayList();
-                        trasmSingola = new DocsPaVO.trasmissione.TrasmissioneSingola();
-
-                        trasmSingola.trasmissioneUtente = new ArrayList();
-                        trasmUtente = new DocsPaVO.trasmissione.TrasmissioneUtente();
-                        trasmUtente.systemId = reader.GetValue(reader.GetOrdinal("ID_TRASM_UTENTE")).ToString();
-                        trasmUtente.dataAccettata = reader.GetValue(reader.GetOrdinal("DTA_ACCETTATA")).ToString();
-                        trasmUtente.dataRifiutata = reader.GetValue(reader.GetOrdinal("DTA_RIFIUTATA")).ToString();
-                        trasmUtente.noteRifiuto = reader.GetValue(reader.GetOrdinal("VAR_NOTE_RIF")).ToString();
-                        trasmUtente.noteAccettazione = reader.GetValue(reader.GetOrdinal("VAR_NOTE_ACC")).ToString();
-                        trasmUtente.dataRisposta = reader.GetValue(reader.GetOrdinal("DTA_RISPOSTA")).ToString();
-                        trasmUtente.valida = reader.GetValue(reader.GetOrdinal("CHA_VALIDA")).ToString();
-                        trasmUtente.dataRimossaTDL = reader.GetValue(reader.GetOrdinal("DTA_RIMOZIONE_TODOLIST")).ToString();
-                        trasmUtente.idPeopleDelegato = reader.GetValue(reader.GetOrdinal("ID_PEOPLE_DELEGATO")).ToString();
-                        trasmUtente.cha_accettata_delegato = reader.GetValue(reader.GetOrdinal("CHA_ACCETTATA_DELEGATO")).ToString();
-                        trasmUtente.cha_vista_delegato = reader.GetValue(reader.GetOrdinal("CHA_VISTA_DELEGATO")).ToString();
-                        trasmUtente.cha_vista_delegato = reader.GetValue(reader.GetOrdinal("CHA_RIFIUTATA_DELEGATO")).ToString();
-
-                        DocsPaDB.Query_DocsPAWS.Utenti ut = new DocsPaDB.Query_DocsPAWS.Utenti();
-                        trasmUtente.utente = ut.getUtenteById(reader.GetValue(reader.GetOrdinal("ID_PEOPLE")).ToString());
-                        trasmSingola.trasmissioneUtente.Add(trasmUtente);
-
-                        trasmissione.trasmissioniSingole.Add(trasmSingola);
-
-                        listTrasmissioni.Add(trasmissione);
-                    }
-                }
-            }
-
-            return listTrasmissioni;
         }
     }
 }

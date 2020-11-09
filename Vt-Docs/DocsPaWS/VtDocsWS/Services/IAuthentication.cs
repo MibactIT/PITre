@@ -21,5 +21,19 @@ namespace VtDocsWS.Services
         [OperationContract]
         VtDocsWS.Services.Authentication.Authenticate.AuthenticateResponse Authenticate(VtDocsWS.Services.Authentication.Authenticate.AuthenticateRequest request);
 
+        [OperationContract]
+        VtDocsWS.Services.AddressBook.SearchUsers.SearchUsersResponse GetAllUsers();
+
+        [OperationContract]
+        VtDocsWS.Services.Authentication.GetAooListForUser.AooUserAssociationResponse GetAooListForUser(string username);
+
+        [OperationContract]
+        VtDocsWS.Services.Authentication.GetAooListForUser.AooUserAssociationResponse GetUsersForAoo(string idAoo);
+
+        [OperationContract]
+        VtDocsWS.Services.Authentication.GetAooListForUser.AooUserAssociationResponse GetAllAoo();
+
+        [OperationContract]
+        VtDocsWS.Services.Authentication.GetAooListForUser.AooUserAssociationResponse GetAssociationUserAooFromGiada(string id, string username);
     }
 }

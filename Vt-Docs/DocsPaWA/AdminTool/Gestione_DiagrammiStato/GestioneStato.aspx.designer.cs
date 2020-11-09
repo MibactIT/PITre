@@ -119,23 +119,5 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox cb_statoNonRicercabile;
-        
-        /// <summary>
-        /// PnlProcessiFirma control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PnlProcessiFirma;
-        
-        /// <summary>
-        /// DdlProcessoFirma control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DdlProcessoFirma;
     }
 }

@@ -24,7 +24,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
 
         protected void btnSalva_Click(object sender, EventArgs e)
         {
-
             if (this.Validate())
             {
                 DocsPaWR.Mailbox mailBox = new Mailbox();
@@ -35,7 +34,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                 mailBox.Port = this.txt_port.Text;
                 mailBox.UseSSL = this.chk_ssl.Checked;
                 mailBox.From = this.txt_from.Text;
-                mailBox.MailPolicy = this.txt_mail_policy.Text;
                 bool result = this._wsInstance.SetMailStruttura(this.IdAmministrazione.ToString(), mailBox);
                 string msg = string.Empty;
 
@@ -50,13 +48,12 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
 
                 ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "save_result", "alert('" + msg + "');", true);
             }
-            this.pnlRecipients.Update();
-            this.pnlMailbox.Update();
         }
 
         protected void FetchData()
         {
             DocsPaWR.Mailbox mailParams = this._wsInstance.GetMailStruttura(this.IdAmministrazione.ToString());
+            //string mailStruttura = this._wsInstance.GetMailStruttura(this.IdAmministrazione.ToString());
 
             if (mailParams != null)
             {
@@ -66,7 +63,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                 this.txt_password.Text = mailParams.Password;
                 this.txt_port.Text = mailParams.Port;
                 this.txt_from.Text = mailParams.From;
-                this.txt_mail_policy.Text = mailParams.MailPolicy;
                 this.chk_ssl.Checked = mailParams.UseSSL;
             }
             else
@@ -97,7 +93,7 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
             }
 
             int i;
-            
+
 
             if (!Int32.TryParse(this.txt_port.Text, out i))
             {

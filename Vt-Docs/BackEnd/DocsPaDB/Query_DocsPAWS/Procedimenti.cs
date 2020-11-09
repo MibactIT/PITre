@@ -120,6 +120,35 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Debug("END");
             return result;
         }
+
+        public bool UpdateDocReindirizzamento(string oldIdProject, string newIdProject, string newIdReg)
+        {
+            logger.Debug("BEGIN");
+            bool result = false;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PROCEDIMENTI_REINDIRIZZAMENTO");
+                query.setParam("old_id_project", oldIdProject);
+                query.setParam("new_id_project", newIdProject);
+                query.setParam("new_id_aoo", newIdReg);
+                string command = query.getSQL();
+
+                logger.Debug("QUERY - " + query);
+                if (!this.ExecuteNonQuery(command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                result = true;
+            }
+            catch(Exception ex)
+            {
+                logger.Debug(ex);
+                result = false;
+            }
+
+            logger.Debug("END");
+            return result;
+        }
         #endregion
 
         #region Select
@@ -166,7 +195,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
                 string str = string.Empty;
                 int counter;
-                if(!this.ExecuteScalar(out str, command)) 
+                if (!this.ExecuteScalar(out str, command))
                 {
                     throw new Exception(this.LastExceptionMessage);
                 }
@@ -264,7 +293,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 Id = ds.Tables[0].Rows[i]["ID_PROFILE"].ToString(),
                                 DataVisualizzazione = ds.Tables[0].Rows[i]["DATA_VISUALIZZAZIONE"].ToString()
                             };
-                            
+
                         }
                     }
                 }
@@ -357,7 +386,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         proc.Autore = ds.Tables[0].Rows[0]["ID_CORR_GLOBALI"].ToString();
                         proc.Descrizione = ds.Tables[0].Rows[0]["DESCRIPTION"].ToString();
                         proc.Documenti = new DocumentoProcedimento[ds.Tables[0].Rows.Count];
-                        for (int i = 0; i < ds.Tables[0].Rows.Count ; i++)
+                        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                         {
                             proc.Documenti[i] = new DocumentoProcedimento()
                             {
@@ -406,8 +435,8 @@ namespace DocsPaDB.Query_DocsPAWS
                         proc.Autore = ds.Tables[0].Rows[0]["ID_CORR_GLOBALI"].ToString();
                         proc.Descrizione = ds.Tables[0].Rows[0]["DESCRIPTION"].ToString();
                         proc.Documenti = new DocumentoProcedimento[1];
-                        proc.Documenti[0] = new DocumentoProcedimento() 
-                        { 
+                        proc.Documenti[0] = new DocumentoProcedimento()
+                        {
                             Id = ds.Tables[0].Rows[0]["ID_PROFILE"].ToString(),
                             DataVisualizzazione = ds.Tables[0].Rows[0]["DATA_VISUALIZZAZIONE"].ToString()
                         };
@@ -423,6 +452,83 @@ namespace DocsPaDB.Query_DocsPAWS
 
             logger.Debug("END");
             return proc;
+        }
+
+        public string GetIdIstanzaProcedimento(string idProject)
+        {
+            logger.Debug("BEGIN");
+            string result = string.Empty;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_PROCEDIMENTO_ISTANZA");
+                query.setParam("id_project", idProject);
+
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + query);
+
+                if (!this.ExecuteScalar(out result, command))
+                    throw new Exception(this.LastExceptionMessage);
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetIdIstanzaProcedimento - ", ex);
+                result = string.Empty;
+            }
+
+            return result;
+        }
+
+        public string GetIdTemplateDocByDescProcedimento(string descrizione, string idAmm)
+        {
+            logger.Debug("BEGIN");
+            string result = string.Empty;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_TEMPLATE_DOC_ID_BY_DESCRIZIONE");
+                query.setParam("descrizione", descrizione.Replace("'", "''"));
+                query.setParam("id_amm", idAmm);
+                string command = query.getSQL();
+
+                logger.Debug("QUERY - " + query);
+                if (!this.ExecuteScalar(out result, command))
+                    throw new Exception(this.LastExceptionMessage);
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore in GetIdTemplateDocByDescProcedimento - ", ex);
+                result = null;
+            }
+
+            logger.Debug("END");
+            return result;
+        }
+
+        public string GetIdTemplateFascByDescProcedimento(string descrizione, string idAmm)
+        {
+            logger.Debug("BEGIN");
+            string result = string.Empty;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_TEMPLATE_FASC_ID_BY_DESCRIZIONE");
+                query.setParam("descrizione", descrizione.Replace("'", "''"));
+                query.setParam("id_amm", idAmm);
+                string command = query.getSQL();
+
+                logger.Debug("QUERY - " + command);
+                if (!this.ExecuteScalar(out result, command))
+                    throw new Exception(this.LastExceptionMessage);
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetIdTemplateFascByDescProcedimento - ", ex);
+                result = null;
+            }
+
+            logger.Debug("END");
+            return result;
         }
 
         public EsitoProcedimento GetEsitoProcedimento(string idFascicolo)
@@ -519,11 +625,11 @@ namespace DocsPaDB.Query_DocsPAWS
                         result = new string[ds.Tables[0].Rows.Count];
                         for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                         {
-                            result[i] = ds.Tables[0].Rows[i]["VAR_DESC_FASC"].ToString() +  "_" + ds.Tables[0].Rows[i]["ID_PROC"].ToString();
+                            result[i] = ds.Tables[0].Rows[i]["VAR_DESC_FASC"].ToString() + "_" + ds.Tables[0].Rows[i]["ID_PROC"].ToString();
                         }
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -572,7 +678,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         foreach (DataRow row in ds.Tables[0].Rows)
                         {
                             DettaglioProcedimento dp = null;
-                            
+
                             if (row["ID_PROJECT"].ToString() != lastId)
                             {
                                 if (!string.IsNullOrEmpty(lastId))
@@ -648,6 +754,273 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Debug("END");
             return list;
         }
+
+        public List<DocsPaVO.utente.Registro> GetAOOAssociateProcedimento(string template, string idAmm)
+        {
+            logger.Debug("BEGIN");
+            List<DocsPaVO.utente.Registro> list = new List<DocsPaVO.utente.Registro>();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_AOO_PROCEDIMENTI");
+                query.setParam("template", template.Replace("'", "''"));
+                query.setParam("id_amm", idAmm);
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                DataSet ds;
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds != null && ds.Tables[0] != null)
+                {
+                    foreach(DataRow row in ds.Tables[0].Rows)
+                    {
+                        DocsPaVO.utente.Registro item = new DocsPaVO.utente.Registro();
+                        item.systemId = row["SYSTEM_ID"].ToString();
+                        item.codice = row["VAR_CODICE"].ToString();
+                        item.descrizione = row["VAR_DESC_REGISTRO"].ToString();
+                        item.idAmministrazione = row["ID_AMM"].ToString();
+
+                        list.Add(item);
+                    }
+                }
+                else
+                {
+                    list = null;
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetAOOAssociateProcedimento - ", ex);
+                list = null;
+            }
+
+            logger.Debug("END");
+            return list;
+        }
+
+        public bool CheckProcedimentoReindirizzato(string idProject, out string newId, out string newIdReg)
+        {
+            logger.Debug("BEGIN");
+            bool result = false;
+
+            newId = string.Empty;
+            newIdReg = string.Empty;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_PROCEDIMENTO_REINDIRIZZATO");
+                query.setParam("id_project", idProject);
+                string command = query.getSQL();
+                
+
+                logger.Debug("QUERY - " + command);
+                DataSet ds = new DataSet();
+                if(!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds != null && ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow row = ds.Tables[0].Rows[0];
+                    newId = row["ID_REDIRECT"].ToString();
+                    newIdReg = row["ID_AOO_REDIRECT"].ToString();
+
+                    result = newId != "0";
+                }
+                else
+                {
+                    result = false;
+                }              
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in CheckProcedimentoReindirizzato - ", ex);
+                newId = string.Empty;
+                newIdReg = string.Empty;
+            }
+
+            logger.Debug("END");
+            return result;
+        }
+
+        public bool CheckStatoChiusuraProcedimento(string idStato)
+        {
+            logger.Debug("BEGIN");
+            bool result = false;
+
+            try
+            {
+
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_CHECK_STATO_CHIUSURA_PROCEDIMENTO");
+                query.setParam("id_stato", idStato);
+
+                string command = query.getSQL();
+                string retVal = string.Empty;
+                logger.Debug("QUERY - " + command);
+
+                if (!this.ExecuteScalar(out retVal, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if (!string.IsNullOrEmpty(retVal) && retVal.Trim() == idStato)
+                    result = true;
+
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in CheckStatoChiusuraProcedimento - ", ex);
+                result = false;
+            }
+
+            logger.Debug("END");
+            return result;
+        }
+
+        #region Amministrazione
+        public List<String> GetTipologieDocumento(String[] AOO)
+        {
+            logger.Debug("BEGIN");
+            List<String> list = new List<String>();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_PORTALE_AMM_GET_TIPI_DOC");
+                string filtro = this.SetFiltroAOO(AOO);
+                query.setParam("aoo", filtro);
+                query.setParam("num_aoo", AOO.Count().ToString());
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+                DataSet ds;
+
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds != null && ds.Tables[0] != null)
+                {
+                    foreach(DataRow row in ds.Tables[0].Rows)
+                    {
+                        list.Add(row["DESCRIZIONE"].ToString());
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetTipologieDocumento - ", ex);
+                list = null;
+            }
+
+            logger.Debug("END");
+            return list;
+        }
+
+        public List<String> GetTipologieFascicolo(String[] AOO)
+        {
+            logger.Debug("BEGIN");
+            List<String> list = new List<String>();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_PORTALE_AMM_GET_TIPI_FASC");
+                string filtro = this.SetFiltroAOO(AOO);
+                query.setParam("aoo", filtro);
+                query.setParam("num_aoo", AOO.Count().ToString());
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+                DataSet ds;
+
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if (ds != null && ds.Tables[0] != null)
+                {
+                    foreach (DataRow row in ds.Tables[0].Rows)
+                    {
+                        list.Add(row["DESCRIZIONE"].ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore in GetTipologieFascicolo - ", ex);
+                list = null;
+            }
+
+            logger.Debug("END");
+            return list;
+        }
+
+        public List<DocsPaVO.utente.Registro> GetAOO()
+        {
+            logger.Debug("BEGIN");
+            List<DocsPaVO.utente.Registro> list = null;
+
+            try
+            {
+                list = new List<DocsPaVO.utente.Registro>();
+
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_PORTALE_AMM_GET_AOO");
+                string command = query.getSQL();
+
+                DataSet ds;
+
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds != null && ds.Tables[0] != null)
+                {
+                    foreach(DataRow row in ds.Tables[0].Rows)
+                    {
+                        DocsPaVO.utente.Registro reg = new DocsPaVO.utente.Registro();
+                        reg.systemId = row["SYSTEM_ID"].ToString();
+                        reg.codRegistro = row["VAR_CODICE"].ToString();
+                        reg.descrizione = row["VAR_DESC_REGISTRO"].ToString();
+                        reg.codAmministrazione = row["VAR_CODICE_AMM"].ToString();
+                        reg.idAmministrazione = row["ID_AMM"].ToString();
+
+                        list.Add(reg);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetAOO - " + ex.Message);
+            }
+
+            logger.Debug("END");
+            return list;
+        }
+        #endregion
+
+        #endregion
+
+        #region Delete
+        public bool DeleteDocProcedimento(string idFascicolo)
+        {
+            logger.Debug("BEGIN");
+            bool result = false;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("D_DPA_PROCEDIMENTI_REINDIRIZZAMENTO");
+                query.setParam("id_project", idFascicolo);
+
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                if (!this.ExecuteNonQuery(command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                result = true;
+            }
+            catch(Exception ex)
+            {
+                logger.Debug(ex);
+                result = false;
+            }
+
+            logger.Debug("END");
+            return result;
+        }
         #endregion
 
         #region Metodi privati
@@ -668,11 +1041,11 @@ namespace DocsPaDB.Query_DocsPAWS
                         {
                             if (dbType.ToUpper().Equals("SQL"))
                             {
-                                filterString = filterString + " AND EXISTS (SELECT 'X' FROM DPA_ASS_PROCEDIMENTI_FASI Y1, DPA_STATI Y2 WHERE Y1.ID_STATO=Y2.SYSTEM_ID AND Y2.Stato_iniziale='1' AND Y1.ID_PROJECT=A.SYSTEM_ID AND YEAR(Y1.DTA_START)= " + f.valore + ") "; 
+                                filterString = filterString + " AND EXISTS (SELECT 'X' FROM DPA_ASS_PROCEDIMENTI_FASI Y1, DPA_STATI Y2 WHERE Y1.ID_STATO=Y2.SYSTEM_ID AND Y2.Stato_iniziale='1' AND Y1.ID_PROJECT=A.SYSTEM_ID AND YEAR(Y1.DTA_START)= " + f.valore + ") ";
                             }
                             else
                             {
-                                filterString = filterString + " AND EXISTS (SELECT 'X' FROM DPA_ASS_PROCEDIMENTI_FASI Y1, DPA_STATI Y2 WHERE Y1.ID_STATO=Y2.SYSTEM_ID AND Y2.Stato_iniziale='1' AND Y1.ID_PROJECT=A.SYSTEM_ID AND TO_CHAR(Y1.DTA_START, 'YYYY)='" + f.valore + "') "; 
+                                filterString = filterString + " AND EXISTS (SELECT 'X' FROM DPA_ASS_PROCEDIMENTI_FASI Y1, DPA_STATI Y2 WHERE Y1.ID_STATO=Y2.SYSTEM_ID AND Y2.Stato_iniziale='1' AND Y1.ID_PROJECT=A.SYSTEM_ID AND TO_CHAR(Y1.DTA_START, 'YYYY)='" + f.valore + "') ";
                             }
                         }
                         break;
@@ -684,6 +1057,27 @@ namespace DocsPaDB.Query_DocsPAWS
 
 
             return filterString;
+        }
+
+        private string SetFiltroAOO(String[] list)
+        {
+            string filter = string.Empty;
+
+            if(list != null && list.Count() > 0)
+            {
+                string listString = string.Empty;
+                for (int i=0; i<list.Count(); i++)
+                {
+                    listString = listString + list[i];
+                    if (i < list.Count() - 1)
+                        listString = listString + ",";
+                }
+
+                //filter = string.Format(" AND B.SYSTEM_ID IN ({0})", listString);
+                filter = listString;
+            }
+
+            return filter;
         }
         #endregion
 

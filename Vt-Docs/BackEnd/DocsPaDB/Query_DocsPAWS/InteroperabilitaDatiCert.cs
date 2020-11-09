@@ -50,10 +50,13 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             logger.Debug("inserimento in notifica: " + q.getSQL());
 
-            using (IDataReader reader = ExecuteReader(q.getSQL()))
+            using (DBProvider dbProvider = new DBProvider())
             {
-                if (reader != null && reader.Read())
-                    verifica = true;
+                using (IDataReader reader = dbProvider.ExecuteReader(q.getSQL()))
+                {
+                    if (reader != null && reader.Read())
+                        verifica = true;
+                }
             }
 
             return verifica;
@@ -80,7 +83,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("descrizione", tipoNotifica.descrizioneNotifica);
 
             logger.Debug("inserimento in tipo_notifica: " + q.getSQL());
-            retval = ExecuteNonQuery(q.getSQL());
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+
+                retval = dbProvider.ExecuteNonQuery(q.getSQL());
+            }
 
             return retval;
         }
@@ -163,7 +171,11 @@ namespace DocsPaDB.Query_DocsPAWS
             }
 
                 logger.Debug("inserimento in notifica: " + q.getSQL());
-            retval = ExecuteNonQuery(q.getSQL());
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                retval = dbProvider.ExecuteNonQuery(q.getSQL());
+            }
 
             return retval;
         }
@@ -207,7 +219,11 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("docnumber", docnumber);
 
             logger.Debug("delete in notifica: " + q.getSQL());
-            retval = ExecuteNonQuery(q.getSQL());
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                retval = dbProvider.ExecuteNonQuery(q.getSQL());
+            }
 
             return retval;
         }
@@ -287,40 +303,46 @@ namespace DocsPaDB.Query_DocsPAWS
 
             logger.Debug("ricerca notifica: " + q.getSQL());
 
-            using (IDataReader reader = ExecuteReader(q.getSQL()))
+
+            using (DBProvider dbProvider = new DBProvider())
             {
 
-                while (reader.Read())
+                using (IDataReader reader = dbProvider.ExecuteReader(q.getSQL()))
                 {
-                    Notifica notifica = new Notifica();
+
+                    while (reader.Read())
+                    {
+                        Notifica notifica = new Notifica();
 
 
-                    notifica.idNotifica = reader["SYSTEM_ID"].ToString();
-                    notifica.mittente = reader["VAR_MITTENTE"].ToString();
-                    notifica.tipoDestinatario = reader["VAR_TIPO_DESTINATARIO"].ToString();
-                    notifica.destinatario = reader["VAR_DESTINATARIO"].ToString();
+                        notifica.idNotifica = reader["SYSTEM_ID"].ToString();
+                        notifica.mittente = reader["VAR_MITTENTE"].ToString();
+                        notifica.tipoDestinatario = reader["VAR_TIPO_DESTINATARIO"].ToString();
+                        notifica.destinatario = reader["VAR_DESTINATARIO"].ToString();
 
-                    // Se il mittente è un url, del destinatario viene recuperata la descrizione
-                    if (Uri.IsWellFormedUriString(notifica.mittente, UriKind.Absolute))
-                        notifica.destinatario = this.GetDestinatarioPerIs(notifica.destinatario);
+                        // Se il mittente è un url, del destinatario viene recuperata la descrizione
+                        if (Uri.IsWellFormedUriString(notifica.mittente, UriKind.Absolute))
+                            notifica.destinatario = this.GetDestinatarioPerIs(notifica.destinatario);
 
-                    notifica.risposte = reader["VAR_RISPOSTE"].ToString();
-                    notifica.oggetto = reader["VAR_OGGETTO"].ToString();
-                    notifica.gestioneEmittente = reader["VAR_GESTIONE_EMITTENTE"].ToString();
-                    notifica.zona = reader["VAR_ZONA"].ToString();
-                    notifica.data_ora = ((DateTime)reader["VAR_GIORNO_ORA"]).ToString("dd/MM/yyyy HH:mm:ss");
-                    notifica.identificativo = reader["VAR_IDENTIFICATIVO"].ToString();
-                    notifica.msgid = reader["VAR_MSGID"].ToString();
-                    notifica.tipoRicevuta = reader["VAR_TIPO_RICEVUTA"].ToString();
-                    notifica.consegna = reader["VAR_CONSEGNA"].ToString();
-                    notifica.ricezione = reader["VAR_RICEZIONE"].ToString();
-                    notifica.errore_esteso = reader["VAR_ERRORE_ESTESO"].ToString();
-                    notifica.docnumber = reader["DOCNUMBER"].ToString();
-                    notifica.idTipoNotifica = reader["ID_TIPO_NOTIFICA"].ToString();
-                    notifica.erroreRicevuta = reader["VAR_ERRORE_RICEVUTA"].ToString();
-                    lista.Add(notifica);
+                        notifica.risposte = reader["VAR_RISPOSTE"].ToString();
+                        notifica.oggetto = reader["VAR_OGGETTO"].ToString();
+                        notifica.gestioneEmittente = reader["VAR_GESTIONE_EMITTENTE"].ToString();
+                        notifica.zona = reader["VAR_ZONA"].ToString();
+                        notifica.data_ora = ((DateTime)reader["VAR_GIORNO_ORA"]).ToString("dd/MM/yyyy HH:mm:ss");
+                        notifica.identificativo = reader["VAR_IDENTIFICATIVO"].ToString();
+                        notifica.msgid = reader["VAR_MSGID"].ToString();
+                        notifica.tipoRicevuta = reader["VAR_TIPO_RICEVUTA"].ToString();
+                        notifica.consegna = reader["VAR_CONSEGNA"].ToString();
+                        notifica.ricezione = reader["VAR_RICEZIONE"].ToString();
+                        notifica.errore_esteso = reader["VAR_ERRORE_ESTESO"].ToString();
+                        notifica.docnumber = reader["DOCNUMBER"].ToString();
+                        notifica.idTipoNotifica = reader["ID_TIPO_NOTIFICA"].ToString();
+                        notifica.erroreRicevuta = reader["VAR_ERRORE_RICEVUTA"].ToString();
+                        lista.Add(notifica);
+                    }
                 }
             }
+
 
             return lista.ToArray();
         }
@@ -450,18 +472,23 @@ namespace DocsPaDB.Query_DocsPAWS
 
             logger.Debug("ricerca tipo notifica by system id: " + q.getSQL());
 
-            using (IDataReader reader = ExecuteReader(q.getSQL()))
-            {
-                if (reader.FieldCount > 0)
-                    if (reader.Read())
-                    {
-                        tipoNotifica = new TipoNotifica();
-                        tipoNotifica.idTipoNotifica = reader["SYSTEM_ID"].ToString();
-                        tipoNotifica.codiceNotifica = reader["VAR_CODICE_NOTIFICA"].ToString();
-                        tipoNotifica.descrizioneNotifica = reader["VAR_DESCRIZIONE"].ToString();
-                    }
-            }
 
+            using (DBProvider dbProvider = new DBProvider())
+            {
+
+                using (IDataReader reader = dbProvider.ExecuteReader(q.getSQL()))
+                {
+                    if (reader.FieldCount > 0)
+                        if (reader.Read())
+                        {
+                            tipoNotifica = new TipoNotifica();
+                            tipoNotifica.idTipoNotifica = reader["SYSTEM_ID"].ToString();
+                            tipoNotifica.codiceNotifica = reader["VAR_CODICE_NOTIFICA"].ToString();
+                            tipoNotifica.descrizioneNotifica = reader["VAR_DESCRIZIONE"].ToString();
+                        }
+                }
+
+            }
             return tipoNotifica;
 
         }
@@ -483,17 +510,21 @@ namespace DocsPaDB.Query_DocsPAWS
             string query = q.getSQL();
             logger.Debug(query);
             //string query = "select a.status_c_mask as statusmask, b.type_id as tipo from dpa_stato_invio a, documenttypes b where a.var_indirizzo='"+address+"' and a.id_profile="+idProfile+" and a.id_documenttype=b.system_id";
-            using (IDataReader reader = ExecuteReader(query))
-            {
-                if (reader.FieldCount > 0)
-                    if (reader.Read())
-                    {
-                        retval = new DocsPaVO.StatoInvio.StatoInvio();
-                        retval.statusMask = reader["statusmask"].ToString();
-                        retval.tipoCanale = reader["tipo"].ToString();
 
-                        
-                    }
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                using (IDataReader reader = dbProvider.ExecuteReader(query))
+                {
+                    if (reader.FieldCount > 0)
+                        if (reader.Read())
+                        {
+                            retval = new DocsPaVO.StatoInvio.StatoInvio();
+                            retval.statusMask = reader["statusmask"].ToString();
+                            retval.tipoCanale = reader["tipo"].ToString();
+
+
+                        }
+                }
             }
 
             return retval;
@@ -520,7 +551,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("param1", updateParam);
                 q.setParam("param2", " UPPER(var_indirizzo)= UPPER('" + address + "') and id_profile=" + idProfile);
                 logger.Debug("Aggiornamento maschera status: " + q.getSQL());
-                retval = ExecuteNonQuery(q.getSQL());
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    retval = dbProvider.ExecuteNonQuery(q.getSQL());
+                }
 
             }
             catch (Exception ex)

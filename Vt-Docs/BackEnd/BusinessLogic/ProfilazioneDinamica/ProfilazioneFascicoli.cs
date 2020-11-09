@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using DocsPaDB.Query_DocsPAWS;
 using log4net;
-using DocsPaVO.ProfilazioneDinamica;
 using DocsPaVO.ProfilazioneDinamicaLite;
 
 namespace BusinessLogic.ProfilazioneDinamica
@@ -475,6 +475,23 @@ namespace BusinessLogic.ProfilazioneDinamica
             }
         }
 
+        public static void UpdateProcedimentoTipoFasc(int systemId_template, string procedimentale)
+        {
+            using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
+            {
+                try
+                {
+                    DocsPaDB.Query_DocsPAWS.ModelFasc  modelDB = new DocsPaDB.Query_DocsPAWS.ModelFasc();
+                    modelDB.UpdateProcedimentoTipoFasc(systemId_template, procedimentale);
+                    transactionContext.Complete();
+                }
+                catch (Exception ex)
+                {
+                    logger.Debug("Errore in ProfilazioneDocumenti - metodo: UpdateInvioConsTipoDoc", ex);
+                }
+            }
+        }
+
         public static ArrayList getIdModelliTrasmAssociatiFasc(string idTipoFasc, string idDiagramma, string idStato)
         {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
@@ -492,30 +509,6 @@ namespace BusinessLogic.ProfilazioneDinamica
                     return null;
                 }
             }
-        }
-
-        public static SelectiveHistoryResponse GetCustomHistoryList(SelectiveHistoryRequest request)
-        {
-            Model profDb = new Model();
-            SelectiveHistoryResponse response = new SelectiveHistoryResponse();
-            response.Fields = profDb.GetCustomHistoryListFasc(request.TemplateId);
-
-            return response;
-        }
-
-        public static DocsPaVO.ProfilazioneDinamica.SelectiveHistoryResponse ActiveSelectiveHistory(DocsPaVO.ProfilazioneDinamica.SelectiveHistoryRequest request)
-        {
-            Model profDb = new Model();
-            bool result = false;
-
-            // Se bisogna abilitare lo storico per tutti i campi della tipologia, viene
-            // richiamata la funzione che abilita tutti gli storici per la tipolgia
-            if (request.ActiveAllFields)
-                result = profDb.ActiveSelectiveHistoryFasc(request.TemplateId);
-            else
-                result = profDb.ActiveSelectiveHistoryFasc(request.TemplateId, request.CustomObjects);
-
-            return new SelectiveHistoryResponse() { Result = result };
         }
 
         public static void salvaAssociazioneModelliFasc(string idTipoFasc, string idDiagramma, ArrayList modelliSelezionati, string idStato)
@@ -829,6 +822,28 @@ namespace BusinessLogic.ProfilazioneDinamica
         {
             DocsPaDB.Query_DocsPAWS.ModelFasc modelFascDB = new DocsPaDB.Query_DocsPAWS.ModelFasc();
             return modelFascDB.getIdPrjByAssTemplates(idOggFasc, valoreDB, ordine);
+        }
+
+        public static bool ReplicaTipoFascicolo(string idTipoFasc, List<string> idAmministrazioni)
+        {
+            bool result = true;
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.ModelFasc tipoFasc = new ModelFasc();
+                foreach (string idAmm in idAmministrazioni)
+                {
+                    if (!tipoFasc.ReplicaTipoFascicolo(idTipoFasc, idAmm))
+                        result = false;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("Errore in ReplicaTipoFascicolo: " + e.Message);
+                result = false;
+            }
+
+            return result;
         }
     }
 }

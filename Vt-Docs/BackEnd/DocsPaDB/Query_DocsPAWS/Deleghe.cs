@@ -511,32 +511,6 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-
-        //Dismette l'esecizio di eventuali deleghe appese
-        public bool DismettiDelegheInEsercizio(DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            string queryString;
-            try
-            {
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DISMETTI_DELEGA");
-
-                    q.setParam("param1", String.Format("id_people_delegato = {0} and cha_in_esercizio = '1'", infoUtente.idPeople));
-                    queryString = q.getSQL();
-                    logger.Debug(queryString);
-                    if (!dbProvider.ExecuteNonQuery(queryString))
-                        throw new Exception();
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-            }
-            return result;
-        }
-
         //Elimina dalla dpa_login le credenziali del delegante
         public void deleteDelegante(string userIdDelegante)
         {
@@ -840,8 +814,8 @@ namespace DocsPaDB.Query_DocsPAWS
                     {
                         //Modifica di delega con data decorrenza uguale ma con data di scadenza maggiore, ovvero allungato intervallo di tempo
                         if (((!string.IsNullOrEmpty(dataScadenzaOld) && Convert.ToDateTime(dataScadenzaOld) < DateTime.Now)
-                            && (string.IsNullOrEmpty(delegaNew.dataScadenza) || toDate(delegaNew.dataScadenza) >= DateTime.Now)
-                            && (Convert.ToDateTime(dataDecorrenzaOld).ToShortDateString() != toDate(delegaNew.dataDecorrenza).ToShortDateString())))
+                            && (string.IsNullOrEmpty(delegaNew.dataScadenza) || Convert.ToDateTime(delegaNew.dataScadenza) >= DateTime.Now)
+                            && (Convert.ToDateTime(dataDecorrenzaOld).ToShortDateString() != Convert.ToDateTime(delegaNew.dataDecorrenza).ToShortDateString())))
                         {
                             if (verificaUnicaDelegaAmm(delegaNew))
                                 creaNuovaDelega(delegaNew);

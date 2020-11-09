@@ -1,6 +1,6 @@
 <%@ Register TagPrefix="cc1" Namespace="DocsPaWebCtrlLibrary" Assembly="DocsPaWebCtrlLibrary" %>
 <%@ Register TagPrefix="uc1" TagName="TestataDocumento" Src="TestataDocumento.ascx" %>
-<%@ Page language="c#" Codebehind="docAllegati.aspx.cs" AutoEventWireup="false" Inherits="DocsPAWA.documento.docAllegati" %>
+<%@ Page language="c#" Codebehind="docAllegati.aspx.cs" AutoEventWireup="True" Inherits="DocsPAWA.documento.docAllegati" %>
 <%@ Register TagPrefix="uc2" TagName="AclDocumento" Src="AclDocumento.ascx" %>
 <%@ Register src="../UserControls/AppTitleProvider.ascx" tagname="AppTitleProvider" tagprefix="uct" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
@@ -177,7 +177,7 @@
                                                     <asp:ImageButton runat="server" ImageUrl="~/images/Indent.ico"  ID="imgGoToDocument"
                                                         ToolTip = "Vai al dettaglio del documento sorgente dell'inoltro"
                                                         Visible='<%# GetIsVisibileSourceButton((DocsPAWA.DocsPaWR.Allegato) Container.DataItem) %>' 
-                                                        CommandName="GoToSource"vvcx
+                                                        CommandName="GoToSource"
                                                         CommandArgument='<%# ((DocsPAWA.DocsPaWR.Allegato) Container.DataItem).ForwardingSource %>'  />
                                                 </ItemTemplate>
                                             </asp:TemplateColumn>
@@ -216,16 +216,16 @@
 							</TR>
 							<TR>
 								<TD><cc1:imagebutton id="btn_aggAlleg" Thema="btn_" SkinId="nuovo_Attivo" AlternateText="Nuovo allegato"
-										Runat="server" DisabledUrl="../images/bottoniera/btn_nuovo_nonattivo.gif" Tipologia="DO_ALL_AGGIUNGI" OnClientClick = "return onClickNuovoAllegato();"></cc1:imagebutton></TD>
+										Runat="server" DisabledUrl="../images/bottoniera/btn_nuovo_nonattivo.gif" Tipologia="DO_ALL_AGGIUNGI" OnClientClick = "return onClickNuovoAllegato();" onclick="btn_aggAlleg_Click"></cc1:imagebutton></TD>
 								<TD><cc1:imagebutton id="btn_modifAlleg" Thema="btn_" SkinId="modifica_attivo" AlternateText="Modifica allegato"
-										Runat="server" DisabledUrl="../images/bottoniera/btn_modifica_nonattivo.gif" Tipologia="DO_ALL_MODIFICA" OnClientClick = "return onClickModificaAllegato();"></cc1:imagebutton></TD>
+										Runat="server" DisabledUrl="../images/bottoniera/btn_modifica_nonattivo.gif" Tipologia="DO_ALL_MODIFICA" OnClientClick = "return onClickModificaAllegato();" onclick="btn_modifAlleg_Click"></cc1:imagebutton></TD>
 								<TD><cc1:imagebutton id="btn_aggiungiAreaLav" Thema="btn_" SkinId="area_attivo" AlternateText="Aggiungi ad Area di lavoro"
-										Runat="server" DisabledUrl="../images/bottoniera/btn_area_nonattivo.gif" Tipologia="DO_ADD_ADL"></cc1:imagebutton></TD>
+										Runat="server" DisabledUrl="../images/bottoniera/btn_area_nonattivo.gif" Tipologia="DO_ADD_ADL" onclick="btn_aggiungiAreaLav_Click"></cc1:imagebutton></TD>
 								<TD><cc1:imagebutton id="btn_sostituisciDocPrinc" Thema="btn_" SkinId="scambia_attivo" Enabled = "true"
 										AlternateText="Scambia con documento principale" Runat="server" DisabledUrl="../images/bottoniera/btn_scambia_nonattivo.gif"
-										Tipologia="DO_ALL_SOSTITUISCI" OnClientClick = "return onClickScambiaAllegato();" ></cc1:imagebutton></TD>
+										Tipologia="DO_ALL_SOSTITUISCI" OnClientClick = "return onClickScambiaAllegato();" onclick="btn_sostituisciDocPrinc_Click"></cc1:imagebutton></TD>
 								<TD><cc1:imagebutton id="btn_rimuoviAlleg" Thema="btn_" SkinId="rimuovi_Attivo" AlternateText="Rimuovi allegato"
-										Runat="server" DisabledUrl="../images/bottoniera/btn_rimuovi_nonattivo.gif" Tipologia="DO_ALL_RIMUOVI" OnClientClick="return onClickRimuoviAllegato();"></cc1:imagebutton></TD>
+										Runat="server" DisabledUrl="../images/bottoniera/btn_rimuovi_nonattivo.gif" Tipologia="DO_ALL_RIMUOVI" OnClientClick="return onClickRimuoviAllegato();" onclick="btn_rimuoviAlleg_Click"></cc1:imagebutton></TD>
 							</TR>
 						</TABLE>
                     </td>

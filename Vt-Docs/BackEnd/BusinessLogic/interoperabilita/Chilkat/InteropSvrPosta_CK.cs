@@ -464,9 +464,12 @@ namespace BusinessLogic.Interoperabilità
 
         private int isDSN (Email e)
         {
+
             //Chilkat.Mime mimemail = e.GetMimeObject();
+
             Chilkat.Mime mimemail = new Mime();
             mimemail.LoadMime(e.GetMime());
+
             int parts = mimemail.NumParts;
 
             for (int i = 1; i < parts; i++)
@@ -485,8 +488,10 @@ namespace BusinessLogic.Interoperabilità
             CMMsg retval = new CMMsg();
 
             //Chilkat.Mime mimemail = msgComponent.GetMimeObject();
+
             Chilkat.Mime mimemail = new Mime();
             mimemail.LoadMime(msgComponent.GetMime());
+
             Chilkat.Mime dstat = mimemail.GetPart(dsnRootLeaf);
             retval.body = string.Format("<PRE> {0} </PRE>", msgComponent.GetMime());
 
@@ -1598,7 +1603,7 @@ namespace BusinessLogic.Interoperabilità
                             msg.headers.Add("utenteDocspa", msg.from);
                             msg.from = mailAtt.FromAddress;
                             msg.subject = mailAtt.Subject;
-                            //Mime mime_msg_1 = mailAtt.GetMimeObject();
+                            // Mime mime_msg_1 = mailAtt.GetMimeObject();
 
                             Chilkat.Mime mime_msg_1 = new Mime();
                             mime_msg_1.LoadMime(mailAtt.GetMime());

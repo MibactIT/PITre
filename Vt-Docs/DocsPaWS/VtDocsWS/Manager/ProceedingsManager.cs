@@ -224,15 +224,35 @@ namespace VtDocsWS.Manager
                             //response.IdDocument = docResult.docNumber;
                             #endregion
 
-                            #region CREAZIONE DOCUMENTO
+                            #region ANALISI TIPOLOGIA
                             logger.Debug("Ricerca tipologia documento");
-                            DocsPaVO.ProfilazioneDinamica.Templates templateDoc = processor.PopolaTemplateDocumento(request.Proceeding.IdDocumentTypology.ToString());
+                            string idDocumentTypology = BusinessLogic.Procedimenti.ProcedimentiManager.GetIdTemplateDocByDescProcedimento(request.Proceeding.DescDocTypology, infoUtente.idAmministrazione);
+                            DocsPaVO.ProfilazioneDinamica.Templates templateDoc = processor.PopolaTemplateDocumento(idDocumentTypology);
+
+                            logger.Debug("Ricerca tipologia fascicolo");
+                            string idFolderTypology = BusinessLogic.Procedimenti.ProcedimentiManager.GetIdTemplateFascByDescProcedimento(request.Proceeding.DescFolderTypology, infoUtente.idAmministrazione);
+                            DocsPaVO.ProfilazioneDinamica.Templates template = processor.PopolaTemplateIstanzaProcedimenti(idFolderTypology);
+
+                            if (template == null || templateDoc == null)
+                            {
+                                throw new PisException("TEMPLATE_NOT_FOUND");
+                            }
+
+                            logger.DebugFormat("Trovata tipologia fascicolo {0} - ID={1}", template.DESCRIZIONE, template.SYSTEM_ID.ToString());
+                            #endregion
+
+
+                            #region CREAZIONE DOCUMENTO
 
                             logger.Debug("Registro");
                             DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistroByCode(request.CodeAdm);
 
                             logger.Debug("Creazione documento");
-                            string docNumber = Utils.CreateDocProceeding(infoUtente, reg.codRegistro, request.Proceeding.DocumentObject, templateDoc, corr, role, addressBookCode, request.Proceeding.Content, request.Proceeding.Attachment);
+                            byte[] flatContent = processor.GetFlatContent();
+                            if (flatContent == null)
+                                throw new PisException("APPLICATION_ERROR");
+
+                            string docNumber = Utils.CreateDocProceeding(infoUtente, reg.codRegistro, request.Proceeding.DocumentObject, templateDoc, corr, role, addressBookCode, flatContent, request.Proceeding.Attachment);
 
                             if (string.IsNullOrEmpty(docNumber))
                             {
@@ -243,17 +263,40 @@ namespace VtDocsWS.Manager
                             #endregion
 
                             #region CREAZIONE FASCICOLO (ISTANZA)
-                            logger.Debug("Ricerca tipologia fascicolo");
+                            // PER SVILUPPO-----------------------------------------------------------------------------------------------------------------------
+                            //System.IO.FileStream file = new System.IO.FileStream("C:\\temp\\testportale.pdf", System.IO.FileMode.Open, System.IO.FileAccess.Read);
+                            //byte[] content = new byte[file.Length];
+                            //file.Read(content, 0, content.Length);
+                            //file.Close();
+                            //request.Content = new byte[content.Length];
+                            //request.Content = content;
+                            // -----------------------------------------------------------------------------------------------------------------------------------
 
-                            DocsPaVO.ProfilazioneDinamica.Templates template = processor.PopolaTemplateIstanzaProcedimenti(request.Proceeding.IdFolderTypology.ToString());
-                            if (template == null)
+                            // Imposto la data di scadenza e la data di avvio
+                            string deadline = BusinessLogic.Procedimenti.ProcedimentiManager.GetValoreFromProcedimento(template, "BE_PROCEDIMENTO_TERMINE");
+                            logger.Debug("Termine temporale: " + deadline);
+                            foreach(DocsPaVO.ProfilazioneDinamica.OggettoCustom oggCustom in template.ELENCO_OGGETTI)
                             {
-                                throw new PisException("TEMPLATE_NOT_FOUND");
+                                if(oggCustom.DESCRIZIONE.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROCEDIMENTO_DATA_SCADENZA").ToUpper())
+                                {
+                                    logger.Debug("Data scadenza - ID=" + oggCustom.SYSTEM_ID.ToString());
+                                    if (!string.IsNullOrEmpty(deadline))
+                                    {
+                                        oggCustom.VALORE_DATABASE = DateTime.Now.AddDays(Convert.ToDouble(deadline)).ToString("dd/MM/yyyy");
+                                    }                                  
+                                }
+                                if(oggCustom.DESCRIZIONE.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROCEDIMENTO_DATA_AVVIO").ToUpper())
+                                {
+                                    logger.Debug("Data avvio - ID=" + oggCustom.SYSTEM_ID.ToString());
+                                    oggCustom.VALORE_DATABASE = DateTime.Now.ToString("dd/MM/yyyy");
+                                }
+                                if(oggCustom.DESCRIZIONE.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROCEDIMENTO_CONTENUTO").ToUpper())
+                                {
+                                    logger.Debug("Contenuto: " + request.Proceeding.ContentMetadata);
+                                    oggCustom.VALORE_DATABASE = request.Proceeding.ContentMetadata;
+                                }
                             }
-                            logger.DebugFormat("Trovata tipologia fascicolo {0} - ID={1}", template.DESCRIZIONE, template.SYSTEM_ID.ToString());
-                            
-                            // Popolamento campi
-                            BusinessLogic.Procedimenti.ProcedimentiManager.PopolaCampiProcedimento(ref template, infoUtente);
+                            logger.Debug("QUI");
 
                             // Ricerca diagramma di stato
                             DocsPaVO.DiagrammaStato.DiagrammaStato stateDiagram = null;
@@ -319,7 +362,8 @@ namespace VtDocsWS.Manager
                             }
 
                             logger.Debug("Ricerca classifica");
-                            DocsPaVO.fascicolazione.Classificazione classificazione = Utils.GetClassificazione(infoUtente, request.Proceeding.FolderCode);
+                            string classCode = BusinessLogic.Procedimenti.ProcedimentiManager.GetValoreFromProcedimento(template, "BE_PROCEDIMENTO_COD_CLASS");
+                            DocsPaVO.fascicolazione.Classificazione classificazione = Utils.GetClassificazione(infoUtente, classCode);
                             if (classificazione == null || titolario == null)
                             {
                                 if (classificazione == null)
@@ -386,26 +430,51 @@ namespace VtDocsWS.Manager
                             istanza.chiudeFascicolo = new DocsPaVO.fascicolazione.ChiudeFascicolo() { idPeople = infoUtente.idPeople, idCorrGlob_Ruolo = infoUtente.idCorrGlobali };
                             if (role.uo != null)
                                 istanza.chiudeFascicolo.idCorrGlob_UO = role.uo.systemId;
-                            BusinessLogic.Fascicoli.FascicoloManager.setFascicolo(infoUtente, istanza);                          
+                            BusinessLogic.Fascicoli.FascicoloManager.setFascicolo(infoUtente, istanza);
 
+                            //// Inserimento in DPA_PROCEDIMENTI
+                            //if (!BusinessLogic.Procedimenti.ProcedimentiManager.InsertDoc(istanza.systemID, docNumber, corr.systemId, true, request.Proceeding.Id, true))
+                            //{
+                            //    throw new PisException("APPLICATION_ERROR");
+                            //}
                             #endregion
 
                             #region TRASMISSIONE FASCICOLO
                             logger.Debug("Trasmissione fascicolo");
-                            DocsPaVO.trasmissione.Trasmissione transmission = new DocsPaVO.trasmissione.Trasmissione();
-                            DocsPaVO.trasmissione.RagioneTrasmissione reason = BusinessLogic.Trasmissioni.RagioniManager.getRagioneByCodice(infoUtente.idAmministrazione, "PORTALE"); // CABLATO PER ORA
 
-                            transmission.tipoOggetto = DocsPaVO.trasmissione.TipoOggetto.FASCICOLO;
-                            transmission.infoFascicolo = new DocsPaVO.fascicolazione.InfoFascicolo(istanza);
-                            transmission.utente = user;
-                            transmission.ruolo = role;
+                            // Estrazione ruoli da notificare
+                            string idCorrResponsabile = BusinessLogic.Procedimenti.ProcedimentiManager.GetIdCorrDefault(template, "BE_PROCEDIMENTO_RESPONSABILE");
+                            string idCorrPrimoNotificato = BusinessLogic.Procedimenti.ProcedimentiManager.GetIdCorrDefault(template, "BE_PROCEDIMENTO_PRIMO_NOT");
+
+                            DocsPaVO.trasmissione.RagioneTrasmissione reason = BusinessLogic.Trasmissioni.RagioniManager.getRagioneByCodice(infoUtente.idAmministrazione, "PORTALE"); // CABLATO PER ORA
+                            DocsPaVO.trasmissione.Trasmissione transmissionResp = new DocsPaVO.trasmissione.Trasmissione(); // al responsabile
+                            DocsPaVO.trasmissione.Trasmissione transmissionNot = new DocsPaVO.trasmissione.Trasmissione();  // al primo notificato
+
+                            transmissionResp.tipoOggetto = DocsPaVO.trasmissione.TipoOggetto.FASCICOLO;
+                            transmissionResp.infoFascicolo = new DocsPaVO.fascicolazione.InfoFascicolo(istanza);
+                            transmissionResp.utente = user;
+                            transmissionResp.ruolo = role;
+
+                            transmissionNot.tipoOggetto = DocsPaVO.trasmissione.TipoOggetto.FASCICOLO;
+                            transmissionNot.infoFascicolo = new DocsPaVO.fascicolazione.InfoFascicolo(istanza);
+                            transmissionNot.utente = user;
+                            transmissionNot.ruolo = role;
 
                             // Destinatari della trasmissione
-                            DocsPaVO.utente.Corrispondente recipient = BusinessLogic.Utenti.UserManager.getCorrispondenteByCodRubrica("SABAP-RM-MET_SEG-II", infoUtente); // CABLATO PER ORA
-                            transmission = BusinessLogic.Trasmissioni.TrasmManager.addTrasmissioneSingola(transmission, recipient, reason, string.Empty, "S");
+                            DocsPaVO.utente.Corrispondente responsabile = BusinessLogic.Utenti.UserManager.getCorrispondente(idCorrResponsabile, true);
+                            DocsPaVO.utente.Corrispondente primoNotificato = BusinessLogic.Utenti.UserManager.getCorrispondente(idCorrPrimoNotificato, true);
 
-                            logger.Debug("Invio trasmissione");
-                            DocsPaVO.trasmissione.Trasmissione resultTrasm = BusinessLogic.Trasmissioni.ExecTrasmManager.saveExecuteTrasmMethod(string.Empty, transmission);
+                            transmissionResp = BusinessLogic.Trasmissioni.TrasmManager.addTrasmissioneSingola(transmissionResp, responsabile, reason, string.Empty, "S");
+                            transmissionNot = BusinessLogic.Trasmissioni.TrasmManager.addTrasmissioneSingola(transmissionNot, primoNotificato, reason, string.Empty, "S");
+
+                            logger.Debug("Invio trasmissione al responsabile");
+                            DocsPaVO.trasmissione.Trasmissione resultTrasm = BusinessLogic.Trasmissioni.ExecTrasmManager.saveExecuteTrasmMethod(string.Empty, transmissionResp);
+
+                            logger.Debug("Invio trasmissione al primo notificato");
+                            DocsPaVO.trasmissione.Trasmissione resultTrasmN = BusinessLogic.Trasmissioni.ExecTrasmManager.saveExecuteTrasmMethod(string.Empty, transmissionNot);
+
+
+                            // La notifica va inviata esclusivamente al primo notificato
                             if (resultTrasm != null && resultTrasm.infoFascicolo != null && !string.IsNullOrEmpty(resultTrasm.infoFascicolo.idFascicolo))
                             {
                                 foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in resultTrasm.trasmissioniSingole)
@@ -413,21 +482,31 @@ namespace VtDocsWS.Manager
                                     string method = "TRASM_FOLDER_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
                                     string desc = "Trasmesso Fascicolo: " + resultTrasm.infoFascicolo.codice;
                                     BusinessLogic.UserLog.UserLog.WriteLog(resultTrasm.utente.userId, resultTrasm.utente.idPeople, resultTrasm.ruolo.idGruppo, infoUtente.idAmministrazione, method, resultTrasm.infoFascicolo.idFascicolo, desc, DocsPaVO.Logger.CodAzione.Esito.OK,
-                                        (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1", single.systemId);
+                                        (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "0", single.systemId); // CHECK_NOTIFY=0
+                                }
+                            }
+                            if (resultTrasmN != null && resultTrasmN.infoFascicolo != null && !string.IsNullOrEmpty(resultTrasmN.infoFascicolo.idFascicolo))
+                            {
+                                foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in resultTrasmN.trasmissioniSingole)
+                                {
+                                    string method = "TRASM_FOLDER_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
+                                    string desc = "Trasmesso Fascicolo: " + resultTrasmN.infoFascicolo.codice;
+                                    BusinessLogic.UserLog.UserLog.WriteLog(resultTrasmN.utente.userId, resultTrasmN.utente.idPeople, resultTrasmN.ruolo.idGruppo, infoUtente.idAmministrazione, method, resultTrasmN.infoFascicolo.idFascicolo, desc, DocsPaVO.Logger.CodAzione.Esito.OK,
+                                        (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1", single.systemId); // CHECK_NOTIFY=1
                                 }
                             }
 
                             // Inserimento in ADL Ruolo del ruolo destinatario
-                            try
-                            {
-                                DocsPaVO.utente.InfoUtente roleRecipient = new DocsPaVO.utente.InfoUtente() { idCorrGlobali = recipient.systemId, idPeople = "0" };
-                                BusinessLogic.Documenti.areaLavoroManager.execAddLavoroRoleMethod(string.Empty, string.Empty, string.Empty, roleRecipient, istanza);
-                            }
-                            catch (Exception e)
-                            {
-                                logger.DebugFormat("Errore nell'inserimento in ADL ruolo: {0}", e.Message);
-                            }
-
+                            //try
+                            //{
+                            //    DocsPaVO.utente.InfoUtente roleRecipient = new DocsPaVO.utente.InfoUtente() { idCorrGlobali = recipient.systemId, idPeople = "0" };
+                            //    BusinessLogic.Documenti.areaLavoroManager.execAddLavoroRoleMethod(string.Empty, string.Empty, string.Empty, roleRecipient, istanza);
+                            //}
+                            //catch (Exception e)
+                            //{
+                            //    logger.DebugFormat("Errore nell'inserimento in ADL ruolo: {0}", e.Message);
+                            //}
+                            
                             #endregion
 
                             trContx.Complete();
@@ -505,6 +584,29 @@ namespace VtDocsWS.Manager
                     throw new Exception("PROJECT_NOT_FOUND");
                 }
 
+                #region VERIFICA E GESTIONE REINDIRIZZAMENTO
+                string idRedirected = string.Empty;
+                string newIdReg = string.Empty;
+                if (BusinessLogic.Procedimenti.ProcedimentiManager.CheckProcedimentoReindirizzato(request.IdProject, out idRedirected, out newIdReg))
+                {
+                    logger.Debug("Procedimento reindirizzato! Vecchio ID = " + request.IdProject);
+                    response.Redirected = true;
+                    request.IdProject = idRedirected;
+                    logger.Debug("Nuovo ID = " + request.IdProject);
+
+                    DocsPaVO.utente.Registro newReg = BusinessLogic.Utenti.RegistriManager.getRegistro(newIdReg);
+                    DocsPaVO.amministrazione.InfoAmministrazione infoAmm = BusinessLogic.Amministrazione.AmministraManager.AmmGetInfoAmmCorrente(newReg.idAmministrazione);
+                    logger.Debug("Nuovo registro: " + newReg.codRegistro);
+
+                    DocsPaVO.utente.Utente newUser = BusinessLogic.Utenti.UserManager.getUtenteByCodice(newReg.codRegistro + ".PORTALE", infoAmm.Codice);
+                    DocsPaVO.utente.Ruolo newRole = Utils.GetRuoloPreferito(newUser.idPeople);
+                    infoUtente = BusinessLogic.Utenti.UserManager.GetInfoUtente(newUser, newRole);
+
+                    response.IdAOO = newReg.systemId;
+                }
+
+                #endregion
+
                 #region FASCICOLO
                 logger.Debug("Estrazione dati fascicolo");
                 Domain.Project responseProject = new Project();
@@ -519,16 +621,28 @@ namespace VtDocsWS.Manager
 
                 if (responseProject.Template != null)
                 {
-                    foreach (Domain.Field field in responseProject.Template.Fields)
+                    //foreach (Domain.Field field in responseProject.Template.Fields)
+                    //{
+                    //    if (field.Type == "Correspondent")
+                    //    {
+                    //        DocsPaVO.utente.Corrispondente corr = BusinessLogic.Utenti.UserManager.getCorrispondenteBySystemIDDisabled(field.Value);
+                    //        if (corr != null)
+                    //        {
+                    //            field.Value = corr.descrizione;
+                    //        }
+                    //    }
+                    //}
+
+                foreach(Domain.Field field in responseProject.Template.Fields)
                     {
-                        if (field.Type == "Correspondent")
-                        {
-                            DocsPaVO.utente.Corrispondente corr = BusinessLogic.Utenti.UserManager.getCorrispondenteBySystemIDDisabled(field.Value);
-                            if (corr != null)
-                            {
-                                field.Value = corr.descrizione;
-                            }
-                        }
+                        if (field.Name.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROCEDIMENTO_TERMINE").ToUpper())
+                            response.Duration = field.Value;
+                        else if (field.Name.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROCEDIMENTO_DATA_SCADENZA").ToUpper())
+                            response.DueDate = field.Value;
+                        else if (field.Name.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROCEDIMENTO_UTENTE_RESP").ToUpper())
+                            response.PersonInCharge = field.Value;
+                        else if (field.Name.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROCEDIMENTO_DATA_CHIUSURA").ToUpper())
+                            response.ClosureDate = field.Value;
                     }
                 }
 
@@ -559,7 +673,7 @@ namespace VtDocsWS.Manager
 
                 #region FASI
                 logger.Debug("Estrazione fasi diagramma di stato");
-                
+
                 // Estrazione diagramma di stato
                 logger.Debug("Estrazione diagramma di stato");
                 DocsPaVO.DiagrammaStato.DiagrammaStato diagram = BusinessLogic.DiagrammiStato.DiagrammiStato.getDgByIdTipoFasc(project.template.ID_TIPO_FASC, infoUtente.idAmministrazione);
@@ -582,8 +696,19 @@ namespace VtDocsWS.Manager
                         {
                             Phase ph = new Phase();
                             ph.Description = item.PHASE.DESCRIZIONE;
-                            ph.Selected = (item.STATO.SYSTEM_ID == state.SYSTEM_ID);
-
+                            if (item.STATO.SYSTEM_ID == state.SYSTEM_ID)
+                            {
+                                ph.Selected = true;
+                                if(!string.IsNullOrEmpty(item.ID_TIPO_DOC))
+                                {
+                                    DocsPaVO.ProfilazioneDinamica.Templates template = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getTemplateById(item.ID_TIPO_DOC);
+                                    if(template != null)
+                                    {
+                                        response.Typology = template.DESCRIZIONE;
+                                    }
+                                }
+                            }
+                                
                             // Se sono presenti delle fasi nella lista devo fare attenzione a non inserire duplicati
                             if (phases.Count > 0)
                             {
@@ -603,7 +728,7 @@ namespace VtDocsWS.Manager
                             {
                                 phases.Add(ph);
                             }
-                         }
+                        }
 
                         response.Phases = phases.ToArray();
                     }
@@ -623,30 +748,30 @@ namespace VtDocsWS.Manager
                 int pageSize = 100;
 
                 // Lista dei fitri da restituire
-                    DocsPaVO.filtri.FiltroRicerca[][] orderRicerca = new DocsPaVO.filtri.FiltroRicerca[1][];
-                    orderRicerca = new DocsPaVO.filtri.FiltroRicerca[1][];
-                    orderRicerca[0] = new DocsPaVO.filtri.FiltroRicerca[1];
-                    DocsPaVO.filtri.FiltroRicerca[] fVlist = new DocsPaVO.filtri.FiltroRicerca[3];
-                    fVlist[0] = new DocsPaVO.filtri.FiltroRicerca()
-                    {
-                        argomento = "ORACLE_FIELD_FOR_ORDER",
-                        valore = "NVL (a.dta_proto, a.creation_time)",
-                        nomeCampo = "D9",
-                    };
-                    fVlist[1] = new DocsPaVO.filtri.FiltroRicerca()
-                    {
-                        argomento = "SQL_FIELD_FOR_ORDER",
-                        valore = "ISNULL (a.dta_proto, a.creation_time)",
-                        nomeCampo = "D9",
-                    };
-                    fVlist[2] = new DocsPaVO.filtri.FiltroRicerca()
-                    {
-                        argomento = "ORDER_DIRECTION",
-                        valore = "DESC",
-                        nomeCampo = "D9",
-                    };
+                DocsPaVO.filtri.FiltroRicerca[][] orderRicerca = new DocsPaVO.filtri.FiltroRicerca[1][];
+                orderRicerca = new DocsPaVO.filtri.FiltroRicerca[1][];
+                orderRicerca[0] = new DocsPaVO.filtri.FiltroRicerca[1];
+                DocsPaVO.filtri.FiltroRicerca[] fVlist = new DocsPaVO.filtri.FiltroRicerca[3];
+                fVlist[0] = new DocsPaVO.filtri.FiltroRicerca()
+                {
+                    argomento = "ORACLE_FIELD_FOR_ORDER",
+                    valore = "NVL (a.dta_proto, a.creation_time)",
+                    nomeCampo = "D9",
+                };
+                fVlist[1] = new DocsPaVO.filtri.FiltroRicerca()
+                {
+                    argomento = "SQL_FIELD_FOR_ORDER",
+                    valore = "ISNULL (a.dta_proto, a.creation_time)",
+                    nomeCampo = "D9",
+                };
+                fVlist[2] = new DocsPaVO.filtri.FiltroRicerca()
+                {
+                    argomento = "ORDER_DIRECTION",
+                    valore = "DESC",
+                    nomeCampo = "D9",
+                };
 
-                    orderRicerca[0] = fVlist;
+                orderRicerca[0] = fVlist;
 
                 foreach (DocsPaVO.fascicolazione.Folder folder in folders)
                 {
@@ -660,65 +785,81 @@ namespace VtDocsWS.Manager
                         {
                             DocsPaVO.Procedimento.DocumentoProcedimento dip = proceeding.Documenti.Where(d => d.Id == item.SearchObjectID).FirstOrDefault();
 
-                                if (dip != null && dip.Id == item.SearchObjectID)
+                            if (dip != null && dip.Id == item.SearchObjectID)
+                            {
+
+                                Domain.Document doc = Utils.GetDocumentFromSearchObject(item, false, null, request.CodeAdm);
+
+                                // Estrazione mittente/destinatario
+                                //string senderRecipient = item.SearchObjectField.Where(e => e.SearchObjectFieldID.Equals("D5")).FirstOrDefault().SearchObjectFieldValue;
+                                //if (senderRecipient.EndsWith("(M)"))
+                                //{
+                                //    string corr = senderRecipient.Substring(0, senderRecipient.Length - 4);
+                                //    doc.Sender = new Correspondent() { Description = corr };
+                                //}
+                                //else if (senderRecipient.EndsWith("(D)"))
+                                //{
+                                //    string corr = senderRecipient.Substring(0, senderRecipient.Length - 4);
+                                //    doc.Sender = new Correspondent() { Description = corr };
+                                //}
+                                // Estrazione mittente
+                                string sender = item.SearchObjectField.Where(e => e.SearchObjectFieldID.Equals("D6")).FirstOrDefault().SearchObjectFieldValue;
+                                if (sender.EndsWith("(M)"))
                                 {
-
-                                    Domain.Document doc = Utils.GetDocumentFromSearchObject(item, false, null, request.CodeAdm);
-
-                                    // Estrazione mittente/destinatario
-                                    //string senderRecipient = item.SearchObjectField.Where(e => e.SearchObjectFieldID.Equals("D5")).FirstOrDefault().SearchObjectFieldValue;
-                                    //if (senderRecipient.EndsWith("(M)"))
-                                    //{
-                                    //    string corr = senderRecipient.Substring(0, senderRecipient.Length - 4);
-                                    //    doc.Sender = new Correspondent() { Description = corr };
-                                    //}
-                                    //else if (senderRecipient.EndsWith("(D)"))
-                                    //{
-                                    //    string corr = senderRecipient.Substring(0, senderRecipient.Length - 4);
-                                    //    doc.Sender = new Correspondent() { Description = corr };
-                                    //}
-                                    // Estrazione mittente
-                                    string sender = item.SearchObjectField.Where(e => e.SearchObjectFieldID.Equals("D6")).FirstOrDefault().SearchObjectFieldValue;
-                                    if (sender.EndsWith("(M)"))
+                                    string corr = sender.Substring(0, sender.Length - 4);
+                                    doc.Sender = new Correspondent() { Description = corr };
+                                }
+                                string recipient;
+                                try
+                                {
+                                    recipient = item.SearchObjectField.Where(e => e.SearchObjectFieldID.Equals("D7")).FirstOrDefault().SearchObjectFieldValue;
+                                    if(recipient.EndsWith("(D)"))
                                     {
-                                        string corr = sender.Substring(0, sender.Length - 4);
-                                        doc.Sender = new Correspondent() { Description = corr };
-                                    }
-
-                                    if ((doc.DocumentType == "A" || doc.DocumentType == "P") && !string.IsNullOrEmpty(doc.Signature))
-                                    {
-                                        doc.ProtocolDate = doc.CreationDate;
-                                        doc.CreationDate = string.Empty;
-                                    }
-
-                                    List<DocsPaVO.documento.Allegato> attachments = BusinessLogic.Documenti.AllegatiManager.getAllegati(doc.DocNumber, "all").Cast<DocsPaVO.documento.Allegato>().ToList();
-
-                                    if (attachments != null && attachments.Count > 0)
-                                    {
-                                        List<DocsPaVO.documento.Allegato> filteredAttachments = (from a in attachments where a.TypeAttachment == 1 select a).ToList();
-
-                                        if (filteredAttachments != null && filteredAttachments.Count > 0)
-                                        {
-                                            doc.Attachments = new File[filteredAttachments.Count];
-                                            int i = 0;
-                                            foreach (DocsPaVO.documento.FileRequest fr in attachments)
-                                            {
-                                                doc.Attachments[i] = Utils.GetFile(fr, false, infoUtente, false, false, string.Empty, null, true);
-                                                i++;
-                                            }
-                                        }
-                                    }
-
-                                    // Stato visualizzazione
-                                    Domain.DocInProceeding docInProc = Utils.GetDocInProceeding(doc);
-                                    docInProc.Viewed = BusinessLogic.Procedimenti.ProcedimentiManager.IsDocVisualizzato(request.IdProject, doc.DocNumber);
-                                    docInProc.ViewedOn = !string.IsNullOrEmpty(dip.DataVisualizzazione) ? dip.DataVisualizzazione : string.Empty;
-
-                                    if (!responseDocuments.Contains(docInProc))
-                                    {
-                                        responseDocuments.Add(docInProc);
+                                        string corr = recipient.Substring(0, recipient.Length - 4);
+                                        doc.Recipients = new Correspondent[1];
+                                        doc.Recipients[0] = new Correspondent() { Description = corr };
                                     }
                                 }
+                                catch(Exception recEx)
+                                {
+                                    recipient = string.Empty;
+                                }
+                                
+
+                                if ((doc.DocumentType == "A" || doc.DocumentType == "P") && !string.IsNullOrEmpty(doc.Signature))
+                                {
+                                    doc.ProtocolDate = doc.CreationDate;
+                                    doc.CreationDate = string.Empty;
+                                }
+
+                                List<DocsPaVO.documento.Allegato> attachments = BusinessLogic.Documenti.AllegatiManager.getAllegati(doc.DocNumber, "all").Cast<DocsPaVO.documento.Allegato>().ToList();
+
+                                if (attachments != null && attachments.Count > 0)
+                                {
+                                    List<DocsPaVO.documento.Allegato> filteredAttachments = (from a in attachments where a.TypeAttachment == 1 select a).ToList();
+
+                                    if (filteredAttachments != null && filteredAttachments.Count > 0)
+                                    {
+                                        doc.Attachments = new File[filteredAttachments.Count];
+                                        int i = 0;
+                                        foreach (DocsPaVO.documento.FileRequest fr in attachments)
+                                        {
+                                            doc.Attachments[i] = Utils.GetFile(fr, false, infoUtente, false, false, string.Empty, null, true);
+                                            i++;
+                                        }
+                                    }
+                                }
+
+                                // Stato visualizzazione
+                                Domain.DocInProceeding docInProc = Utils.GetDocInProceeding(doc);
+                                docInProc.Viewed = BusinessLogic.Procedimenti.ProcedimentiManager.IsDocVisualizzato(request.IdProject, doc.DocNumber);
+                                docInProc.ViewedOn = !string.IsNullOrEmpty(dip.DataVisualizzazione) ? dip.DataVisualizzazione : string.Empty;
+
+                                if (!responseDocuments.Contains(docInProc))
+                                {
+                                    responseDocuments.Add(docInProc);
+                                }
+                            }
                         }
                     }
                 }
@@ -769,7 +910,7 @@ namespace VtDocsWS.Manager
                 DocsPaVO.utente.Utente user = null;
                 DocsPaVO.utente.Ruolo role = new DocsPaVO.utente.Ruolo();
                 DocsPaVO.utente.InfoUtente infoUtente = null;
-                
+
                 infoUtente = Utils.CheckAuthentication(request, "StartProceeding");
                 user = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
                 if (user == null)
@@ -823,7 +964,8 @@ namespace VtDocsWS.Manager
                         BusinessLogic.Modelli.AsposeModelProcessor.PdfModelProcessor processor = new BusinessLogic.Modelli.AsposeModelProcessor.PdfModelProcessor(request.Content);
 
                         logger.Debug("Ricerca tipologia documento");
-                        DocsPaVO.ProfilazioneDinamica.Templates templateDoc = processor.PopolaTemplateDocumento(request.IdDocumentTypology.ToString());
+                        string idDocumentTypology = BusinessLogic.Procedimenti.ProcedimentiManager.GetIdTemplateDocByDescProcedimento(request.DescDocumentTypology, infoUtente.idAmministrazione);
+                        DocsPaVO.ProfilazioneDinamica.Templates templateDoc = processor.PopolaTemplateDocumento(idDocumentTypology);
 
                         string docNumber = Utils.CreateDocProceeding(infoUtente, request.CodeAdm, request.DocumentObject, templateDoc, corr, role, addressBookCode, request.Content, request.Attachment);
 
@@ -856,6 +998,9 @@ namespace VtDocsWS.Manager
                         DocsPaVO.trasmissione.Trasmissione transmission = new DocsPaVO.trasmissione.Trasmissione();
                         DocsPaVO.trasmissione.RagioneTrasmissione reason = BusinessLogic.Trasmissioni.RagioniManager.getRagioneByCodice(infoUtente.idAmministrazione, "PORTALE"); // CABLATO PER ORA
 
+                        DocsPaVO.ProfilazioneDinamica.Templates template = BusinessLogic.ProfilazioneDinamica.ProfilazioneFascicoli.getTemplateFascDettagli(request.IdProceeding);
+                        string idCorrPrimoNotificato = BusinessLogic.Procedimenti.ProcedimentiManager.GetIdCorrDefault(template, "BE_PROCEDIMENTO_PRIMO_NOT");
+
                         transmission.tipoOggetto = DocsPaVO.trasmissione.TipoOggetto.DOCUMENTO;
                         transmission.utente = user;
                         transmission.ruolo = role;
@@ -865,18 +1010,19 @@ namespace VtDocsWS.Manager
                             docNumber = docNumber,
                             oggetto = request.DocumentObject,
                             tipoProto = "A",
-                            tipoAtto = request.IdDocumentTypology.ToString()
+                            tipoAtto = idDocumentTypology
                         };
 
                         // Destinatari della trasmissione
+                        DocsPaVO.utente.Corrispondente primoNotificato = BusinessLogic.Utenti.UserManager.getCorrispondente(idCorrPrimoNotificato, true);
 
                         // 1 - ruolo a cui trasmetto il fascicolo (cablato)
-                        DocsPaVO.utente.Corrispondente recipient = BusinessLogic.Utenti.UserManager.getCorrispondenteByCodRubrica("SABAP-RM-MET_SEG-II", infoUtente); // CABLATO PER ORA
-                        transmission = BusinessLogic.Trasmissioni.TrasmManager.addTrasmissioneSingola(transmission, recipient, reason, string.Empty, "S");
-                        
+                        //DocsPaVO.utente.Corrispondente recipient = BusinessLogic.Utenti.UserManager.getCorrispondenteByCodRubrica("SABAP-RM-MET_SEG-II", infoUtente); // CABLATO PER ORA
+                        transmission = BusinessLogic.Trasmissioni.TrasmManager.addTrasmissioneSingola(transmission, primoNotificato, reason, string.Empty, "S");
+
                         // 2 - utente responsabile del procedimento (se definito)
                         string assigneeID = string.Empty;
-                        DocsPaVO.ProfilazioneDinamica.Templates template = BusinessLogic.ProfilazioneDinamica.ProfilazioneFascicoli.getTemplateFascDettagli(request.IdProceeding);
+                        
                         foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom obj in template.ELENCO_OGGETTI)
                         {
                             if (obj.DESCRIZIONE.ToUpper() == "UTENTE ASSEGNATARIO")
@@ -893,7 +1039,7 @@ namespace VtDocsWS.Manager
                                 transmission = BusinessLogic.Trasmissioni.TrasmManager.addTrasmissioneSingola(transmission, assignee, reason, string.Empty, "S");
                             }
                         }
-                        
+
 
                         logger.Debug("Invio trasmissione");
                         DocsPaVO.trasmissione.Trasmissione resultTrasm = BusinessLogic.Trasmissioni.ExecTrasmManager.saveExecuteTrasmMethod(string.Empty, transmission);
@@ -913,7 +1059,8 @@ namespace VtDocsWS.Manager
                         #region CONTROLLO EVENTI PER CAMBIO STATO
                         if (templateDoc != null)
                         {
-                            BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoProcedimento(request.IdProceeding, "RICEZIONE", templateDoc.ID_TIPO_ATTO, infoUtente);
+                            //BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoProcedimento(request.IdProceeding, "RICEZIONE", templateDoc.ID_TIPO_ATTO, infoUtente);
+                            BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoAutomatico(request.IdProceeding, "RICEZIONE", infoUtente, templateDoc.ID_TIPO_ATTO, string.Empty);
                         }
                         #endregion
 
@@ -1011,7 +1158,7 @@ namespace VtDocsWS.Manager
                         response.Proceedings = new Proceeding[list.Count];
                         for (int i = 0; i < list.Count; i++)
                         {
-                            response.Proceedings[i] = new Domain.Proceeding() { Id = list[i].IdEsterno, Description = list[i].Descrizione,  UnreadDocuments = list[i].Documenti.Count() };
+                            response.Proceedings[i] = new Domain.Proceeding() { Id = list[i].IdEsterno, Description = list[i].Descrizione, UnreadDocuments = list[i].Documenti.Count() };
                         }
                     }
                 }
@@ -1082,7 +1229,7 @@ namespace VtDocsWS.Manager
                 }
                 #endregion
 
-                using(DocsPaDB.TransactionContext trContxt = new DocsPaDB.TransactionContext())
+                using (DocsPaDB.TransactionContext trContxt = new DocsPaDB.TransactionContext())
                 {
                     try
                     {
@@ -1095,14 +1242,14 @@ namespace VtDocsWS.Manager
 
                         #region CONTROLLO AUTOMATISMI
                         DocsPaVO.ProfilazioneDinamica.Templates template = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getTemplate(request.IdDoc);
-                        if (template != null)
-                        {
-                            BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoProcedimento(request.IdProceeding, "PRESA_VISIONE", template.SYSTEM_ID.ToString(), infoUtente);
-                        }
+                        //if (template != null)
+                        //{
+                        //    BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoProcedimento(request.IdProceeding, "PRESA_VISIONE", template.SYSTEM_ID.ToString(), infoUtente);
+                        //}
                         #endregion
 
                         #region CREAZIONE RICEVUTA DI PRESA VISIONE
-                        DocsPaVO.documento.FileDocumento receipt = BusinessLogic.Modelli.StampaRicevutaGenerica.Create(infoUtente, request.IdDoc, BusinessLogic.Modelli.TipoRicevuta.PresaVisione);
+                        DocsPaVO.documento.FileDocumento receipt = BusinessLogic.Modelli.StampaRicevutaGenerica.Create(infoUtente, new string[1] { request.IdDoc }, BusinessLogic.Modelli.TipoRicevuta.PresaVisione);
                         if (receipt != null)
                         {
                             DocsPaVO.documento.Allegato attachment = new DocsPaVO.documento.Allegato();
@@ -1151,6 +1298,176 @@ namespace VtDocsWS.Manager
                 response.Success = false;
             }
             catch (Exception ex)
+            {
+                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
+                response.Error = new Services.ResponseError
+                {
+                    Code = "APPLICATION_ERROR",
+                    Description = ex.Message
+                };
+
+                response.Success = false;
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// Restituisce la lista delle UO a cui associare un procedimento
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static Services.Proceedings.GetAOO.GetAOOResponse GetAOO(Services.Proceedings.GetAOO.GetAOORequest request)
+        {
+            Services.Proceedings.GetAOO.GetAOOResponse response = new Services.Proceedings.GetAOO.GetAOOResponse();
+
+            try
+            {
+                #region AUTENTICAZIONE E VALIDAZIONE PARAMETRI
+                DocsPaVO.utente.Utente user = null;
+                DocsPaVO.utente.Ruolo role = new DocsPaVO.utente.Ruolo();
+                DocsPaVO.utente.InfoUtente infoUtente = null;
+
+                infoUtente = Utils.CheckAuthentication(request, "SetReadNotifications");
+                user = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
+                if (user == null)
+                {
+                    throw new PisException("USER_NO_EXIST");
+                }
+                role = BusinessLogic.Utenti.UserManager.getRuoloByIdGruppo(infoUtente.idGruppo);
+                if (role == null)
+                {
+                    throw new PisException("ROLE_NO_EXIST");
+                }
+                #endregion
+
+                //List<DocsPaVO.utente.Corrispondente> uoList = BusinessLogic.Utenti.UserManager.GetListaUoProcedimenti(request.Description);
+                List<DocsPaVO.utente.Registro> list = BusinessLogic.Procedimenti.AmministrazioneManager.GetAOO();
+
+                if(list == null)
+                {
+                    throw new Exception("APPLICATION_ERROR");
+                }
+
+                if (list.Count > 0)
+                {
+                    response.AOO = new Register[list.Count];
+
+                    int i = 0;
+
+                    foreach(DocsPaVO.utente.Registro reg in list)
+                    {
+                        response.AOO[i] = new Register();
+                        response.AOO[i].Id = reg.systemId;
+                        response.AOO[i].Code = reg.codRegistro;
+                        response.AOO[i].Description = reg.descrizione;                       
+                        i++;
+                    }
+                }
+                else
+                {
+                    response.AOO = new Register[0];
+                }
+
+                response.Success = true;
+            }
+            catch (PisException pisEx)
+            {
+                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
+                response.Error = new Services.ResponseError
+                {
+                    Code = pisEx.ErrorCode,
+                    Description = pisEx.Description
+                };
+
+                response.Success = false;
+            }
+            catch(Exception ex)
+            {
+                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
+                response.Error = new Services.ResponseError
+                {
+                    Code = "APPLICATION_ERROR",
+                    Description = ex.Message
+                };
+
+                response.Success = false;
+            }
+
+            return response;
+        }
+
+        public static Services.Proceedings.GetTipologies.GetTipologiesResponse GetTipologies(Services.Proceedings.GetTipologies.GetTipologiesRequest request)
+        {
+            Services.Proceedings.GetTipologies.GetTipologiesResponse response = new Services.Proceedings.GetTipologies.GetTipologiesResponse();
+
+            try
+            {
+                #region AUTENTICAZIONE E VALIDAZIONE PARAMETRI
+                DocsPaVO.utente.Utente user = null;
+                DocsPaVO.utente.Ruolo role = new DocsPaVO.utente.Ruolo();
+                DocsPaVO.utente.InfoUtente infoUtente = null;
+
+                infoUtente = Utils.CheckAuthentication(request, "SetReadNotifications");
+                user = BusinessLogic.Utenti.UserManager.getUtenteById(infoUtente.idPeople);
+                if (user == null)
+                {
+                    throw new PisException("USER_NO_EXIST");
+                }
+                role = BusinessLogic.Utenti.UserManager.getRuoloByIdGruppo(infoUtente.idGruppo);
+                if (role == null)
+                {
+                    throw new PisException("ROLE_NO_EXIST");
+                }
+                if (string.IsNullOrEmpty(request.ObjectType))
+                {
+                    throw new PisException("MISSING_PARAMETER");
+                }
+                if(request.AOO == null)
+                {
+                    throw new PisException("MISSING_PARAMETER");
+                }
+                #endregion
+
+                List<String> typologies = new List<String>();
+
+                if(request.ObjectType == "D")
+                {
+                    typologies = BusinessLogic.Procedimenti.AmministrazioneManager.GetTipologieDocumento(request.AOO);
+                }
+                else if(request.ObjectType == "F")
+                {
+                    typologies = BusinessLogic.Procedimenti.AmministrazioneManager.GetTipologieFascicolo(request.AOO);
+                }
+                else
+                {
+                    throw new PisException("INVALID_PARAMETER");
+                }
+
+                if(typologies != null)
+                {
+                    response.Typologies = typologies.ToArray();
+                }
+                else
+                {
+                    throw new PisException("APPLICATION_ERROR");
+                }
+
+                response.Success = true;
+
+            }
+            catch (PisException pisEx)
+            {
+                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
+                response.Error = new Services.ResponseError
+                {
+                    Code = pisEx.ErrorCode,
+                    Description = pisEx.Description
+                };
+
+                response.Success = false;
+            }
+            catch(Exception ex)
             {
                 logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
                 response.Error = new Services.ResponseError

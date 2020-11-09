@@ -58,8 +58,6 @@ namespace Amministrazione.Gestione_Utenti
 
 
         protected System.Web.UI.WebControls.CheckBox chkUserPasswordNeverExpire;
-        //check utente automatico
-        protected System.Web.UI.WebControls.CheckBox chkUserAutomatic;
         protected System.Web.UI.HtmlControls.HtmlTableRow trIntegrazioneLdap;
         protected System.Web.UI.WebControls.Button btnLdapSync;
         protected System.Web.UI.WebControls.Label lblSyncronizeLdap;
@@ -101,7 +99,6 @@ namespace Amministrazione.Gestione_Utenti
         protected System.Web.UI.WebControls.CheckBox cbx_chiavi;
         protected Utilities.MessageBox msg_conferma;
         protected Utilities.MessageBox msg_modifica;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_returnValueModalLF;
 
         #endregion
 
@@ -180,10 +177,6 @@ namespace Amministrazione.Gestione_Utenti
             // Mev CS 1.4 - Esibizione
             // La checkBox cb_abilitatoEsibizione sarà visibile o meno in ragione della chiave di web.config VISUALIZZA_CB_ESIBIZIONE
             this.cb_abilitatoEsibizione.Visible = this.isCBEsibizioneVisible();
-            if (!string.IsNullOrEmpty(DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_LIBRO_FIRMA")) && DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_LIBRO_FIRMA").Equals("1"))
-                this.chkUserAutomatic.Visible = true;
-            else
-                this.chkUserAutomatic.Visible = false;
             // End Mev CS 1.4
             //
 
@@ -271,10 +264,6 @@ namespace Amministrazione.Gestione_Utenti
                     this.btn_vociMenu.Visible = false;
                     this.dg_Utenti.SelectedItem.Cells[8].Text = "0";
                     this.AlertJS("Attenzione,\\nconfermare le modifiche effettuate tramite il tasto 'Modifica' in basso a destra.");
-                }
-                if (this.hd_returnValueModalLF.Value != null && this.hd_returnValueModalLF.Value != string.Empty && this.hd_returnValueModalLF.Value != "undefined")
-                {
-                    this.GestRitornoAvvisoLF(this.hd_returnValueModalLF.Value);
                 }
             }
 
@@ -599,7 +588,6 @@ namespace Amministrazione.Gestione_Utenti
 
             this.cb_abilitato.Checked = false;
             this.cb_abilitatoCentroServizi.Checked = false;
-            this.chkUserAutomatic.Checked = false;
 
             //
             // MEV CS 1.4 - Esibizione
@@ -1074,18 +1062,6 @@ namespace Amministrazione.Gestione_Utenti
                         //<
                         isUserMultiAmm = (VerificaUtenteMultiAmministrazione(this.txt_userid.Text.Trim().ToUpper()));
 
-
-                        if (this.chkUserAutomatic.Checked)
-                        {
-                            theManager.CurrentIDAmm(AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "0"));
-                            string idAmministrazione = theManager.getIDAmministrazione();
-                            if (VerificaUtenteAutomaticoInAmministrazione(idAmministrazione, ""))
-                            {
-                                continua = false;
-                                this.AlertJS("Attenzione, esiste già un utente automatico per questa amministrazione");
-                            }
-                        }
-
                         if (Session["ok_multiAmm"] == null)
                         {
                             if (isUserMultiAmm)
@@ -1123,7 +1099,6 @@ namespace Amministrazione.Gestione_Utenti
                             utente.FromEmail = this.txt_from_email.Text.Trim();
                             utente.Abilitato = (this.cb_abilitato.Checked) ? "1" : "0";
                             utente.AbilitatoCentroServizi = this.cb_abilitatoCentroServizi.Checked;
-                            utente.Automatico = this.chkUserAutomatic.Checked;
                             //
                             // Mev CS 1.4 - Esibizione
                             if (this.cb_abilitatoEsibizione != null)
@@ -1199,40 +1174,6 @@ namespace Amministrazione.Gestione_Utenti
             string returnMsg = string.Empty;
             DocsPAWA.DocsPaWR.Amministrazione[] listaAmm = UserManager.getListaAmministrazioniByUser(this, userId, true, out returnMsg);
             return (listaAmm.Length > 1) ? true : false;
-        }
-
-        /// <summary>
-        /// Verifica se esiste già un utente automatico nell'amministrazione
-        /// </summary>
-        private bool VerificaUtenteAutomaticoInAmministrazione(string idAmm, string idUtente)
-        {
-            string returnMsg = string.Empty;
-            var utente = UserManager.GetUtenteAutomatico(this, idAmm, out returnMsg);
-            //return (utente != null) ? true : false; 
-            if(utente != null)
-            {
-                return (utente.idPeople != idUtente) ? true : false;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
-
-        private bool IsUtenteAutomatico(string idAmm, string idUtente)
-        {
-            string returnMsg = string.Empty;
-            var utente = UserManager.GetUtenteAutomatico(this, idAmm, out returnMsg);
-            //return (utente != null) ? true : false; 
-            if (utente != null)
-            {
-                return (utente.idPeople == idUtente) ? true : false;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         /// <summary>
@@ -1314,19 +1255,7 @@ namespace Amministrazione.Gestione_Utenti
                         break;
                 }
 
-                //verifica se esiste già un utente automatico nell'amministrazione
-                if (this.chkUserAutomatic.Checked)
-                {
-                    Manager.UtentiManager theManager = new Amministrazione.Manager.UtentiManager();
-                    theManager.CurrentIDAmm(AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "0"));
-                    string idAmministrazione = theManager.getIDAmministrazione();
-                    if (VerificaUtenteAutomaticoInAmministrazione(idAmministrazione, this.txt_userid.Text.Trim().ToUpper()))
-                    {
-                        continua = false;
-                        this.AlertJS("Attenzione, esiste già un utente automatico per questa amministrazione");
-                    }
-                }
-
+                
                 //verifice se responsabile AOO
                 if (Session["ok_multiAmm"] == null)
                 {
@@ -1411,9 +1340,6 @@ namespace Amministrazione.Gestione_Utenti
 
                             utente.AbilitatoChiaviConfigurazione = this.cbx_chiavi.Checked;
 
-                            //Utente automatico
-                            utente.Automatico = this.chkUserAutomatic.Checked;
-
                             if (Session["ok_multiAmm"] == null)
                             {
                                 if (isUserMultiAmm)
@@ -1434,11 +1360,18 @@ namespace Amministrazione.Gestione_Utenti
                         if (Session["coinvoltoInLF"] == null && !this.cb_abilitato.Checked)
                         {
                             string stridUtente = this.dg_Utenti.SelectedItem.Cells[1].Text;
-                            if(VerificaPresenzaProcessiFirma(stridUtente))
+                            if (!string.IsNullOrEmpty(stridUtente))
+                                VerificaProcessiCoinvolti(stridUtente);
+                            if (this.dg_Utenti.SelectedItem.Cells[10].Text.Replace("&nbsp;", "") == "N")
+                            {
+                                alert = getCoinvoltoInLibroFirma();
+                            }
+                            if (!string.IsNullOrEmpty(alert))
                             {
                                 continua = false;
                                 Session.Add("coinvoltoInLF", utente);
-                            }                        
+                                msg_modifica.Confirm(alert);
+                            }
                         }
                         else
                         {
@@ -1489,12 +1422,38 @@ namespace Amministrazione.Gestione_Utenti
             }
         }
 
-        private void InvalidaPassiCorrelati(string idPeople, string idRuolo, InfoUtenteAmministratore infoAmm)
+        private void InvalidaPassiCorrelati()
         {
             DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
             wws.Timeout = System.Threading.Timeout.Infinite;
-            string tipoTick = "U";
-            wws.InvalidaPassiCorrelatiTitolare(idRuolo, idPeople, tipoTick, infoAmm);
+            List<ProcessoFirma> processiCoinvolti_U = (Session["processiCoinvolti_U"] != null && ((int)Session["processiCoinvolti_U"]) >0 ? wws.GetProcessiDiFirmaByUtenteTitolare(this.dg_Utenti.SelectedItem.Cells[1].Text, string.Empty).ToList() : new List<ProcessoFirma>());
+            List<IstanzaProcessoDiFirma> istazaProcessiCoinvolti_U = (Session["istazaProcessiCoinvolti_U"] != null && ((int)Session["istazaProcessiCoinvolti_U"]) > 0 ? wws.GetIstanzeProcessiDiFirmaByUtenteCoinvolto(this.dg_Utenti.SelectedItem.Cells[1].Text, string.Empty).ToList() : new List<IstanzaProcessoDiFirma>());
+
+            if (processiCoinvolti_U.Count > 0)
+            {
+                List<string> idPassi = new List<string>();
+                foreach (ProcessoFirma processo in processiCoinvolti_U)
+                {
+                    foreach (PassoFirma passo in processo.passi)
+                    {
+                        if (!idPassi.Contains(passo.idPasso))
+                        {
+                            idPassi.Add(passo.idPasso);
+                        }
+                    }
+                }
+
+                wws.TickPasso(idPassi.ToArray(), "U");
+                Session["processiCoinvolti_U"] = null;
+            }
+
+            if (istazaProcessiCoinvolti_U.Count > 0)
+            {
+                DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
+                wws.TickIstanze(istazaProcessiCoinvolti_U.ToArray(), "U", sessionManager.getUserAmmSession());
+
+                Session["istazaProcessiCoinvolti_U"] = null;
+            }
         }
 
         /// <summary>
@@ -1559,9 +1518,11 @@ namespace Amministrazione.Gestione_Utenti
                             {
                                 case 0:
                                     this.EliminaUtenteDefin(utente);
+                                    InvalidaPassiCorrelati();
                                     break;
                                 case 1:
                                     this.DisabilitaUtDaEliminare(utente);
+                                    InvalidaPassiCorrelati();
                                     break;
                                 case 9:
                                     this.AlertJS("Attenzione, " + esito.Descrizione);
@@ -1710,8 +1671,6 @@ namespace Amministrazione.Gestione_Utenti
             {
                 Manager.UtentiManager theManager = new Amministrazione.Manager.UtentiManager();
                 string idAmm = AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "3");
-                DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                InvalidaPassiCorrelati(utente.IDPeople, "", sessionManager.getUserAmmSession());
                 theManager.DisabilitaUtente(utente.IDPeople, idAmm);
 
                 DocsPAWA.DocsPaWR.EsitoOperazione esito = new DocsPAWA.DocsPaWR.EsitoOperazione();
@@ -1725,6 +1684,7 @@ namespace Amministrazione.Gestione_Utenti
                 {
                     this.AlertJS("NOTA\\n" + esito.Descrizione);
                     retValue = true;
+                    InvalidaPassiCorrelati();
                 }
                 else // uguale a "1" (errore)
                 {
@@ -2201,37 +2161,28 @@ namespace Amministrazione.Gestione_Utenti
 
         }
 
-        private bool VerificaPresenzaProcessiFirma(string idPeople)
+        private void VerificaProcessiCoinvolti(string idUtenteCoinvolto)
         {
-            bool result = false;
-            //Verifico che non ci siano processi attivi
-            string idUtente;
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            int countProcessiCoinvolti = 0;
-            int countIstanzaProcessiCoinvolti = 0;
-            string tipoTitolare = string.Empty;
+            DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
 
-            idUtente = idPeople;
-            countProcessiCoinvolti = ws.GetCountProcessiDiFirmaByTitolare("", idUtente);
-            countIstanzaProcessiCoinvolti = ws.GetCountIstanzaProcessiDiFirmaByTitolare("", idUtente);
-            if (countProcessiCoinvolti > 0 || countIstanzaProcessiCoinvolti > 0)
+            processiCoinvolti_U = wws.GetCountProcessiDiFirmaByUtenteTitolare(idUtenteCoinvolto, string.Empty);
+            if (processiCoinvolti_U > 0)
             {
-                result = true;
+                Session["processiCoinvolti_U"] = processiCoinvolti_U;
+                istazaProcessiCoinvolti_U = wws.GetCountIstanzeProcessiDiFirmaByUtenteCoinvolto(idUtenteCoinvolto, string.Empty);
+                if (istazaProcessiCoinvolti_U > 0)
+                {
+                    Session["istazaProcessiCoinvolti_U"] = istazaProcessiCoinvolti_U;
+                }
+                else
+                {
+                    Session["istazaProcessiCoinvolti_U"] = null;
+                }
             }
-            else //Verifico se l'utente è l'ultimo utente di ruoli coinvolti in PROCESSI
+            else
             {
-                List<string> listIdRuoli = ws.GetIdRuoliProcessiUltimoUtente(idUtente);
-                if(listIdRuoli != null && listIdRuoli.Count > 0)
-                    result = true;
+                Session["processiCoinvolti_U"] = null;
             }
-            if(result)
-            {
-                tipoTitolare = Manager.OrganigrammaManager.SoggettoInModifica.DISABILITA_UTENTE;
-                string scriptString = "<SCRIPT>AvvisoUtenteConLF('" + tipoTitolare + "','','" + idUtente + "','" + countProcessiCoinvolti + "','" + countIstanzaProcessiCoinvolti + "');</SCRIPT>";
-                this.Page.RegisterStartupScript("AvvisoUtenteConLF", scriptString);
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -2264,7 +2215,7 @@ namespace Amministrazione.Gestione_Utenti
             retVal = (!string.IsNullOrEmpty(passivi) && !string.IsNullOrEmpty(attivi) ? passivi + "\\n\\r Inoltre i" + attivi : (
                 !string.IsNullOrEmpty(passivi) ? passivi : (!string.IsNullOrEmpty(attivi) ? "I" + attivi : "")));
             if (!string.IsNullOrEmpty(retVal))
-                retVal = retVal + "\\n\\r Si vuole procedere comunque? Importante avvisare il disegnatore dei processi coinvolti e il proponente.";
+                retVal = retVal + "\\n\\r Si vuole procedere comunque? Importante avvisare il creatore dei processi coinvolti e il proponente.";
 
             return retVal;
         }
@@ -2291,6 +2242,7 @@ namespace Amministrazione.Gestione_Utenti
             //string msgLibroFirma=string.Empty;
             if (!string.IsNullOrEmpty(idUtenteSelezionato))
             {
+                VerificaProcessiCoinvolti(idUtenteSelezionato);
                 msgLibroFirma = getCoinvoltoInLibroFirma();
             }
 
@@ -2386,11 +2338,6 @@ namespace Amministrazione.Gestione_Utenti
 
             this.SetClientModelProcessor(item.Cells[21].Text);
 
-            //Check utente automatico
-            string idAmm = AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "3");
-            bool utenteAutomatico = IsUtenteAutomatico(idAmm, item.Cells[1].Text);
-            this.chkUserAutomatic.Checked = utenteAutomatico;
-
             // tipo componenti
             /*
             bool isEnabledSmartClient;
@@ -2455,6 +2402,7 @@ namespace Amministrazione.Gestione_Utenti
             //string msgLibroFirma = string.Empty;
             if (!string.IsNullOrEmpty(idUtenteSelezionato))
             {
+                VerificaProcessiCoinvolti(idUtenteSelezionato);
                 msgLibroFirma = getCoinvoltoInLibroFirma();
             }
 
@@ -2507,8 +2455,6 @@ namespace Amministrazione.Gestione_Utenti
             // End Mev CS 1.4 - Esibizione
             //
 
-            
-
             // campo matricola ----------------------------------------------
             this.txt_Matricola.Text = e.Item.Cells[27].Text.Replace("&nbsp;", "");
 
@@ -2553,11 +2499,6 @@ namespace Amministrazione.Gestione_Utenti
             this.hdIdSincronizzazioneLdap.Value = e.Item.Cells[20].Text;
 
             this.SetClientModelProcessor(e.Item.Cells[21].Text);
-
-            //check utente automatico
-            string idAmm = AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "3");
-            bool utenteAutomatico = IsUtenteAutomatico(idAmm, e.Item.Cells[1].Text);
-            this.chkUserAutomatic.Checked = utenteAutomatico;
 
             /**bool isEnabledSmartClient;
             if (Boolean.TryParse(e.Item.Cells[22].Text, out isEnabledSmartClient))
@@ -3263,29 +3204,6 @@ namespace Amministrazione.Gestione_Utenti
             result = ((string.IsNullOrEmpty(IS_CONSERVAZIONE_PARER) || IS_CONSERVAZIONE_PARER.Equals("0")) ? false : true);
 
             return result;
-        }
-
-        private void GestRitornoAvvisoLF(string valore)
-        {
-            try
-            {
-                int index = Convert.ToInt32(Session["indexUser"]);
-                string vecchioUtente;
-                switch (valore)
-                {              
-                    case "Y":
-                        ModificaUtente();
-                        break;
-
-                    case "N":
-                        Session.Remove("coinvoltoInLF");
-                        break;
-                }
-                this.hd_returnValueModalLF.Value = "";
-            }
-            catch
-            {
-            }
         }
     }
 }

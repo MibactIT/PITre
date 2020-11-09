@@ -35,9 +35,5 @@ namespace DocsPaVO.amministrazione
 
         // Per gestione pendenti tramite PEC
         public string MailRicevutePendenti = string.Empty;
-
-        //Note da inserire nel testo della mail in spedizione documento
-        public string MessageSendMail = string.Empty;
-        public bool OverwriteMessageAmm = false;
     }
 }

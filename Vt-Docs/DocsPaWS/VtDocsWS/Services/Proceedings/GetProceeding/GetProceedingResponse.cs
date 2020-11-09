@@ -19,6 +19,27 @@ namespace VtDocsWS.Services.Proceedings.GetProceeding
         public Domain.DocInProceeding[] Documents { get; set; }
 
         [DataMember]
+        public String DueDate { get; set; }
+
+        [DataMember]
+        public String ClosureDate { get; set; }
+
+        [DataMember]
+        public String PersonInCharge { get; set; }
+
+        [DataMember]
+        public String Duration { get; set; }
+
+        [DataMember]
         public int Status { get; set; }
+
+        [DataMember]
+        public bool Redirected { get; set; }
+
+        [DataMember]
+        public String IdAOO { get; set; }
+
+        [DataMember]
+        public string Typology { get; set; }
     }
 }

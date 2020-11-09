@@ -14,7 +14,6 @@ using ConservazioneWA.Utils;
 using System.Drawing;
 using System.Xml;
 using System.Security.Cryptography;
-using System.Security.Cryptography.Xml;
 using System.IO;
 using CAPICOM;
 using System.Globalization;

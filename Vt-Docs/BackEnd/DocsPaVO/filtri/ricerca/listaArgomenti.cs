@@ -72,7 +72,11 @@ namespace DocsPaVO.filtri.ricerca
 		PROFILAZIONE_DINAMICA,
 		ID_UO_REF,
 		ID_UO_PROT,
+        COD_UO_PROT,
+        DESC_UO_PROT,
 		ID_UO_PROT_GERARCHIA,
+        UO_PROT_STORICIZZATE,
+        UO_PROT_SOTTOSTATNTI,
 		DESC_UO_REF,
 		ID_DESTINATARIO,
 		ID_DESCR_DESTINATARIO,
@@ -211,6 +215,5 @@ namespace DocsPaVO.filtri.ricerca
         DATA_REPERTORIO_MC,
         DATA_REPERTORIO_SC,
         ESTENDI_A_NODI_FIGLI_E_FASCICOLI,
-        DOCUMENTI_IN_RISPOSTA
-	}
+    }
 }

@@ -14,7 +14,6 @@ namespace DocsPaVO.Conservazione.PARER
         private String _mail_from;
         private bool _use_ssl;
         private String _recipients;
-        private String _policy_recipients;
 
         public String Server
         {
@@ -55,13 +54,7 @@ namespace DocsPaVO.Conservazione.PARER
         public String MailStruttura
         {
             get { return _recipients; }
-            set {_recipients = value;}
-        }
-
-        public String MailPolicy
-        {
-            get { return _policy_recipients; }
-            set { _policy_recipients = value; }
+            set { _recipients = value; }
         }
     }
 }

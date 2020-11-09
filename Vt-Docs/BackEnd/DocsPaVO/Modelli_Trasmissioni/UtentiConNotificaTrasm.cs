@@ -15,6 +15,5 @@ namespace DocsPaVO.Modelli_Trasmissioni
         public string CODICE_UTENTE = string.Empty;         // Codice dell'utente
         public string NOME_COGNOME_UTENTE = string.Empty;   // Nome e cognome dell'utente        
         public string FLAG_NOTIFICA = string.Empty;         // 1 = con notifica, 0 = senza notifica
-        public string ID_MODELLO_MITT_DEST = string.Empty;
     }
 }

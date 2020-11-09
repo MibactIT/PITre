@@ -18,11 +18,4 @@ namespace DocsPaVO.documento
         public string chaEsito;
         public string descProduttore;
 	}
-
-    public enum LogAmministrazione
-    {
-        INTERROTTO_PROCESSO_DOCUMENTO_DA_ADMIN,
-        INTERROTTO_PROCESSO_ALLEGATO_DA_ADMIN,
-        DOC_CAMBIO_STATO_ADMIN
-    }
 }

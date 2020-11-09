@@ -416,23 +416,24 @@ namespace DocsPaDB.Query_DocsPAWS
 			return result;
 		}
 
-        /// <summary>
-        /// </summary>
-        /// <param name="infoUtente"></param>
-        /// <param name="nomeUtente"></param>
-        /// <param name="nomeRuolo"></param>
-        /// <returns></returns>
-        public string GetRegByName(string nomeRegistro)
-        {
-            string result = null;
+		/// <summary>
+		/// </summary>
+		/// <param name="infoUtente"></param>
+		/// <param name="nomeUtente"></param>
+		/// <param name="nomeRuolo"></param>
+		/// <returns></returns>
+		public string GetRegByName(string nomeRegistro)
+		{
+			string result = null;
 
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitImportExportQuery.getInstance().getQuery("GET_REG_BY_NAME");
-                q.setParam("param1", nomeRegistro);
-                string command = q.getSQL();
-                //string command = "SELECT system_id FROM DPA_EL_REGISTRI WHERE var_codice='" + nomeRegistro + "'";
-                using(DBProvider dbProvider = new DBProvider())
+			try
+			{
+				DocsPaUtils.Query q = DocsPaUtils.InitImportExportQuery.getInstance().getQuery("GET_REG_BY_NAME");
+				q.setParam("param1",nomeRegistro);
+				string command=q.getSQL();
+				//string command = "SELECT system_id FROM DPA_EL_REGISTRI WHERE var_codice='" + nomeRegistro + "'";
+				//this.ExecuteScalar(out result, command);
+                using (DBProvider dbProvider = new DBProvider())
                 {
                     using (IDataReader reader = dbProvider.ExecuteReader(command))
                     {
@@ -443,22 +444,20 @@ namespace DocsPaDB.Query_DocsPAWS
                         }
                     }
                 }
-
-                //this.ExecuteScalar(out result, command);
             }
-            catch(Exception exception)
-            {
-                logger.Debug("Errore durante l'acquisizione del registro.", exception);
+			catch(Exception exception)
+			{
+				logger.Debug("Errore durante l'acquisizione del registro.", exception);
 
-                result = null;
-            }
+				result = null;
+			}
+		
+			return result;
+		}
 
-            return result;
-        }
 
 
-
-        public bool GetFolderFascicolo(string idFascicolo,out System.Data.DataSet folder)
+		public bool GetFolderFascicolo(string idFascicolo,out System.Data.DataSet folder)
 		{
 			bool result = true;
 			folder=null;
@@ -512,15 +511,14 @@ namespace DocsPaDB.Query_DocsPAWS
 		{
 			string result = null;
 
-            try
-            {
-                //string command = "SELECT system_id FROM DPA_AMMINISTRA WHERE var_codice_amm='" + nomeAmm + "'";
-                DocsPaUtils.Query q = DocsPaUtils.InitImportExportQuery.getInstance().getQuery("GET_ADMIN_BY_NAME");
-                q.setParam("param1", nomeAmm);
-                string command = q.getSQL();
-                logger.Debug(command);
+			try
+			{
+				//string command = "SELECT system_id FROM DPA_AMMINISTRA WHERE var_codice_amm='" + nomeAmm + "'";
+				DocsPaUtils.Query q = DocsPaUtils.InitImportExportQuery.getInstance().getQuery("GET_ADMIN_BY_NAME");
+				q.setParam("param1",nomeAmm);
+				string command=q.getSQL();
+				logger.Debug(command);
                 //this.ExecuteScalar(out result, command);
-
                 using (DBProvider dbProvider = new DBProvider())
                 {
                     using (IDataReader reader = dbProvider.ExecuteReader(command))
@@ -533,10 +531,8 @@ namespace DocsPaDB.Query_DocsPAWS
                     }
                 }
 
-
-
             }
-            catch (Exception exception)
+			catch(Exception exception)
 			{
 				logger.Debug("Errore durante l'acquisizione dell'amministrazione.", exception);
 
@@ -3910,6 +3906,50 @@ namespace DocsPaDB.Query_DocsPAWS
 	
 			return result;
 		}
+
+        public bool GetSegnaturaPermanenteFascicolatura(string idAmm, out string segnatura, out string fascicolatura, out string segnaturaNP, out string segnaturaIsPermanente, out string segnaturaNPisPermanente)
+        {
+            segnatura = null;
+            fascicolatura = null;
+            segnaturaNP = null;
+            segnaturaIsPermanente = null;
+            segnaturaNPisPermanente = null;
+
+            try
+            {
+                logger.Info("START");
+                System.Data.DataSet dataSet;
+                //string queryString = "SELECT VAR_FORMATO_SEGNATURA, VAR_FORMATO_FASCICOLATURA FROM DPA_AMMINISTRA WHERE SYSTEM_ID = " + idAmm;
+                DocsPaUtils.Query q = DocsPaUtils.InitImportExportQuery.getInstance().getQuery("GET_SEGNATURA_FASCICOLATURA");
+                q.setParam("param1", idAmm);
+                string queryString = q.getSQL();
+                logger.Debug("param idamm" + idAmm);
+                logger.Debug(queryString);
+
+                this.ExecuteQuery(out dataSet, queryString);
+
+                if (dataSet == null)
+                    logger.Debug("dataSet GetSegnaturaFascicolatura is NULL");
+
+                if (dataSet.Tables[0].Rows.Count > 0)
+                {
+                    segnatura = dataSet.Tables[0].Rows[0][0].ToString();
+                    fascicolatura = dataSet.Tables[0].Rows[0][1].ToString();
+                    segnaturaNP = dataSet.Tables[0].Rows[0][2].ToString();
+                    segnaturaIsPermanente = dataSet.Tables[0].Rows[0][3].ToString();
+                    segnaturaNPisPermanente = dataSet.Tables[0].Rows[0][4].ToString();
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
+            finally
+            {
+                logger.Info("END");
+            }
+            return true;
+        }
 
 		public bool Exp_GetAmministrazioni(out System.Data.DataSet dataSet) 
 		{

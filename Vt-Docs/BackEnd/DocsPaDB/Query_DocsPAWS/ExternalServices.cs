@@ -88,43 +88,6 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-        public Servizio getServizioFatturazione()
-        {
-            logger.Debug("BEGIN");
-            Servizio servizio = new Servizio();
-
-            try
-            {
-                Query query = InitQuery.getInstance().getQuery("S_GET_SERVIZIO_FATTURAZIONE");
-                string command = query.getSQL();
-                logger.Debug("QUERY - " + command);
-
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    DataSet ds;
-                    if (!dbProvider.ExecuteQuery(out ds, command))
-                        throw new Exception(dbProvider.LastExceptionMessage);
-
-                    if(ds != null && ds.Tables[0] != null)
-                    {
-                        DataRow row = ds.Tables[0].Rows[0];
-                        servizio.setId(row["SYSTEM_ID"].ToString());
-                        servizio.setDescrizione(row["DESCRIZIONE"].ToString());
-                        servizio.setCodiceEsecutore(row["CODICE_ESECUTORE"].ToString());
-                        caricaParametri(servizio);
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Error("Errore in getServizioFatturazione - ", ex);
-                servizio = null;
-            }
-
-            logger.Debug("END");
-            return servizio;
-        }
-
         public void caricaParametri(Servizio servizio)
         {
             List<Servizio> retList = new List<Servizio>();

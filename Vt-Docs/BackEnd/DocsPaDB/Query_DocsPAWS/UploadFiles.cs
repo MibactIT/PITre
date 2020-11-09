@@ -20,40 +20,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
         #region select
 
-        public string GetUploaderVersion()
-        {
-            string retVal = null;
-
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_DESKTOP_APPS");
-                
-                query = q.getSQL();
-                query = query + " WHERE NOME = 'FILEUPLOADER'";
-                logger.Debug("GetUploaderVersion: " + query);
-
-                if (this.ExecuteQuery(out ds, "UPLOADER_VERSION", query))
-                {
-                    if (ds.Tables["UPLOADER_VERSION"] != null && ds.Tables["UPLOADER_VERSION"].Rows.Count > 0)
-                    {
-                        DataRow row = ds.Tables["UPLOADER_VERSION"].Rows[0];
-                        retVal = row["VERSIONE"].ToString();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo GetUploaderVersion in DocsPaDb.Query_DocsPAWS.GetUploaderVersion " + e.Message);
-                return null;
-            }
-
-            logger.Debug("FINE Metodo GetUploaderVersion in DocsPaDb.Query_DocsPAWS.GetUploaderVersion");
-            return retVal;
-        }
-
         public FileInUpload GetFileInUpload(string strIdentity, DocsPaVO.utente.InfoUtente infoUtente)
         {
             //hashFile non viene più considerato
@@ -211,46 +177,6 @@ namespace DocsPaDB.Query_DocsPAWS
             }
 
             return listFilesOnServer;
-        }
-
-        public string GetHashFile(string idPeople, string idRuolo, string filePath, string strIdentificativo)
-        {
-            //hashFile non viene più considerato
-            logger.Debug("INIZIO Metodo GetHashFile in DocsPaDb.Query_DocsPAWS.UploadFiles");
-            string retVal = string.Empty;
-
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_HASH");
-                q.setParam("idPeople", idPeople);
-                q.setParam("idRuolo", idRuolo);
-                q.setParam("strIdentificativo", strIdentificativo);
-
-                query = q.getSQL();
-                logger.Debug("GetHashFile: " + query);
-
-                if (this.ExecuteQuery(out ds, "UPLOADED_FILE", query))
-                {
-                    if (ds.Tables["UPLOADED_FILE"] != null && ds.Tables["UPLOADED_FILE"].Rows.Count > 0)
-                    {
-                        DataRow row = ds.Tables["UPLOADED_FILE"].Rows[0];
-
-                        retVal = row["FILE_HASH"].ToString();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo GetHashFile in DocsPaDb.Query_DocsPAWS.UploadFiles " + e.Message);
-                return null;
-            }
-
-            logger.Debug("FINE Metodo GetHashFile in DocsPaDb.Query_DocsPAWS.UploadFiles");
-            
-            return retVal;
         }
 
         #endregion
@@ -417,51 +343,6 @@ namespace DocsPaDB.Query_DocsPAWS
             }
 
             logger.Debug("Fine Metodo DeleteFileInUpload in DocsPaDb.Query_DocsPAWS.UploadFiles");
-            return retValue;
-        }
-
-        public bool UpdateComponentsPath(string docNumber, string pathFile, string fileName, string fileExt, int fileSize, string hashFile, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Debug("INIZIO Metodo GetFileInUpload in DocsPaDb.Query_DocsPAWS.UpdateComponentsPath");
-
-            bool retValue = true;
-
-            fileExt = fileExt.Replace("application/", "");
-
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_COMPONENTS_PATH");
-                q.setParam("fileHash", hashFile.ToUpper());
-                q.setParam("filePath", pathFile);
-                q.setParam("fileName", fileName);
-                q.setParam("fileExt", fileExt);
-                q.setParam("fileSize", fileSize.ToString());
-                q.setParam("docNumber", docNumber);
-
-                string query = q.getSQL();
-                logger.Debug("UpdateComponents: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento della components: " + query);
-                }
-                else 
-                {
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("U_PROFILE_EXT");
-                    q.setParam("ext", "'" + fileExt + "'");
-                    q.setParam("docnumber", docNumber);
-
-                    query = q.getSQL();
-                    ExecuteNonQuery(query);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo DeleteFileInUpload in DocsPaDb.Query_DocsPAWS.UpdateComponentsPath: " + e.Message);
-                return false;
-            }
-
-            logger.Debug("Fine Metodo DeleteFileInUpload in DocsPaDb.Query_DocsPAWS.UpdateComponentsPath");
-
             return retValue;
         }
     }

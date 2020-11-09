@@ -237,7 +237,7 @@ namespace BusinessLogic.Documenti.DigitalSignature
             //allora la marca è scaduta!!!
             if (DateTime.Now.CompareTo(cert.NotAfter.ToLocalTime()) > 0)
             {
-                //outTSR.esito = "KO";
+                outTSR.esito = "KO";
                 outTSR.descrizioneErrore = "marca temporale scaduta";
                 logger.Debug("marca temporale scaduta");
                 //return outTSR;

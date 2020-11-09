@@ -9,61 +9,68 @@ using DocsPaVO.Spedizione;
 
 namespace DocsPaDB.Query_DocsPAWS
 {
-	/// <summary>
-	/// Classe contenente tutte le query (22) di DocsPAWS > interoperabilita
-	/// </summary>
-	public partial class Interoperabilita : DBProvider
-	{
+    /// <summary>
+    /// Classe contenente tutte le query (22) di DocsPAWS > interoperabilita
+    /// </summary>
+    public partial class Interoperabilita : DBProvider
+    {
         private ILog logger = LogManager.GetLogger(typeof(Interoperabilita));
 
-		#region DocsPaWS.interoperabilita.InteroperabilitaControlloRicevute (2)
+        #region DocsPaWS.interoperabilita.InteroperabilitaControlloRicevute (2)
 
-		/// <summary>
-		/// Query per il metodo "findIdProfRicevuta"
-		/// </summary>
-		/// <param name="dataSet"></param>
-		/// <param name="codiceAOO"></param>
-		/// <param name="numeroRegistrazione"></param>
-		/// <param name="anno"></param>
-		public void findIdProf(out DataSet dataSet,string codiceAOO,string numeroRegistrazione,int anno)
-		{	
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_PROFILE__DPA_EL_REGISTRI");
-			q.setParam("param1",codiceAOO);
-			q.setParam("param2",numeroRegistrazione);
-			q.setParam("param3",anno.ToString());
-			string queryString = q.getSQL();
-			ExecuteQuery(out dataSet,"ID_DOC",queryString);
+        /// <summary>
+        /// Query per il metodo "findIdProfRicevuta"
+        /// </summary>
+        /// <param name="dataSet"></param>
+        /// <param name="codiceAOO"></param>
+        /// <param name="numeroRegistrazione"></param>
+        /// <param name="anno"></param>
+        public void findIdProf(out DataSet dataSet, string codiceAOO, string numeroRegistrazione, int anno)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_PROFILE__DPA_EL_REGISTRI");
+            q.setParam("param1", codiceAOO);
+            q.setParam("param2", numeroRegistrazione);
+            q.setParam("param3", anno.ToString());
+            string queryString = q.getSQL();
 
-            if (!(dataSet != null && dataSet.Tables["ID_DOC"] != null && dataSet.Tables["ID_DOC"].Rows.Count > 0 ))
+            using (DBProvider dbProvider = new DBProvider())
             {
-                //rifaccio il controllo con anno precedente perchè potrebbe essere che ricevo una conferma di un protocollo dell'anno
-                //precedente, protocollato dal destinatario nell'anno successivo.. più di un anno di differenza sembra molto imporbabile.
-                
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_PROFILE__DPA_EL_REGISTRI");
-                q.setParam("param1", codiceAOO);
-                q.setParam("param2", numeroRegistrazione);
-                q.setParam("param3", (anno - 1).ToString());
-                queryString = q.getSQL();
-                ExecuteQuery(out dataSet, "ID_DOC", queryString);
+                dbProvider.ExecuteQuery(out dataSet, "ID_DOC", queryString);
 
+                if (!(dataSet != null && dataSet.Tables["ID_DOC"] != null && dataSet.Tables["ID_DOC"].Rows.Count > 0))
+                {
+                    //rifaccio il controllo con anno precedente perchè potrebbe essere che ricevo una conferma di un protocollo dell'anno
+                    //precedente, protocollato dal destinatario nell'anno successivo.. più di un anno di differenza sembra molto imporbabile.
+
+                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_PROFILE__DPA_EL_REGISTRI");
+                    q.setParam("param1", codiceAOO);
+                    q.setParam("param2", numeroRegistrazione);
+                    q.setParam("param3", (anno - 1).ToString());
+                    queryString = q.getSQL();
+                    ExecuteQuery(out dataSet, "ID_DOC", queryString);
+
+                }
             }
 
 
-		}
 
-		/// <summary>
-		/// Query per il metodo "updateStatoInvio"
-		/// </summary>
-		/// <param name="idProf"></param>
-		/// <param name="codiceAOO"></param>
-		/// <param name="codiceAmministrazione"></param>
-		/// <param name="data"></param>
-		/// <param name="numeroRegistrazione"></param>
-		/// <param name="anno"></param>
-		/// <param name="debug"></param>
-		public bool updStatoInvio(string idProf, string codiceAOO,string codiceAmministrazione, string data, string numeroRegistrazione,int anno)
-		{
-			bool res=false;
+
+
+        }
+
+        /// <summary>
+        /// Query per il metodo "updateStatoInvio"
+        /// </summary>
+        /// <param name="idProf"></param>
+        /// <param name="codiceAOO"></param>
+        /// <param name="codiceAmministrazione"></param>
+        /// <param name="data"></param>
+        /// <param name="numeroRegistrazione"></param>
+        /// <param name="anno"></param>
+        /// <param name="debug"></param>
+        public bool updStatoInvio(string idProf, string codiceAOO, string codiceAmministrazione, string data, string numeroRegistrazione, int anno)
+        {
+            bool res = false;
             // PEC 4 Modifica Maschera Caratteri
             string statusmask = getStatusMask1(idProf, codiceAOO, codiceAmministrazione);
             if (!string.IsNullOrEmpty(statusmask))
@@ -76,9 +83,9 @@ namespace DocsPaDB.Query_DocsPAWS
                 statusmask = new string(sm);
             }
 
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPAStatoInvio1");
-			q.setParam("param1","'"+numeroRegistrazione+"/"+codiceAOO+"/"+anno+"'");
-			q.setParam("param2",DocsPaDbManagement.Functions.Functions.ToDate(data));
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPAStatoInvio1");
+            q.setParam("param1", "'" + numeroRegistrazione + "/" + codiceAOO + "/" + anno + "'");
+            q.setParam("param2", DocsPaDbManagement.Functions.Functions.ToDate(data));
 
             // PEC 4 Modifica Maschera Caratteri
             // Inserisco il cancellamento dell'eccezione
@@ -86,25 +93,19 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("statusmask", ", STATUS_C_MASK = 'VVVVANN', CHA_ANNULLATO = NULL, VAR_MOTIVO_ANNULLA = NULL");
             else
                 q.setParam("statusmask", ", STATUS_C_MASK = '" + statusmask + "', CHA_ANNULLATO = NULL, VAR_MOTIVO_ANNULLA = NULL");
-			//DocsPaWS.Utils.dbControl.toDate(data,false));
-			q.setParam("param3",idProf);
+            //DocsPaWS.Utils.dbControl.toDate(data,false));
+            q.setParam("param3", idProf);
             if (codiceAOO != null)
                 codiceAOO = codiceAOO.ToUpper();
-			q.setParam("param4","'" + codiceAOO + "'");
+            q.setParam("param4", "'" + codiceAOO + "'");
             if (codiceAmministrazione != null)
                 codiceAmministrazione = codiceAmministrazione.ToUpper();
-			q.setParam("param5","'" + codiceAmministrazione + "'");
-			string updateString = q.getSQL();
-			logger.Debug(updateString);
-
-            int rowsAffected;
-
-            if (ExecuteNonQuery(updateString, out rowsAffected))
-                res = (rowsAffected > 0);
-
-            //res =ExecuteNonQuery(updateString);
-			return res;
-		}
+            q.setParam("param5", "'" + codiceAmministrazione + "'");
+            string updateString = q.getSQL();
+            logger.Debug(updateString);
+            res = ExecuteNonQuery(updateString);
+            return res;
+        }
 
         /// <summary>
         /// PEC 4 Modifica Maschera Caratteri
@@ -114,7 +115,7 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <param name="codiceAOO"></param>
         /// <param name="codiceAmministrazione"></param>
         /// <returns></returns>
-        public string getStatusMask1(string idProf, string codiceAOO, string codiceAmministrazione, string systemidDPASI="")
+        public string getStatusMask1(string idProf, string codiceAOO, string codiceAmministrazione, string systemidDPASI = "")
         {
             string statusMask = null;
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPAStatoinvio");
@@ -155,7 +156,7 @@ namespace DocsPaDB.Query_DocsPAWS
             //string query = "select status_c_mask as mask from dpa_stato_invio where id_profile=" + idProf + " AND upper(VAR_CODICE_AOO) = '" + codiceAOO.ToUpper() + "' and upper(VAR_CODICE_AMM)= '" + codiceAmministrazione.ToUpper() + "'" ; // temporanea
 
             logger.Debug(query);
-            DataSet ds= new DataSet();
+            DataSet ds = new DataSet();
             ExecuteQuery(ds, "STAT_MASK", query);
             if (ds != null && ds.Tables["STAT_MASK"] != null && ds.Tables["STAT_MASK"].Rows.Count > 0)
             {
@@ -163,7 +164,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             return statusMask;
         }
-		#endregion
+        #endregion
 
         #region DocsPaWS.interoperabilita.NotificaEccezione
         /// <summary>
@@ -175,14 +176,14 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <param name="numeroRegistrazione"></param>
         /// <param name="anno"></param>
         /// <param name="debug"></param>
-        public bool updStatoInvioEccezione(string SystemID,  string motivo_annulla)
+        public bool updStatoInvioEccezione(string SystemID, string motivo_annulla)
         {
             bool res = false;
-            string statusmask= getStatusMask1("", "", "", SystemID);
+            string statusmask = getStatusMask1("", "", "", SystemID);
             if (!string.IsNullOrEmpty(statusmask))
             {
                 char[] sm = statusmask.ToCharArray();
-                if (sm[5] == 'A' && sm[2]=='V')
+                if (sm[5] == 'A' && sm[2] == 'V')
                 {
                     sm[0] = 'X';
                     sm[3] = 'N';
@@ -227,19 +228,19 @@ namespace DocsPaDB.Query_DocsPAWS
         }
         #endregion
 
-		#region DocsPaWS.interoperabilita.NotificaAnnullamento
-		/// <summary>
-		/// Query per il metodo "updateStatoInvio"
-		/// </summary>
-		/// <param name="codiceAOO"></param>
-		/// <param name="codiceAmministrazione"></param>
-		/// <param name="data"></param>
-		/// <param name="numeroRegistrazione"></param>
-		/// <param name="anno"></param>
-		/// <param name="debug"></param>
-		public bool updStatoInvioAnnulla(string idProfile,string codiceAOO,string codiceAmministrazione, string data, string numeroRegistrazione,int anno,string motivo_annulla, string provvedimento)
-		{
-			bool res=false;
+        #region DocsPaWS.interoperabilita.NotificaAnnullamento
+        /// <summary>
+        /// Query per il metodo "updateStatoInvio"
+        /// </summary>
+        /// <param name="codiceAOO"></param>
+        /// <param name="codiceAmministrazione"></param>
+        /// <param name="data"></param>
+        /// <param name="numeroRegistrazione"></param>
+        /// <param name="anno"></param>
+        /// <param name="debug"></param>
+        public bool updStatoInvioAnnulla(string idProfile, string codiceAOO, string codiceAmministrazione, string data, string numeroRegistrazione, int anno, string motivo_annulla, string provvedimento)
+        {
+            bool res = false;
             // PEC 4 Modifica Maschera Caratteri
             string statusmask = getStatusMask1(idProfile, codiceAOO, codiceAmministrazione);
             if (!string.IsNullOrEmpty(statusmask))
@@ -249,93 +250,96 @@ namespace DocsPaDB.Query_DocsPAWS
                 statusmask = new string(sm);
             }
 
-			DocsPaUtils.Query q;
+            DocsPaUtils.Query q;
 
-			if (motivo_annulla!=null && !motivo_annulla.Equals(""))
-				motivo_annulla=motivo_annulla.Replace("'","''");
-			if (provvedimento!= null && !provvedimento.Equals(""))
-				provvedimento=provvedimento.Replace("'","''");
+            if (motivo_annulla != null && !motivo_annulla.Equals(""))
+                motivo_annulla = motivo_annulla.Replace("'", "''");
+            if (provvedimento != null && !provvedimento.Equals(""))
+                provvedimento = provvedimento.Replace("'", "''");
 
-			if (idProfile != null && !idProfile.Equals(""))
-			{
-				q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPAStatoInvio3");
-				q.setParam("param8",idProfile);
-					
-			}
-			else
-			{
-				q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPAStatoInvio2");
-			}
-			q.setParam("param1","'"+numeroRegistrazione+"/"+codiceAOO+"/"+anno+"'");
-			q.setParam("param2",DocsPaDbManagement.Functions.Functions.ToDate(data));	
-			q.setParam("param3","'" + codiceAOO + "'");
-			q.setParam("param4","'" + codiceAmministrazione + "'");
-			q.setParam("param5","'" + motivo_annulla.Replace("'","''") + "'");
-			q.setParam("param6","'1'");
-			q.setParam("param7","'" + provvedimento + "'");
+            if (idProfile != null && !idProfile.Equals(""))
+            {
+                q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPAStatoInvio3");
+                q.setParam("param8", idProfile);
+
+            }
+            else
+            {
+                q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPAStatoInvio2");
+            }
+            q.setParam("param1", "'" + numeroRegistrazione + "/" + codiceAOO + "/" + anno + "'");
+            q.setParam("param2", DocsPaDbManagement.Functions.Functions.ToDate(data));
+            q.setParam("param3", "'" + codiceAOO + "'");
+            q.setParam("param4", "'" + codiceAmministrazione + "'");
+            q.setParam("param5", "'" + motivo_annulla.Replace("'", "''") + "'");
+            q.setParam("param6", "'1'");
+            q.setParam("param7", "'" + provvedimento + "'");
             // PEC 4 Modifica Maschera Caratteri
             if (string.IsNullOrEmpty(statusmask))
                 q.setParam("statusmask", ", STATUS_C_MASK = 'VVVVVNN'");
             else
                 q.setParam("statusmask", ", STATUS_C_MASK = '" + statusmask + "'");
-			string updateString = q.getSQL();
-			logger.Debug(updateString);			
-			res=ExecuteNonQuery(updateString);
-			return res;
-		}
-		#endregion
+            string updateString = q.getSQL();
+            logger.Debug(updateString);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                res = dbProvider.ExecuteNonQuery(updateString);
+            }
+            return res;
+        }
+        #endregion
 
-		#region DocsPaWS.interoperabilita.InteroperabilitaManagerRicevute (3)
+        #region DocsPaWS.interoperabilita.InteroperabilitaManagerRicevute (3)
 
-		/// <summary>
-		/// Query #1 per il metodo "costruisciXml"
-		/// </summary>
-		/// <param name="dataSet"></param>
-		/// <param name="idProfile"></param>
-		/// <param name="debug"></param>
-		public void getMittSegn(out DataSet dataSet,string idProfile)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_CORR_GLOBALI__PROFILE__DOC_ARRIVO_PAR");
-			q.setParam("param1",idProfile);
-			string queryMittString = q.getSQL();
-			logger.Debug(queryMittString);			
-			ExecuteQuery(out dataSet,"INFO_MITT",queryMittString);
-		}
-		public void getDatiProtoSpedito(out DataSet dataSet,string idProfile)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_PROFILE_DATI_PROTO");
-			q.setParam("param1",idProfile);
-			string queryString = q.getSQL();
-			logger.Debug(queryString);			
-			ExecuteQuery(out dataSet,"INFO_PROTO",queryString);
-		}
+        /// <summary>
+        /// Query #1 per il metodo "costruisciXml"
+        /// </summary>
+        /// <param name="dataSet"></param>
+        /// <param name="idProfile"></param>
+        /// <param name="debug"></param>
+        public void getMittSegn(out DataSet dataSet, string idProfile)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_CORR_GLOBALI__PROFILE__DOC_ARRIVO_PAR");
+            q.setParam("param1", idProfile);
+            string queryMittString = q.getSQL();
+            logger.Debug(queryMittString);
+            ExecuteQuery(out dataSet, "INFO_MITT", queryMittString);
+        }
+        public void getDatiProtoSpedito(out DataSet dataSet, string idProfile)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_PROFILE_DATI_PROTO");
+            q.setParam("param1", idProfile);
+            string queryString = q.getSQL();
+            logger.Debug(queryString);
+            ExecuteQuery(out dataSet, "INFO_PROTO", queryString);
+        }
 
 
-		/// <summary>
-		/// Query #2 per il metodo "costruisciXml"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="idProfile"></param>
-		/// <param name="debug"></param>
-		public void getIdent(out DataSet ds,string idProfile)
-		{			
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_Profile");
-			q.setParam("param1",idProfile);
-			string queryProtoString = q.getSQL();
-			logger.Debug(queryProtoString);
-			ExecuteQuery(out ds,"INFO_PROTO",queryProtoString);
-		}
+        /// <summary>
+        /// Query #2 per il metodo "costruisciXml"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="idProfile"></param>
+        /// <param name="debug"></param>
+        public void getIdent(out DataSet ds, string idProfile)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_Profile");
+            q.setParam("param1", idProfile);
+            string queryProtoString = q.getSQL();
+            logger.Debug(queryProtoString);
+            ExecuteQuery(out ds, "INFO_PROTO", queryProtoString);
+        }
 
-		#endregion
+        #endregion
 
-		#region DocsPaWS.interoperabilita.InteroperabilitaInvioSegnatura (2)
+        #region DocsPaWS.interoperabilita.InteroperabilitaInvioSegnatura (2)
 
-		/// <summary>
-		/// Query per il metodo "interopInviaMethod"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="reg"></param>
-		/* NON PIU' NECESSARIO CON L'AGGIUNTA DEL MULTICASELLA
+        /// <summary>
+        /// Query per il metodo "interopInviaMethod"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="reg"></param>
+        /* NON PIU' NECESSARIO CON L'AGGIUNTA DEL MULTICASELLA
          * public void getDatiReg(out DataSet ds,DocsPaVO.utente.Registro reg)
 		{
 			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_EL_REGISTRI__AMMINISTRA3");
@@ -344,57 +348,57 @@ namespace DocsPaDB.Query_DocsPAWS
 			ExecuteQuery(out ds,"REGISTRO",queryRegString);
 		}*/
 
-		/// <summary>
-		/// Query per il metodo "isMailPreferred"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="corr"></param>
-		public void getDatiCan(out DataSet ds,DocsPaVO.utente.Corrispondente corr)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_T_CANALE_CORR__DOCUMENTTYPES2");
-			q.setParam("param1",corr.systemId);			
-			string queryString = q.getSQL();
-            logger.Debug(queryString);			
-		 	ExecuteQuery(out ds,"CANALE",queryString);
-		}
+        /// <summary>
+        /// Query per il metodo "isMailPreferred"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="corr"></param>
+        public void getDatiCan(out DataSet ds, DocsPaVO.utente.Corrispondente corr)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_T_CANALE_CORR__DOCUMENTTYPES2");
+            q.setParam("param1", corr.systemId);
+            string queryString = q.getSQL();
+            logger.Debug(queryString);
+            ExecuteQuery(out ds, "CANALE", queryString);
+        }
 
         public void setRicevutaPec(string idRegistro, DocsPaVO.amministrazione.CasellaRegistro[] casella)
         {
             new Amministrazione().UpdateMailRegistro(idRegistro, casella);
         }
-		#endregion
+        #endregion
 
-		#region DocsPaWS.interoperabilita.InteroperabilitaRicezione (3)
+        #region DocsPaWS.interoperabilita.InteroperabilitaRicezione (3)
 
-		/// <summary>
-		/// Query per il metodo "getRuoloReg"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="reg"></param>
-		public void getRuoReg(out DataSet ds,DocsPaVO.utente.Registro reg)
-		{
-			logger.Debug("start > getRuoReg");
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_CORR_GLOBALI__TIPO_RUOLO__L_RUOLO_REG");
-			q.setParam("param1",reg.systemId);			
-			string queryString = q.getSQL();
-			logger.Debug(queryString);			
-			ExecuteQuery(out ds,"RUOLO",queryString);
-		}
+        /// <summary>
+        /// Query per il metodo "getRuoloReg"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="reg"></param>
+        public void getRuoReg(out DataSet ds, DocsPaVO.utente.Registro reg)
+        {
+            logger.Debug("start > getRuoReg");
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_CORR_GLOBALI__TIPO_RUOLO__L_RUOLO_REG");
+            q.setParam("param1", reg.systemId);
+            string queryString = q.getSQL();
+            logger.Debug(queryString);
+            ExecuteQuery(out ds, "RUOLO", queryString);
+        }
 
-		/// <summary>
-		/// Query per il metodo "getUtenteReg"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="ruolo"></param>
-		public void getUtReg(out DataSet ds,DocsPaVO.utente.Ruolo ruolo)
-		{
-			logger.Debug("start > getUtReg");
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_PEOPLE__PEOPLEGROUPS");
-			q.setParam("param1",ruolo.idGruppo);			
-			string queryString = q.getSQL();
-			logger.Debug(queryString);			
-			ExecuteQuery(out ds,"UTENTE",queryString);
-		}
+        /// <summary>
+        /// Query per il metodo "getUtenteReg"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="ruolo"></param>
+        public void getUtReg(out DataSet ds, DocsPaVO.utente.Ruolo ruolo)
+        {
+            logger.Debug("start > getUtReg");
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_PEOPLE__PEOPLEGROUPS");
+            q.setParam("param1", ruolo.idGruppo);
+            string queryString = q.getSQL();
+            logger.Debug(queryString);
+            ExecuteQuery(out ds, "UTENTE", queryString);
+        }
 
         public string isEnabledSaveMail(string idReg)
         {
@@ -407,9 +411,13 @@ namespace DocsPaDB.Query_DocsPAWS
                 string commandText = q.getSQL();
                 logger.Debug(commandText);
                 string field = string.Empty;
-                if (!ExecuteScalar(out field, commandText))
+
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    throw new Exception(LastExceptionMessage);
+                    if (!dbProvider.ExecuteScalar(out field, commandText))
+                    {
+                        throw new Exception(LastExceptionMessage);
+                    }
                 }
                 result = field;
 
@@ -424,27 +432,27 @@ namespace DocsPaDB.Query_DocsPAWS
 
         }
 
-		#endregion
+        #endregion
 
-		#region DocsPaWS.interoperabilita.InteroperabilitaSegnatura (10)
+        #region DocsPaWS.interoperabilita.InteroperabilitaSegnatura (10)
 
-		/// <summary>
-		/// Query #1 per il metodo "addNewCorrispondente"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="codiceAmm"></param>
-		/// <param name="reg"></param>
-		/// <param name="debug"></param>
-		public void getCodRubr(out DataSet ds,string codiceAmm,DocsPaVO.utente.Registro reg)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPACorrGlob8");
-			q.setParam("param1",codiceAmm);	
-			q.setParam("param2",reg.idAmministrazione);	
-			q.setParam("param3",reg.systemId);	
-			string queryString = q.getSQL();	
-			logger.Debug(queryString);		
-			ExecuteQuery(out ds,"AMMINISTRAZIONE",queryString);
-		}
+        /// <summary>
+        /// Query #1 per il metodo "addNewCorrispondente"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="codiceAmm"></param>
+        /// <param name="reg"></param>
+        /// <param name="debug"></param>
+        public void getCodRubr(out DataSet ds, string codiceAmm, DocsPaVO.utente.Registro reg)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPACorrGlob8");
+            q.setParam("param1", codiceAmm);
+            q.setParam("param2", reg.idAmministrazione);
+            q.setParam("param3", reg.systemId);
+            string queryString = q.getSQL();
+            logger.Debug(queryString);
+            ExecuteQuery(out ds, "AMMINISTRAZIONE", queryString);
+        }
 
 		/// <summary>
 		/// Query #2 per il metodo "addNewCorrispondente"
@@ -490,7 +498,12 @@ namespace DocsPaDB.Query_DocsPAWS
 			string insertAmm = q.getSQL();
 			logger.Debug(insertAmm);
 			string sysId;
-			InsertLocked(out sysId,insertAmm,"DPA_CORR_GLOBALI");
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.InsertLocked(out sysId,insertAmm,"DPA_CORR_GLOBALI");
+            }
+            
 			return sysId;
 		}
 
@@ -544,97 +557,106 @@ namespace DocsPaDB.Query_DocsPAWS
             string insertAmm = q.getSQL();
             logger.Debug(insertAmm);
             string sysId;
-            InsertLocked(out sysId, insertAmm, "DPA_CORR_GLOBALI");
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.InsertLocked(out sysId, insertAmm, "DPA_CORR_GLOBALI");
+            }
+            
             return sysId;
         }
 
-		/// <summary>
-		/// Query #3 per il metodo "addNewCorrispondente"
-		/// </summary>
-		/// <param name="codRubricaAmm"></param>
-		/// <param name="sysId"></param>
-		public void setCodRub(string codRubricaAmm,string sysId, bool updateDescCorr)
-		{
+        /// <summary>
+        /// Query #3 per il metodo "addNewCorrispondente"
+        /// </summary>
+        /// <param name="codRubricaAmm"></param>
+        /// <param name="sysId"></param>
+        public void setCodRub(string codRubricaAmm, string sysId, bool updateDescCorr)
+        {
             DocsPaUtils.Query q = null;
-            if(updateDescCorr)
+            if (updateDescCorr)
                 q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPACorrGlobDescCorrAndCod");
             else
                 q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPACorrGlob5");
 			q.setParam("param1",codRubricaAmm);	
 			q.setParam("param2",sysId);	
 			string updateCodRubricaAmm = q.getSQL();
-			ExecuteNonQuery(updateCodRubricaAmm);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(updateCodRubricaAmm);
+            }
 		}
 
-		/// <summary>
-		/// Query #4 per il metodo "addNewCorrispondente"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="descrizioneUO"></param>
-		/// <param name="reg"></param>
-		/// <param name="debug"></param>
-		public void getExistUo(out DataSet ds,string descrizioneUO,DocsPaVO.utente.Registro reg,string idParent)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPACorrGlob9");
-			q.setParam("param1",descrizioneUO.Replace("'","''"));	
-			q.setParam("param2",reg.idAmministrazione);	
-			q.setParam("param3",idParent);	
-			string queryString = q.getSQL();	
-			logger.Debug(queryString);		
-			ExecuteQuery(out ds,"UO",queryString);
-		}
+        /// <summary>
+        /// Query #4 per il metodo "addNewCorrispondente"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="descrizioneUO"></param>
+        /// <param name="reg"></param>
+        /// <param name="debug"></param>
+        public void getExistUo(out DataSet ds, string descrizioneUO, DocsPaVO.utente.Registro reg, string idParent)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPACorrGlob9");
+            q.setParam("param1", descrizioneUO.Replace("'", "''"));
+            q.setParam("param2", reg.idAmministrazione);
+            q.setParam("param3", idParent);
+            string queryString = q.getSQL();
+            logger.Debug(queryString);
+            ExecuteQuery(out ds, "UO", queryString);
+        }
 
-		/// <summary>
-		/// Query #5 per il metodo "addNewCorrispondente"
-		/// </summary>
-		/// <param name="elUO"></param>
-		/// <param name="db"></param>
-		/// <param name="level"></param>
-		/// <param name="tipoIE"></param>
-		/// <param name="reg"></param>
-		/// <param name="mailMitt"></param>
-		/// <param name="descrizioneUO"></param>
-		/// <param name="dataInizio"></param>
-		/// <param name="idParent"></param>
-		/// <param name="codiceAmm"></param>
-		/// <param name="tipoCorr"></param>
-		/// <param name="codiceAOO"></param>
-		/// <param name="descrInterUO"></param>
-		/// <param name="debug"></param>
-		/// <returns></returns>
-		public string addNewUO(XmlElement elUO,/*DocsPaWS.Utils.Database db,*/int level,string tipoIE,DocsPaVO.utente.Registro reg,string mailMitt,string descrizioneUO,string idParent,string codiceAmm,string tipoCorr,string codiceAOO,string descrInterUO)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPACorrGlobali5");
-			string dataInizio = DocsPaDbManagement.Functions.Functions.ToDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US") ));
+        /// <summary>
+        /// Query #5 per il metodo "addNewCorrispondente"
+        /// </summary>
+        /// <param name="elUO"></param>
+        /// <param name="db"></param>
+        /// <param name="level"></param>
+        /// <param name="tipoIE"></param>
+        /// <param name="reg"></param>
+        /// <param name="mailMitt"></param>
+        /// <param name="descrizioneUO"></param>
+        /// <param name="dataInizio"></param>
+        /// <param name="idParent"></param>
+        /// <param name="codiceAmm"></param>
+        /// <param name="tipoCorr"></param>
+        /// <param name="codiceAOO"></param>
+        /// <param name="descrInterUO"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public string addNewUO(XmlElement elUO,/*DocsPaWS.Utils.Database db,*/int level, string tipoIE, DocsPaVO.utente.Registro reg, string mailMitt, string descrizioneUO, string idParent, string codiceAmm, string tipoCorr, string codiceAOO, string descrInterUO)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPACorrGlobali5");
+            string dataInizio = DocsPaDbManagement.Functions.Functions.ToDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US")));
 
-			q.setParam("param1",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-			//DocsPaWS.Utils.dbControl.GetSystemIdColName());	
-			if(isLastUO(elUO))
-			{				
-				q.setParam("param2",",VAR_EMAIL,VAR_DESC_CORR_OLD");
+            q.setParam("param1", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+            //DocsPaWS.Utils.dbControl.GetSystemIdColName());	
+            if (isLastUO(elUO))
+            {
+                q.setParam("param2", ",VAR_EMAIL,VAR_DESC_CORR_OLD");
                 q.setParam("param16", ",'" + mailMitt + "','" + descrizioneUO.Replace("'", "''") + "'");
-			}			
-			q.setParam("param3",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_CORR_GLOBALI"));
-			//DocsPaWS.Utils.dbControl.getSystemIdNextVal("DPA_CORR_GLOBALI"));	
-			q.setParam("param4",level.ToString()+",");
-			q.setParam("param5","'"+tipoIE+"',");
-			q.setParam("param6",reg.systemId+",");
-			q.setParam("param7",reg.idAmministrazione+",");
-			q.setParam("param8","'"+codiceAmm+"',");
-			q.setParam("param9","'"+descrizioneUO.Replace("'","''")+"',");
-			q.setParam("param10",dataInizio+",");
-			q.setParam("param11",idParent+",");
-			q.setParam("param12","'"+tipoCorr+"',");
-			q.setParam("param13","'"+getPA(elUO)+"',");
-			q.setParam("param14","'"+codiceAOO+"',");
-			q.setParam("param15","'INTEROP_"+descrInterUO.Replace("'","''")+"'");				
+            }
+            q.setParam("param3", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_CORR_GLOBALI"));
+            //DocsPaWS.Utils.dbControl.getSystemIdNextVal("DPA_CORR_GLOBALI"));	
+            q.setParam("param4", level.ToString() + ",");
+            q.setParam("param5", "'" + tipoIE + "',");
+            q.setParam("param6", reg.systemId + ",");
+            q.setParam("param7", reg.idAmministrazione + ",");
+            q.setParam("param8", "'" + codiceAmm + "',");
+            q.setParam("param9", "'" + descrizioneUO.Replace("'", "''") + "',");
+            q.setParam("param10", dataInizio + ",");
+            q.setParam("param11", idParent + ",");
+            q.setParam("param12", "'" + tipoCorr + "',");
+            q.setParam("param13", "'" + getPA(elUO) + "',");
+            q.setParam("param14", "'" + codiceAOO + "',");
+            q.setParam("param15", "'INTEROP_" + descrInterUO.Replace("'", "''") + "'");
 
-			string insertUO = q.getSQL();
-			logger.Debug(insertUO);
-			string sysId;
-			InsertLocked (out sysId,insertUO,"DPA_CORR_GLOBALI");
-			return sysId;
-		}
+            string insertUO = q.getSQL();
+            logger.Debug(insertUO);
+            string sysId;
+            InsertLocked(out sysId, insertUO, "DPA_CORR_GLOBALI");
+            return sysId;
+        }
 
 
 
@@ -699,33 +721,38 @@ namespace DocsPaDB.Query_DocsPAWS
         }
 
 
-		/// <summary>
-		/// Query #6 per il metodo "addNewCorrispondente"
-		/// </summary>
-		/// <param name="codRubricaUO"></param>
-		/// <param name="sysId"></param>
-		public void updCodRubr(string codRubricaUO,string sysId)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPACorrGlob6");
-			q.setParam("param1",codRubricaUO);	
-			q.setParam("param2",sysId);	
-			string updateCodRubricaUO = q.getSQL();
-			ExecuteNonQuery(updateCodRubricaUO);
-		}
+        /// <summary>
+        /// Query #6 per il metodo "addNewCorrispondente"
+        /// </summary>
+        /// <param name="codRubricaUO"></param>
+        /// <param name="sysId"></param>
+        public void updCodRubr(string codRubricaUO, string sysId)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPACorrGlob6");
+            q.setParam("param1", codRubricaUO);
+            q.setParam("param2", sysId);
+            string updateCodRubricaUO = q.getSQL();
+            ExecuteNonQuery(updateCodRubricaUO);
+        }
 
 
-		/// <summary>
-		/// Query per il metodo "getRagioneTrasm"
-		/// </summary>
-		/// <param name="ds"></param>
-		public void getRagTrasm(out DataSet ds,string idAmm, String tipoRagione)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPARagTrasm2");			
-			q.setParam("param1",idAmm);
+        /// <summary>
+        /// Query per il metodo "getRagioneTrasm"
+        /// </summary>
+        /// <param name="ds"></param>
+        public void getRagTrasm(out DataSet ds, string idAmm, String tipoRagione)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPARagTrasm2");
+            q.setParam("param1", idAmm);
             q.setParam("param2", tipoRagione);
-			string queryString = q.getSQL();		
-			ExecuteQuery(out ds,"RAGIONE",queryString);
-		}
+            string queryString = q.getSQL();
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out ds, "RAGIONE", queryString);
+            }
+            
+        }
 
         /// <summary>
         /// Ricava i destinatari del protocollo in partenza dal quale è stato originato il predisposto
@@ -743,24 +770,24 @@ namespace DocsPaDB.Query_DocsPAWS
             ExecuteQuery(out ds, "PROTOUSCITA", queryString);
         }
 
-		/// <summary>
-		/// Query per il metodo "getRuoliDestTrasm"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="reg"></param>
-		public void getCorrRuoloFun(out DataSet ds,DocsPaVO.utente.Registro reg, string mailAddress)
-		{
+        /// <summary>
+        /// Query per il metodo "getRuoliDestTrasm"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="reg"></param>
+        public void getCorrRuoloFun(out DataSet ds, DocsPaVO.utente.Registro reg, string mailAddress)
+        {
 
             //DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_J_DPA_CORR_GLOBALI__TIPO_F_RUOLO__TIPO_FUNZIONE__TIPO_RUOLO__CORR_GLOBALI__L_RUOLO_REG_2");;
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_RUOLI_VIS_CONSULTA_PEC"); ;
-            q.setParam("idRegistro",reg.systemId);
+            q.setParam("idRegistro", reg.systemId);
             if (string.IsNullOrEmpty(mailAddress) &&
                 System.Configuration.ConfigurationManager.AppSettings["INTEROP_INT_NO_MAIL"] != null &&
                 System.Configuration.ConfigurationManager.AppSettings["INTEROP_INT_NO_MAIL"].ToString() != "0")
                 q.setParam("email", " AND ( V.var_email_registro='' OR V.var_email_registro is null ) ");
-            else if(!string.IsNullOrEmpty(mailAddress))
+            else if (!string.IsNullOrEmpty(mailAddress))
                 q.setParam("email", " AND (V.var_email_registro='" + mailAddress + "' OR V.var_email_registro is null)");
-               // q.setParam("email", " AND V.var_email_registro = '" + mailAddress + "' "); SAB la query non restituiva risultati per oracle
+            // q.setParam("email", " AND V.var_email_registro = '" + mailAddress + "' "); SAB la query non restituiva risultati per oracle
             /*
             //modifica
             string prau = "PRAU";
@@ -771,12 +798,16 @@ namespace DocsPaDB.Query_DocsPAWS
             */
             string queryString = q.getSQL();
             logger.Debug("query per ruoli per notifica interop: " + queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out ds, "RUOLI", queryString);
+            }
             
-			ExecuteQuery(out ds,"RUOLI",queryString);
 
 
-            
-		}
+
+        }
 
 		/// <summary>
 		/// Query per il metodo "updateUOMittente"
@@ -790,25 +821,35 @@ namespace DocsPaDB.Query_DocsPAWS
 			q.setParam("param2",uoMitt.systemId);			
 			string queryString = q.getSQL();	
 			logger.Debug(queryString);
-			ExecuteNonQuery(queryString);
+
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
 		}
 
-		/// <summary>
-		/// Query per il metodo "updateCanalePref"
-		/// </summary>
-		/// <param name="ds"></param>
-		/// <param name="uoMitt"></param>
-		/// <param name="debug"></param>
-		/// <param name="db"></param>
-		public void updCanalPref(DataSet ds,DocsPaVO.utente.UnitaOrganizzativa uoMitt/*,DocsPaWS.Utils.Database db*/)
-		{
+        /// <summary>
+        /// Query per il metodo "updateCanalePref"
+        /// </summary>
+        /// <param name="ds"></param>
+        /// <param name="uoMitt"></param>
+        /// <param name="debug"></param>
+        /// <param name="db"></param>
+        public void updCanalPref(DataSet ds, DocsPaVO.utente.UnitaOrganizzativa uoMitt/*,DocsPaWS.Utils.Database db*/)
+        {
             //Nuova Gestione
             //Si cercano le system_id dei possibili tipi di canale - mail o interop
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DocumentTypes2");
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteQuery(ds, "TIPO_CAN", queryString);
 
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(ds, "TIPO_CAN", queryString);
+            }
+            
             string idTipoCanale = string.Empty;
             string mailId = string.Empty;
             if (ds.Tables["TIPO_CAN"].Rows.Count != 0)
@@ -828,7 +869,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 q2.setParam("param2", idTipoCanale);
                 string queryString2 = q2.getSQL();
                 logger.Debug(queryString2);
-                ExecuteQuery(ds, "CANALI", queryString2);
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(ds, "CANALI", queryString2);
+                }
+                
             }
 
             //Se il corrispondente non ha un tipo canale lo associamo
@@ -841,11 +886,16 @@ namespace DocsPaDB.Query_DocsPAWS
                 q4.setParam("param20", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal(""));
                 string queryString4 = q4.getSQL();
                 logger.Debug(queryString4);
-                ExecuteLockedNonQuery(queryString4);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteLockedNonQuery(queryString4);
+                }
+                
             }
 
             //Vecchia gestione
-	        /*
+            /*
 			//si trova l'id del canale mail
 			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DocumentTypes2");
 			string queryString = q.getSQL();	
@@ -894,51 +944,62 @@ namespace DocsPaDB.Query_DocsPAWS
 			//db.commitTransaction();
 			CommitTransaction();
             */
-		}
+        }
 
-		#endregion
+        #endregion
 
-		#region DocsPaWS.interoperabilita.InteroperabilitaUtils (2)
+        #region DocsPaWS.interoperabilita.InteroperabilitaUtils (2)
 
-		/// <summary>
-		/// Query per il metodo "checkId"
-		/// </summary>
-		/// <param name="dataSet"></param>
-		/// <param name="messageId"></param>
-		/// <param name="debug"></param>
-		public void getMailElab(out DataSet dataSet, string messageId,string id_registro)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPAMailElab");
-			q.setParam("param1","'" + messageId.Replace("'","''") + "'");
-            q.setParam("idRegistro", id_registro);
-			string queryString = q.getSQL();	
-			logger.Debug(queryString);		
-			ExecuteQuery(out dataSet,"MAIL",queryString);
-		}
+        /// <summary>
+        /// Query per il metodo "checkId"
+        /// </summary>
+        /// <param name="dataSet"></param>
+        /// <param name="messageId"></param>
+        /// <param name="debug"></param>
+        public void getMailElab(out DataSet dataSet, string messageId, string id_registro)
+        {
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPAMailElab");
+                q.setParam("param1", "'" + messageId.Replace("'", "''") + "'");
+                q.setParam("idRegistro", id_registro);
+                string queryString = q.getSQL();
+                logger.Debug(queryString);
+                dbProvider.ExecuteQueryNewConn(out dataSet, "MAIL", queryString);
+            }
+        }
 
-		/// <summary>
-		/// Query per il metodo "mailElaborata"
-		/// </summary>
-		/// <param name="idMessage"></param>
-		/// <param name="ragione"></param>
-		/// <param name="debug"></param>
-		public void insMailElab(string idMessage, string ragione)
-		{
-			DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPAMailElab");
-			q.setParam("param1",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-			//DocsPaWS.Utils.dbControl.GetSystemIdColName());	
-			q.setParam("param2",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_MAIL_ELABORATE"));
-			//DocsPaWS.Utils.dbControl.getSystemIdNextVal("DPA_MAIL_ELABORATE"));
-			q.setParam("param3","'" + idMessage.Replace("'","''") + "',");
-			q.setParam("param4","'"+ragione+"',");
-			q.setParam("param5",DocsPaDbManagement.Functions.Functions.ToDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US") )));
-		    //DocsPaWS.Utils.dbControl.toDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US") ),true));
+        /// <summary>
+        /// Query per il metodo "mailElaborata"
+        /// </summary>
+        /// <param name="idMessage"></param>
+        /// <param name="ragione"></param>
+        /// <param name="debug"></param>
+        public void insMailElab(string idMessage, string ragione)
+        {
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPAMailElab");
+            q.setParam("param1", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+            //DocsPaWS.Utils.dbControl.GetSystemIdColName());	
+            q.setParam("param2", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_MAIL_ELABORATE"));
+            //DocsPaWS.Utils.dbControl.getSystemIdNextVal("DPA_MAIL_ELABORATE"));
+            q.setParam("param3", "'" + idMessage.Replace("'", "''") + "',");
+            q.setParam("param4", "'" + ragione + "',");
+            q.setParam("param5", DocsPaDbManagement.Functions.Functions.ToDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US"))));
+            //DocsPaWS.Utils.dbControl.toDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US") ),true));
             q.setParam("id_registro", ",null");
             q.setParam("docnumber", ", null");
-            string insertString = q.getSQL();	
-			logger.Debug(insertString);
-			ExecuteNonQuery(insertString);			
-		}
+
+            //Aggiunto per valorizzare il parametro @email@, altrimenti va in errore l'esecuzione della query
+            q.setParam("email", ", null");
+
+            string insertString = q.getSQL();
+            logger.Debug(insertString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(insertString);
+            }
+        }
 
         public void insMailElab(string idMessage, string ragione, string id_registro, string docnumber, string email)
         {
@@ -947,14 +1008,21 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_MAIL_ELABORATE"));
             q.setParam("param3", "'" + idMessage.Replace("'", "''") + "',");
             q.setParam("param4", "'" + ragione + "',");
-            q.setParam("param5", DocsPaDbManagement.Functions.Functions.ToDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US")))+",");
-            q.setParam("id_registro",id_registro);
+            q.setParam("param5", DocsPaDbManagement.Functions.Functions.ToDate(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt", new CultureInfo("en-US"))) + ",");
+            q.setParam("id_registro", id_registro);
             q.setParam("docnumber", string.IsNullOrEmpty(docnumber) ? ", null" : ", " + docnumber);
             q.setParam("email", string.IsNullOrEmpty(email) ? ", 'null'" : ", '" + email + "'");
 
             string insertString = q.getSQL();
             logger.Debug(insertString);
-            ExecuteNonQuery(insertString);
+
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(insertString);
+            }
+
+
         }
 
         public void CestinaPredisposto(string docnumber)
@@ -984,7 +1052,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 logger.Error("CestinaPredisposto: Errore durante la rimozione del predisposto");
             }
-            
+
         }
 
         /// <summary>
@@ -1000,7 +1068,10 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("casella", "'" + reg.email + "'");
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteQuery(out ds, "REGISTRO", queryString);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out ds, "REGISTRO", queryString);
+            }
             logger.Debug("END : DocsPaDB > Query_DocsPAWS > Interoperabilita > getCampiReg");
         }
 
@@ -1020,9 +1091,14 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("casella", "'" + casella + "'");
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteQuery(out ds, "REGISTRO", queryString);
-            logger.Debug("END : DocsPaDB > Query_DocsPAWS > Interoperabilita > getVarMailRicPendenti");
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out ds, "REGISTRO", queryString);
+            }
             
+            logger.Debug("END : DocsPaDB > Query_DocsPAWS > Interoperabilita > getVarMailRicPendenti");
+
         }
 
         /// <summary>
@@ -1055,7 +1131,7 @@ namespace DocsPaDB.Query_DocsPAWS
         }
 
 
-		#endregion
+        #endregion
 
         #region Spedizioni
         public ArrayList GetSpedizioni(string idProfile)
@@ -1066,7 +1142,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 DataSet dataSet;
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_STATO_INVIO_ELENCO");
-                q.setParam("param1", idProfile); 
+                q.setParam("param1", idProfile);
                 string queryString = q.getSQL();
                 logger.Debug(queryString);
                 ExecuteQuery(out dataSet, "SPEDIZIONI", queryString);
@@ -1186,7 +1262,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 // Fix: prendo l'id_documenttype dalla tabella stessa cercando per descrizione, e non dalla DPA_DOC_ARRIVO_PAR
                 // che non cambia quando cambio il mezzo di spedizione di un destinatario
                 queryDef.setParam("canalePref", descCanPref);
-                
+
                 // PEC 4 requisito 4 - report spedizioni
                 // Serve per i documenti spediti dal ruolo
                 queryDef.setParam("idGruppoMittente", idGruppo);
@@ -1221,14 +1297,18 @@ namespace DocsPaDB.Query_DocsPAWS
                 DataSet ds;
                 string commandText = q.getSQL();
                 logger.Debug(commandText);
-                ExecuteQuery(out ds, "SPEDIZIONI", commandText);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(out ds, "SPEDIZIONI", commandText);
+                }
                 foreach (DataRow dataRow in ds.Tables["SPEDIZIONI"].Rows)
                 {
                     lista.Add(GetElementiStoricoSpedizione(dataRow));
                 }
                 ds.Dispose();
 
-                
+
             }
             catch (Exception e)
             {
@@ -1309,51 +1389,81 @@ namespace DocsPaDB.Query_DocsPAWS
         #region Metodi privati
 
         private static bool isLastUO(XmlElement elUO)
-		{
-			XmlNode elUoInt=elUO.SelectSingleNode("UnitaOrganizzativa");
-			if(elUoInt==null)
-			{
-				//non ci sono unità interne. 
-				return true;
-			}
-			else
-			{
-				XmlNode elDenUo=elUoInt.SelectSingleNode("Denominazione");
-				if(elDenUo.InnerText.Trim().Equals(""))
-				{
-					return true;
-				}
-				else
-				{
-					return false;	
-				};
-			}		
-		}
+        {
+            XmlNode elUoInt = elUO.SelectSingleNode("UnitaOrganizzativa");
+            if (elUoInt == null)
+            {
+                //non ci sono unità interne. 
+                return true;
+            }
+            else
+            {
+                XmlNode elDenUo = elUoInt.SelectSingleNode("Denominazione");
+                if (elDenUo.InnerText.Trim().Equals(""))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                };
+            }
+        }
 
-		private static string getPA(XmlElement elUO)
-		{
-			XmlNode elUoInt=elUO.SelectSingleNode("UnitaOrganizzativa");
-			if(elUoInt==null)
-			{
-				//non ci sono ruoli interni, non ci sono unità interne. 
-				return "1";
-			}
-			else
-			{
-				XmlNode elDenUo=elUoInt.SelectSingleNode("Denominazione");
-				if(elDenUo.InnerText.Trim().Equals(""))
-				{
-					return "1";
-				}
-				else
-				{
-					return "0";	
-				};
-			}			
-		}
-		#endregion
+        private static string getPA(XmlElement elUO)
+        {
+            XmlNode elUoInt = elUO.SelectSingleNode("UnitaOrganizzativa");
+            if (elUoInt == null)
+            {
+                //non ci sono ruoli interni, non ci sono unità interne. 
+                return "1";
+            }
+            else
+            {
+                XmlNode elDenUo = elUoInt.SelectSingleNode("Denominazione");
+                if (elDenUo.InnerText.Trim().Equals(""))
+                {
+                    return "1";
+                }
+                else
+                {
+                    return "0";
+                };
+            }
+        }
+        #endregion
 
         #region check mailbox manager
+
+        public bool CheckScaricoOtherRole(string idReg, string email)
+        {
+            bool result = false;
+            DataSet ds = new DataSet();
+            try
+            {
+                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_CHECK_MAILBOX_REG_MAIL");
+                q.setParam("idReg", idReg);
+                q.setParam("mail", email);
+                string queryString = q.getSQL();
+                logger.Debug(queryString);
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (dbProvider.ExecuteQuery(out ds, "S_DPA_CHECK_MAILBOX_REG_MAIL", queryString))
+                    {
+                        if (ds.Tables["S_DPA_CHECK_MAILBOX_REG_MAIL"] != null && ds.Tables["S_DPA_CHECK_MAILBOX_REG_MAIL"].Rows.Count > 0)
+                        {
+                            result = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("Errore in CheckScaricoOtherRole " + e.Message);
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Aggiunge un nuovo record nella DPA_CHECK_MAILBOX
@@ -1367,7 +1477,7 @@ namespace DocsPaDB.Query_DocsPAWS
         public void CreateCheckMailbox(string idJob, string idUser, string idRole, string idReg, string email, out string id)
         {
             logger.Debug("start > InsertCheckmailBox");
-            BeginTransaction();
+            //BeginTransaction();
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_CHECK_MAILBOX");
             q.setParam("idJob", idJob);
             q.setParam("idUser", idUser);
@@ -1376,40 +1486,46 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("mail", email);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            try
+            using (DBProvider dbProvider = new DBProvider())
             {
-                if (ExecuteNonQuery(queryString))
+                try
                 {
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_CHECK_MAILBOX_ID");
-                    q.setParam("idJob", idJob);
-                    q.setParam("idUser", idUser);
-                    q.setParam("idRole", idRole);
-                    q.setParam("idReg", idReg);
-                    q.setParam("mail", email);
-                    queryString = q.getSQL();
-                    logger.Debug(queryString);
-                    if (ExecuteScalar(out id, queryString) && !string.IsNullOrEmpty(id))
+                    if (dbProvider.ExecuteNonQuery(queryString))
                     {
-                        CommitTransaction();
+                        q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_CHECK_MAILBOX_ID");
+                        q.setParam("idJob", idJob);
+                        q.setParam("idUser", idUser);
+                        q.setParam("idRole", idRole);
+                        q.setParam("idReg", idReg);
+                        q.setParam("mail", email);
+                        queryString = q.getSQL();
+                        logger.Debug(queryString);
+                        if (dbProvider.ExecuteScalar(out id, queryString) && !string.IsNullOrEmpty(id))
+                        {
+                            //CommitTransaction();
+                            logger.Info("CreateCheckMailbox OK");
+                        }
+                        else
+                        {
+                            //RollbackTransaction();
+                            logger.Error("Errore in CreateCheckMailbox");
+                            id = "0";
+                        }
                     }
                     else
                     {
-                        RollbackTransaction();
+                        //RollbackTransaction();
+                        logger.Error("Errore in CreateCheckMailbox");
                         id = "0";
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    RollbackTransaction();
+                    logger.Error(e.Message);
+                    logger.Error("Errore nella gestione della mailbox (Query - CreateCheckMailbox)", e);
+                    //RollbackTransaction();
                     id = "0";
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-                logger.Error("Errore nella gestione della mailbox (Query - CreateCheckMailbox)", e);
-                RollbackTransaction();
-                id = "0";
             }
         }
 
@@ -1436,13 +1552,20 @@ namespace DocsPaDB.Query_DocsPAWS
                 //}
                 //else
                 //    return false;
-                ExecuteNonQuery(queryString, out res);
-                if (res > 0)
+
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    return true;
+                    dbProvider.ExecuteNonQuery(queryString, out res);
+                    if (res > 0)
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
                 }
-                else
-                    return false;
+
+
+
             }
             catch (Exception e)
             {
@@ -1466,7 +1589,7 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Debug("start > UpdateInfoCheckMailbox");
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_CHECK_MAILBOX");
             q.setParam("id", id);
-            q.setParam("param1", "MAILUSERID = '" + mailUserId + "', ERRORMESSAGE = '" + errorMessage.Replace("'", "''") + "', MAILSERVER = '" + mailServer + "'");
+            q.setParam("param1", "MAILUSERID = '" + mailUserId + "', ERRORMESSAGE = '" + errorMessage.Replace("'", "''") + "', MAILSERVER = '" + mailServer + "', CONCLUDED='1', DTA_CONCLUDED=" + DocsPaDbManagement.Functions.Functions.GetDate(true));
             string queryString = q.getSQL();
             logger.Debug(queryString);
             try
@@ -1478,13 +1601,16 @@ namespace DocsPaDB.Query_DocsPAWS
                 //}
                 //else
                 //    return false;
-                ExecuteNonQuery(queryString, out res);
-                if (res > 0)
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    return true;
+                    dbProvider.ExecuteNonQuery(queryString, out res);
+                    if (res > 0)
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
                 }
-                else
-                    return false;
             }
             catch (Exception e)
             {
@@ -1508,21 +1634,26 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param1", "TOTAL = " + total);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            try
+
+            using (DBProvider dbProvider = new DBProvider())
             {
-                ExecuteScalar(out res, queryString);
-                if (Convert.ToInt32(res) > 0)
+
+                try
                 {
-                    return true;
+                    dbProvider.ExecuteScalar(out res, queryString);
+                    if (Convert.ToInt32(res) > 0)
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
                 }
-                else
+                catch (Exception e)
+                {
+                    logger.Error(e.Message);
+                    logger.Error("Errore nella gestione della mailbox (Query - MailTotalCheckMailbox)", e);
                     return false;
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-                logger.Error("Errore nella gestione della mailbox (Query - MailTotalCheckMailbox)", e);
-                return false;
+                }
             }
         }
 
@@ -1533,26 +1664,39 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <returns></returns>
         public bool MailProcessedCheckMailbox(string id, string processed)
         {
-            logger.Debug("start > CompleteCheckMailBox");
-            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_CHECK_MAILBOX");
-            q.setParam("id", id);
-            q.setParam("param1", "ELABORATE = " + processed);
-            string queryString = q.getSQL();
-            logger.Debug(queryString);
-            try
+
+            using (DBProvider dbProvider = new DBProvider())
             {
-                if (ExecuteNonQuery(queryString))
+                logger.Debug("start > CompleteCheckMailBox");
+                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_CHECK_MAILBOX");
+                q.setParam("id", id);
+                q.setParam("param1", "ELABORATE = " + processed);
+                string queryString = q.getSQL();
+                logger.Debug(queryString);
+
+                try
                 {
-                    return true;
+                    //if (ExecuteNonQuery(queryString))
+                    //{
+                    //    return true;
+                    //}
+                    //else
+                    //    return false;
+
+
+                    if (dbProvider.ExecuteNonQuery(queryString))
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
                 }
-                else
+                catch (Exception e)
+                {
+                    logger.Error(e.Message);
+                    logger.Error("Errore nella gestione della mailbox (Query - MailProcessedCheckMailbox)", e);
                     return false;
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-                logger.Error("Errore nella gestione della mailbox (Query - MailProcessedCheckMailbox)", e);
-                return false;
+                }
             }
         }
 
@@ -1563,128 +1707,135 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <returns></returns>
         public bool CreateCheckMailboxReport(string idCheckMailbox, DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed mailprocessed)
         {
-            logger.Debug("start > CreateCheckMailboxReport");
-            mailprocessed = (DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed)DocsPaUtils.Functions.Functions.XML_Serialization_Deserialization_By_Encode(mailprocessed, typeof(DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed), null, System.Text.Encoding.UTF8);
-            string processedType;
-            string receipt;
-            switch (mailprocessed.ProcessedType)
-            { 
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.ConfirmReception:
-                    processedType = "ConfirmReception";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.DatiCert:
-                    processedType = "DatiCert";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Eccezione:
-                    processedType = "Eccezione";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NonPEC:
-                    processedType = "NonPEC";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NotifyCancellation:
-                    processedType = "NotifyCancellation";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Pec:
-                    processedType = "Pec";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Signature:
-                    processedType = "Signature";
-                    break;
-                default:
-                    processedType = string.Empty;
-                    break;
-            }
 
-            switch (mailprocessed.PecXRicevuta)
-            { 
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.Delivery_Status_Notification:
-                    receipt = "Delivery_Status_Notification";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.From_Non_PEC:
-                    receipt = "From_Non_PEC";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Accept_Notify:
-                    receipt = "PEC_Accept_Notify";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Alert_Virus:
-                    receipt = "PEC_Alert_Virus";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Contain_Virus:
-                    receipt = "PEC_Contain_Virus";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered:
-                    receipt = "PEC_Delivered";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered_Notify:
-                    receipt = "PEC_Delivered_Notify";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered_Notify_Short:
-                    receipt = "PEC_Delivered_Notify_Short";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error:
-                    receipt = "PEC_Error";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error_Delivered_Notify_By_Virus:
-                    receipt = "PEC_Error_Delivered_Notify_By_Virus";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error_Preavviso_Delivered_Notify:
-                    receipt = "PEC_Error_Preavviso_Delivered_Notify";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Mancata_Consegna:
-                    receipt = "PEC_Mancata_Consegna";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_NO_XRicevuta:
-                    receipt = "PEC_NO_XRicevuta";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Non_Accept_Notify:
-                    receipt = "PEC_Non_Accept_Notify";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Presa_In_Carico:
-                    receipt = "PEC_Presa_In_Carico";
-                    break;
-                case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.unknown:
-                    receipt = "unknown";
-                    break;
-                default:
-                    receipt = string.Empty;
-                    break;
-            }
-
-            BeginTransaction();
-            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_REPORT_MAILBOX");
-            string values = "";
-            values = DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_REPORT_MAILBOX") + " " +
-                idCheckMailbox + ", '" +
-                mailprocessed.MailID.ToString().Replace("'", "''") + "', '" +
-                processedType.Replace("'", "''") + "', '" +
-                 receipt.Replace("'", "''") + "'," + DocsPaDbManagement.Functions.Functions.ToDate(mailprocessed.Date.ToShortDateString() + " " + mailprocessed.Date.ToShortTimeString())
-                  + " , '" +
-                mailprocessed.From.Replace("'", "''") + "', '" +
-                mailprocessed.ErrorMessage.Replace("'","''") + "', " + 
-                mailprocessed.CountAttatchments +
-                ", '" + mailprocessed.Subject.Replace("'", "''") + "'";
-            q.setParam("param1", values);
-            string queryString = q.getSQL();
-            logger.Debug(queryString);
-            try
+            using (DBProvider dbProvider = new DBProvider())
             {
-                if(ExecuteNonQuery(queryString))
+
+                logger.Debug("start > CreateCheckMailboxReport");
+                mailprocessed = (DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed)DocsPaUtils.Functions.Functions.XML_Serialization_Deserialization_By_Encode(mailprocessed, typeof(DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed), null, System.Text.Encoding.UTF8);
+                string processedType;
+                string receipt;
+                switch (mailprocessed.ProcessedType)
                 {
-                    CommitTransaction();
-                    return true;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.ConfirmReception:
+                        processedType = "ConfirmReception";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.DatiCert:
+                        processedType = "DatiCert";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Eccezione:
+                        processedType = "Eccezione";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NonPEC:
+                        processedType = "NonPEC";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NotifyCancellation:
+                        processedType = "NotifyCancellation";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Pec:
+                        processedType = "Pec";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Signature:
+                        processedType = "Signature";
+                        break;
+                    default:
+                        processedType = string.Empty;
+                        break;
                 }
-                else
+
+                switch (mailprocessed.PecXRicevuta)
                 {
-                    RollbackTransaction();
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.Delivery_Status_Notification:
+                        receipt = "Delivery_Status_Notification";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.From_Non_PEC:
+                        receipt = "From_Non_PEC";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Accept_Notify:
+                        receipt = "PEC_Accept_Notify";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Alert_Virus:
+                        receipt = "PEC_Alert_Virus";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Contain_Virus:
+                        receipt = "PEC_Contain_Virus";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered:
+                        receipt = "PEC_Delivered";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered_Notify:
+                        receipt = "PEC_Delivered_Notify";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered_Notify_Short:
+                        receipt = "PEC_Delivered_Notify_Short";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error:
+                        receipt = "PEC_Error";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error_Delivered_Notify_By_Virus:
+                        receipt = "PEC_Error_Delivered_Notify_By_Virus";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error_Preavviso_Delivered_Notify:
+                        receipt = "PEC_Error_Preavviso_Delivered_Notify";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Mancata_Consegna:
+                        receipt = "PEC_Mancata_Consegna";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_NO_XRicevuta:
+                        receipt = "PEC_NO_XRicevuta";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Non_Accept_Notify:
+                        receipt = "PEC_Non_Accept_Notify";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Presa_In_Carico:
+                        receipt = "PEC_Presa_In_Carico";
+                        break;
+                    case DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.unknown:
+                        receipt = "unknown";
+                        break;
+                    default:
+                        receipt = string.Empty;
+                        break;
+                }
+
+                //BeginTransaction();
+                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_REPORT_MAILBOX");
+                string values = "";
+                values = DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_REPORT_MAILBOX") + " " +
+                    idCheckMailbox + ", '" +
+                    mailprocessed.MailID.ToString().Replace("'", "''") + "', '" +
+                    processedType.Replace("'", "''") + "', '" +
+                     receipt.Replace("'", "''") + "'," + DocsPaDbManagement.Functions.Functions.ToDate(mailprocessed.Date.ToShortDateString() + " " + mailprocessed.Date.ToShortTimeString())
+                      + " , '" +
+                    mailprocessed.From.Replace("'", "''") + "', '" +
+                    mailprocessed.ErrorMessage.Replace("'", "''") + "', " +
+                    mailprocessed.CountAttatchments +
+                    ", '" + mailprocessed.Subject.Replace("'", "''") + "'";
+                q.setParam("param1", values);
+                string queryString = q.getSQL();
+                logger.Debug(queryString);
+                try
+                {
+                    if (dbProvider.ExecuteNonQuery(queryString))
+                    {
+                        //CommitTransaction();
+                        logger.Info("CreateCheckMailboxReport OK");
+                        return true;
+                    }
+                    else
+                    {
+                        //RollbackTransaction();
+                        logger.Error("Errore in CreateCheckMailboxReport");
+                        return false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e.Message);
+                    logger.Error("Errore nella gestione della mailbox (Query - CreateCheckMailboxReport)", e);
+                    //RollbackTransaction();
                     return false;
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-                logger.Error("Errore nella gestione della mailbox (Query - CreateCheckMailboxReport)", e);
-                RollbackTransaction();
-                return false;
             }
         }
 
@@ -1695,39 +1846,46 @@ namespace DocsPaDB.Query_DocsPAWS
         public void CreateJobs(out string id)
         {
             logger.Debug("start > CreateJobs");
-            BeginTransaction();
+            //BeginTransaction();
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_JOBS");
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            try
+            using (DBProvider dbProvider = new DBProvider())
             {
-                if (ExecuteNonQuery(queryString))
+                try
                 {
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_JOBS");
-                    queryString = q.getSQL();
-                    logger.Debug(queryString);
-                    if (ExecuteScalar(out id, queryString) && !string.IsNullOrEmpty(id))
+                    if (dbProvider.ExecuteNonQuery(queryString))
                     {
-                        CommitTransaction();
+                        q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_JOBS");
+                        queryString = q.getSQL();
+                        logger.Debug(queryString);
+                        if (dbProvider.ExecuteScalar(out id, queryString) && !string.IsNullOrEmpty(id))
+                        {
+                            //CommitTransaction();
+                            logger.Info("CreateJobs OK");
+                        }
+                        else
+                        {
+                            //RollbackTransaction();
+                            logger.Error("Errore in CreateJobs");
+
+                            id = "0";
+                        }
                     }
                     else
                     {
-                        RollbackTransaction();
+                        //RollbackTransaction();
+                        logger.Error("Errore in CreateJobs");
                         id = "0";
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    RollbackTransaction();
+                    logger.Error(e.Message);
+                    logger.Error("Errore nella gestione del job (Query - CreateJobs)", e);
+                    //RollbackTransaction();
                     id = "0";
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-                logger.Error("Errore nella gestione del job (Query - CreateJobs)", e);
-                RollbackTransaction();
-                id = "0";
             }
         }
 
@@ -1738,52 +1896,117 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <returns></returns>
         public List<DocsPaVO.Interoperabilita.InfoCheckMailbox> InfoCheckMailbox(List<string> listEmails)
         {
-            try
+            #region commentato
+            //try
+            //{
+            //    logger.Debug("start > InfoCheckMailbox");
+            //    List<DocsPaVO.Interoperabilita.InfoCheckMailbox> listResult = new List<DocsPaVO.Interoperabilita.InfoCheckMailbox>();
+            //    string where = string.Empty;
+            //    string or = " OR ";
+            //    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_CHECK_MAILBOX_WHERE_CONDITION");
+            //    DataSet ds = new DataSet();
+            //    if (listEmails.Count > 0)
+            //    {
+            //        where += "MAIL = '" + listEmails[0] + "' ";
+            //        for (int i = 1; i < listEmails.Count; i++)
+            //        {
+            //            where += or + "MAIL = '" + listEmails[i] + "'";
+            //        }
+            //        q.setParam("whereCondition", where);
+            //        q.setParam("fields", "ID, IDUSER, IDROLE, IDREG, MAIL, ELABORATE, TOTAL, CONCLUDED");
+            //        string queryString = q.getSQL();
+            //        ExecuteQuery(ds, "CheckMailbox",  queryString);
+            //        if (ds.Tables["CheckMailbox"] != null && ds.Tables["CheckMailbox"].Rows.Count > 0)
+            //        {
+            //            foreach (DataRow row in ds.Tables["Checkmailbox"].Rows)
+            //            {
+            //                DocsPaVO.Interoperabilita.InfoCheckMailbox checkMailbox = new DocsPaVO.Interoperabilita.InfoCheckMailbox();
+            //                checkMailbox.IdCheckMailbox = row["ID"].ToString();
+            //                checkMailbox.UserID = row["IDUSER"].ToString();
+            //                checkMailbox.RoleID = row["IDROLE"].ToString();
+            //                checkMailbox.RegisterID = row["IDREG"].ToString();
+            //                checkMailbox.Mail = row["MAIL"].ToString();
+            //                checkMailbox.Elaborate = Convert.ToInt32(row["ELABORATE"].ToString());
+            //                checkMailbox.Total = Convert.ToInt32(row["TOTAL"].ToString());
+            //                checkMailbox.Concluded = row["CONCLUDED"].ToString();
+            //                listResult.Add(checkMailbox);
+            //            }
+            //        }
+            //        logger.Debug(queryString);
+            //    }
+
+            //    return listResult;
+            //}
+            //catch (Exception e)
+            //{
+            //    logger.Error(e.Message);
+            //    logger.Error("Errore nella gestione della mailbox (Query - InfoCheckMailbox)", e);
+            //    return new List<DocsPaVO.Interoperabilita.InfoCheckMailbox>();
+            //}
+            #endregion
+
+            List<DocsPaVO.Interoperabilita.InfoCheckMailbox> listResult = new List<DocsPaVO.Interoperabilita.InfoCheckMailbox>();
+
+            using (DBProvider dbProvider = new DBProvider())
             {
-                logger.Debug("start > InfoCheckMailbox");
-                List<DocsPaVO.Interoperabilita.InfoCheckMailbox> listResult = new List<DocsPaVO.Interoperabilita.InfoCheckMailbox>();
-                string where = string.Empty;
-                string or = " OR ";
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_CHECK_MAILBOX_WHERE_CONDITION");
-                DataSet ds = new DataSet();
-                if (listEmails.Count > 0)
+                try
                 {
-                    where += "MAIL = '" + listEmails[0] + "' ";
-                    for (int i = 1; i < listEmails.Count; i++)
+                    logger.Debug("start > InfoCheckMailbox");
+                    string where = string.Empty;
+                    string or = " OR ";
+                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_CHECK_MAILBOX_WHERE_CONDITION");
+                    DataSet ds = new DataSet();
+                    if (listEmails.Count > 0)
                     {
-                        where += or + "MAIL = '" + listEmails[i] + "'";
-                    }
-                    q.setParam("whereCondition", where);
-                    q.setParam("fields", "ID, IDUSER, IDROLE, IDREG, MAIL, ELABORATE, TOTAL, CONCLUDED");
-                    string queryString = q.getSQL();
-                    ExecuteQuery(ds, "CheckMailbox",  queryString);
-                    if (ds.Tables["CheckMailbox"] != null && ds.Tables["CheckMailbox"].Rows.Count > 0)
-                    {
-                        foreach (DataRow row in ds.Tables["Checkmailbox"].Rows)
+                        where += "MAIL = '" + listEmails[0] + "' ";
+                        for (int i = 1; i < listEmails.Count; i++)
                         {
-                            DocsPaVO.Interoperabilita.InfoCheckMailbox checkMailbox = new DocsPaVO.Interoperabilita.InfoCheckMailbox();
-                            checkMailbox.IdCheckMailbox = row["ID"].ToString();
-                            checkMailbox.UserID = row["IDUSER"].ToString();
-                            checkMailbox.RoleID = row["IDROLE"].ToString();
-                            checkMailbox.RegisterID = row["IDREG"].ToString();
-                            checkMailbox.Mail = row["MAIL"].ToString();
-                            checkMailbox.Elaborate = Convert.ToInt32(row["ELABORATE"].ToString());
-                            checkMailbox.Total = Convert.ToInt32(row["TOTAL"].ToString());
-                            checkMailbox.Concluded = row["CONCLUDED"].ToString();
-                            listResult.Add(checkMailbox);
+                            where += or + "MAIL = '" + listEmails[i] + "'";
                         }
+                        q.setParam("whereCondition", where);
+                        q.setParam("fields", "ID, IDUSER, IDROLE, IDREG, MAIL, ELABORATE, TOTAL, CONCLUDED");
+                        string queryString = q.getSQL();
+                        try
+                        {
+                            if (dbProvider.ExecuteQuery(out ds, "CheckMailbox", queryString))
+                            {
+                                if (ds.Tables["CheckMailbox"] != null && ds.Tables["CheckMailbox"].Rows.Count > 0)
+                                {
+                                    foreach (DataRow row in ds.Tables["Checkmailbox"].Rows)
+                                    {
+                                        DocsPaVO.Interoperabilita.InfoCheckMailbox checkMailbox = new DocsPaVO.Interoperabilita.InfoCheckMailbox();
+                                        checkMailbox.IdCheckMailbox = row["ID"].ToString();
+                                        checkMailbox.UserID = row["IDUSER"].ToString();
+                                        checkMailbox.RoleID = row["IDROLE"].ToString();
+                                        checkMailbox.RegisterID = row["IDREG"].ToString();
+                                        checkMailbox.Mail = row["MAIL"].ToString();
+                                        checkMailbox.Elaborate = Convert.ToInt32(row["ELABORATE"].ToString());
+                                        checkMailbox.Total = Convert.ToInt32(row["TOTAL"].ToString());
+                                        checkMailbox.Concluded = row["CONCLUDED"].ToString();
+                                        listResult.Add(checkMailbox);
+                                    }
+                                }
+                            }
+
+                            logger.Debug(queryString);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Debug("Errore nella gestione della mailbox (Query - InfoCheckMailbox)", e);
+                            return null;
+                        }
+
                     }
-                    logger.Debug(queryString);
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e.Message);
+                    logger.Error("Errore nella gestione della mailbox (Query - InfoCheckMailbox)", e);
                 }
 
                 return listResult;
             }
-            catch (Exception e)
-            {
-                logger.Error(e.Message);
-                logger.Error("Errore nella gestione della mailbox (Query - InfoCheckMailbox)", e);
-                return new List<DocsPaVO.Interoperabilita.InfoCheckMailbox>();
-            }
+
         }
 
         /// <summary>
@@ -1802,7 +2025,10 @@ namespace DocsPaDB.Query_DocsPAWS
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_DPA_CHECK_MAILBOX");
                 q.setParam("idCheckMailbox", idCheckMailbox);
                 string query = q.getSQL();
-                res = ExecuteNonQuery(query);
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    res = ExecuteNonQuery(query);
+                }
                 return res;
             }
             catch (Exception e)
@@ -1828,113 +2054,120 @@ namespace DocsPaDB.Query_DocsPAWS
                 DataSet ds = new DataSet();
                 q.setParam("id", idCheckMailbox);
                 string queryString = q.getSQL();
-                ExecuteQuery(ds, "CheckMailbox", queryString);
-                if (ds.Tables["CheckMailbox"] != null && ds.Tables["CheckMailbox"].Rows.Count > 0)
-                {
-                    DataRow row = ds.Tables["CheckMailbox"].Rows[0];
-                    mailAccountResponse.Registro = row["registerCode"].ToString();
-                    mailAccountResponse.MailAddress = row["mail"].ToString();
-                    mailAccountResponse.MailServer = row["mailserver"].ToString();
-                    mailAccountResponse.MailUserID = row["mailuserid"].ToString();
-                    mailAccountResponse.ErrorMessage = row["errormessage"].ToString();
-                    mailAccountResponse.DtaConcluded = Convert.ToDateTime(row["DTA_CONCLUDED"].ToString());
 
-                    ds = new DataSet();
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_REPORT_MAILBOX");
-                    q.setParam("id", idCheckMailbox);
-                    queryString = q.getSQL();
+                using (DBProvider dbProvider = new DBProvider())
+                {
                     ExecuteQuery(ds, "CheckMailbox", queryString);
                     if (ds.Tables["CheckMailbox"] != null && ds.Tables["CheckMailbox"].Rows.Count > 0)
                     {
-                        foreach (DataRow r in ds.Tables["CheckMailbox"].Rows)
+                        DataRow row = ds.Tables["CheckMailbox"].Rows[0];
+                        mailAccountResponse.Registro = row["registerCode"].ToString();
+                        mailAccountResponse.MailAddress = row["mail"].ToString();
+                        mailAccountResponse.MailServer = row["mailserver"].ToString();
+                        mailAccountResponse.MailUserID = row["mailuserid"].ToString();
+                        mailAccountResponse.ErrorMessage = row["errormessage"].ToString();
+                        mailAccountResponse.DtaConcluded = Convert.ToDateTime(row["DTA_CONCLUDED"].ToString());
+
+                        ds = new DataSet();
+                        q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_REPORT_MAILBOX");
+                        q.setParam("id", idCheckMailbox);
+                        queryString = q.getSQL();
+                        ExecuteQuery(ds, "CheckMailbox", queryString);
+                        if (ds.Tables["CheckMailbox"] != null && ds.Tables["CheckMailbox"].Rows.Count > 0)
                         {
-                            DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed mailprocessed =
-                                new DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed();
-                            mailprocessed.Subject = r["subject"].ToString();
-                            mailprocessed.Date = Convert.ToDateTime(r["date_mail"].ToString());
-                            mailprocessed.MailID = r["mailid"].ToString();
-                            mailprocessed.From = r["from_mail"].ToString();
-                            mailprocessed.CountAttatchments = Convert.ToInt32(r["count_attachments"].ToString());
-                            mailprocessed.ErrorMessage = r["error"].ToString();
-                            switch (r["type"].ToString())
+                            foreach (DataRow r in ds.Tables["CheckMailbox"].Rows)
                             {
-                                case "ConfirmReception":
-                                    mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.ConfirmReception;
-                                    break;
-                                case "DatiCert":
-                                    mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.DatiCert;
-                                    break;
-                                case "Eccezione":
-                                    mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Eccezione;
-                                    break;
-                                case "NonPEC":
-                                    mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NonPEC;
-                                    break;
-                                case "NotifyCancellation":
-                                    mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NotifyCancellation;
-                                    break;
-                                case "Pec":
-                                    mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Pec;
-                                    break;
-                                case "Signature":
-                                    mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Signature;
-                                    break;
+                                DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed mailprocessed =
+                                    new DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed();
+                                mailprocessed.Subject = r["subject"].ToString();
+                                mailprocessed.Date = Convert.ToDateTime(r["date_mail"].ToString());
+                                mailprocessed.MailID = r["mailid"].ToString();
+                                mailprocessed.From = r["from_mail"].ToString();
+                                mailprocessed.CountAttatchments = Convert.ToInt32(r["count_attachments"].ToString());
+                                mailprocessed.ErrorMessage = r["error"].ToString();
+                                switch (r["type"].ToString())
+                                {
+                                    case "ConfirmReception":
+                                        mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.ConfirmReception;
+                                        break;
+                                    case "DatiCert":
+                                        mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.DatiCert;
+                                        break;
+                                    case "Eccezione":
+                                        mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Eccezione;
+                                        break;
+                                    case "NonPEC":
+                                        mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NonPEC;
+                                        break;
+                                    case "NotifyCancellation":
+                                        mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NotifyCancellation;
+                                        break;
+                                    case "Pec":
+                                        mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Pec;
+                                        break;
+                                    case "Signature":
+                                        mailprocessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Signature;
+                                        break;
+                                }
+                                switch (r["receipt"].ToString())
+                                {
+                                    case "Delivery_Status_Notification":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.Delivery_Status_Notification;
+                                        break;
+                                    case "From_Non_PEC":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.From_Non_PEC;
+                                        break;
+                                    case "PEC_Accept_Notify":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Accept_Notify;
+                                        break;
+                                    case "PEC_Alert_Virus":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Alert_Virus;
+                                        break;
+                                    case "PEC_Contain_Virus":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Contain_Virus;
+                                        break;
+                                    case "PEC_Delivered":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered;
+                                        break;
+                                    case "PEC_Delivered_Notify":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered_Notify;
+                                        break;
+                                    case "PEC_Delivered_Notify_Short":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered_Notify_Short;
+                                        break;
+                                    case "PEC_Error":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error;
+                                        break;
+                                    case "PEC_Error_Delivered_Notify_By_Virus":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error_Delivered_Notify_By_Virus;
+                                        break;
+                                    case "PEC_Error_Preavviso_Delivered_Notify":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error_Preavviso_Delivered_Notify;
+                                        break;
+                                    case "PEC_Mancata_Consegna":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Mancata_Consegna;
+                                        break;
+                                    case "PEC_NO_XRicevuta":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_NO_XRicevuta;
+                                        break;
+                                    case "PEC_Non_Accept_Notify":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Non_Accept_Notify;
+                                        break;
+                                    case "PEC_Presa_In_Carico":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Presa_In_Carico;
+                                        break;
+                                    case "unknown":
+                                        mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.unknown;
+                                        break;
+                                }
+                                mailAccountResponse.MailProcessedList.Add(mailprocessed);
                             }
-                            switch (r["receipt"].ToString())
-                            {
-                                case "Delivery_Status_Notification":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.Delivery_Status_Notification;
-                                    break;
-                                case "From_Non_PEC":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.From_Non_PEC;
-                                    break;
-                                case "PEC_Accept_Notify":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Accept_Notify;
-                                    break;
-                                case "PEC_Alert_Virus":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Alert_Virus;
-                                    break;
-                                case "PEC_Contain_Virus":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Contain_Virus;
-                                    break;
-                                case "PEC_Delivered":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered;
-                                    break;
-                                case "PEC_Delivered_Notify":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered_Notify;
-                                    break;
-                                case "PEC_Delivered_Notify_Short":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Delivered_Notify_Short;
-                                    break;
-                                case "PEC_Error":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error;
-                                    break;
-                                case "PEC_Error_Delivered_Notify_By_Virus":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error_Delivered_Notify_By_Virus;
-                                    break;
-                                case "PEC_Error_Preavviso_Delivered_Notify":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Error_Preavviso_Delivered_Notify;
-                                    break;
-                                case "PEC_Mancata_Consegna":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Mancata_Consegna;
-                                    break;
-                                case "PEC_NO_XRicevuta":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_NO_XRicevuta;
-                                    break;
-                                case "PEC_Non_Accept_Notify":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Non_Accept_Notify;
-                                    break;
-                                case "PEC_Presa_In_Carico":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.PEC_Presa_In_Carico;
-                                    break;
-                                case "unknown":
-                                    mailprocessed.PecXRicevuta = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailPecXRicevuta.unknown;
-                                    break;
-                            }
-                            mailAccountResponse.MailProcessedList.Add(mailprocessed);
                         }
                     }
                 }
+
+
+
                 return mailAccountResponse;
             }
             catch (Exception e)
@@ -1945,7 +2178,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-       
+
 
         #region Report Spedizioni
 
@@ -1963,11 +2196,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 // recupero elenco documenti spediti
                 DataSet dsDocSpediti = new DataSet();
                 DocsPaUtils.Query qDocSpediti = DocsPaUtils.InitQuery.getInstance().getQuery("GET_REPORT_SPEDIZIONI_MASTER");
-                qDocSpediti.setParam("filters", GetReportSpedizioniQueryFilters(filters,idGruppo,true));
+                qDocSpediti.setParam("filters", GetReportSpedizioniQueryFilters(filters, idGruppo, true));
                 qDocSpediti.setParam("filtersEsito", GetReportSpedizioniQueryFiltersEsito(filters));
                 // Controllo della visibilità nella query
                 qDocSpediti.setParam("idPeople", idPeople);
-                qDocSpediti.setParam("idGruppo",idGruppo);
+                qDocSpediti.setParam("idGruppo", idGruppo);
                 string qSDocSpediti = qDocSpediti.getSQL();
                 logger.Debug(qSDocSpediti);
                 ExecuteQuery(out dsDocSpediti, "DocSpediti", qSDocSpediti);
@@ -1975,7 +2208,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 //recupero elenco spedizioni
                 DataSet dsSpedizioni = new DataSet();
                 DocsPaUtils.Query qSpedizioni = DocsPaUtils.InitQuery.getInstance().getQuery("GET_REPORT_SPEDIZIONI_DETAILS");
-                qSpedizioni.setParam("filters", GetReportSpedizioniQueryFilters(filters,idGruppo,false));
+                qSpedizioni.setParam("filters", GetReportSpedizioniQueryFilters(filters, idGruppo, false));
                 string qSSpedizioni = qSpedizioni.getSQL();
                 logger.Debug(qSSpedizioni);
                 ExecuteQuery(out dsSpedizioni, "Spedizioni", qSSpedizioni);
@@ -2040,7 +2273,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 spedizione.ProtocolloDestinatario = (rowSpedizioni["PROTO_DEST"] != null ? rowSpedizioni["PROTO_DEST"].ToString() : string.Empty);
                                 spedizione.DataProtDest = (rowSpedizioni["DATA_PROTO_DEST"] != null ? rowSpedizioni["DATA_PROTO_DEST"].ToString() : string.Empty);
                                 spedizione.MotivoAnnullEccezione = (rowSpedizioni["MOTIVO_ANNULLA"] != null ? rowSpedizioni["MOTIVO_ANNULLA"].ToString() : string.Empty);
-                                
+
                                 // Problema associazione valori sbagliati Statusmask
                                 if (spedizione.MezzoSpedizione != "INTEROPERABILITA" && spedizione.IdMezzoSpedizione != InteroperabilitaSemplificata.SimplifiedInteroperabilityId)
                                 {
@@ -2121,7 +2354,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-        private string GetReportSpedizioniQueryFilters(FiltriReportSpedizioni filters,string idGruppo, bool allReceivers)
+        private string GetReportSpedizioniQueryFilters(FiltriReportSpedizioni filters, string idGruppo, bool allReceivers)
         {
             // METODI PER ORACLE - sono da fare per sql
             string resultQueryFilters = string.Empty;
@@ -2142,7 +2375,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         else if (dbType.ToUpper() == "SQL")
                         {
                             resultQueryFilters += string.Format("AND A.DTA_SPEDIZIONE >= {0} AND  A.DTA_SPEDIZIONE <= {1}", DocsPaDbManagement.Functions.Functions.ToDateBetween(filters.DataDa.ToShortDateString(), true), DocsPaDbManagement.Functions.Functions.ToDateBetween(filters.DataA.ToShortDateString(), false));
-                                            
+
                         }
                         break;
                     case FiltriReportSpedizioni.TipoFiltroData.Oggi:
@@ -2154,16 +2387,16 @@ namespace DocsPaDB.Query_DocsPAWS
                         else if (dbType.ToUpper() == "SQL")
                         {
                             resultQueryFilters += string.Format("AND A.DTA_SPEDIZIONE >= {0} AND  A.DTA_SPEDIZIONE <= {1}", DocsPaDbManagement.Functions.Functions.ToDateBetween(filters.DataDa.ToShortDateString(), true), DocsPaDbManagement.Functions.Functions.ToDateBetween(filters.DataDa.ToShortDateString(), false));
-                            
+
                         }
-                            break;
+                        break;
                 }
 
                 //filtro ruolo
                 if (filters.VisibilitaDoc == FiltriReportSpedizioni.TipoVisibilitaDocumenti.AllDocByRuolo)
                     resultQueryFilters += " AND a.ID_PROFILE IN (SELECT ID_PROFILE FROM DPA_SEND_STO k WHERE k.ID_GROUP_SENDER=" + idGruppo + " and k.esito='Spedito' and k.dta_spedizione>=a.dta_spedizione and k.id_profile=a.id_profile and k.id_corr_globale=a.id_corr_globale)";
 
-                
+
             }
 
             // Modifica per il requisito 4.
@@ -2212,7 +2445,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     if (filters.TipoRicevuta_Eccezione)
                         resultQueryFiltersTipoRicevuta += " SUBSTR(A.STATUS_C_MASK,6,1) = 'X' OR";
                 }
-                else if (dbType.ToUpper()=="SQL")
+                else if (dbType.ToUpper() == "SQL")
                 {
                     //filtro tipo ricevuta - Avvenuta Accettazione
                     if (filters.TipoRicevuta_Accettazione)
@@ -2316,19 +2549,19 @@ namespace DocsPaDB.Query_DocsPAWS
                     //filters tipo ricevuta - Con Errori
                     if (filters.TipoRicevuta_ConErrori)
                         resultQueryFiltersTipoRicevuta += " EXISTS( select 'X' from DPA_STATO_INVIO z1 where z1.id_profile=a.id_profile and SUBSTRING(z1.STATUS_C_MASK,7,1) = 'V') OR";
-                
-                }
-                }
 
-                if ((filters.TipoRicevuta_Accettazione) ||
-                    (filters.TipoRicevuta_MancataAccettazione) ||
-                    (filters.TipoRicevuta_AvvenutaConsegna) ||
-                    (filters.TipoRicevuta_MancataConsegna) ||
-                    (filters.TipoRicevuta_ConfermaRicezione) ||
-                    (filters.TipoRicevuta_AnnullamentoProtocollazione) ||
-                    (filters.TipoRicevuta_ConErrori) ||
-                    (filters.TipoRicevuta_Eccezione)) resultQueryFilters += string.Format(" AND ({0})", resultQueryFiltersTipoRicevuta.Substring(0, resultQueryFiltersTipoRicevuta.Length - 3));
-            
+                }
+            }
+
+            if ((filters.TipoRicevuta_Accettazione) ||
+                (filters.TipoRicevuta_MancataAccettazione) ||
+                (filters.TipoRicevuta_AvvenutaConsegna) ||
+                (filters.TipoRicevuta_MancataConsegna) ||
+                (filters.TipoRicevuta_ConfermaRicezione) ||
+                (filters.TipoRicevuta_AnnullamentoProtocollazione) ||
+                (filters.TipoRicevuta_ConErrori) ||
+                (filters.TipoRicevuta_Eccezione)) resultQueryFilters += string.Format(" AND ({0})", resultQueryFiltersTipoRicevuta.Substring(0, resultQueryFiltersTipoRicevuta.Length - 3));
+
             return resultQueryFilters;
         }
 
@@ -2457,7 +2690,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 spedizione.TipoRicevuta_Annullamento = InfoSpedizione.TipologiaStatoRicevuta.Attendere;
                             }
                         }
-                                
+
                         listSpedizioni.Add(spedizione);
                     }
                     docSpedito.Spedizioni = listSpedizioni;
@@ -2468,147 +2701,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 return docSpediti;
             }
             catch (Exception ex) { throw ex; }
-        }
-
-        public List<InfoDocumentoSpedito> GetReportSpedizioniDocumenti(FiltriReportSpedizioni filters, List<string> idDocumenti, string idGruppo)
-        {
-            try
-            {
-                logger.Debug("START : DocsPaDB > Query_DocsPAWS > Interoperabilita > getReportSpedizioni");
-
-                //recupero elenco spedizioni
-                DataSet dsSpedizioni = new DataSet();
-                DocsPaUtils.Query qSpedizioni = DocsPaUtils.InitQuery.getInstance().getQuery("GET_REPORT_SPEDIZIONI_DETAILS");
-                string filter = GetReportSpedizioniQueryFilters(filters, idGruppo, false);
-                //AGGIUNGO FILTRI DOCUMENTO
-                int i = 0;
-                string listDocuments = " AND A.ID_PROFILE IN (";
-                foreach (string id in idDocumenti)
-                {
-                    listDocuments += id;
-                    if (i < idDocumenti.Count - 1)
-                    {
-                        if (i % 998 == 0 && i > 0)
-                        {
-                            listDocuments += ") OR A.ID_PROFILE IN (";
-                        }
-                        else
-                        {
-                            listDocuments += ", ";
-                        }
-                    }
-                    else
-                    {
-                        listDocuments += ")";
-                    }
-                    i++;
-                }
-                
-                filter += listDocuments;
-
-                qSpedizioni.setParam("filters", filter);
-
-                string qSSpedizioni = qSpedizioni.getSQL();
-                logger.Debug(qSSpedizioni);
-                ExecuteQuery(out dsSpedizioni, "Spedizioni", qSSpedizioni);
-
-                //mapping dati 
-                List<InfoDocumentoSpedito> listDocSpediti = new List<InfoDocumentoSpedito>();
-                if (idDocumenti.Count > 0)
-                {
-                    foreach (string idDoc in idDocumenti)
-                    {
-                        InfoDocumentoSpedito docSpedito = new InfoDocumentoSpedito();
-                        List<InfoSpedizione> listSpedizioni = new List<InfoSpedizione>();
-                        //add info documento
-                        docSpedito.InfoSpedizione = InfoDocumentoSpedito.TipoInfoSpedizione.Effettuato;// default value alert azione
-                        //docSpedito.IDDocumento = rowDoc["IDDOCUMENT"].ToString();
-                        foreach (DataRow rowSpedizioni in dsSpedizioni.Tables["Spedizioni"].Rows)
-                        {
-                            if (idDoc.Equals(rowSpedizioni["IDDOCUMENT"].ToString()))
-                            {
-                                docSpedito.IDDocumento = rowSpedizioni["IDDOCUMENT"].ToString();
-                                docSpedito.Protocollo = rowSpedizioni["PROTOCOLLO"].ToString();
-                                docSpedito.DescrizioneDocumento = rowSpedizioni["OGGETTO"].ToString();
-                                // add info spedizione
-                                InfoSpedizione spedizione = new InfoSpedizione();
-                                spedizione.MezzoSpedizione = rowSpedizioni["MEZZO"].ToString();
-                                spedizione.IdMezzoSpedizione = rowSpedizioni["TYPE_ID_MEZZO"].ToString();
-                                spedizione.NominativoDestinatario = rowSpedizioni["DESTINATARIO"].ToString();
-                                spedizione.EMailDestinatario = rowSpedizioni["MAIL"].ToString();
-
-                                spedizione.EMailMittente = (rowSpedizioni["MAIL_MITTENTE"] != null ? rowSpedizioni["MAIL_MITTENTE"].ToString() : "");
-
-                                if (spedizione.IdMezzoSpedizione == InteroperabilitaSemplificata.SimplifiedInteroperabilityId || spedizione.EMailDestinatario.Contains("InteroperabilityService.svc"))
-                                {
-                                    spedizione.EMailDestinatario = "N.A.";
-                                    spedizione.EMailMittente = "N.A.";
-                                }
-
-                                if (string.IsNullOrEmpty(rowSpedizioni["TIPO_DEST"].ToString()))
-                                    spedizione.TipoDestinatario = "";
-                                else
-                                {
-                                    if (rowSpedizioni["TIPO_DEST"].ToString() == "D" || rowSpedizioni["TIPO_DEST"].ToString() == "F" || rowSpedizioni["TIPO_DEST"].ToString() == "L")
-                                        spedizione.TipoDestinatario = "D";
-                                    else if (rowSpedizioni["TIPO_DEST"].ToString() == "C")
-                                        spedizione.TipoDestinatario = "CC";
-                                    else spedizione.TipoDestinatario = "";
-                                }
-                                spedizione.DataSpedizione = rowSpedizioni["DATASPEDIZIONE"].ToString();
-                                if (!string.IsNullOrEmpty(rowSpedizioni["MASK"].ToString()))
-                                {
-                                    spedizione.Azione_Info = GetStatoAzione(rowSpedizioni["MASK"].ToString().Substring(0, 1));
-                                    // set alert 
-                                    if (spedizione.Azione_Info == InfoSpedizione.TipologiaAzione.Attendere && docSpedito.InfoSpedizione != InfoDocumentoSpedito.TipoInfoSpedizione.Errore) docSpedito.InfoSpedizione = InfoDocumentoSpedito.TipoInfoSpedizione.Warning;
-                                    if (spedizione.Azione_Info == InfoSpedizione.TipologiaAzione.Rispedire) docSpedito.InfoSpedizione = InfoDocumentoSpedito.TipoInfoSpedizione.Errore;
-                                    spedizione.TipoRicevuta_Accettazione = GetStatoRicevuta(rowSpedizioni["MASK"].ToString().Substring(1, 1));
-                                    spedizione.TipoRicevuta_Consegna = GetStatoRicevuta(rowSpedizioni["MASK"].ToString().Substring(2, 1));
-                                    spedizione.TipoRicevuta_Conferma = GetStatoRicevuta(rowSpedizioni["MASK"].ToString().Substring(3, 1));
-                                    spedizione.TipoRicevuta_Annullamento = GetStatoRicevuta(rowSpedizioni["MASK"].ToString().Substring(4, 1));
-                                    spedizione.TipoRicevuta_Eccezione = GetStatoRicevuta(rowSpedizioni["MASK"].ToString().Substring(5, 1));
-                                }
-
-                                spedizione.ProtocolloDestinatario = (rowSpedizioni["PROTO_DEST"] != null ? rowSpedizioni["PROTO_DEST"].ToString() : string.Empty);
-                                spedizione.DataProtDest = (rowSpedizioni["DATA_PROTO_DEST"] != null ? rowSpedizioni["DATA_PROTO_DEST"].ToString() : string.Empty);
-                                spedizione.MotivoAnnullEccezione = (rowSpedizioni["MOTIVO_ANNULLA"] != null ? rowSpedizioni["MOTIVO_ANNULLA"].ToString() : string.Empty);
-
-                                // Problema associazione valori sbagliati Statusmask
-                                if (spedizione.MezzoSpedizione != "INTEROPERABILITA" && spedizione.IdMezzoSpedizione != InteroperabilitaSemplificata.SimplifiedInteroperabilityId)
-                                {
-                                    spedizione.TipoRicevuta_Annullamento = InfoSpedizione.TipologiaStatoRicevuta.AttendereCausaMezzo;
-                                    spedizione.TipoRicevuta_Conferma = InfoSpedizione.TipologiaStatoRicevuta.AttendereCausaMezzo;
-
-                                }
-                                else
-                                {
-                                    if ((string.IsNullOrEmpty(spedizione.DataProtDest) || string.IsNullOrEmpty(spedizione.ProtocolloDestinatario))
-                                        && (spedizione.Azione_Info == InfoSpedizione.TipologiaAzione.OK || spedizione.TipoRicevuta_Conferma == InfoSpedizione.TipologiaStatoRicevuta.OK))
-                                    {
-                                        spedizione.Azione_Info = InfoSpedizione.TipologiaAzione.Attendere;
-                                        spedizione.TipoRicevuta_Conferma = InfoSpedizione.TipologiaStatoRicevuta.Attendere;
-                                        spedizione.TipoRicevuta_Annullamento = InfoSpedizione.TipologiaStatoRicevuta.Attendere;
-                                    }
-                                }
-
-                                listSpedizioni.Add(spedizione);
-                            }
-                        }
-                        if (listSpedizioni != null && listSpedizioni.Count > 0)
-                        {
-                            docSpedito.Spedizioni = listSpedizioni;
-                            listDocSpediti.Add(docSpedito);
-                        }
-                    }
-                }
-
-                logger.Debug("END : DocsPaDB > Query_DocsPAWS > Interoperabilita > getReportSpedizioni");
-                return listDocSpediti;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
         }
         #endregion
 

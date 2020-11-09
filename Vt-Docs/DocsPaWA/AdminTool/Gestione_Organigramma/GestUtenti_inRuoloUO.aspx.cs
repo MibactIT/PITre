@@ -29,9 +29,7 @@ namespace Amministrazione.Gestione_Organigramma
       protected System.Web.UI.WebControls.DropDownList ddl_ricerca;
       protected System.Web.UI.WebControls.Label lbl_risultatoUtentiRuolo;
       protected System.Web.UI.HtmlControls.HtmlInputHidden hd_returnValueModal;
-      protected System.Web.UI.HtmlControls.HtmlInputHidden hd_returnValueModalLF;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_returnValueModalUtenteConTrasm;
-        protected System.Web.UI.WebControls.Label lbl_percorso;
+      protected System.Web.UI.WebControls.Label lbl_percorso;
 
       private List<ProcessoFirma> processiCoinvolti_U = new List<ProcessoFirma>();
       private List<IstanzaProcessoDiFirma> istazaProcessiCoinvolti_U = new List<IstanzaProcessoDiFirma>();
@@ -40,10 +38,10 @@ namespace Amministrazione.Gestione_Organigramma
 
       //---------------------------------------------------------------------------------
       protected DataSet dsUtenti;
-        #endregion
+      #endregion
 
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
+      #region Web Form Designer generated code
+      override protected void OnInit(EventArgs e)
       {
          //
          // CODEGEN: This call is required by the ASP.NET Web Form Designer.
@@ -106,15 +104,6 @@ namespace Amministrazione.Gestione_Organigramma
                {
                   this.GestRitornoAvviso(this.hd_returnValueModal.Value);
                }
-
-                if (this.hd_returnValueModalLF.Value != null && this.hd_returnValueModalLF.Value != string.Empty && this.hd_returnValueModalLF.Value != "undefined")
-                {
-                    this.GestRitornoAvvisoLF(this.hd_returnValueModalLF.Value);
-                }
-                if (this.hd_returnValueModalUtenteConTrasm.Value != null && this.hd_returnValueModalUtenteConTrasm.Value != string.Empty && this.hd_returnValueModalUtenteConTrasm.Value != "undefined")
-                {
-                    this.GestRitornoAvvisoUtenteConTrasm(this.hd_returnValueModalUtenteConTrasm.Value);
-                }
             }
          }
          catch
@@ -123,13 +112,13 @@ namespace Amministrazione.Gestione_Organigramma
          }
       }
 
-      private void SetCoinvoltoInLibroFirma(string idPeople, string idRuolo, string nomeUtente)
+      private void SetCoinvoltoInLibroFirma(string idPeople, string idRuolo)
       {
         string retVal = string.Empty;
 
         string passivi = string.Empty;
         string attivi = string.Empty;
-        
+
         DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
 
         int countProcessiCoinvolti_U = wws.GetCountProcessiDiFirmaByUtenteTitolare(idPeople, idRuolo);
@@ -150,10 +139,10 @@ namespace Amministrazione.Gestione_Organigramma
             }
         }
 
-        retVal = (!string.IsNullOrEmpty(passivi) && !string.IsNullOrEmpty(attivi) ? passivi + "<br /> Inoltre i" + attivi : (
+        retVal = (!string.IsNullOrEmpty(passivi) && !string.IsNullOrEmpty(attivi) ? passivi + "\\n\\r Inoltre i" + attivi : (
             !string.IsNullOrEmpty(passivi) ? passivi : (!string.IsNullOrEmpty(attivi) ? "I" + attivi : "")));
         if (!string.IsNullOrEmpty(retVal))
-            retVal = retVal + "<br />Importante avvisare il disegnatore dei processi coinvolti e il proponente.<br />Sei sicuro di voler rimuovere " + nomeUtente ;
+            retVal = retVal + "\\n\\r Si vuole procedere comunque? Importante avvisare il creatore dei processi coinvolti e il proponente.";
         string[] itemToAdd = new string[] { (string.IsNullOrEmpty(retVal)?"":idPeople), retVal };
         AlertsLF.Add(itemToAdd);
       }
@@ -163,10 +152,7 @@ namespace Amministrazione.Gestione_Organigramma
       /// </summary>
       private void Inizialize()
       {
-            this.RemoveSessionSostUtente();
-            this.RemoveSessionSostUtenteLF();
-            this.RemoveSessionInterrompiProcessi();
-            this.LoadUtentiAttuali();
+         this.LoadUtentiAttuali();
       }
 
       /// <summary>
@@ -217,10 +203,7 @@ namespace Amministrazione.Gestione_Organigramma
             {
 
                this.dg_utenti.Visible = true;
-                if (this.GetSessionSostUtenteLF() == null || this.GetSessionSostUtenteLF() == string.Empty)
-                {
-                    this.lbl_risultatoUtentiRuolo.Visible = false;
-                }
+               this.lbl_risultatoUtentiRuolo.Visible = false;
 
                this.InitializeDataSetUtenti();
 
@@ -244,9 +227,9 @@ namespace Amministrazione.Gestione_Organigramma
 
                   dsUtenti.Tables["UTENTI"].Rows.Add(row);
 
-                  //SetCoinvoltoInLibroFirma(utente.IDPeople, Request.QueryString["idGruppo"], utente.Cognome + " " + utente.Nome);
-                  //if (intCounter == theManager.getListaUtenti().Count)
-                  //      Session["ListaMessaggiLibroFirma"] = AlertsLF;
+                  SetCoinvoltoInLibroFirma(utente.IDPeople, Request.QueryString["idGruppo"]);
+                  if (intCounter == theManager.getListaUtenti().Count)
+                        Session["ListaMessaggiLibroFirma"] = AlertsLF;
 
                   intCounter += 1;
                }
@@ -285,49 +268,31 @@ namespace Amministrazione.Gestione_Organigramma
          dsUtenti.Tables["UTENTI"].Columns.Add(dc);
       }
 
-        protected void dg_utenti_ItemDataBaund(object sender, System.Web.UI.WebControls.DataGridItemEventArgs e)
-        {
-            if (e.Item.ItemType.Equals(ListItemType.Item) || e.Item.ItemType.Equals(ListItemType.AlternatingItem))
-            {
-                /*
-                string idUtente = e.Item.Cells[4].Text;
-                string idRuolo = Request.QueryString["idGruppo"].ToString();
-                DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
-                int countProcessiCoinvolti_U = wws.GetCountProcessiDiFirmaByUtenteTitolare(idUtente, idRuolo);
-                int countIstazaProcessiCoinvolti_U = wws.GetCountIstanzeProcessiDiFirmaByUtenteCoinvolto(idUtente, idRuolo);
-                if (countProcessiCoinvolti_U > 0 || countIstazaProcessiCoinvolti_U > 0)
-                {
-                    e.Item.Cells[5].Attributes.Add("onclick", "AvvisoRuoloConLF('" + idRuolo + "','" + idUtente + "','" + countProcessiCoinvolti_U + "','" + countIstazaProcessiCoinvolti_U + "');");
-                }
-                else
-                {
-                    string utente = e.Item.Cells[2].Text;
-                    string alert = string.Empty;
+      protected void dg_utenti_ItemDataBaund(object sender, System.Web.UI.WebControls.DataGridItemEventArgs e)
+      {
+          if (e.Item.ItemType.Equals(ListItemType.Item) || e.Item.ItemType.Equals(ListItemType.AlternatingItem))
+          {
+              AlertsLF = (List<string[]>)Session["ListaMessaggiLibroFirma"];
+              string utente = string.Empty;
+              string alert = string.Empty;
+              utente = e.Item.Cells[2].Text;
+              if ((AlertsLF != null) && (AlertsLF.Count > 0) && (e.Item.ItemIndex > -1) && ((AlertsLF.Count - 1) >= e.Item.ItemIndex) && (!string.IsNullOrEmpty(AlertsLF[e.Item.ItemIndex][1])))
+              {
+                    alert = "if (window.confirm('" + AlertsLF[e.Item.ItemIndex][1] + "')){if (!window.confirm('Sei sicuro di voler rimuovere " + utente + " ?')){return false;}}else {return false;}";
+              }
+              else
+              {
                     alert = "if (!window.confirm('Sei sicuro di voler rimuovere " + utente + " ?')) {return false};";
-                    e.Item.Cells[5].Attributes.Add("onclick", alert);
-                }
-                */
-                string utente = e.Item.Cells[2].Text;
-                string alert = string.Empty;
-                alert = "if (!window.confirm('Sei sicuro di voler rimuovere " + utente + " ?')) {return false};";
-                e.Item.Cells[5].Attributes.Add("onclick", alert);
-                e.Item.Cells[6].Visible = false;
-                if (this.GetSessionSostUtenteLF() != null && this.GetSessionSostUtenteLF() != string.Empty)
-                {
-                    e.Item.Cells[5].Visible = false;
-                    e.Item.Cells[6].Visible = true;
-                    string idPeopleEliminato = this.GetSessionSostUtenteLF();
-                    if (e.Item.Cells[4].Text.Equals(idPeopleEliminato))
-                        e.Item.Visible = false;
-                }
-            }
-        }
+              }
+              e.Item.Cells[5].Attributes.Add("onclick", alert);
+          }
+      }
 
-        #endregion
+      #endregion
 
-        #region Ricerca utenti
+      #region Ricerca utenti
 
-        private void ddl_ricerca_SelectedIndexChanged(object sender, System.EventArgs e)
+      private void ddl_ricerca_SelectedIndexChanged(object sender, System.EventArgs e)
       {
          if (this.ddl_ricerca.SelectedValue.ToString().Equals("*"))
          {
@@ -475,8 +440,6 @@ namespace Amministrazione.Gestione_Organigramma
                {
                   if (this.SostituzioneUtente(e.Item.Cells[4].Text))
                   {
-                    string idRuolo = Request.QueryString["idGruppo"];
-                    SostituisciUtentePassiCorrelati(idRuolo, this.dg_utenti.Items[0].Cells[4].Text, e.Item.Cells[4].Text);
                      // elimina l'unico utente presente nella datagrid per questo ruolo
                      if (this.EliminaUtenteInRuolo(this.dg_utenti.Items[0].Cells[4].Text, Request.QueryString["idGruppo"]))
                      {
@@ -486,7 +449,6 @@ namespace Amministrazione.Gestione_Organigramma
                            this.RemoveSessionSostUtente();
                         }
                      }
-                     this.RemoveSessionInterrompiProcessi();
                   }
                }
 
@@ -697,178 +659,92 @@ namespace Amministrazione.Gestione_Organigramma
          Session.Remove("UTENTEELIMINATO");
       }
 
-        #endregion
+      #endregion
 
-        #region Gestione sessione sostituzione obbligatoria di un utente per libro firma
+      #region Elimina utente
 
-        private void SetSessionSostUtenteLF(string idPeople)
-        {
-            Session["UTENTEELIMINATOLF"] = idPeople;
-        }
-
-        private string GetSessionSostUtenteLF()
-        {
-            return (string)Session["UTENTEELIMINATOLF"];
-        }
-
-        private void RemoveSessionSostUtenteLF()
-        {
-            Session.Remove("UTENTEELIMINATOLF");
-        }
-
-        private void SetSessionInterrompiProcessi(bool interrompi)
-        {
-            Session["INTERROMPIPROCESSILFU"] = interrompi;
-        }
-
-        private bool GetSessionInterrompiProcessi()
-        {
-            if (Session["INTERROMPIPROCESSILFU"] == null)
-                return false;
-            else
-                return (bool)Session["INTERROMPIPROCESSILFU"];
-        }
-
-        private void RemoveSessionInterrompiProcessi()
-        {
-            Session.Remove("INTERROMPIPROCESSILFU");
-        }
-        #endregion
-        #region Elimina utente
-
-        private void dg_utenti_ItemCommand(object source, System.Web.UI.WebControls.DataGridCommandEventArgs e)
+      private void dg_utenti_ItemCommand(object source, System.Web.UI.WebControls.DataGridCommandEventArgs e)
       {
-            try
+         try
+         {
+            if (e.CommandName.Equals("Eliminazione"))
             {
-                this.RemoveSessionInterrompiProcessi();
-                if (e.CommandName.Equals("Eliminazione"))
-                {
-                    // verifica che l'utente non sia connesso a docspa
-                    if (this.VerificaUtenteLoggato(e.Item.Cells[1].Text, e.Item.Cells[3].Text))
-                    {
-                        // INC000000577348
-                        // verifica che l'utente non sia responsabile di una stampa di repertorio
-                        if (this.VerificaUtenteRespStampeRep(e.Item.Cells[4].Text, Request.QueryString["idGruppo"], e.Item.Cells[3].Text))
-                        {
-                            // verifica che l'utente non sia configurato come responsabile della conservazione
-                            if (this.VerificaUtenteRespCons(e.Item.Cells[4].Text, Request.QueryString["idGruppo"], e.Item.Cells[3].Text))
-                            {
-                                if (VerificaPresenzaProcessiFirma(e.Item.Cells[4].Text, Request.QueryString["idGruppo"]))
-                                {
-                                    Session["indexUser"] = e.Item.ItemIndex;
-                                    return;
-                                }
+               // verifica che l'utente non sia connesso a docspa
+               if (this.VerificaUtenteLoggato(e.Item.Cells[1].Text, e.Item.Cells[3].Text))
+               {
+                  // INC000000577348
+                  // verifica che l'utente non sia responsabile di una stampa di repertorio
+                   if (this.VerificaUtenteRespStampeRep(e.Item.Cells[4].Text, Request.QueryString["idGruppo"], e.Item.Cells[3].Text))
+                   {
+                       // verifica che l'utente non sia configurato come responsabile della conservazione
+                       if (this.VerificaUtenteRespCons(e.Item.Cells[4].Text, Request.QueryString["idGruppo"], e.Item.Cells[3].Text))
+                       {
+                           // verifica che non sia l'unico del ruolo
+                           if (this.dg_utenti.Items.Count > 1)
+                           {
+                               // NON è l'unico utente nel ruolo quindi lo elimina dal ruolo
+                               if (this.EliminaUtenteInRuolo(e.Item.Cells[4].Text, Request.QueryString["idGruppo"]))
+                               {
+                                   // ripulisce l'AREA DI LAVORO
+                                   if (this.EliminaADLUtente(e.Item.Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
+                                   {
+                                       this.LoadUtentiAttuali();
+                                   }
 
-                                // verifica che non sia l'unico del ruolo
-                                if (this.dg_utenti.Items.Count > 1)
-                                {
-                                    if(VerificaPresenzaTrasmissioniPendentiUtente(e.Item.Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
-                                    {
-                                        Session["indexUser"] = e.Item.ItemIndex;
-                                        return;
-                                    }
-                                    // NON è l'unico utente nel ruolo quindi lo elimina dal ruolo
-                                    if (this.EliminaUtenteInRuolo(e.Item.Cells[4].Text, Request.QueryString["idGruppo"]))
-                                    {
-                                        // ripulisce l'AREA DI LAVORO
-                                        if (this.EliminaADLUtente(e.Item.Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
-                                        {
-                                            this.LoadUtentiAttuali();
-                                        }
+                                   // ricarica la ricerca
+                                   this.RicercaUtenti();
+                               }
+                           }
+                           else
+                           {
+                               // è l'unico utente del ruolo...
+                               // verifica che il ruolo non abbia trasmissioni con work-flow
+                               if (this.RuoloConTrasmissioni(Request.QueryString["idCorrGlobRuolo"]))
+                               {
+                                   // ruolo con trasmissioni... avvisa l'amministratore e apre una modal Dialog
+                                   if (!this.Page.IsStartupScriptRegistered("openModalRuoloConTX"))
+                                   {
+                                       string scriptString = "<SCRIPT>AvvisoRuoloConTX('" + e.Item.Cells[2].Text.Replace("'", "\\'") + "');</SCRIPT>";
+                                       this.Page.RegisterStartupScript("openModalRuoloConTX", scriptString);
+                                   }
+                               }
+                               else
+                               {
+                                   // elimina utente dal ruolo
+                                   if (this.EliminaUtenteInRuolo(e.Item.Cells[4].Text, Request.QueryString["idGruppo"]))
+                                   {
+                                       // ripulisce l'AREA DI LAVORO
+                                       if (this.EliminaADLUtente(e.Item.Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
+                                       {
 
-                                        // ricarica la ricerca
-                                        this.RicercaUtenti();
-                                    }
-                                }
-                                else
-                                {
-                                    // è l'unico utente del ruolo...
-                                    // verifica che il ruolo non abbia trasmissioni con work-flow
-                                    if (this.RuoloConTrasmissioni(Request.QueryString["idCorrGlobRuolo"]))
-                                    {
-                                        // ruolo con trasmissioni... avvisa l'amministratore e apre una modal Dialog
-                                        if (!this.Page.IsStartupScriptRegistered("openModalRuoloConTX"))
-                                        {
-                                            string scriptString = "<SCRIPT>AvvisoRuoloConTX('" + e.Item.Cells[2].Text.Replace("'", "\\'") + "','" + e.Item.Cells[4].Text + "','" + Request.QueryString["idCorrGlobRuolo"] + "');</SCRIPT>";
-                                            this.Page.RegisterStartupScript("openModalRuoloConTX", scriptString);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // elimina utente dal ruolo
-                                        if (this.EliminaUtenteInRuolo(e.Item.Cells[4].Text, Request.QueryString["idGruppo"]))
-                                        {
-                                            // ripulisce l'AREA DI LAVORO
-                                            if (this.EliminaADLUtente(e.Item.Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
-                                            {
+                                           // ripulisce il datagrid
+                                           this.InitializeDataSetUtenti();
 
-                                                // ripulisce il datagrid
-                                                this.InitializeDataSetUtenti();
+                                           DataView dv = dsUtenti.Tables["UTENTI"].DefaultView;
+                                           dv.Sort = "descrizione ASC";
+                                           dg_utenti.DataSource = dv;
+                                           dg_utenti.DataBind();
 
-                                                DataView dv = dsUtenti.Tables["UTENTI"].DefaultView;
-                                                dv.Sort = "descrizione ASC";
-                                                dg_utenti.DataSource = dv;
-                                                dg_utenti.DataBind();
+                                           this.dg_utenti.Visible = false;
+                                           this.lbl_risultatoUtentiRuolo.Visible = true;
 
-                                                this.dg_utenti.Visible = false;
-                                                this.lbl_risultatoUtentiRuolo.Visible = true;
-
-                                                // ricarica la ricerca
-                                                this.RicercaUtenti();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (e.CommandName.Equals("Sostituzione"))
-                {
-                    string idOldPeople = this.GetSessionSostUtenteLF();
-                    string idNewPeople = e.Item.Cells[4].Text;
-                    string idRuolo = Request.QueryString["idGruppo"];
-
-                    if (SostituisciUtentePassiCorrelati(idRuolo, idOldPeople, idNewPeople))
-                    {
-                        if (this.EliminaUtenteInRuolo(idOldPeople, Request.QueryString["idGruppo"]))
-                        {
-                           this.EliminaADLUtente(idOldPeople, Request.QueryString["idCorrGlobRuolo"]);
-                            this.RemoveSessionSostUtenteLF();
-                            this.LoadUtentiAttuali();
-                        }
-                    }
-                }
+                                           // ricarica la ricerca
+                                           this.RicercaUtenti();
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }
+               }
             }
-            catch
-            {
-                this.gestErrori();
-            }
+         }
+         catch
+         {
+            this.gestErrori();
+         }
       }
 
-        private bool SostituisciUtentePassiCorrelati(string idRuolo, string idOldPeople, string idNewPeople)
-        {
-            bool result = true;
-
-            try
-            {
-                Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                result = theManager.SostituisciUtentePassiCorrelati(idRuolo, idOldPeople, idNewPeople);
-
-                if (!result)
-                {
-                    string scriptString = "<SCRIPT>alert('Attenzione, errore durante la sostituzione dell'utente');</SCRIPT>";
-                    this.Page.RegisterStartupScript("alertJavaScript", scriptString);
-                }
-            }
-            catch
-            {
-                this.gestErrori();
-            }
-
-            return result;
-        }
-        
       private bool VerificaUtenteLoggato(string userId, string idAmm)
       {
          bool result = false;
@@ -964,67 +840,6 @@ namespace Amministrazione.Gestione_Organigramma
           return result;
       }
 
-        private bool VerificaPresenzaTrasmissioniPendentiUtente(string idPeople, string idCorrGlobali)
-        {
-            bool result = false;
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            try
-            {
-                if(ws.VerificaPresenzaTrasmissioniPendentiUtente(idPeople, idCorrGlobali))
-                {
-                    result = true;
-                    string scriptString = "<SCRIPT>AvvisoUtenteConTrasm('" + idPeople + "','" + idCorrGlobali + "');</SCRIPT>";
-                    this.Page.RegisterStartupScript("AvvisoUtenteConTrasm", scriptString);
-                }
-            }
-            catch(Exception e)
-            {
-                this.gestErrori();
-            }
-            return result;
-        }
-
-        private bool VerificaPresenzaProcessiFirma(string idPeople, string idGruppo)
-        {
-            bool result = false;
-            //Verifico che non ci siano processi attivi
-            string idUtente;
-            string idRuolo = Request.QueryString["idGruppo"].ToString();
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            int countProcessiCoinvolti = 0;
-            int countIstazaProcessiCoinvolti = 0;
-            string tipoTitolare = string.Empty;
-
-            idUtente = idPeople;
-            countProcessiCoinvolti = ws.GetCountProcessiDiFirmaByTitolare(idRuolo, idUtente);
-            countIstazaProcessiCoinvolti = ws.GetCountIstanzaProcessiDiFirmaByTitolare(idRuolo, idUtente);
-            if (countProcessiCoinvolti > 0 || countIstazaProcessiCoinvolti > 0)
-                tipoTitolare = Manager.OrganigrammaManager.SoggettoInModifica.UTENTE;
-
-            if (this.dg_utenti.Items.Count == 1)
-            {
-                int countProcessiUtente = countProcessiCoinvolti;
-                int countIstanzeUtente = countIstazaProcessiCoinvolti;
-                countProcessiCoinvolti = ws.GetCountProcessiDiFirmaByTitolare(idRuolo, "");
-                countIstazaProcessiCoinvolti = ws.GetCountIstanzaProcessiDiFirmaByTitolare(idRuolo, "");
-                
-                //Se i processi a ruolo sono maggiori rispetto a quelli utente allora ci sono processi in cui è coinvolto il ruolo senza alcun utente
-                if (countProcessiCoinvolti > 0 || countIstazaProcessiCoinvolti > 0)
-                {
-                    if(countProcessiCoinvolti > countProcessiUtente || countIstazaProcessiCoinvolti > countIstanzeUtente)
-                        tipoTitolare = !string.IsNullOrEmpty(tipoTitolare) ? Manager.OrganigrammaManager.SoggettoInModifica.ULTIMO_UTENTE_E_RUOLO : 
-                            Manager.OrganigrammaManager.SoggettoInModifica.ULTIMO_UTENTE_RUOLO;
-                }
-            }
-            if (countProcessiCoinvolti > 0 || countIstazaProcessiCoinvolti > 0)
-            {
-                string scriptString = "<SCRIPT>AvvisoRuoloConLF('" + tipoTitolare + "','" + idRuolo + "','" + idUtente + "','" + countProcessiCoinvolti + "','" + countIstazaProcessiCoinvolti + "');</SCRIPT>";
-                this.Page.RegisterStartupScript("AvvisoRuoloConLF", scriptString);
-                return true;
-            }
-            return result;
-        }
-
       private bool EliminaUtenteInRuolo(string idPeople, string idGruppo)
       {
          bool result = false;
@@ -1059,15 +874,11 @@ namespace Amministrazione.Gestione_Organigramma
                if (esito.Codice.Equals(0))
                {
                   result = true;
-                  bool interrompi = this.GetSessionInterrompiProcessi();
-                    if (interrompi)
-                    {
-                        DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                        //InvalidaPassiCorrelati(idPeople);
-                        AsyncCallback callback = new AsyncCallback(CallBack);
-                        invalidaPassiCorrelati = new InvalidaPassiCorrelatiDelegate(InvalidaPassiCorrelati);
-                        invalidaPassiCorrelati.BeginInvoke(idPeople, idGruppo, sessionManager.getUserAmmSession(), callback, null);
-                    }
+                  DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
+                   //InvalidaPassiCorrelati(idPeople);
+                  AsyncCallback callback = new AsyncCallback(CallBack);
+                  invalidaPassiCorrelati = new InvalidaPassiCorrelatiDelegate(InvalidaPassiCorrelati);
+                  invalidaPassiCorrelati.BeginInvoke(idPeople, idGruppo, sessionManager.getUserAmmSession(), callback, null);
                }
                else
                {
@@ -1101,18 +912,39 @@ namespace Amministrazione.Gestione_Organigramma
 
       private void InvalidaPassiCorrelati(string idPeople, string idRuolo, InfoUtenteAmministratore infoAmm)
       {
-            DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
-            wws.Timeout = System.Threading.Timeout.Infinite;
-            string tipoTick = "U";
-            if (this.dg_utenti.Items.Count == 1)
-            {
-                idPeople = string.Empty;
-                tipoTick = "R";
-            }
-            wws.InvalidaPassiCorrelatiTitolare(idRuolo, idPeople, tipoTick, infoAmm);
+          DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
+          wws.Timeout = System.Threading.Timeout.Infinite;
+          List<ProcessoFirma> processiCoinvolti_U = processiCoinvolti_U = wws.GetProcessiDiFirmaByUtenteTitolare(idPeople, idRuolo).ToList();
+          List<IstanzaProcessoDiFirma> istazaProcessiCoinvolti_U = wws.GetIstanzeProcessiDiFirmaByUtenteCoinvolto(idPeople, idRuolo).ToList();
+
+          if (processiCoinvolti_U.Count > 0)
+          {
+              List<string> idPassi = new List<string>();
+              foreach (ProcessoFirma processo in processiCoinvolti_U)
+              {
+                  foreach (PassoFirma passo in processo.passi)
+                  {
+                      if (!idPassi.Contains(passo.idPasso))
+                      {
+                          idPassi.Add(passo.idPasso);
+                      }
+                  }
+              }
+
+              wws.TickPasso(idPassi.ToArray(), "U");
+              Session["processiCoinvolti_U"] = null;
+          }
+
+          if (istazaProcessiCoinvolti_U.Count > 0)
+          {
+              wws.TickIstanze(istazaProcessiCoinvolti_U.ToArray(), "U", infoAmm);
+
+              Session["istazaProcessiCoinvolti_U"] = null;
+          }
       }
 
       public delegate void InvalidaPassiCorrelatiDelegate(string idPeople, string idGruppo, InfoUtenteAmministratore infoAmm);
+
 
       private void CallBack(IAsyncResult result)
       {
@@ -1225,79 +1057,7 @@ namespace Amministrazione.Gestione_Organigramma
          return result;
       }
 
-        private bool AccettaTrasmConWF(string idCorrGlobRuolo)
-        {
-            bool result = false;
-
-            try
-            {
-
-                Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                theManager.AccettaTrasmConWF(idCorrGlobRuolo);
-
-                DocsPAWA.DocsPaWR.EsitoOperazione esito = new DocsPAWA.DocsPaWR.EsitoOperazione();
-                esito = theManager.getEsitoOperazione();
-
-                if (esito.Codice.Equals(0))
-                {
-                    result = true;
-                }
-                else
-                {
-                    if (!this.Page.IsStartupScriptRegistered("alertJavaScript"))
-                    {
-                        string scriptString = "<SCRIPT>alert('Attenzione, " + esito.Descrizione.Replace("'", "''") + "');</SCRIPT>";
-                        this.Page.RegisterStartupScript("alertJavaScript", scriptString);
-                    }
-                }
-
-                esito = null;
-            }
-            catch
-            {
-                this.gestErrori();
-            }
-
-            return result;
-        }
-
-        private bool AccettaTrasmConWFUtente(string idPeople, string idCorrGlobaliRuolo)
-        {
-            bool result = false;
-
-            try
-            {
-
-                Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                theManager.AccettaTrasmConWFUtente(idPeople, idCorrGlobaliRuolo);
-
-                DocsPAWA.DocsPaWR.EsitoOperazione esito = new DocsPAWA.DocsPaWR.EsitoOperazione();
-                esito = theManager.getEsitoOperazione();
-
-                if (esito.Codice.Equals(0))
-                {
-                    result = true;
-                }
-                else
-                {
-                    if (!this.Page.IsStartupScriptRegistered("alertJavaScript"))
-                    {
-                        string scriptString = "<SCRIPT>alert('Attenzione, " + esito.Descrizione.Replace("'", "\\'") + "');</SCRIPT>";
-                        this.Page.RegisterStartupScript("alertJavaScript", scriptString);
-                    }
-                }
-
-                esito = null;
-            }
-            catch
-            {
-                this.gestErrori();
-            }
-
-            return result;
-        }
-
-        private void GestRitornoAvviso(string valore)
+      private void GestRitornoAvviso(string valore)
       {
          try
          {
@@ -1338,23 +1098,6 @@ namespace Amministrazione.Gestione_Organigramma
                      }
                   }
                   break;
-                case "NA":
-                    if (this.AccettaTrasmConWF(Request.QueryString["idCorrGlobRuolo"]))
-                    {
-                        // elimina l'unico utente presente nella datagrid per questo ruolo
-                        if (this.EliminaUtenteInRuolo(this.dg_utenti.Items[0].Cells[4].Text, Request.QueryString["idGruppo"]))
-                        {
-                            // ripulisce l'AREA DI LAVORO
-                            if (this.EliminaADLUtente(this.dg_utenti.Items[0].Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
-                            {
-                                this.dg_utenti.Visible = false;
-                                this.lbl_risultatoUtentiRuolo.Visible = true;
-
-                                this.hd_returnValueModal.Value = "";
-                            }
-                        }
-                    }
-                    break;
             }
          }
          catch
@@ -1363,159 +1106,13 @@ namespace Amministrazione.Gestione_Organigramma
          }
       }
 
-        private void GestRitornoAvvisoLF(string valore)
-        {
-            try
-            {
-                int index = Convert.ToInt32(Session["indexUser"]);
-                string vecchioUtente;
-                switch (valore)
-                {
-                    case "ADD_USER":
-                        this.dg_utenti.Visible = false;
-                        this.lbl_risultatoUtentiRuolo.Visible = true;
-                        this.SetSessionInterrompiProcessi(false);
-                        this.SetSessionSostUtente(this.dg_utenti.Items[0].Cells[4].Text);
-                        vecchioUtente = this.dg_utenti.Items[0].Cells[2].Text;
+      #endregion
 
-                        this.dg_utentiTrovati.Visible = false;
-                        this.txt_ricerca.Text = "";
-
-                        this.lbl_risultatoUtentiRuolo.Visible = true;
-                        this.lbl_risultatoUtentiRuolo.Text = "<font color='#ff0000'><br>...attesa inserimento obbligatorio<br>di un nuovo utente al posto di:<br>" + vecchioUtente + "</font>";
-
-                        this.hd_returnValueModal.Value = "";
-                        break;
-                    case "REPLACE_USER":
-                        this.SetSessionInterrompiProcessi(false);
-                        this.SetSessionSostUtenteLF(this.dg_utenti.Items[index].Cells[4].Text);
-                        this.LoadUtentiAttuali();
-                        this.lbl_risultatoUtentiRuolo.Visible = true;
-                        vecchioUtente = this.dg_utenti.Items[index].Cells[2].Text;
-
-                        this.dg_utentiTrovati.Visible = false;
-                        this.txt_ricerca.Text = "";
-
-                        this.lbl_risultatoUtentiRuolo.Visible = true;
-                        this.lbl_risultatoUtentiRuolo.Text = "<font color='#ff0000'><br>...attesa sostituzione obbligatoria<br>di un utente al posto di:<br>" + vecchioUtente + "</font>";
-
-                        this.hd_returnValueModal.Value = "";
-                        break;
-                    case "Y":
-                        // verifica che non sia l'unico del ruolo
-                        this.SetSessionInterrompiProcessi(true);
-                        if (this.dg_utenti.Items.Count > 1)
-                        {
-                            // NON è l'unico utente nel ruolo quindi lo elimina dal ruolo
-                            if (this.EliminaUtenteInRuolo(dg_utenti.Items[index].Cells[4].Text, Request.QueryString["idGruppo"]))
-                            {
-                                // ripulisce l'AREA DI LAVORO
-                                if (this.EliminaADLUtente(dg_utenti.Items[index].Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
-                                {
-                                    this.LoadUtentiAttuali();
-                                }
-
-                                // ricarica la ricerca
-                                this.RicercaUtenti();
-                            }
-                        }
-                        else
-                        {
-                            // è l'unico utente del ruolo...
-                            // verifica che il ruolo non abbia trasmissioni con work-flow
-                            if (this.RuoloConTrasmissioni(Request.QueryString["idCorrGlobRuolo"]))
-                            {
-                                // ruolo con trasmissioni... avvisa l'amministratore e apre una modal Dialog
-                                if (!this.Page.IsStartupScriptRegistered("openModalRuoloConTX"))
-                                {
-                                    string scriptString = "<SCRIPT>AvvisoRuoloConTX('" + dg_utenti.Items[index].Cells[2].Text.Replace("'", "\\'") + "','" + dg_utenti.Items[index].Cells[4].Text + "','" + Request.QueryString["idCorrGlobRuolo"] + "');</SCRIPT>";
-                                    this.Page.RegisterStartupScript("openModalRuoloConTX", scriptString);
-                                }
-                            }
-                            else
-                            {
-                                // elimina utente dal ruolo
-                                if (this.EliminaUtenteInRuolo(dg_utenti.Items[index].Cells[4].Text, Request.QueryString["idGruppo"]))
-                                {
-                                    // ripulisce l'AREA DI LAVORO
-                                    if (this.EliminaADLUtente(dg_utenti.Items[index].Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
-                                    {
-
-                                        // ripulisce il datagrid
-                                        this.InitializeDataSetUtenti();
-
-                                        DataView dv = dsUtenti.Tables["UTENTI"].DefaultView;
-                                        dv.Sort = "descrizione ASC";
-                                        dg_utenti.DataSource = dv;
-                                        dg_utenti.DataBind();
-
-                                        this.dg_utenti.Visible = false;
-                                        this.lbl_risultatoUtentiRuolo.Visible = true;
-
-                                        // ricarica la ricerca
-                                        this.RicercaUtenti();
-                                    }
-                                }
-                            }
-                        }
-                        break;
-
-                    case "N":
-                        break;
-                }
-                this.hd_returnValueModalLF.Value = "";
-                Session["indexUser"] = null;
-            }
-            catch
-            {
-                this.gestErrori();
-            }
-        }
-
-        private void GestRitornoAvvisoUtenteConTrasm(string valore)
-        {
-            try
-            {
-                int index = Convert.ToInt32(Session["indexUser"]);
-                switch (valore)
-                {
-                    case "Y":
-                        if (this.AccettaTrasmConWFUtente(dg_utenti.Items[index].Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
-                        {
-                            if (this.EliminaUtenteInRuolo(dg_utenti.Items[index].Cells[4].Text, Request.QueryString["idGruppo"]))
-                            {
-                                // ripulisce l'AREA DI LAVORO
-                                if (this.EliminaADLUtente(dg_utenti.Items[index].Cells[4].Text, Request.QueryString["idCorrGlobRuolo"]))
-                                {
-                                    this.LoadUtentiAttuali();
-                                }
-
-                                // ricarica la ricerca
-                                this.RicercaUtenti();
-                            }
-                        }
-
-                        break;
-
-                    case "N":
-                        break;
-                }
-                this.hd_returnValueModalUtenteConTrasm.Value = "";
-                Session["indexUser"] = null;
-            }
-            catch
-            {
-                this.gestErrori();
-            }
-        }
-
-        #endregion
-
-        #region Gestione errori
-        /// <summary>
-        /// gestore degli errori
-        /// </summary>
-        private void gestErrori()
+      #region Gestione errori
+      /// <summary>
+      /// gestore degli errori
+      /// </summary>
+      private void gestErrori()
       {
          this.dg_utentiTrovati.Visible = false;
          this.lbl_avviso.Text = "Errore di sistema!";

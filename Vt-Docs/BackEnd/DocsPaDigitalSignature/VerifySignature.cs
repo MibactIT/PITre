@@ -13,9 +13,6 @@ using log4net;
 using System.Collections.Generic;
 using DocsPaVO.SmartClient;
 using DocsPaUtils.ConverterDate;
-using System.Xml;
-using System.Text;
-using System.Linq;
 
 namespace BusinessLogic.Documenti.DigitalSignature
 {
@@ -417,7 +414,6 @@ namespace BusinessLogic.Documenti.DigitalSignature
         {
             string pathName = fileDoc.name;
             string backName = fileDoc.name;
-            bool isPadesAndCades = false;
             logger.Debug("Leggo il file input per backup");
             byte[] backup = File.ReadAllBytes(Path.Combine(this.GetPKCS7InputDirectory(), pathName));
             DocsPaVO.documento.VerifySignatureResult vsr = null;
@@ -452,7 +448,6 @@ namespace BusinessLogic.Documenti.DigitalSignature
                 {
                     Pades_Utils.Pades.VerifyPadesSignature(fd1);
                     vsr = fd1.signatureResult;
-                    isPadesAndCades = true;
                 }
 
             }
@@ -496,25 +491,14 @@ namespace BusinessLogic.Documenti.DigitalSignature
                 ExternalModule ext = new ExternalModule();
                 bool result = false;
                 if (CRLServiceUrl != null)
-                    result = ext.externalClrCheckWS(CRLServiceUrl, file, dataVerifica, isPadesAndCades);
+                    result = ext.externalClrCheckWS(CRLServiceUrl, file, dataVerifica);
                 else
                     return null;
 
                 //per i pades
                 DocsPaVO.documento.VerifySignatureResult padesRetval = PadesExternalCheck(pathName, file, ext);
                 if (padesRetval != null)
-                {
-                    if(!result)
-                    {
-                        if (ext.Esito != null && ext.Esito.message != string.Empty)
-                        {
-                            logger.Error(ext.Esito.message);
-                            ErrorMessageLst.Add(ext.Esito.message);
-                            padesRetval.ErrorMessages = ErrorMessageLst.ToArray();
-                        }
-                    }
                     return padesRetval;
-                }
 
                 if (!result)
                 {
@@ -1007,139 +991,5 @@ namespace BusinessLogic.Documenti.DigitalSignature
             return retValue;
         }
 
-        public DocsPaVO.documento.VerifySignatureResult VerifySignatureXADES_External(DocsPaVO.documento.FileDocumento fileDoc, DateTime dataDiRiferimento)
-        {
-            string pathName = fileDoc.name;
-            DocsPaVO.documento.VerifySignatureResult vsr = new DocsPaVO.documento.VerifySignatureResult();
-            SignedDocument mainP7Doc;
-            mainP7Doc = new SignedDocument(Path.Combine(this.GetPKCS7InputDirectory(), pathName));
-
-            List<string> ErrorMessageLst = new List<string>();
-            #region Verifica Esterna
-            //Dati CertEsterno
-            try
-            {
-                string CRLServiceUrl = CLRVerificationServiceUrl();
-                string file = Path.Combine(this.GetPKCS7InputDirectory(), pathName);
-
-                ExternalModule ext = new ExternalModule();
-                bool result = false;
-                if (CRLServiceUrl != null)
-                    result = ext.externalClrCheckWS(CRLServiceUrl, file, dataDiRiferimento, false);
-                else
-                    return null;
-                DocsPaVO.documento.PKCS7Document pkc = null;
-                vsr.PKCS7Documents = new DocsPaVO.documento.PKCS7Document [ext.Esito.VerifySignatureResult.PKCS7Documents.Length];
-                for(int i = 0; i < ext.Esito.VerifySignatureResult.PKCS7Documents.Length; i++)
-                {
-                    pkc = ext.Esito.VerifySignatureResult.PKCS7Documents[i];
-                    pkc.SignAlgorithm = string.Empty;
-                    pkc.SignHash = string.Empty;
-                    pkc.SignatureType = (DocsPaVO.documento.SignType)Enum.Parse(typeof(DocsPaVO.documento.SignType), "XADES");
-                    vsr.PKCS7Documents[i] = pkc;
-                }
-                if (!result)
-                {
-                    string errDesc = String.Format("Il modulo di verifica esterno ha dato esito negativo: (ceritificato scaduto/revocato/errore) CRLServiceUrl {0} file {1}", CRLServiceUrl, file);
-                    if (CRLServiceUrl == null)
-                        errDesc += " controllate l'argomento del modulo di verifica che è null o vuoto";
-
-                    logger.Debug(errDesc);
-                    if (ext.Esito.message != string.Empty)
-                    {
-                        logger.Error(ext.Esito.message);
-                        ErrorMessageLst.Add(ext.Esito.message);
-                    }
-                }
-                if (ext.Esito != null)
-                {
-
-                    Dictionary<string, DocsPaVO.documento.SignerInfo> siList = getSignerInfoFromExternalVerify(ext.Esito.VerifySignatureResult);
-                    List<DocsPaVO.documento.SignerInfo> signInfo = this.ExtractSignersXml(fileDoc.content);
-                    foreach (KeyValuePair<string, DocsPaVO.documento.SignerInfo> si in siList)
-                    {
-                        string key = si.Key;
-                        siList[key].CertificateInfo.X509Certificate = (from s in signInfo where GetKeySubjectInfo(s.SubjectInfo).Equals(key) select s).FirstOrDefault().CertificateInfo.X509Certificate;
-                        
-                    }
-                    //popolo la signerInfo con il valore di ritorno
-                    vsr = setSignerInfoFromExternalVerify(siList, ext.Esito, ext.Esito.VerifySignatureResult);
-
-                    //e' stata fatta la verifica online (servizio esterno)
-                    vsr.CRLOnlineCheck = true;
-
-                    if (!result)
-                    {
-                        string errMsg = String.Format("EXTCHECK : {0}-{1}", ext.Esito.errorCode, ext.Esito.message);
-                        ErrorMessageLst.Add(String.Format(errMsg));
-                        ErrorMessageLst.Add(vsr.StatusDescription);
-                        vsr.StatusDescription += " " + errMsg;
-
-                        if (vsr.StatusCode == 0)
-                            vsr.StatusCode = -1;
-                    }
-                    else
-                    {
-                        vsr.StatusDescription = ext.Esito.VerifySignatureResult.StatusDescription;
-                        vsr.StatusCode = ext.Esito.VerifySignatureResult.StatusCode;
-                    }
-                }    
-            }
-            catch (Exception e)
-            {
-                if (vsr.CRLOnlineCheck == false)
-                    vsr.StatusCode = -100;  //problemi a raggiungere il server
-                else
-                    vsr.StatusCode = -1;
-
-                vsr.StatusDescription = e.Message;
-                ErrorMessageLst.Add(vsr.StatusDescription);
-                logger.Debug("eccezione in verify External: " + e.Message);
-            }
-
-            #endregion
-            vsr.FinalDocumentName = fileDoc.name;
-            if (ErrorMessageLst != null)
-                vsr.ErrorMessages = ErrorMessageLst.ToArray();
-            return vsr;
-        }
-
-        private string GetKeySubjectInfo(DocsPaVO.documento.SubjectInfo si)
-        {
-            return string.Format("{0}§{1}", si.CertId.ToUpper(), si.CommonName.ToUpper());
-        }
-
-        private List<DocsPaVO.documento.SignerInfo> ExtractSignersXml(byte[] content)
-        {
-            List<DocsPaVO.documento.SignerInfo> siList = new List<DocsPaVO.documento.SignerInfo>();
-
-            XmlDocument xmlfile = new XmlDocument();
-            xmlfile.PreserveWhitespace = true;
-            XmlTextReader tr = new XmlTextReader(new System.IO.MemoryStream(content));
-            tr.XmlResolver = null;
-            try
-            {
-                xmlfile.Load(tr);
-                XmlNodeList certificates = xmlfile.GetElementsByTagName("ds:X509Certificate");
-                if (certificates != null && certificates.Count > 0)
-                {
-                    X509Certificate2 cert;
-                    SignedDocument signDoc = new SignedDocument();
-                    for (int i = 0; i<certificates.Count; i++)
-                    {
-                        cert = new X509Certificate2(Convert.FromBase64String(certificates[i].InnerText));
-                        DocsPaVO.documento.SignerInfo signerInfo = signDoc.ExtractSignerInfo(cert);
-                        signerInfo.CertificateInfo.X509Certificate = Convert.FromBase64String(certificates[i].InnerText);
-                        siList.Add(signerInfo);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel metodo ExtractSigners " + e.Message);
-            }
-
-            return siList;
-        }
     }
 }

@@ -501,8 +501,7 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
             String ftpUsername,
             String ftpPassword,
             bool isEnabledPregressi,
-            AcquireFileDelegate acquireDelegate,
-            bool isStampaUnione = false)
+            AcquireFileDelegate acquireDelegate)
         {
             #region Dichiarazione variabili
 
@@ -512,11 +511,6 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
             // Valore booleano utilizzato per indicare la
             // validità dei dati
             bool validParameters = false;
-
-            bool canCreateDocument = true;
-            string msgCanCreateDocument = string.Empty;
-            // La lista di funzioni associate al ruolo
-            Funzione[] functions = null;
 
             // La lista dei problemi rilevati durante le fasi di
             // creazione di un documento
@@ -567,36 +561,6 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
 
                 #endregion
 
-                #region Controllo abilitazione ruolo
-                functions = (Funzione[])role.funzioni.ToArray(typeof(Funzione));
-                switch (protoType)
-                {
-                    case "A":
-                        canCreateDocument = functions.Where(e => e.codice == "DO_NUOVOPROT").FirstOrDefault() != null && functions.Where(e => e.codice == "PROTO_IN").FirstOrDefault() != null;
-                        msgCanCreateDocument = "Ruolo non abilitato alla creazione di documenti in arrivo.";
-                        break;
-                    case "P":
-                        canCreateDocument = functions.Where(e => e.codice == "DO_NUOVOPROT").FirstOrDefault() != null && functions.Where(e => e.codice == "PROTO_OUT").FirstOrDefault() != null;
-                        msgCanCreateDocument = "Ruolo non abilitato alla creazione di documenti in partenza.";
-                        break;
-                    case "I":
-                        canCreateDocument = functions.Where(e => e.codice == "DO_NUOVOPROT").FirstOrDefault() != null && functions.Where(e => e.codice == "PROTO_OWN").FirstOrDefault() != null;
-                        msgCanCreateDocument = "Ruolo non abilitato alla creazione di documenti interni.";
-                        break;
-                }
-                if (!canCreateDocument)
-                {
-                    toReturn = new ImportResult()
-                    {
-                        Outcome = ImportResult.OutcomeEnumeration.KO,
-                        Message = msgCanCreateDocument,
-                        OtherInformation = creationProblems,
-                        Ordinal = documentRowData.OrdinalNumber
-                    };
-                    return toReturn;
-                }
-                #endregion
-
                 #region Controllo validità campi obbligatori
 
                 validParameters = this.CheckDataValidity(documentRowData, isProfilationRequired, isRapidClassificationRequired, out creationProblems);
@@ -614,7 +578,7 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
                     {
                         // Creazione del documento
                         bool fileAcquired;
-                        creationProblems = this.CreateDocument(documentRowData, userInfo, role, out identificationData, serverPath, isGray, isRapidClassificationRequired, ftpAddress, isSmistamentoEnabled, protoType, out docNumber, out idProfile, ftpUsername, ftpPassword, isEnabledPregressi,acquireDelegate,out fileAcquired, isStampaUnione);
+                        creationProblems = this.CreateDocument(documentRowData, userInfo, role, out identificationData, serverPath, isGray, isRapidClassificationRequired, ftpAddress, isSmistamentoEnabled, protoType, out docNumber, out idProfile, ftpUsername, ftpPassword, isEnabledPregressi,acquireDelegate,out fileAcquired);
                         // Aggiunta degli eventuali errori alla lista dei dettagli
                         // del risultato
                         toReturn.OtherInformation.AddRange(creationProblems);
@@ -631,10 +595,6 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
                             }
                             else
                             {
-                                // Alessandro Aiello
-                                // *****
-                                // throw new Exception("File non acquisito, creazione documento annullata");
-                                // ***** FINE
                                 toReturn.Outcome = ImportResult.OutcomeEnumeration.FileNotAcquired;
                                 toReturn.Message = String.Format("Documento creato con successo, ma acquisizione file fallita. {0}.",identificationData);
                             }
@@ -848,7 +808,7 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
         /// <param name="idProfile">Il system id del documento creato</param>
         /// <param name="acquireDelegate">Il delegate che si occupa dell'acquisizione</param>
         /// <returns>La lista dei problemi verificatisi in fase di creazione del documento</returns>
-        protected List<string> CreateDocument(DocumentRowData rowData, InfoUtente userInfo, Ruolo role, out string identificationData, string serverPath, bool isGray, bool isRapidClassificationRequired, string ftpAddress, bool isSmistamentoEnabled, string protoType, out string docNumber, out string idProfile, String ftpUsername, String ftpPassword, bool isEnabledPregressi, AcquireFileDelegate acquireDelegate, out bool fileAcquired, bool isStampaUnione = false)
+        protected List<string> CreateDocument(DocumentRowData rowData, InfoUtente userInfo, Ruolo role, out string identificationData, string serverPath, bool isGray, bool isRapidClassificationRequired, string ftpAddress, bool isSmistamentoEnabled, string protoType, out string docNumber, out string idProfile, String ftpUsername, String ftpPassword, bool isEnabledPregressi,AcquireFileDelegate acquireDelegate,out bool fileAcquired)
         {
             #region Dichiarazione variabili
 
@@ -869,27 +829,6 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
 
             // L'id del titolario
             string titolarioSyd = String.Empty;
-
-
-            // Alessandro Aiello 22/03/2019
-            // ***** I protocolli vengono prima predisposti, in seguito all'acquisizione del file (come previsto dall normativa, verranno protocollati)
-            // ***** INIZIO
-            switch (protoType.ToUpper())
-            {
-                case "A":
-                case "P":
-                case "I":
-                    isGray = false;
-                    if (!isStampaUnione)
-                    {
-                        rowData.Predisposto = true;
-                    }
-                    break;
-            }
-
-            // ***** FINE
-
-            bool isPredisposto = rowData.Predisposto;
 
             // Lista temporanea in cui verranno memorizzati i
             // problemi avvenuti in una delle fasi di creazione del documento
@@ -958,18 +897,10 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
                 throw new Exception("Non è stato rilevato alcun fascicolo in cui classificare il documento. Dato che la classificazione è obbligatoria, non si può procedere alla creazione del documento.");
 
             // 4. Creazione documento, allegato o protocollo
-            if (!isGray && !isPredisposto)
+            if (!isGray)
                 this.ProtocolDocument(schedaDocumento, userInfo, role);
             else
-            {
                 this.CreateGrayDocument(schedaDocumento, userInfo, role);
-                if (isPredisposto)
-                {
-                    this.PredisponiDocumentoAllaProtocollazione(schedaDocumento, userInfo);
-                    schedaDocumento.tipoProto = protoType;
-                }
-                   
-            }
 
             // 5. Acquisizione del file associato al documento, se valorizzato
             fileAcquired = true;
@@ -982,7 +913,6 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
                 // Aggiunta del problema alla lista dei problemi
                 fileAcquired = false;
                 toReturn.Add(e.Message);
-                // rimuovere il documento ed impedire l'acquisizione degli allegati associati
             }
 
             // 6. Fascicolazione
@@ -990,42 +920,6 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
 
             // Aggiunta dei problemi di fascicolazione alla lista dei problemi
             toReturn.AddRange(tempProblems);
-
-
-
-            // Alessandro Aiello 
-            // ***** 25/03/2019
-            // Protocollo i documenti
-            // ***** INIZIO
-            if(!isStampaUnione)
-            {
-                switch (protoType.ToUpper())
-                {
-                    case "A":
-                    case "P":
-                    case "I":
-                        DocsPaDocumentale.Documentale.DocumentManager documentManager = new DocsPaDocumentale.Documentale.DocumentManager(userInfo, "0");
-                        schedaDocumento = BusinessLogic.Documenti.ProtoManager.getDataProtocollo(schedaDocumento);
-                        DocsPaVO.documento.ResultProtocollazione result;
-                        if (!fileAcquired)
-                        {
-                            toReturn.Add("Documento non protocollato perché il file non è stato acquisito");
-                        }
-                        else if (!documentManager.ProtocollaDocumentoPredisposto(schedaDocumento, role, out result))
-                        {
-                            toReturn.Add("Errore nella Protocollazione del documento");
-                        }
-
-                        break;
-                }
-            }
-            
-            // ***** FINE
-
-
-
-
-
 
             // 7. Trasmissione documento
             tempProblems = this.TransmitDocument(schedaDocumento, rowData, userInfo, role, serverPath);
@@ -1044,11 +938,8 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
 
             }
 
-            
-
             // Impostazione delle informazioni sul documento
-            bool grigio = isGray || isPredisposto;
-            identificationData = this.GetIdentificationData(schedaDocumento, grigio);
+            identificationData = this.GetIdentificationData(schedaDocumento, isGray);
 
             // Impostazione del docNumber
             docNumber = schedaDocumento.docNumber;
@@ -1067,23 +958,6 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
         /// <param name="schedaDocumento">La scheda documento con le informazioni sul documento o allegato da creare</param>
         /// <param name="userInfo">Le informazioni sull'utente che ha lanciato la procedura</param>
         /// <param name="role">Il ruolo dell'utente che ha lanciato la procedura</param>
-        private void PredisponiDocumentoAllaProtocollazione(SchedaDocumento schedaDocumento, InfoUtente userInfo)
-        {
-
-            try
-            {
-                // Creazione del documento grigio
-                schedaDocumento = DocSave.predisponiAllaProtocollazione(
-                    userInfo,
-                    schedaDocumento);
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Errore durante la fase di creazione del documento grigio.");
-            }
-
-        }
-
         private void CreateGrayDocument(SchedaDocumento schedaDocumento, InfoUtente userInfo, Ruolo role)
         {
 
@@ -1510,7 +1384,7 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
 
         }
 
-        protected void AcquireFile(DocumentRowData rowData, InfoUtente userInfo, Ruolo role, bool isSmistamentoEnabled, SchedaDocumento schedaDocumento, string ftpAddress, String ftpUsername, String ftpPassword)
+        protected void AcquireFile(DocumentRowData rowData, InfoUtente userInfo, Ruolo role, bool isSmistamentoEnabled,SchedaDocumento schedaDocumento, string ftpAddress, String ftpUsername, String ftpPassword)
         {
             if (String.IsNullOrEmpty(rowData.Pathname)) return;
             #region Dichiarazione Variabili
@@ -1531,25 +1405,14 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
             try
             {
                 // Apertura, lettura e chiusura del file
-                //fileContent = ImportUtils.DownloadFileFromFTP(
-                //    ftpAddress,
-                //    String.Format("{0}/{1}/{2}",
-                //        rowData.AdminCode,
-                //        userInfo.userId,
-                //        rowData.Pathname),
-                //    ftpUsername,
-                //    ftpPassword);
-
-                // nuova versione, i file vengono presi in locale e caricati dagli utenti in locale nella procedura di import
-
-                if(schedaDocumento.documentoPrincipale == null)
-                {
-                    fileContent = ImportUtils.DounloadFileFromUserTempFolder(rowData, userInfo);
-                }
-                else
-                {
-                    fileContent = ImportUtils.DounloadFileFromUserTempFolder(rowData, userInfo, true);
-                }
+                fileContent = ImportUtils.DownloadFileFromFTP(
+                    ftpAddress,
+                    String.Format("{0}/{1}/{2}",
+                        rowData.AdminCode,
+                        userInfo.userId,
+                        rowData.Pathname),
+                    ftpUsername,
+                    ftpPassword);
 
             }
             catch (Exception e)

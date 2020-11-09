@@ -52,8 +52,8 @@ namespace Amministrazione.UserControl
 
         protected System.Web.UI.HtmlControls.HtmlInputHidden hd_sblocca_doc_stato_finale;
         protected System.Web.UI.HtmlControls.HtmlInputHidden hd_gestione_pregressi;
-
         protected System.Web.UI.HtmlControls.HtmlInputHidden hd_gestione_struttura_sottofascicoli;
+        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_scarico_RDE;
 
 
         protected DocsPAWA.DocsPaWR.InfoUtenteAmministratore _datiAmministratore = null;
@@ -226,15 +226,6 @@ namespace Amministrazione.UserControl
                 {
                     this.hd_gestione_sistemi_esterni.Value = "0";
                 }
-
-                if (string.IsNullOrEmpty(DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_PROJECT_LEVEL")) || DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_PROJECT_LEVEL") == "0")
-                {
-                    this.hd_gestione_struttura_sottofascicoli.Value = "0";
-                }
-                else
-                {
-                    this.hd_gestione_struttura_sottofascicoli.Value = "1";
-                }
             }
 		}
 
@@ -399,7 +390,7 @@ namespace Amministrazione.UserControl
 
                         this.hd_gestione_struttura_sottofascicoli.Value = this.isAttivo("STRUTTURE FASCICOLI");
 
-
+                        this.hd_scarico_RDE.Value = this.isAttivo("SCARICO RDE");
 
         }
 

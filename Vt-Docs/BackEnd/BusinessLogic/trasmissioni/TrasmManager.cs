@@ -1548,23 +1548,6 @@ namespace BusinessLogic.Trasmissioni
             //trasmissione = BusinessLogic.Trasmissioni.TrasmManager.saveTrasmMethod(trasmissione);
             //BusinessLogic.Trasmissioni.ExecTrasmManager.executeTrasmMethod(
             trasmissione = ExecTrasmManager.saveExecuteTrasmMethod(serverPath, trasmissione);
-            string notify = "1";
-            if (trasmissione.NO_NOTIFY != null && trasmissione.NO_NOTIFY.Equals("1"))
-            {
-                notify = "0";
-            }
-            if (trasmissione != null)
-            {
-                if (trasmissione.infoFascicolo != null && !string.IsNullOrEmpty(trasmissione.infoFascicolo.idFascicolo))
-                {
-                    foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in trasmissione.trasmissioniSingole)
-                    {
-                        string method = "TRASM_FOLDER_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
-                        string desc = "Trasmesso Fascicolo ID: " + trasmissione.infoFascicolo.idFascicolo.ToString();
-                        BusinessLogic.UserLog.UserLog.WriteLog(trasmissione.utente.userId, trasmissione.utente.idPeople, trasmissione.ruolo.idGruppo, trasmissione.utente.idAmministrazione, method, trasmissione.infoFascicolo.idFascicolo, desc, DocsPaVO.Logger.CodAzione.Esito.OK, infoUtente.delegato, notify, single.systemId);
-                    }
-                }
-            }
             return true;
 
         }
@@ -1851,7 +1834,6 @@ namespace BusinessLogic.Trasmissioni
                     newRagioneTrasm = new DocsPaVO.trasmissione.RagioneTrasmissione();
                     newRagioneTrasm.tipo = rowTX["cha_tipo_ragione"].ToString();
                     newRagioneTrasm.systemId = rowTX["id_ragione"].ToString();
-                    newRagioneTrasm.azioneRichiesta = rowTX["CHA_PROC_RES"].ToString();
 
                     if (setEredita == "1")
                     {
@@ -1936,29 +1918,6 @@ namespace BusinessLogic.Trasmissioni
         }
 
         #region Metodi per la gestione dell'accettazione massiva di documenti e fascicoli in To do list
-
-        public static DocsPaVO.amministrazione.EsitoOperazione AccettazioneMassivaInTdl_SP(string idGruppo, string idCorrBlobaliRuolo, string note)
-        {
-            DocsPaVO.amministrazione.EsitoOperazione retVal = new DocsPaVO.amministrazione.EsitoOperazione();
-            bool result = false;
-            string message = string.Empty;
-
-            DocsPaDB.Query_DocsPAWS.Trasmissione trasm = new DocsPaDB.Query_DocsPAWS.Trasmissione();
-            using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
-            {
-                result = trasm.AccettazioneMassivaInTdl_SP(idGruppo, idCorrBlobaliRuolo, note);
-                if (result)
-                    transactionContext.Complete();
-                else
-                    transactionContext.Dispose();
-            }
-
-            // Costruzione e restituzione dell'esito
-            retVal.Codice = result ? 0 : -1;
-            retVal.Descrizione = message.ToString();
-
-            return retVal;
-        }
 
         /// <summary>
         /// Metodo per l'accettazione massiva di trasmissioni presenti nella to do list
@@ -2380,7 +2339,7 @@ namespace BusinessLogic.Trasmissioni
             {
                 trasmissioneSingola.tipoDest = DocsPaVO.trasmissione.TipoDestinatario.RUOLO;
                 //DocsPaVO.utente.Corrispondente[] listaUtenti = queryUtenti(corr);
-                ArrayList listaUtenti = queryUtenti(corr);
+               // ArrayList listaUtenti = queryUtenti(corr);
                 //if (listaUtenti.Length == 0)
                 if (destinatari.UTENTI_NOTIFICA.Count == 0)
                     trasmissioneSingola = null;
@@ -2393,19 +2352,7 @@ namespace BusinessLogic.Trasmissioni
                     DocsPaVO.trasmissione.TrasmissioneUtente trasmissioneUtente = new DocsPaVO.trasmissione.TrasmissioneUtente();
                     DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm utTemp = new DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm();
                     utTemp = (DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm)destinatari.UTENTI_NOTIFICA[i];
-                    if (listaUtenti != null && listaUtenti.Count > 0)
-                    {
-                        for (int j = 0; j < listaUtenti.Count; j++)
-                        {
-                            if (utTemp.ID_PEOPLE == ((DocsPaVO.utente.Utente)listaUtenti[j]).idPeople)
-                                trasmissioneUtente.utente = (DocsPaVO.utente.Utente)listaUtenti[j];
-                        }
-                    }
-                    else
-                    {
-                        // non riesce a prendere la notifica via mail
-                        trasmissioneUtente.utente = Utenti.UserManager.getUtenteById(utTemp.ID_PEOPLE);
-                    }
+                    trasmissioneUtente.utente = Utenti.UserManager.getUtenteById(utTemp.ID_PEOPLE);
                     //trasmissioneSingola.trasmissioneUtente = TrasmManager.addTrasmissioneUtente(trasmissioneSingola.trasmissioneUtente, trasmissioneUtente);
                     trasmissioneSingola.trasmissioneUtente.Add(trasmissioneUtente);
                 }
@@ -2542,122 +2489,6 @@ namespace BusinessLogic.Trasmissioni
             {
                 return trasmDb.GetLastTrasmTypeForDocument(documentId);
             }
-        }
-
-        public static List<DocsPaVO.trasmissione.InfoTrasmissione> GetTrasmissioniPendentiConWorkflow(string idDocOrFasc, string docOrFasc, string idRuoloInUO, string idPeople, out List<string> idTrasmsSingola, ref DocsPaVO.ricerche.SearchPagingContext pagingContext)
-        {
-            idTrasmsSingola = new List<string>();
-            DocsPaDB.Query_DocsPAWS.Trasmissione trasm = new DocsPaDB.Query_DocsPAWS.Trasmissione();
-            return trasm.GetTrasmissioniPendentiConWorkflow(idDocOrFasc, docOrFasc, idRuoloInUO, idPeople, out idTrasmsSingola, ref pagingContext);
-        }
-
-        public static bool AcceptMassiveTrasmDocument(string idProfile, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            DocsPaDB.Query_DocsPAWS.Trasmissione trasm = new DocsPaDB.Query_DocsPAWS.Trasmissione();
-            try
-            {
-                List<string> idTrasmsSingola = new List<string>();
-                trasm.CountTrasmissioniPendentiConWorkflow(idProfile, "D", ruolo.systemId, infoUtente.idPeople, out idTrasmsSingola);
-                if(idTrasmsSingola != null && idTrasmsSingola.Count() > 0)
-                {
-                    result = AcceptTransmissions(idTrasmsSingola, string.Empty, ruolo, infoUtente);
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in AcceptMassiveTrasmDocument " + e);
-                result = false;
-            }
-            return result;
-        }
-
-        public static bool ViewMassiveTrasmDocument(string idProfile, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
-            try
-            {
-                doc.SetDataVistaSP_TASTOVISTO(infoUtente, idProfile, "D");
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in ViewMassiveTrasmDocument " + e);
-                result = false;
-            }
-            return result;
-        }
-
-        public static bool ViewMassiveTrasmFasc(string idProject, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
-            try
-            {
-                doc.SetDataVistaSP_TASTOVISTO(infoUtente, idProject, "F");
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in ViewMassiveTrasmFasc " + e);
-                result = false;
-            }
-            return result;
-        }
-
-        public static bool AcceptMassiveTrasmFasc(string idProject, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            DocsPaDB.Query_DocsPAWS.Trasmissione trasm = new DocsPaDB.Query_DocsPAWS.Trasmissione();
-            try
-            {
-                List<string> idTrasmsSingola = new List<string>();
-                trasm.CountTrasmissioniPendentiConWorkflow(idProject, "F", ruolo.systemId, infoUtente.idPeople, out idTrasmsSingola);
-                if (idTrasmsSingola != null && idTrasmsSingola.Count() > 0)
-                {
-                    result = AcceptTransmissions(idTrasmsSingola, string.Empty, ruolo, infoUtente);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in AcceptMassiveTrasmDocument " + e);
-                result = false;
-            }
-            return result;
-        }
-
-        public static bool AcceptTransmissions(List<string> idTrasmSingole, string noteAccettazione, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            string errore = string.Empty;
-            string mode;
-            string idObj;
-            string msg;
-            try
-            {
-                DocsPaVO.utente.Utente utente = null;
-                string idUtente = infoUtente.idPeople;
-                utente = BusinessLogic.Utenti.UserManager.getUtenteById(idUtente);
-                foreach (string idSingola in idTrasmSingole)
-                {
-                    DocsPaVO.trasmissione.TrasmissioneUtente[] trasmissioneUtenteInRuolo = BusinessLogic.Trasmissioni.TrasmManager.getTrasmissioneUtenteInRuolo(infoUtente, idSingola, utente);
-
-                    trasmissioneUtenteInRuolo[0].dataAccettata = DocsPaDbManagement.Functions.Functions.GetDate(); 
-                    trasmissioneUtenteInRuolo[0].noteAccettazione = noteAccettazione;
-                    trasmissioneUtenteInRuolo[0].tipoRisposta = DocsPaVO.trasmissione.TipoRisposta.ACCETTAZIONE;
-
-                    string idTrasmissione = BusinessLogic.Trasmissioni.TrasmManager.GetIdTrasmissioneByIdTrasmSingola(idSingola);
-                    if (!BusinessLogic.Trasmissioni.ExecTrasmManager.executeAccRifMethod(trasmissioneUtenteInRuolo[0], idTrasmissione, ruolo, infoUtente, out errore, out mode, out idObj))
-                    {
-                        result = false;
-                        logger.Error("Errore in AcceptTransmissions con idTrasmSingola " + idSingola + "; Errore: " + errore);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in AcceptTransmissions " + e);
-            }
-            return result;
         }
 
     }

@@ -110,3 +110,4 @@ PARAMETER_FILEINUP_MISSING=Il parametro FileInUpload della request risulta esser
 FILE_NOT_EXIST=File non trovato nel database
 TEMPLATE_NOT_FOUND=Tipologia fascicolo inesistente
 MISSING_FILE_CONTENT=File non presente
+INVALID_PARAMETER=Parametro non valido

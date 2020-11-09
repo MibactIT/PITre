@@ -583,16 +583,31 @@ namespace DocsPaDB.Query_DocsPAWS
         {
             bool first = true;
             StringBuilder query = new StringBuilder();
-            foreach (var corr in corrs)
+            Query q = null;
+            if (dbType.ToUpper().Equals("SQL"))
             {
-                Query q = InitQuery.getInstance().getQuery("S_CORR_IDS_BY_ID");
-                q.setParam("corrCode", corr);
-                query.AppendFormat("{0} {1}",
-                    first ? String.Empty : " union ",
-                    q.getSQL());
-                first = false;
+                string listCorr = string.Empty;
+                q = InitQuery.getInstance().getQuery("S_CORR_IDS_BY_ID");
+                foreach (var corr in corrs)
+                {
+                    listCorr += first ? "'" + corr + "'" : ",'" + corr + "'";
+                    first = false;
+                }
+                q.setParam("corrCode", listCorr);
+                query.Append(q.getSQL());
             }
-
+            else
+            {
+                foreach (var corr in corrs)
+                {
+                    q = InitQuery.getInstance().getQuery("S_CORR_IDS_BY_ID");
+                    q.setParam("corrCode", corr);
+                    query.AppendFormat("{0} {1}",
+                        first ? String.Empty : " union ",
+                        q.getSQL());
+                    first = false;
+                }
+            }
             return query.ToString();
         }
 

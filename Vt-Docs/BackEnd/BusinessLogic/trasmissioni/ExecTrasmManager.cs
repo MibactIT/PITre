@@ -968,7 +968,7 @@ namespace BusinessLogic.Trasmissioni
                     bodyMail = bodyMail.Replace("NOTE_IND", "---------");
                 }
 
-                if (!string.IsNullOrEmpty(trasm.infoDocumento.segnatura)) // solo per i protocolli metto la segnatura
+                if (trasm.infoDocumento.segnatura != null) // solo per i protocolli metto la segnatura
                 {
                     bodyMail = bodyMail.Replace("SEGN_ID_DOC", "<B>" + trasm.infoDocumento.segnatura + "</B>");
                 }
@@ -1516,6 +1516,7 @@ namespace BusinessLogic.Trasmissioni
                     string modo = string.Empty;
 
                     DocsPaVO.trasmissione.TrasmissioneSingola trasmsingola = getTrasmSingola(objTrasmUtente);
+
                     if (!TrasmManager.checkTrasm_UNO_TUTTI_AccettataRifiutata(trasmsingola))
                     {
                         errore = "La Trasmissione risulta già ACCETTATA/RIFIUTATA";
@@ -1651,20 +1652,9 @@ namespace BusinessLogic.Trasmissioni
                                         {
                                             string dateInterruption = DateTime.Now.ToString();
                                             string interrottoDa = "T"; //Titolare
-                                            libroFirma.InterruptionSignatureProcess(e.IdIstanzaProcesso, DocsPaVO.LibroFirma.TipoStatoProcesso.STOPPED, e.InfoDocumento.Docnumber, objTrasmUtente.noteRifiuto, dateInterruption, interrottoDa, infoUtente);
+                                            libroFirma.InterruptionSignatureProcess(e.IdIstanzaProcesso, DocsPaVO.LibroFirma.TipoStatoProcesso.STOPPED, e.InfoDocumento.Docnumber, objTrasmUtente.noteRifiuto, dateInterruption, interrottoDa);
                                             libroFirma.UpdateStatoIstanzaPasso(e.IdIstanzaPasso, e.InfoDocumento.VersionId, DocsPaVO.LibroFirma.TipoStatoPasso.STUCK.ToString(), infoUtente, dateInterruption);
 
-                                            BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirma(e.IdIstanzaProcesso, e.InfoDocumento.Docnumber, "Interruzione del processo di firma", infoUtente);
-                                            //Verifico se è stato avviato dal passaggio di stato, in caso torno allo stato precedente
-                                            DocsPaVO.DiagrammaStato.Stato statoDiagramma = BusinessLogic.DiagrammiStato.DiagrammiStato.getStatoDoc(e.InfoDocumento.Docnumber);
-                                            if (!string.IsNullOrEmpty(statoDiagramma.ID_PROCESSO_FIRMA))
-                                            {
-                                                DocsPaDB.Query_DocsPAWS.DiagrammiStato diag = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                                                DocsPaVO.DiagrammaStato.Stato statoDiagrammaPrecedente = diag.GetStatoDocPrecedente(e.InfoDocumento.Docnumber);
-                                                DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = diag.getDiagrammaById(Convert.ToString(statoDiagrammaPrecedente.ID_DIAGRAMMA));
-                                                BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStatoDiagrammaDoc(statoDiagrammaPrecedente, diagramma, e.InfoDocumento.Docnumber, infoUtente);
-                                            }
-                                            
                                             msg = "Interruzione del processo di firma per il file " + e.InfoDocumento.Docnumber;
                                             varMetodo = string.IsNullOrEmpty(e.InfoDocumento.IdDocumentoPrincipale) ? "INTERROTTO_PROCESSO_DOCUMENTO_DAL_TITOLARE" : "INTERROTTO_PROCESSO_ALLEGATO_DAL_TITOLARE";
                                             BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, ruolo.idGruppo, infoUtente.idAmministrazione, varMetodo, e.InfoDocumento.Docnumber, msg, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1", null, dateInterruption);
@@ -1707,9 +1697,52 @@ namespace BusinessLogic.Trasmissioni
                         // Individuo eventuali ragioni che prevedano il cambio stato del fascicolo trasmesso
                         if (!string.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ENABLE_PORTALE_PROCEDIMENTI")) && !DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ENABLE_PORTALE_PROCEDIMENTI").Equals("0"))
                         {
-                            if (trasm.tipoOggetto == DocsPaVO.trasmissione.TipoOggetto.FASCICOLO && objTrasmUtente.tipoRisposta == DocsPaVO.trasmissione.TipoRisposta.ACCETTAZIONE)
+                            if (trasm.tipoOggetto == DocsPaVO.trasmissione.TipoOggetto.FASCICOLO)
                             {
-                                BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoProcedimento(trasm.infoFascicolo.idFascicolo, "ACCETTAZIONE", trasmsingola.ragione.systemId, infoUtente);
+                                if (objTrasmUtente.tipoRisposta == DocsPaVO.trasmissione.TipoRisposta.ACCETTAZIONE)
+                                {
+                                    //BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoProcedimento(trasm.infoFascicolo.idFascicolo, "ACCETTAZIONE", trasmsingola.ragione.systemId, infoUtente);
+                                    BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoAutomatico(trasm.infoFascicolo.idFascicolo, "ACCETTAZIONE", infoUtente, string.Empty, trasmsingola.ragione.systemId);
+                                }
+                                else
+                                {
+                                    BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoAutomatico(trasm.infoFascicolo.idFascicolo, "RIFIUTO", infoUtente, string.Empty, trasmsingola.ragione.systemId);
+                                }
+                            }
+                            else
+                            {
+                                ArrayList listaFasc = Fascicoli.FascicoloManager.getFascicoliDaDocNoSecurity(infoUtente, trasm.infoDocumento.idProfile);
+                                DocsPaVO.Procedimento.Procedimento proc = null;
+                                string idProcedimento = string.Empty;
+                                if(listaFasc != null && listaFasc.Count > 0)
+                                {
+                                    foreach (DocsPaVO.fascicolazione.Fascicolo fasc in listaFasc)
+                                    {
+                                        proc = new DocsPaVO.Procedimento.Procedimento();
+                                        proc = Procedimenti.ProcedimentiManager.GetProcedimentoByIdFascicolo(fasc.systemID);
+                                        if (proc != null && proc.Id == fasc.systemID)
+                                        {
+                                            idProcedimento = fasc.systemID;
+                                            break;
+                                        }
+                                    }
+                                    if (string.IsNullOrEmpty(idProcedimento))
+                                    {
+                                        proc = null;
+                                    }
+                                }
+
+                                if(proc != null)
+                                {
+                                    if (objTrasmUtente.tipoRisposta == DocsPaVO.trasmissione.TipoRisposta.ACCETTAZIONE)
+                                    {
+                                        BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoAutomatico(proc.Id, "ACCETTAZIONE", infoUtente, string.Empty, trasmsingola.ragione.systemId);
+                                    }
+                                    else
+                                    {
+                                        BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoAutomatico(proc.Id, "RIFIUTO", infoUtente, string.Empty, trasmsingola.ragione.systemId);
+                                    }
+                                }
                             }
                         }
 
@@ -1730,33 +1763,6 @@ namespace BusinessLogic.Trasmissioni
             }
             logger.Info("END");
             return retValue;
-        }
-
-        /// <summary>
-        /// Verifica se è possibile estendere la visibilità del documento
-        /// </summary>
-        /// <param name="infoDoc"></param>
-        /// <param name="ragione"></param>
-        /// <returns></returns>
-        private static bool CheckEstendiVisibilitaGerarchica(InfoDocumento infoDoc, DocsPaVO.trasmissione.RagioneTrasmissione ragione)
-        {
-            bool estendi = true;
-            try
-            {
-                //Se il documento è marcato come privato e la ragione è di tipo libro firma non estendo la visibilità
-                if (infoDoc.privato.Equals("1") && IsRagioneDiLibroFirma(ragione))
-                    estendi = false;
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore nel metodo CheckEstendiVisibilitaGerarchica: " + e.Message);
-            }
-            return estendi;
-        }
-
-        private static bool IsRagioneDiLibroFirma(DocsPaVO.trasmissione.RagioneTrasmissione ragione)
-        {
-            return !string.IsNullOrEmpty(ragione.azioneRichiesta);
         }
 
         /// <summary>
@@ -2429,9 +2435,7 @@ namespace BusinessLogic.Trasmissioni
             {
                 DocsPaVO.trasmissione.TrasmissioneSingola currentTrasmissione = (DocsPaVO.trasmissione.TrasmissioneSingola)objTrasm.trasmissioniSingole[i];
                 logger.Debug("Query relative all'idObj " + idObj);
-                if (!CheckEstendiVisibilitaGerarchica(objTrasm.infoDocumento, currentTrasmissione.ragione))
-                    estendeVisibilitaGerarchica = false;
-                
+
                 ArrayList queryObj = getQueryTrasm(idObj, objTrasm, currentTrasmissione, false, estendeVisibilitaGerarchica, ref ruoliSuperiori);
 
                 for (int j = 0; j < queryObj.Count; j++)
@@ -2803,15 +2807,6 @@ namespace BusinessLogic.Trasmissioni
                     //
                     //      Fase 2 - la trasmissione prevedeva Workflow ed è stata accettata in un secondo momento: ora si estendere SOLO la visibilità gerarchica
                     //
-
-                    //Caso anomalia IS per cui estraeva i ruoli storicizzati, in questo caso la uo era nulla e quindi estendeva la visibilità a tutti i ruoli. Quindi se la UO è null non estendo
-                    /*
-                    if (currentTrasmissione != null && currentTrasmissione.corrispondenteInterno != null && currentTrasmissione.corrispondenteInterno.GetType() == typeof(DocsPaVO.utente.Ruolo))
-                    {
-                        if (((DocsPaVO.utente.Ruolo)currentTrasmissione.corrispondenteInterno).uo == null)
-                            estendeVisibilitaGerarchica = false;
-                    }
-                    */
                     if (estendeVisibilitaGerarchica)
                     {
                         // FASE 2                   

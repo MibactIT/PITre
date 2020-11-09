@@ -17,7 +17,6 @@ namespace DocsPaVO.trasmissione
         { }
 
         public string IdTrasmissione = string.Empty;
-        public string idTrasmSingola = string.Empty;
         public string IdRuolo = string.Empty;
         public string Ruolo = string.Empty;
         public string IdUtente = string.Empty;

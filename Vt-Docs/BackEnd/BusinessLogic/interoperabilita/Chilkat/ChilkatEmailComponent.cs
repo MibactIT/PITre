@@ -3,8 +3,6 @@ using System.Collections;
 using System.IO;
 using Chilkat;
 using log4net;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace BusinessLogic.Interoperabilità 
 {
@@ -194,6 +192,7 @@ namespace BusinessLogic.Interoperabilità
 
         public bool salvaMailInLocale(int indexMail, string pathFile, string NomeDellaMail)
         {
+            logger.Info("salvaMailInLocale con index > START " + indexMail);
             bool retval = false;
             try
             {
@@ -201,21 +200,27 @@ namespace BusinessLogic.Interoperabilità
                 logger.Debug("NomeDellaMail: " + NomeDellaMail);
 
                 indexMail--;
-
+                logger.Info("mbx.GetEmail(indexMail) > START " + indexMail);
                 Email msgComponent = mbx.GetEmail(indexMail);
+                logger.Info("mbx.GetEmail(indexMail) > END " + indexMail);
 
                 object eml = null;
                 if (msgComponent != null)
                 {
                     if (this.clientType == CMClientType.POP)
                     {
+                        logger.Info("mm.FetchMime(uidl) - POP - index > START " + indexMail);
                         //il Fetch da Pop Torna Byte[]
                         eml = mm.FetchMime(msgComponent.Uidl);
+                        logger.Info("mm.FetchMime(uidl) - POP - index > END " + indexMail);
                     }
                     else
                     {
+
+                        logger.Info("FetchSingleAsMime(msgComponent.GetImapUid(), true) - IMAP > START " + indexMail);
                         //il fetch da IMAP torna stringa
                         eml = imap.FetchSingleAsMime(msgComponent.GetImapUid(), true);
+                        logger.Info("FetchSingleAsMime(msgComponent.GetImapUid(), true) - IMAP > END  " + indexMail);
                     }
                     if (eml != null)
                     {
@@ -224,14 +229,19 @@ namespace BusinessLogic.Interoperabilità
                             if (eml.GetType() == typeof(String))
                             {
                                 //Imap
+                                logger.Info("File.WriteAllText - IMAP - index > START " + indexMail);
                                 File.WriteAllText(@pathFile + "\\" + NomeDellaMail, (String)eml);
+                                logger.Info("File.WriteAllText - IMAP - index > END " + indexMail);
                             }
                             else
                             {
                                 //Pop
+                                logger.Info("File.WriteAllText - POP - index > START " + indexMail);
                                 File.WriteAllBytes(@pathFile + "\\" + NomeDellaMail, (byte[])eml);
+                                logger.Info("File.WriteAllText - POP - index > END " + indexMail);
                             }
                             retval = true;
+                            logger.Info("salvaMailInLocale con index > START " + indexMail);
                         }
                         catch (Exception e)
                         {
@@ -275,6 +285,7 @@ namespace BusinessLogic.Interoperabilità
 
                 Email msgComponent = mbx.GetEmail(index);
 
+
                 if ((msgComponent.ReceivedSigned) && (!msgComponent.SignaturesValid))
                     return false;
 
@@ -307,7 +318,8 @@ namespace BusinessLogic.Interoperabilità
 
         public CMMsg getMessage(int index)
         {
-
+            logger.Info("getMessage(int index) > START");
+            DateTime _dataIn = DateTime.Now;
 
             if (this.clientType == CMClientType.POP)
             {
@@ -325,8 +337,14 @@ namespace BusinessLogic.Interoperabilità
             {
                 if ((this.clientType == CMClientType.POP) && !mm.VerifyPopConnection())
                     throw new Exception("(connerr)errore di connessione alla casella pop: " + mm.LastErrorText);
-
+                logger.Info("getMessage(int index) - GetEmail - POP > START");
                 Email msgComponent = mbx.GetEmail(index);
+                logger.Info("getMessage(int index) - GetEmail - POP > END");
+                if (msgComponent == null)
+                {
+                    logger.Error("msgComponent = null");
+                    throw new Exception("Fallito GetEmail di Chilkat (index)");
+                }
                 logger.Debug("MAIL FIRMA " + msgComponent.ReceivedSigned);
                 logger.Debug("FIRMA VALIDA " + msgComponent.SignaturesValid);
                 if ((msgComponent.ReceivedSigned) && (!msgComponent.SignaturesValid))
@@ -341,7 +359,14 @@ namespace BusinessLogic.Interoperabilità
             }
             catch (Exception exc)
             {
+                logger.Error("getMessage(id) - Errore nel recupero della mail dal server" + server + ", messaggio:" + exc.Message, exc);
                 throw new Exception(String.Format("Errore nel recupero della mail dal server [{0}]. {1}", server, exc.Message));
+            }
+            finally
+            {
+                logger.Info("getMessage(int index) > END");
+                TimeSpan _duration = DateTime.Now.Subtract(_dataIn);
+                logger.Warn("Durata getMessage: " + _duration.ToString());
             }
         }
 
@@ -349,6 +374,7 @@ namespace BusinessLogic.Interoperabilità
 
         public CMMsg getMessage(string uidl)
         {
+            logger.Info("GetMessage chilkatEmailComponent -> START");
 
             if (this.clientType == CMClientType.POP)
             {
@@ -367,14 +393,24 @@ namespace BusinessLogic.Interoperabilità
                     throw new Exception("(connerr)errore di connessione alla casella pop: " + mm.LastErrorText);
 
                 Email msgComponent = null;
+                logger.Info("uidl: " + uidl);
                 if (this.clientType == CMClientType.POP)
                 {
+                    logger.Info("mm.FetchEmail(uidl) - getMessage(uidl) - POP > START");
                     msgComponent = mm.FetchEmail(uidl);
+                    logger.Info("mm.FetchEmail(uidl) - getMessage(uidl) - POP > END");
                 }
                 else if (this.clientType == CMClientType.IMAP)
                 {
                     int uid = Convert.ToInt32(uidl);
+                    logger.Info("imap.FetchSingle(uid, true) - getMessage(uidl) - IMAP > START");
                     msgComponent = imap.FetchSingle(uid, true);
+                    logger.Info("imap.FetchSingle(uid, true) - getMessage(uidl) - IMAP > END");
+                }
+                if (msgComponent == null)
+                {
+                    logger.Error("msgComponent getemail(uidl) = null");
+                    throw new Exception("Fallito GetEmail di Chilkat (uidl)");
                 }
                 logger.Debug("MAIL FIRMA " + msgComponent.ReceivedSigned);
                 logger.Debug("FIRMA VALIDA " + msgComponent.SignaturesValid);
@@ -390,55 +426,87 @@ namespace BusinessLogic.Interoperabilità
             }
             catch (Exception exc)
             {
+                logger.Error("getMessage(uidl) - Errore nel recupero della mail dal server " + server + ", messaggio:" + exc.Message, exc);
                 throw new Exception(String.Format("Errore nel recupero della mail dal server [{0}]. {1}", server, exc.Message));
             }
+            logger.Info("GetMessage chilkatEmailComponent -> END");
         }
 
 
         public string[] getUidls()
         {
-            string[] list;
-            if (this.clientType == CMClientType.POP)
+            logger.Info("getUidls chilkatEmailComponent -> START");
+            string[] list = new string[] { };
+            try
             {
-                Chilkat.StringArray uidls = mbx.GetUidls();
-                int n = uidls.Count;
-                list = new string[n];
 
-                for (int i = 0; i <= uidls.Count - 1; i++)
+                if (this.clientType == CMClientType.POP)
                 {
-                    list[i] = uidls.GetString(i);
-                }
-            }
-            else
-            {
-                Chilkat.MessageSet uids= imap.GetAllUids();
-                ArrayList tmp = new ArrayList();
-                for (int i = 0; i <= uids.Count - 1; i++)
-                {
-                    int id = uids.GetId(i);
-                    logger.Debug("ID mail: " + id);
-                    Email mail = imap.FetchSingle(uids.GetId(i), true);
-                    if (mail == null)
+                    logger.Info("mbx.GetUidls() - POP > START");
+                    Chilkat.StringArray uidls = mbx.GetUidls();
+                    logger.Info("mbx.GetUidls() - POP > END");
+                    if (uidls == null)
                     {
-                        logger.Debug("L'oggetto mail è NULL");
-                        //Se torna null esegue lo scarico usando l'indice e non l'id
-                        return null;
+                        logger.Error("uidls = null");
+                        throw new Exception("Fallito Getuidls di Chilkat (uidls) - uilds = null");
                     }
-                    else
-                        logger.Debug("L'oggetto mail non è NULL");
-                    if (InteroperabilitaUtils.CheckId(mail.GetHeaderField("message-id"), user, regId))
-                        tmp.Add(uids.GetId(i).ToString());
+                    if (uidls.Count == 0)
+                    {
+                        logger.Error("uidls vuota");
+                        throw new Exception("Fallito Getuidls di Chilkat (uidls) -uidls vuoto");
+                    }
+                    int n = uidls.Count;
+                    list = new string[n];
 
+                    for (int i = 0; i <= uidls.Count - 1; i++)
+                    {
+                        list[i] = uidls.GetString(i);
+                    }
                 }
-                list = (string[])tmp.ToArray(typeof(string));
-            }
+                else
+                {
+                    logger.Info("imap.GetAllUids() - IMAP > START");
+                    Chilkat.MessageSet uids = imap.GetAllUids();
+                    logger.Info("imap.GetAllUids() - IMAP > END");
+                    ArrayList tmp = new ArrayList();
+                    for (int i = 0; i <= uids.Count - 1; i++)
+                    {
+                        int id = uids.GetId(i);
+                        logger.Info("imap.FetchSingle(uids.GetId(i), true) - IMAP > START");
+                        logger.Debug("ID mail: " + id);
+                        logger.Info("imap.FetchSingle(uids.GetId(i), true) - IMAP > END");
+                        Email mail = imap.FetchSingle(uids.GetId(i), true);
+                        if (mail == null)
+                        {
+                            logger.Debug("L'oggetto mail è NULL");
+                            //Se torna null esegue lo scarico usando l'indice e non l'id
+                            return null;
+                        }
+                        else
+                            logger.Debug("L'oggetto mail non è NULL");
+                        if (InteroperabilitaUtils.CheckId(mail.GetHeaderField("message-id"), user, regId))
+                        {
+                            logger.Info("uids.GetId(i).ToString() > START");
+                            tmp.Add(uids.GetId(i).ToString());
+                            logger.Info("uids.GetId(i).ToString() > END");
+                        }
 
+                    }
+                    list = (string[])tmp.ToArray(typeof(string));
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("exception getUidls chilkatEmailComponent: " + ex.Message);
+            }
+            logger.Info("getUidls chilkatEmailComponent -> END");
             return list;
         }
 
 
         public bool salvaMailInLocale(string uidl, string pathFile, string NomeDellaMail)
         {
+            logger.Info("salvaMailInLocale con UIDL > START " + uidl);
             bool retval = false;
             try
             {
@@ -448,15 +516,18 @@ namespace BusinessLogic.Interoperabilità
                 object eml = null;
                 if (this.clientType == CMClientType.POP)
                 {
-                    //il Fetch da Pop Torna Byte[]
+                    //il Fetch da Pop Torna Byte[]                    
+                    logger.Info("mm.FetchMime(uidl) - POP > START " + uidl);
                     eml = mm.FetchMime(uidl);
+                    logger.Info("mm.FetchMime(uidl) - POP > END " + uidl);
                 }
                 else
                 {
+                    logger.Info("FetchSingleAsMime(uid, true) - IMAP > START " + uidl);
                     //il fetch da IMAP torna stringa
                     int uid = Convert.ToInt32(uidl);
-                    Email msgComponent = imap.FetchSingle(uid, true);
-                    eml = msgComponent.GetMimeBinary();
+                    eml = imap.FetchSingleAsMime(uid, true);
+                    logger.Info("FetchSingleAsMime(uid, true) - IMAP > END " + uidl);
                 }
                 if (eml != null)
                 {
@@ -464,15 +535,20 @@ namespace BusinessLogic.Interoperabilità
                     {
                         if (eml.GetType() == typeof(String))
                         {
+                            logger.Info("File.WriteAllText - POP - uidl > START" + uidl);
                             //Imap
                             File.WriteAllText(@pathFile + "\\" + NomeDellaMail, (String)eml);
+                            logger.Info("File.WriteAllText - POP - uidl > END " + uidl);
                         }
                         else
                         {
+                            logger.Info("File.WriteAllText - IMAP - uidl > START " + uidl);
                             //Pop
                             File.WriteAllBytes(@pathFile + "\\" + NomeDellaMail, (byte[])eml);
+                            logger.Info("File.WriteAllText - IMAP - uidl > END " + uidl);
                         }
                         retval = true;
+                        logger.Info("salvaMailInLocale con UIDL > END " + uidl);
                     }
                     catch (Exception e)
                     {
@@ -1066,6 +1142,7 @@ namespace BusinessLogic.Interoperabilità
 
         private void mmInitialize()
         {
+            logger.Info("mmInitialize > START");
             mm = new MailMan();
             mm.UnlockComponent(ChilkatKeys.Mail);
             mm.MailHost = this.server;
@@ -1087,10 +1164,14 @@ namespace BusinessLogic.Interoperabilità
             if (!this.smtpSTA.Equals(""))
                 mm.StartTLS = (this.smtpSTA == "1") ? true : false;
 
+            logger.Info("mmInitialize > END");
+
         }
 
         private void mmInitializeImap()
         {
+
+            logger.Info("mmInitializeImap > START");
             imap = new Chilkat.Imap();
             imap.UnlockComponent(ChilkatKeys.IMAP);
             ////imap.Connect(this.server);
@@ -1104,6 +1185,7 @@ namespace BusinessLogic.Interoperabilità
                 mm.ReadTimeout = Int32.Parse(System.Configuration.ConfigurationManager.AppSettings["IMAP_READ_TIMEOUT"].ToString());
 
             imap.Ssl = (this.PopSsl == "1") ? true : false;//this.mm.PopSsl;
+            logger.Info("mmInitializeImap > END");
 
 
         }
@@ -1156,6 +1238,7 @@ namespace BusinessLogic.Interoperabilità
 
         private bool FetchMailFromMProvider()
         {
+            logger.Info("FetchMailFromMProvider > START"); 
             bool retVal = false;
             EmailBundle mbx_temp = new EmailBundle();
             mbx = new EmailBundle();
@@ -1164,7 +1247,9 @@ namespace BusinessLogic.Interoperabilità
                 case CMClientType.POP:
                     try
                     {
+                        logger.Info("GetAllHeaders - POP > START");
                         mbx_temp = mm.GetAllHeaders(0);
+                        logger.Info("GetAllHeaders - POP > END");
                     }
                     catch (Exception ex)
                     {
@@ -1187,7 +1272,9 @@ namespace BusinessLogic.Interoperabilità
                     try
                     {
                         //mbx_temp = imap.FetchHeaders(messageSet);
+                        logger.Info("FetchHeaders - IMAP > START");
                         mbx_temp = imap.FetchHeaders(messageSet = imap.Search("ALL", true));
+                        logger.Info("FetchHeaders - IMAP > END");
                     }
                     catch (Exception ex)
                     {
@@ -1212,16 +1299,26 @@ namespace BusinessLogic.Interoperabilità
             {
                 for (int index = 0; index < mbx_temp.MessageCount; index++)
                 {
+                    logger.Info("mbx_temp.GetEmail(index) > START");
                     Email mail = mbx_temp.GetEmail(index);
+                    logger.Info("mbx_temp.GetEmail(index) > END");
                     if (!string.IsNullOrEmpty(mail.Uidl))
                     {
                         if (InteroperabilitaUtils.CheckId(mail.Uidl + " " + mail.GetHeaderField("message-id"), user, regId) &&
                              InteroperabilitaUtils.CheckId(mail.GetHeaderField("message-id"), user, regId))
                         {
                             if (clientType == CMClientType.POP)
+                            {
+                                logger.Info("AddEmail - POP > START");
                                 mbx.AddEmail(mm.GetFullEmail(mail));
+                                logger.Info("AddEmail - POP > END");
+                            }
                             else if (clientType == CMClientType.IMAP)
+                            {
+                                logger.Info("AddEmail - IMAP > START");
                                 mbx.AddEmail(imap.FetchSingle(messageSet.GetId(index), true));
+                                logger.Info("AddEmail - IMAP > END");
+                            }
                         }
                     }
                     else
@@ -1229,14 +1326,24 @@ namespace BusinessLogic.Interoperabilità
                         if (InteroperabilitaUtils.CheckId(mail.GetHeaderField("message-id"), user, regId))
                         {
                             if (clientType == CMClientType.POP)
+                            {
+                                logger.Info("AddEmail - POP > START");
                                 mbx.AddEmail(mm.GetFullEmail(mail));
+                                logger.Info("AddEmail - POP > END");
+                            }
                             else if (clientType == CMClientType.IMAP)
+                            {
+                                logger.Info("AddEmail - IMAP > START");
                                 mbx.AddEmail(imap.FetchSingle(messageSet.GetId(index), true));
+                                logger.Info("AddEmail - IMAP > END");
+                            }
                         }
                     }
                 }
                 retVal = true;
+                logger.Info("mbx_temp.Dispose() > START");
                 mbx_temp.Dispose();
+                logger.Info("mbx_temp.Dispose() > END");
             }
 
             return retVal;
@@ -1244,6 +1351,7 @@ namespace BusinessLogic.Interoperabilità
 
         private CMMsg extractMessage(Email msgComponent)
         {
+            logger.Info("extractMessage > START");
             CMMsg msg = null;
             DateTime ReceiveDate = DateTime.MinValue;
             msg = extractMail(msgComponent);
@@ -1255,7 +1363,7 @@ namespace BusinessLogic.Interoperabilità
                     logger.Debug("FIRMA VALIDA " + msg.errorMessage);
                     return msg;
                 }
-                try { ReceiveDate = msgComponent.LocalDate; }catch { }
+                try { ReceiveDate = msgComponent.LocalDate; }catch(Exception ex) { logger.Error(ex.Message, ex); }
                 if (msg.isPECDelivered() ||
                     (msg.isFromNonPEC() &&
                     (msgComponent.NumAttachedMessages == 1)))
@@ -1281,6 +1389,7 @@ namespace BusinessLogic.Interoperabilità
                     }
                 }
             }
+            logger.Info("extractMessage > END");
             return msg;
         }
 
@@ -1309,8 +1418,12 @@ namespace BusinessLogic.Interoperabilità
             CMMsg retval = new CMMsg();
 
             //Chilkat.Mime mimemail = msgComponent.GetMimeObject();
+
+
             Chilkat.Mime mimemail = new Mime();
             mimemail.LoadMime(msgComponent.GetMime());
+
+
             Chilkat.Mime dstat = mimemail.GetPart(dsnRootLeaf);
             retval.body = string.Format("<PRE> {0} </PRE>", msgComponent.GetMime());
 
@@ -1416,6 +1529,7 @@ namespace BusinessLogic.Interoperabilità
 
         private CMMsg extractMail(Email msgComponent)
         {
+            logger.Info("extractMail > START");
             // declarations
             string sTemp;
             //string formato = "ddd\\, dd MMM yyyy HH:mm:ss zzz";
@@ -1466,9 +1580,12 @@ namespace BusinessLogic.Interoperabilità
                             msg.headers.Add("utenteDocspa", msg.from);
                             msg.from = mailAtt.FromAddress;
                             msg.subject = mailAtt.Subject;
+
                             //Mime mime_msg_1 = mailAtt.GetMimeObject();
+
                             Chilkat.Mime mime_msg_1 = new Mime();
                             mime_msg_1.LoadMime(mailAtt.GetMime());
+
                             mime_msg_1.UnlockComponent(ChilkatKeys.SMime);
                             //   }
                             if (mime_msg_1.ContentType.ToLower().StartsWith("multipart"))
@@ -1488,11 +1605,14 @@ namespace BusinessLogic.Interoperabilità
                         rcp.name = msgComponent.GetTo(i);
                         msg.recipients.Add(rcp);
                     }
-
+                    logger.Info("extractMail > END");
                     return msg;
                 }
                 else
+                {
+                    logger.Info("extractMail > END");
                     return null;
+                }
             }
             catch (Exception exc)
             {
@@ -1501,6 +1621,7 @@ namespace BusinessLogic.Interoperabilità
         }
         private bool extractMailPec(Email msgComponent)
         {
+            logger.Info("extractMailPec > START");
             // declarations
             string sTemp;
             //string formato = "ddd\\, dd MMM yyyy HH:mm:ss zzz";
@@ -1514,10 +1635,14 @@ namespace BusinessLogic.Interoperabilità
                     sTemp = ExtractEmail(msgComponent, msg);
                     //se la mail è una ricevuta di ritorno non eseguo il forward di una mail
                     //Attachments Message - Forward di una email alla casella istituzionale 
+                    logger.Info("extractMailPec > END");
                     return msg.isPECDelivered();
                 }
                 else
+                {
+                    logger.Info("extractMailPec > END");
                     return false;
+                }
             }
             catch (Exception exc)
             {
@@ -1527,12 +1652,15 @@ namespace BusinessLogic.Interoperabilità
 
         private string ExtractEmail(Email msgComponent, CMMsg msg)
         {
+            logger.Info("ExtractEmail > START");
             string retval = null;
             // mail info
 
             //Mime mime_msg = msgComponent.GetMimeObject();
+
             Chilkat.Mime mime_msg = new Mime();
             mime_msg.LoadMime(msgComponent.GetMime());
+
             mime_msg.UnlockComponent(ChilkatKeys.SMime);
             string codifica = msgComponent.Charset;
             if (mime_msg.ContentType.ToLower().StartsWith("multipart"))
@@ -1590,41 +1718,7 @@ namespace BusinessLogic.Interoperabilità
                     msg.attachments.Add(att);
                 }
             }
-
-            //Anomalia Chilkat: alcuni file con un particolare content-type non vengono estratti dalla chilkat; recupero questi file
-            string elencoContentType = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_CONTENT_TYPE_MIME");
-            if (!string.IsNullOrEmpty(elencoContentType) && !elencoContentType.Equals("0"))
-            {
-                string[] contentTypes = elencoContentType.Split(';');
-                Dictionary<string, int> cont = new Dictionary<string, int>();
-                foreach (string c in contentTypes)
-                    cont.Add(c, 0);
-
-                int numPartMime = mime_msg.NumParts;
-                if (numPartMime > 0)
-                {
-                    for (int i = 0; i < numPartMime; i++)
-                    {
-                        //Il file che non viene estratto come allegato dalla chilkat ha IsAttachment a false
-                        bool isAttach = mime_msg.GetPart(i).IsAttachment();
-                        if (contentTypes.Contains(mime_msg.GetPart(i).ContentType) && !isAttach)
-                        {
-                            int index = cont[mime_msg.GetPart(i).ContentType];
-                            byte[] a_content = msgComponent.GetNthBinaryPartOfType(index, mime_msg.GetPart(i).ContentType, false, false);
-                            string a_conttype = mime_msg.GetPart(i).ContentType;
-                            string a_filename = mime_msg.GetPart(i).Name;
-
-                            CMAttachment att = new CMAttachment(a_filename,
-                            a_conttype, a_content);
-
-                            //Aggiorno l'indice nel dictionary
-                            cont[mime_msg.GetPart(i).ContentType] = index + 1;
-
-                            msg.attachments.Add(att);
-                        }
-                    }
-                }
-            }
+            logger.Info("extractMailPec > END");
             return retval;
         }
 

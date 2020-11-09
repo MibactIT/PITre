@@ -17,18 +17,8 @@ namespace DocsPAWA.documento
 	/// <summary>
 	/// Summary description for docAllegati.
 	/// </summary>
-	public class docAllegati : DocsPAWA.CssPage
+	public partial class docAllegati : DocsPAWA.CssPage
 	{
-        protected System.Web.UI.WebControls.DataGrid grdAllegati;
-		protected DocsPaWebCtrlLibrary.ImageButton btn_rimuoviAlleg;
-		protected DocsPaWebCtrlLibrary.ImageButton btn_sostituisciDocPrinc;
-		protected DocsPaWebCtrlLibrary.ImageButton btn_aggiungiAreaLav;
-		protected DocsPaWebCtrlLibrary.ImageButton btn_modifAlleg;
-		protected DocsPaWebCtrlLibrary.ImageButton btn_aggAlleg;
-		protected System.Web.UI.WebControls.Label lbl_message;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden txtSavedVersionId;
-        protected System.Web.UI.HtmlControls.HtmlLink styleLink;
-        protected System.Web.UI.WebControls.RadioButtonList rblFilter;
             /// <summary>
         /// 
         /// </summary>
@@ -39,7 +29,7 @@ namespace DocsPAWA.documento
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-		private void Page_Load(object sender, System.EventArgs e)
+		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			// Put user code to initialize the page here
 			Utils.startUp(this);
@@ -107,7 +97,7 @@ namespace DocsPAWA.documento
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Page_PreRender(object sender, System.EventArgs e)
+        protected void Page_PreRender(object sender, System.EventArgs e)
         {
             string Tema = GetCssAmministrazione();
 
@@ -321,13 +311,6 @@ namespace DocsPAWA.documento
 		private void InitializeComponent()
 		{
             this.grdAllegati.PageIndexChanged += new System.Web.UI.WebControls.DataGridPageChangedEventHandler(this.grdAllegati_pager);
-			this.btn_aggAlleg.Click += new System.Web.UI.ImageClickEventHandler(this.btn_aggAlleg_Click);
-			this.btn_modifAlleg.Click += new System.Web.UI.ImageClickEventHandler(this.btn_modifAlleg_Click);
-			this.btn_aggiungiAreaLav.Click += new System.Web.UI.ImageClickEventHandler(this.btn_aggiungiAreaLav_Click);
-			this.btn_sostituisciDocPrinc.Click += new System.Web.UI.ImageClickEventHandler(this.btn_sostituisciDocPrinc_Click);
-			this.btn_rimuoviAlleg.Click += new System.Web.UI.ImageClickEventHandler(this.btn_rimuoviAlleg_Click);
-			this.Load += new System.EventHandler(this.Page_Load);
-			this.PreRender += new System.EventHandler(this.Page_PreRender);
             this.rblFilter.SelectedIndexChanged += new EventHandler(rblFilter_SelectedIndexChanged); 
 
             // Se è attiva l'interoperabilità semplificata, viene aggiunta una voce che consente di
@@ -963,7 +946,7 @@ namespace DocsPAWA.documento
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-		private void btn_aggiungiAreaLav_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+		protected void btn_aggiungiAreaLav_Click(object sender, System.Web.UI.ImageClickEventArgs e)
 		{
 			try 
 			{
@@ -985,7 +968,7 @@ namespace DocsPAWA.documento
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btn_aggAlleg_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+        protected void btn_aggAlleg_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             this.SelectPageAllegato(this.txtSavedVersionId.Value);
 
@@ -1002,7 +985,7 @@ namespace DocsPAWA.documento
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-		private void btn_rimuoviAlleg_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+		protected void btn_rimuoviAlleg_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             this.SelectPageAllegato(this.txtSavedVersionId.Value);
 
@@ -1018,7 +1001,7 @@ namespace DocsPAWA.documento
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-		private void btn_modifAlleg_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+		protected void btn_modifAlleg_Click(object sender, System.Web.UI.ImageClickEventArgs e)
 		{
             // Associazione dati
             this.BindGrid();
@@ -1044,7 +1027,7 @@ namespace DocsPAWA.documento
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-		private void btn_sostituisciDocPrinc_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+		protected void btn_sostituisciDocPrinc_Click(object sender, System.Web.UI.ImageClickEventArgs e)
 		{
             bool isCheckedOut = this.IsDocumentCheckedOut();
 

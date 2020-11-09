@@ -2035,17 +2035,6 @@ namespace BusinessLogic.Utenti
             return utenti.getUtenteByCodice(userName, codiceAmm);
         }
 
-        /// <summary>
-        /// Torna l'utente automatico per l'amministrazione
-        /// </summary>
-        /// <param name="idAmm"></param>
-        /// <returns></returns>
-        public static DocsPaVO.utente.Utente GetUtenteAutomatico(string idAmm)
-        {
-            DocsPaDB.Query_DocsPAWS.Utenti utenti = new DocsPaDB.Query_DocsPAWS.Utenti();
-            return utenti.GetUtenteAutomatico(idAmm);
-        }
-
         public static Canale GetDatiCanPref_Experimental(Corrispondente corr)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
@@ -2100,15 +2089,13 @@ namespace BusinessLogic.Utenti
         public static string[] getMementoUtente(InfoUtente infoutente)
         {
             DocsPaDB.Query_DocsPAWS.Utenti utenti = new DocsPaDB.Query_DocsPAWS.Utenti();
-            string idPeople = infoutente.delegato != null && !string.IsNullOrEmpty(infoutente.delegato.idPeople) ? infoutente.delegato.idPeople : infoutente.idPeople;
-            return utenti.GetMementoUtente (idPeople, infoutente.idAmministrazione);
+            return utenti.GetMementoUtente (infoutente.idPeople, infoutente.idAmministrazione);
         }
 
         public static bool setMementoUtente(InfoUtente infoutente,string dominio, string alias)
         {
             DocsPaDB.Query_DocsPAWS.Utenti utenti = new DocsPaDB.Query_DocsPAWS.Utenti();
-            string idPeople = infoutente.delegato != null && !string.IsNullOrEmpty(infoutente.delegato.idPeople) ? infoutente.delegato.idPeople : infoutente.idPeople;
-            return utenti.SetMementoUtente(idPeople, infoutente.idAmministrazione, dominio,alias);
+            return utenti.SetMementoUtente(infoutente.idPeople, infoutente.idAmministrazione, dominio,alias);
         }
 
         #endregion 
@@ -2159,5 +2146,75 @@ namespace BusinessLogic.Utenti
             return u.SelectHSMParameters(idAmministrazione);
         }
         #endregion HSMPARAMETERS
+
+        #region PORTALE PROCEDIMENTI
+
+        public static List<Corrispondente> GetListaUoProcedimenti(string searchString)
+        {
+            DocsPaDB.Query_DocsPAWS.Utenti utenti = new DocsPaDB.Query_DocsPAWS.Utenti();
+            return utenti.GetListaUoProcedimenti(searchString);
+        }
+
+        #endregion
+
+        #region ESPI VIEVER
+
+        public static ArrayList getListaUtenti()
+        {
+            ArrayList result = null;
+
+            DocsPaDB.Query_DocsPAWS.Utenti u = new DocsPaDB.Query_DocsPAWS.Utenti();
+
+            result = u.GetListaUtenti();
+
+            return result;
+        }
+
+        public static ArrayList GetUserAooAssociationList(string username)
+        {
+            ArrayList result = null;
+
+            DocsPaDB.Query_DocsPAWS.Utenti u = new DocsPaDB.Query_DocsPAWS.Utenti();
+
+            result = u.GetListaAooPerUtente(username);
+
+            return result;
+        }
+
+        public static ArrayList GetUsersForAoo(string aooId)
+        {
+            ArrayList result = null;
+
+            DocsPaDB.Query_DocsPAWS.Utenti u = new DocsPaDB.Query_DocsPAWS.Utenti();
+
+            result = u.GetUsersForAoo(aooId);
+
+            return result;
+        }
+
+
+        public static ArrayList GetAllAoo()
+        {
+            ArrayList result = null;
+
+            DocsPaDB.Query_DocsPAWS.Utenti u = new DocsPaDB.Query_DocsPAWS.Utenti();
+
+            result = u.GetAllAooForEspi();
+
+            return result;
+        }
+
+        public static ArrayList GetAssociationUserAooFromGiada(string id, string username)
+        {
+            ArrayList result = null;
+
+            DocsPaDB.Query_DocsPAWS.Utenti u = new DocsPaDB.Query_DocsPAWS.Utenti();
+
+            result = u.GetAssociationUserAooFromGiada(id, username);
+
+            return result;
+        }
+
+        #endregion
     }
 }

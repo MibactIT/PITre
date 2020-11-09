@@ -32,6 +32,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 Panel_Diagrammi_Trasmissioni.Visible = value;
                 Panel_Personalizzazione.Visible = value;
                 Panel_MesiCons.Visible = value;
+                Panel_Procedimentale.Visible = value;
                 pnlTemplateStruttura.Visible = value;
             }
         }
@@ -68,7 +69,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                     "<script>alert('Attenzione selezionare un\\'amministrazione !'); document.location = '../Gestione_Homepage/Home.aspx';</script>");
                 return;
             }
-            var amministrazione = ((string) Session["AMMDATASET"]).Split('@');
+            var amministrazione = ((string)Session["AMMDATASET"]).Split('@');
             var codiceAmministrazione = amministrazione[0];
             idAmministrazione = Utils.getIdAmmByCod(codiceAmministrazione, this);
 
@@ -86,7 +87,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 dg_listaTemplates.Columns[4].HeaderStyle.Width = Unit.Percentage(30);
                 dg_listaTemplates.Columns[1].HeaderStyle.Width = Unit.Percentage(10);
             }
-            
+
             if (!IsPostBack)
             {
                 if (!string.IsNullOrEmpty(valorechiave) && valorechiave.Equals("1"))
@@ -94,7 +95,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
                 popolaTemplateDG();
                 lbl_position.Text = "&nbsp;&bull;&nbsp;Amministrazione: " +
-                                    UtilsXml.GetAmmDataSession((string) Session["AMMDATASET"], "1");
+                                    UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "1");
 
                 //Aggiunta Stefano Limiti per avviare lo script che non permette l'inserimento dei caratteri alfabetici nella 
                 //textbox dei mesi dei conservazione del template
@@ -392,7 +393,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             //ArrayList tipiAttoTotali = new ArrayList(wws.GetTipologiaAttoProfDin(idAmministrazione));
             var tipiFascTotali = new ArrayList(ProfilazioneFascManager.getTemplatesFasc(idAmministrazione, this));
             for (var i = 0; i < tipiFascTotali.Count; i++)
-                if (txt_TipoDocumento.Text.Equals(((Templates) tipiFascTotali[i]).DESCRIZIONE))
+                if (txt_TipoDocumento.Text.Equals(((Templates)tipiFascTotali[i]).DESCRIZIONE))
                     return true;
             return false;
         }
@@ -417,17 +418,17 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             if (dim > 111)
             {
                 if (nomeControl == "DivDGListaTemplates")
-                    ((HtmlControl) FindControl(nomeControl)).Attributes.Add("style", "OVERFLOW: auto; HEIGHT: 117px");
+                    ((HtmlControl)FindControl(nomeControl)).Attributes.Add("style", "OVERFLOW: auto; HEIGHT: 117px");
                 else
-                    ((HtmlControl) FindControl(nomeControl)).Attributes.Add("style", "OVERFLOW: auto; HEIGHT: 109px");
+                    ((HtmlControl)FindControl(nomeControl)).Attributes.Add("style", "OVERFLOW: auto; HEIGHT: 109px");
             }
             else
             {
                 if (nomeControl == "DivDGListaTemplates")
-                    ((HtmlControl) FindControl(nomeControl)).Attributes.Add("style",
+                    ((HtmlControl)FindControl(nomeControl)).Attributes.Add("style",
                         "OVERFLOW: auto; HEIGHT:" + (dim + 4) + "px");
                 else
-                    ((HtmlControl) FindControl(nomeControl)).Attributes.Add("style",
+                    ((HtmlControl)FindControl(nomeControl)).Attributes.Add("style",
                         "OVERFLOW: auto; HEIGHT:" + dim + "px");
             }
         }
@@ -470,7 +471,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
         protected void RadioButtonContatore_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var rbl = (RadioButtonList) sender;
+            var rbl = (RadioButtonList)sender;
             var li = rbl.SelectedItem;
 
             if (li.Value.ToUpper() == "CUSTOM")
@@ -610,12 +611,12 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         protected System.Web.UI.WebControls.Button btn_ConfermaPersCampoDiTesto;
         protected System.Web.UI.WebControls.Button btn_ConfermaPersCasellaDiSelezione;
         protected System.Web.UI.WebControls.TextBox txt_etichettaCampoDiTesto;
+        protected System.Web.UI.WebControls.TextBox txt_default_campotesto;
         protected System.Web.UI.WebControls.TextBox txt_etichettaCasellaDiSelezione;
         protected System.Web.UI.WebControls.Button btn_modelli;
         protected System.Web.UI.WebControls.Button btn_anteprima;
         protected System.Web.UI.WebControls.Button btn_salvaTemplate;
         protected System.Web.UI.WebControls.Button btn_CampiComuni;
-        protected System.Web.UI.WebControls.Button btn_Storico;
         protected System.Web.UI.WebControls.TextBox txt_etichettaSelezioneEsclusiva;
         protected System.Web.UI.WebControls.DropDownList ddl_valoriSelezioneEsclusiva;
         protected System.Web.UI.WebControls.DropDownList ddl_separatore;
@@ -723,6 +724,15 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         protected System.Web.UI.WebControls.Button btn_confermaMesiCons;
         protected System.Web.UI.WebControls.ImageButton pulsante_chiudi_MesiCons;
         protected System.Web.UI.WebControls.TextBox txt_ModMesiCons;
+        //Gestione tipo procedimentale
+        protected System.Web.UI.WebControls.Label LblTipoFascProcedimentale;
+        protected System.Web.UI.WebControls.Panel Panel_Procedimentale;
+        protected System.Web.UI.WebControls.Button btn_confermaProcedimentale;
+        protected System.Web.UI.WebControls.ImageButton pulsante_chiudi_Procedimentale;
+        protected System.Web.UI.WebControls.CheckBox cb_ModProcedimentale;
+
+        protected System.Web.UI.WebControls.CheckBox cb_Procedimentale;
+
         //gestione Link
         protected System.Web.UI.WebControls.ImageButton Link;
         protected System.Web.UI.WebControls.Panel Panel_PersLink;
@@ -763,6 +773,8 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         protected System.Web.UI.WebControls.ImageButton btAnnullaTemplate;
         protected Label lbTipoFascicoloTemplate;
 
+        protected System.Web.UI.WebControls.Button btn_replica;
+
         #endregion Dichiarazioni-PageLoad
 
         override protected void OnInit(EventArgs e)
@@ -774,6 +786,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         private void InitializeComponent()
         {
             this.btn_inEsercizio.Click += new System.EventHandler(this.btn_inEsercizio_Click);
+            this.btn_replica.Click += new System.EventHandler(this.btn_replica_Click);
             this.btn_salvaTemplate.Click += new System.EventHandler(this.btn_salvaTemplate_Click);
             this.btn_modelli.Click += new System.EventHandler(this.btn_modelli_Click);
             this.btn_nuovoModello.Click += new System.EventHandler(this.btn_nuovoModello_Click);
@@ -849,6 +862,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             this.pulsante_chiudi_MesiCons.Click +=
                 new System.Web.UI.ImageClickEventHandler(this.pulsante_chiudi_MesiCons_Click);
             this.btn_confermaMesiCons.Click += new System.EventHandler(this.btn_confermaMesiCons_Click);
+            // eventi dei button per la gestione del tipo procedimentale
+            this.pulsante_chiudi_Procedimentale.Click += new System.Web.UI.ImageClickEventHandler(this.pulsante_chiudi_Procedimentale_Click);
+            this.btn_confermaProcedimentale.Click += new System.EventHandler(this.btn_confermaProcedimentale_Click);
 
             //this.btn_associaRuolo.Click += new ImageClickEventHandler(btn_associaRuolo_Click);
             //this.Page.PreRender += new EventHandler(Page_PreRender);
@@ -889,7 +905,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             dt_listaComponenti.Columns.Add("Ordinamento");
             dt_listaComponenti.Columns.Add("Tipo");
             dt_listaComponenti.Columns.Add("Etichetta");
-            var template = (Templates) Session["template"];
+            var template = (Templates)Session["template"];
             for (var i = 0; i < template.ELENCO_OGGETTI.Length; i++)
             {
                 var oggettoCustom = template.ELENCO_OGGETTI[i];
@@ -931,7 +947,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
             {
-                var template = (Templates) Session["template"];
+                var template = (Templates)Session["template"];
                 var oggettoCustom = template.ELENCO_OGGETTI[oggettoSelezionato];
                 var tipoOggetto = oggettoCustom.TIPO;
                 if (oggettoCustom.TIPO.DESCRIZIONE_TIPO == "Contatore")
@@ -978,14 +994,14 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
         private void dg_listaComponenti_DeleteCommand(object source, DataGridCommandEventArgs e)
         {
-            if (((HtmlInputHidden) FindControl("txt_confirmDel")).Value == "si")
+            if (((HtmlInputHidden)FindControl("txt_confirmDel")).Value == "si")
             {
-                ((HtmlInputHidden) FindControl("txt_confirmDel")).Value = "";
+                ((HtmlInputHidden)FindControl("txt_confirmDel")).Value = "";
                 //Metodo invocato quando si desidera rimuovere un componente dal DataGrid contenente la lista di quest'ultimi.
                 //Di conseguenza la rimozione viene anche effettuata dal template in sessione.
 
                 //Verifico che se si elimina un campo comune quest'ultimo non deve essere associato a nessuna tipologia
-                var template = (Templates) Session["template"];
+                var template = (Templates)Session["template"];
                 var oggettoSelezionato = e.Item.ItemIndex;
                 var oggettoCustom = template.ELENCO_OGGETTI[oggettoSelezionato];
 
@@ -1040,7 +1056,8 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             Panel_Privato.Visible = false;
             Panel_MesiCons.Visible = false;
             btn_CampiComuni.Visible = false;
-            btn_Storico.Enabled = false;
+            Panel_Procedimentale.Visible = false;
+            cb_Procedimentale.Checked = false;
         }
 
         private void btn_AggiungiOggetto_Click(object sender, ImageClickEventArgs e)
@@ -1049,7 +1066,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
             //Questa imageButton mi serve per conservare una delle cinque imageButton cliccabili e
             //recuperarne l'ID per capire quale è stata cliccata
-            var imgBtn = (ImageButton) sender;
+            var imgBtn = (ImageButton)sender;
 
             //Controllo esistenza tipo di documento
             if (controllaTipoDiDocumento() && !dg_listaTemplates.Visible)
@@ -1166,7 +1183,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             //Il seguente metodo viene chiamato quando si clicca uno dei pulsanti "Conferma" dei pannelli
             //di personalizzazione. A senconda della provenienza della chiamata vengono effettuate
             //le dovute operazioni.
-            var button = (Button) sender;
+            var button = (Button)sender;
             switch (button.ID)
             {
                 case "btn_ConfermaPersCampoDiTesto":
@@ -1360,7 +1377,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                     }
 
                     var oggettoCustomSelezionato = dg_listaComponenti.SelectedIndex;
-                    var template = (Templates) Session["template"];
+                    var template = (Templates)Session["template"];
                     var oggettoCustom = template.ELENCO_OGGETTI[oggettoCustomSelezionato];
 
                     /*
@@ -1712,7 +1729,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             if (Session["template"] != null)
             {
-                var template = (Templates) Session["template"];
+                var template = (Templates)Session["template"];
                 for (var i = 0; i < template.ELENCO_OGGETTI.Length; i++)
                     if (dg_listaComponenti.SelectedIndex != -1 && i != dg_listaComponenti.SelectedIndex)
                     {
@@ -1731,7 +1748,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         private void btn_confermaPrivato_Click(object sender, EventArgs e)
         {
             //codice per salvare le info privato
-            var template = (Templates) Session["templateSelPerPrivato"];
+            var template = (Templates)Session["templateSelPerPrivato"];
             var check = "0";
             if (cb_ModPrivato.Checked)
                 check = "1";
@@ -1741,7 +1758,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             {
                 template.PRIVATO = check;
                 //Controllo se esistono documenti con questa tipologia
-                var amministrazione = ((string) Session["AMMDATASET"]).Split('@');
+                var amministrazione = ((string)Session["AMMDATASET"]).Split('@');
                 var codiceAmministrazione = amministrazione[0];
                 var numDoc = ProfilazioneFascManager.countFascTipoFasc(template.ID_TIPO_FASC, codiceAmministrazione,
                     this);
@@ -1776,7 +1793,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             if (e.ButtonPressed == MessageBox.MessageBoxEventHandler.Button.Ok)
             {
-                var template = (Templates) Session["templateSelPerPrivato"];
+                var template = (Templates)Session["templateSelPerPrivato"];
                 ProfilazioneFascManager.updatePrivatoTipoFasc(template.SYSTEM_ID, template.PRIVATO, this);
                 Panel_Privato.Visible = false;
                 popolaTemplateDG();
@@ -1790,7 +1807,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         private void btn_confermaMesiCons_Click(object sender, EventArgs e)
         {
             //codice per salvare le info riguardanti i mesi di conservazione
-            var template = (Templates) Session["templateSelPerMesiCons"];
+            var template = (Templates)Session["templateSelPerMesiCons"];
             var mesi = "0";
             if (!string.IsNullOrEmpty(txt_ModMesiCons.Text))
                 mesi = txt_ModMesiCons.Text;
@@ -1813,6 +1830,37 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             Panel_MesiCons.Visible = false;
             txt_ModMesiCons.Text = "";
+        }
+
+        #endregion
+
+        #region btn_confermaProcedimentale_Click - pulsante_chiudi_Procedimentale_Click
+
+        private void btn_confermaProcedimentale_Click(object sender, System.EventArgs e)
+        {
+            DocsPAWA.DocsPaWR.Templates template = (DocsPAWA.DocsPaWR.Templates)Session["templateSelPerProcedimentale"];
+            string procedimentale = cb_ModProcedimentale.Checked ? "1" : "0";
+
+            if (string.IsNullOrEmpty(template.PROCEDIMENTALE))
+                template.PROCEDIMENTALE = "0";
+
+            if (!template.PROCEDIMENTALE.Equals(procedimentale))
+            {
+                ProfilazioneFascManager.updateProcedimentaleTipoFasc(template.SYSTEM_ID, procedimentale, this);
+                Panel_Procedimentale.Visible = false;
+                popolaTemplateDG();
+            }
+            else
+            {
+                Panel_Procedimentale.Visible = false;
+                dg_listaTemplates.SelectedIndex = -1;
+            }
+        }
+
+        private void pulsante_chiudi_Procedimentale_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+        {
+            Panel_Procedimentale.Visible = false;
+            LblTipoFascProcedimentale.Text = "";
         }
 
         #endregion
@@ -1858,9 +1906,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             //Oggetti identificati dal fatto che vengono inseriti nel dataGrid "dg_listaComponenti" 
             //con la cella del campo Ordinamento vuota.
             for (var i = 0; i < dg_listaComponenti.Items.Count; i++)
-                if (dg_listaComponenti.Items[i].Cells[0].Text == "&nbsp;" && (Templates) Session["template"] != null)
+                if (dg_listaComponenti.Items[i].Cells[0].Text == "&nbsp;" && (Templates)Session["template"] != null)
                 {
-                    var template = (Templates) Session["template"];
+                    var template = (Templates)Session["template"];
                     Session.Add("template", ProfilazioneFascManager.eliminaOggettoCustomTemplateFasc(template, i, this));
                     aggiungiComponenteDG();
                 }
@@ -1871,7 +1919,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             //Questo metodo viene chiamato ogni qualvolta si desidera aggiungere un componente ad un template.
             //Viene chiamato il metodo del backend che permette l'aggiunta di un oggetto allo specifico template 
             //e che restituisce a sua volta il template aggiornato che viene rimesso in sessione.
-            var template = (Templates) Session["template"];
+            var template = (Templates)Session["template"];
             var oggettoCustom = new OggettoCustom();
 
             //string nomeOgg = Convert.ToString( Convert.ToInt32(Session["nomeCampo"]) +1 );
@@ -1912,7 +1960,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
             if (oggettoSelezionato != -1)
             {
-                var template = (Templates) Session["template"];
+                var template = (Templates)Session["template"];
                 //modifica
                 foreach (var oggettoCustom1 in template.ELENCO_OGGETTI)
                     oggettoCustom1.DA_VISUALIZZARE_RICERCA = "0";
@@ -1930,6 +1978,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                         oggettoCustom.NUMERO_DI_LINEE = txt_NumeroLinee_CampoDiTesto.Text;
                         oggettoCustom.TIPO_RICERCA_CORR = "0";
                         oggettoCustom.ID_RUOLO_DEFAULT = "0";
+                        oggettoCustom.VALORE_DATABASE = txt_default_campotesto.Text;
                         //Di default i seguenti valori MULTILINEA, CAMPO DI RICERCA e CAMPO OBBLIGATORIO sono una stringa vuota
                         if (cb_Multilinea_CampoDiTesto.Checked)
                             oggettoCustom.MULTILINEA = "SI";
@@ -1978,23 +2027,23 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                             oggettoCustom.ELENCO_VALORI[0] = new ValoreOggetto();
                         }
                         for (var i = 0; i < ddl_valoriMenuATendina.Items.Count; i++)
-                        for (var j = 0; j < oggettoCustom.ELENCO_VALORI.Length; j++)
-                        {
-                            if (ddl_valoriMenuATendina.Items[i].Text == oggettoCustom.ELENCO_VALORI[j].VALORE)
+                            for (var j = 0; j < oggettoCustom.ELENCO_VALORI.Length; j++)
                             {
-                                newArrayValoriMenuATendina.Add(oggettoCustom.ELENCO_VALORI[j]);
-                                break;
+                                if (ddl_valoriMenuATendina.Items[i].Text == oggettoCustom.ELENCO_VALORI[j].VALORE)
+                                {
+                                    newArrayValoriMenuATendina.Add(oggettoCustom.ELENCO_VALORI[j]);
+                                    break;
+                                }
+                                if (j + 1 == oggettoCustom.ELENCO_VALORI.Length)
+                                {
+                                    var valoreOggettoNuovo = new ValoreOggetto();
+                                    valoreOggettoNuovo.DESCRIZIONE_VALORE = "Valore" +
+                                                                            (ddl_valoriMenuATendina.SelectedIndex + 1);
+                                    valoreOggettoNuovo.VALORE = ddl_valoriMenuATendina.Items[i].Text;
+                                    valoreOggettoNuovo.VALORE_DI_DEFAULT = "NO";
+                                    newArrayValoriMenuATendina.Add(valoreOggettoNuovo);
+                                }
                             }
-                            if (j + 1 == oggettoCustom.ELENCO_VALORI.Length)
-                            {
-                                var valoreOggettoNuovo = new ValoreOggetto();
-                                valoreOggettoNuovo.DESCRIZIONE_VALORE = "Valore" +
-                                                                        (ddl_valoriMenuATendina.SelectedIndex + 1);
-                                valoreOggettoNuovo.VALORE = ddl_valoriMenuATendina.Items[i].Text;
-                                valoreOggettoNuovo.VALORE_DI_DEFAULT = "NO";
-                                newArrayValoriMenuATendina.Add(valoreOggettoNuovo);
-                            }
-                        }
                         oggettoCustom.ELENCO_VALORI = new ValoreOggetto[newArrayValoriMenuATendina.Count];
                         newArrayValoriMenuATendina.CopyTo(oggettoCustom.ELENCO_VALORI);
                         break;
@@ -2027,23 +2076,23 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                             oggettoCustom.ELENCO_VALORI[0] = new ValoreOggetto();
                         }
                         for (var i = 0; i < ddl_valoriSelezioneEsclusiva.Items.Count; i++)
-                        for (var j = 0; j < oggettoCustom.ELENCO_VALORI.Length; j++)
-                        {
-                            if (ddl_valoriSelezioneEsclusiva.Items[i].Text == oggettoCustom.ELENCO_VALORI[j].VALORE)
+                            for (var j = 0; j < oggettoCustom.ELENCO_VALORI.Length; j++)
                             {
-                                newArrayValoriSelezioneEsclusiva.Add(oggettoCustom.ELENCO_VALORI[j]);
-                                break;
+                                if (ddl_valoriSelezioneEsclusiva.Items[i].Text == oggettoCustom.ELENCO_VALORI[j].VALORE)
+                                {
+                                    newArrayValoriSelezioneEsclusiva.Add(oggettoCustom.ELENCO_VALORI[j]);
+                                    break;
+                                }
+                                if (j + 1 == oggettoCustom.ELENCO_VALORI.Length)
+                                {
+                                    var valoreOggettoNuovo = new ValoreOggetto();
+                                    valoreOggettoNuovo.DESCRIZIONE_VALORE = "Valore" +
+                                                                            (ddl_valoriSelezioneEsclusiva.SelectedIndex + 1);
+                                    valoreOggettoNuovo.VALORE = ddl_valoriSelezioneEsclusiva.Items[i].Text;
+                                    valoreOggettoNuovo.VALORE_DI_DEFAULT = "NO";
+                                    newArrayValoriSelezioneEsclusiva.Add(valoreOggettoNuovo);
+                                }
                             }
-                            if (j + 1 == oggettoCustom.ELENCO_VALORI.Length)
-                            {
-                                var valoreOggettoNuovo = new ValoreOggetto();
-                                valoreOggettoNuovo.DESCRIZIONE_VALORE = "Valore" +
-                                                                        (ddl_valoriSelezioneEsclusiva.SelectedIndex + 1);
-                                valoreOggettoNuovo.VALORE = ddl_valoriSelezioneEsclusiva.Items[i].Text;
-                                valoreOggettoNuovo.VALORE_DI_DEFAULT = "NO";
-                                newArrayValoriSelezioneEsclusiva.Add(valoreOggettoNuovo);
-                            }
-                        }
                         oggettoCustom.ELENCO_VALORI = new ValoreOggetto[newArrayValoriSelezioneEsclusiva.Count];
                         newArrayValoriSelezioneEsclusiva.CopyTo(oggettoCustom.ELENCO_VALORI);
                         break;
@@ -2149,23 +2198,23 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                             oggettoCustom.ELENCO_VALORI[0] = new ValoreOggetto();
                         }
                         for (var i = 0; i < ddl_valoriCasellaSelezione.Items.Count; i++)
-                        for (var j = 0; j < oggettoCustom.ELENCO_VALORI.Length; j++)
-                        {
-                            if (ddl_valoriCasellaSelezione.Items[i].Text == oggettoCustom.ELENCO_VALORI[j].VALORE)
+                            for (var j = 0; j < oggettoCustom.ELENCO_VALORI.Length; j++)
                             {
-                                newArrayValoriCasellaDiSelezione.Add(oggettoCustom.ELENCO_VALORI[j]);
-                                break;
+                                if (ddl_valoriCasellaSelezione.Items[i].Text == oggettoCustom.ELENCO_VALORI[j].VALORE)
+                                {
+                                    newArrayValoriCasellaDiSelezione.Add(oggettoCustom.ELENCO_VALORI[j]);
+                                    break;
+                                }
+                                if (j + 1 == oggettoCustom.ELENCO_VALORI.Length)
+                                {
+                                    var valoreOggettoNuovo = new ValoreOggetto();
+                                    valoreOggettoNuovo.DESCRIZIONE_VALORE = "Valore" +
+                                                                            (ddl_valoriCasellaSelezione.SelectedIndex + 1);
+                                    valoreOggettoNuovo.VALORE = ddl_valoriCasellaSelezione.Items[i].Text;
+                                    valoreOggettoNuovo.VALORE_DI_DEFAULT = "NO";
+                                    newArrayValoriCasellaDiSelezione.Add(valoreOggettoNuovo);
+                                }
                             }
-                            if (j + 1 == oggettoCustom.ELENCO_VALORI.Length)
-                            {
-                                var valoreOggettoNuovo = new ValoreOggetto();
-                                valoreOggettoNuovo.DESCRIZIONE_VALORE = "Valore" +
-                                                                        (ddl_valoriCasellaSelezione.SelectedIndex + 1);
-                                valoreOggettoNuovo.VALORE = ddl_valoriCasellaSelezione.Items[i].Text;
-                                valoreOggettoNuovo.VALORE_DI_DEFAULT = "NO";
-                                newArrayValoriCasellaDiSelezione.Add(valoreOggettoNuovo);
-                            }
-                        }
                         oggettoCustom.ELENCO_VALORI = new ValoreOggetto[newArrayValoriCasellaDiSelezione.Count];
                         newArrayValoriCasellaDiSelezione.CopyTo(oggettoCustom.ELENCO_VALORI);
                         break;
@@ -2324,7 +2373,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
                 if (oggettoSelezionato != -1)
                 {
-                    var template = (Templates) Session["template"];
+                    var template = (Templates)Session["template"];
                     var oggettoCustom = template.ELENCO_OGGETTI[oggettoSelezionato];
                     if (ProfilazioneFascManager.isValueInUseFasc(Convert.ToString(oggettoCustom.SYSTEM_ID),
                         Convert.ToString(template.SYSTEM_ID), ddl_valoriSelezioneEsclusiva.SelectedItem.Text, this))
@@ -2389,7 +2438,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
                 if (oggettoSelezionato != -1)
                 {
-                    var template = (Templates) Session["template"];
+                    var template = (Templates)Session["template"];
                     var oggettoCustom = template.ELENCO_OGGETTI[oggettoSelezionato];
                     if (ProfilazioneFascManager.isValueInUseFasc(Convert.ToString(oggettoCustom.SYSTEM_ID),
                         Convert.ToString(template.SYSTEM_ID), ddl_valoriCasellaSelezione.SelectedItem.Text, this))
@@ -2420,7 +2469,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
                 if (oggettoSelezionato != -1)
                 {
-                    var template = (Templates) Session["template"];
+                    var template = (Templates)Session["template"];
                     var oggettoCustom = template.ELENCO_OGGETTI[oggettoSelezionato];
                     if (ProfilazioneFascManager.isValueInUseFasc(Convert.ToString(oggettoCustom.SYSTEM_ID),
                         Convert.ToString(template.SYSTEM_ID), ddl_valoriMenuATendina.SelectedItem.Text, this))
@@ -2487,6 +2536,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             txt_NumeroLinee_CampoDiTesto.Text = "";
             //txt_NumeroLinee_CampoDiTesto.Enabled = false;
             //txt_NumeroLinee_CampoDiTesto.BackColor = System.Drawing.Color.AntiqueWhite;
+            txt_default_campotesto.Text = "";
         }
 
         public void compilaPersCampoDiTesto(OggettoCustom oggettoCustom)
@@ -2506,6 +2556,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 cb_Multilinea_CampoDiTesto.Checked = true;
             else
                 cb_Multilinea_CampoDiTesto.Checked = false;
+
+            if (!string.IsNullOrEmpty(oggettoCustom.VALORE_DATABASE))
+                txt_default_campotesto.Text = oggettoCustom.VALORE_DATABASE;
         }
 
         #endregion resetta-compila CampoDiTesto
@@ -2562,9 +2615,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     cb_Default_CasellaSelezione.Checked = false;
                     cb_Disabilitato_CasellaSelezione.Checked = false;
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
@@ -2626,9 +2679,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     cb_Default_MenuATendina.Checked = false;
                     cb_Disabilitato_MenuATendina.Checked = false;
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
@@ -2694,9 +2747,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     cb_Default_SelezioneEsclusiva.Checked = false;
                     cb_Disabilitato_SelezioneEsclusiva.Checked = false;
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
@@ -2738,17 +2791,17 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             ddl_ruoloPredefinito.Items.Add(itemEmpty);
 
             var listaRuoli = new ArrayList(ProfilazioneFascManager.getRuoliByAmm(idAmministrazione, "", "", this));
-            var template = (Templates) Session["template"];
+            var template = (Templates)Session["template"];
             if (template != null)
             {
                 var listaRuoliSelezionati =
                     new ArrayList(ProfilazioneFascManager.getRuoliTipoFasc(template.ID_TIPO_FASC, this));
                 for (var i = 0; i < listaRuoli.Count; i++)
                 {
-                    var ruolo = (Ruolo) listaRuoli[i];
+                    var ruolo = (Ruolo)listaRuoli[i];
                     for (var j = 0; j < listaRuoliSelezionati.Count; j++)
                     {
-                        var obj = (AssDocFascRuoli) listaRuoliSelezionati[j];
+                        var obj = (AssDocFascRuoli)listaRuoliSelezionati[j];
                         if (ruolo.idGruppo == obj.ID_GRUPPO)
                         {
                             var item = new ListItem();
@@ -2960,10 +3013,10 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             //Ripulisco il template da eventuali Campi in lavorazione che non sono stati salvati
             aggiornaTemplateInSessione();
-            var template = (Templates) Session["template"];
+            var template = (Templates)Session["template"];
 
             //Metodo che permette l'inserimento del template in sessione, nel database
-            var amministrazione = ((string) Session["AMMDATASET"]).Split('@');
+            var amministrazione = ((string)Session["AMMDATASET"]).Split('@');
             var codiceAmministrazione = amministrazione[0];
             var idAmministrazione = Utils.getIdAmmByCod(codiceAmministrazione, this);
 
@@ -2994,6 +3047,11 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                         template.NUM_MESI_CONSERVAZIONE = "0";
                     else
                         template.NUM_MESI_CONSERVAZIONE = txt_MesiConservazione.Text;
+
+                    if (cb_Procedimentale.Checked)
+                        template.PROCEDIMENTALE = "1";
+                    else
+                        template.PROCEDIMENTALE = "0";
 
                     ProfilazioneFascManager.salvaTemplateFasc(datiAmministratore, template, idAmministrazione, this);
                     Panel_NuovoModello.Visible = false;
@@ -3066,7 +3124,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             // Vengono aggiunte le righe, che rappresentano i tipi di documento, al DataGrid che contiene, l'elenco
             // di questi ultimi. Per la definizione del DataSource del DataGrid, è stato creato un DataTable
             // contente una colonna Tipo di Documento.
-            var amministrazione = ((string) Session["AMMDATASET"]).Split('@');
+            var amministrazione = ((string)Session["AMMDATASET"]).Split('@');
             var codiceAmministrazione = amministrazione[0];
             var idAmministrazione = Utils.getIdAmmByCod(codiceAmministrazione, this);
 
@@ -3079,9 +3137,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             for (var i = 0; i < listaTemplates.Count; i++)
             {
                 var dr = dt_listaTemplates.NewRow();
-                dr["Tipo"] = ((Templates) listaTemplates[i]).DESCRIZIONE;
-                dr["In Esercizio"] = ((Templates) listaTemplates[i]).IN_ESERCIZIO;
-                dr["IDTemplate"] = ((Templates) listaTemplates[i]).ID_TEMPLATE_STRUTTURA;
+                dr["Tipo"] = ((Templates)listaTemplates[i]).DESCRIZIONE;
+                dr["In Esercizio"] = ((Templates)listaTemplates[i]).IN_ESERCIZIO;
+                dr["IDTemplate"] = ((Templates)listaTemplates[i]).ID_TEMPLATE_STRUTTURA;
                 dt_listaTemplates.Rows.Add(dr);
             }
 
@@ -3091,7 +3149,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             // Imposto le colonne : Privato, Mesi Conservazione e Template Struttura
             for (var i = 0; i < listaTemplates.Count; i++)
             {
-                var template = (Templates) listaTemplates[i];
+                var template = (Templates)listaTemplates[i];
                 var privato = dg_listaTemplates.Items[i].FindControl("lbl_privato") as Label;
                 privato.Text = "NO";
                 if (template.PRIVATO != null && template.PRIVATO == "1")
@@ -3114,6 +3172,13 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                             lbTemplate.Text = result[0][1].ToString();
                     }
                 }
+                // Imposto la colonna Procedimentale
+                //Label lbl_procedimentale = ((Label)dg_listaTemplates.Items[i].Cells[8].Controls[3]);
+                var lbl_procedimentale = dg_listaTemplates.Items[i].FindControl("lbl_procedimentale") as Label;
+                if (!string.IsNullOrEmpty(template.PROCEDIMENTALE) && template.PROCEDIMENTALE == "1")
+                    lbl_procedimentale.Text = "SI";
+                else
+                    lbl_procedimentale.Text = "NO";
             }
 
             // Imposto il campo Diagramma di Stato
@@ -3121,7 +3186,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 ConfigurationManager.AppSettings["DiagrammiStato"] == "1")
                 for (var i = 0; i < listaTemplates.Count; i++)
                 {
-                    var template = (Templates) listaTemplates[i];
+                    var template = (Templates)listaTemplates[i];
                     var idDiagrammaAssociato =
                         DiagrammiManager.getDiagrammaAssociatoFasc(Convert.ToString(template.SYSTEM_ID), this);
                     var diagrammaAssociato = DiagrammiManager.getDiagrammaById(idDiagrammaAssociato.ToString(), this);
@@ -3135,16 +3200,16 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             // Imposto le differenze grafiche e funzionali per l'iperfascicolo che sicuro è il primo della lista
             // avendo ordinato lato backend l'array nel metodo "getTemplatesFasc"
             if (listaTemplates != null && listaTemplates.Count != 0)
-                if (((Templates) listaTemplates[0]).IPER_FASC_DOC == "1")
+                if (((Templates)listaTemplates[0]).IPER_FASC_DOC == "1")
                 {
                     dg_listaTemplates.Items[0].Cells[0].ControlStyle.Font.Bold = true;
                     dg_listaTemplates.Items[0].Cells[1].Enabled = false;
-                    ((Label) dg_listaTemplates.Items[0].Cells[1].Controls[3]).Visible = false;
-                    ((ImageButton) dg_listaTemplates.Items[0].Cells[1].Controls[1]).Visible = false;
+                    ((Label)dg_listaTemplates.Items[0].Cells[1].Controls[3]).Visible = false;
+                    ((ImageButton)dg_listaTemplates.Items[0].Cells[1].Controls[1]).Visible = false;
                     dg_listaTemplates.Items[0].Cells[2].Enabled = false;
                     dg_listaTemplates.Items[0].Cells[3].Enabled = false;
                     dg_listaTemplates.Items[0].Cells[4].Enabled = false;
-                    ((ImageButton) dg_listaTemplates.Items[0].Cells[4].Controls[1]).Visible = false;
+                    ((ImageButton)dg_listaTemplates.Items[0].Cells[4].Controls[1]).Visible = false;
                     dg_listaTemplates.Items[0].Cells[5].Enabled = false;
                     dg_listaTemplates.Items[0].Cells[7].Controls[0].Visible = false;
                     dg_listaTemplates.Items[0].BackColor = Color.Gray;
@@ -3159,7 +3224,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
         private void impostaImmaginiModelli()
         {
-            var amministrazione = ((string) Session["AMMDATASET"]).Split('@');
+            var amministrazione = ((string)Session["AMMDATASET"]).Split('@');
             var codiceAmministrazione = amministrazione[0];
             var idAmministrazione = Utils.getIdAmmByCod(codiceAmministrazione, this);
 
@@ -3168,29 +3233,29 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             //Imposto il campo Modelli
             for (var i = 0; i < listaTemplates.Count; i++)
             {
-                var template = (Templates) listaTemplates[i];
+                var template = (Templates)listaTemplates[i];
                 if (template.PATH_MODELLO_1 != "" && template.PATH_MODELLO_2 == "")
                 {
-                    ((Image) dg_listaTemplates.Items[i].Cells[3].Controls[3]).Visible = true;
-                    ((Image) dg_listaTemplates.Items[i].Cells[3].Controls[5]).Visible = false;
+                    ((Image)dg_listaTemplates.Items[i].Cells[3].Controls[3]).Visible = true;
+                    ((Image)dg_listaTemplates.Items[i].Cells[3].Controls[5]).Visible = false;
                 }
                 if (template.PATH_MODELLO_2 != "")
                 {
-                    ((Image) dg_listaTemplates.Items[i].Cells[3].Controls[3]).Visible = false;
-                    ((Image) dg_listaTemplates.Items[i].Cells[3].Controls[5]).Visible = true;
+                    ((Image)dg_listaTemplates.Items[i].Cells[3].Controls[3]).Visible = false;
+                    ((Image)dg_listaTemplates.Items[i].Cells[3].Controls[5]).Visible = true;
                 }
                 if (template.PATH_MODELLO_1 == "" && template.PATH_MODELLO_2 == "")
                 {
-                    ((Image) dg_listaTemplates.Items[i].Cells[3].Controls[3]).Visible = false;
-                    ((Image) dg_listaTemplates.Items[i].Cells[3].Controls[5]).Visible = false;
+                    ((Image)dg_listaTemplates.Items[i].Cells[3].Controls[3]).Visible = false;
+                    ((Image)dg_listaTemplates.Items[i].Cells[3].Controls[5]).Visible = false;
                 }
             }
         }
 
         private void btn_inEsercizio_Click(object sender, EventArgs e)
         {
-            var template = (Templates) Session["template"];
-            var amministrazione = ((string) Session["AMMDATASET"]).Split('@');
+            var template = (Templates)Session["template"];
+            var amministrazione = ((string)Session["AMMDATASET"]).Split('@');
             var codiceAmministrazione = amministrazione[0];
             var idAmministrazione = Utils.getIdAmmByCod(codiceAmministrazione, this);
 
@@ -3211,11 +3276,19 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             popolaTemplateDG();
         }
 
+        private void btn_replica_Click(object sender, System.EventArgs e)
+        {
+            DocsPAWA.DocsPaWR.Templates template = (DocsPAWA.DocsPaWR.Templates)Session["template"];
+            Session.Add("templateSelPerReplicaFasc", template);
+
+            RegisterStartupScript("ReplicaInAOO", "<script>apriPopupReplicaInAoo();</script>");
+        }
+
         private void dg_listaTemplates_DeleteCommand(object source, DataGridCommandEventArgs e)
         {
-            if (((HtmlInputHidden) FindControl("txt_confirmDel")).Value == "si")
+            if (((HtmlInputHidden)FindControl("txt_confirmDel")).Value == "si")
             {
-                ((HtmlInputHidden) FindControl("txt_confirmDel")).Value = "";
+                ((HtmlInputHidden)FindControl("txt_confirmDel")).Value = "";
                 Panel_Diagrammi_Trasmissioni.Visible = false;
 
                 //Metodo invocato quando si desidera rimuovere un componente dal DataGrid contenente la lista di quest'ultimi.
@@ -3223,11 +3296,11 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 var elSelezionato = e.Item.ItemIndex;
                 if (elSelezionato != -1)
                 {
-                    var amministrazione = ((string) Session["AMMDATASET"]).Split('@');
+                    var amministrazione = ((string)Session["AMMDATASET"]).Split('@');
                     var codiceAmministrazione = amministrazione[0];
                     idAmministrazione = Utils.getIdAmmByCod(codiceAmministrazione, this);
 
-                    var template = (Templates) listaTemplates[elSelezionato];
+                    var template = (Templates)listaTemplates[elSelezionato];
                     ProfilazioneFascManager.disabilitaTemplateFasc(template, idAmministrazione, codiceAmministrazione,
                         this);
 
@@ -3254,6 +3327,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                     btn_anteprima.Visible = false;
                     btn_salvaTemplate.Visible = false;
                     btn_inEsercizio.Visible = false;
+                    btn_replica.Visible = false;
                     lbl_titolo.Visible = true;
                     lbl_nameTypeFasc.Text = "";
                 }
@@ -3266,7 +3340,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             listaTemplates = new ArrayList(ProfilazioneFascManager.getTemplatesFasc(idAmministrazione, this));
             var template =
                 ProfilazioneFascManager.getTemplateFascById(
-                    ((Templates) listaTemplates[elSelezionato]).SYSTEM_ID.ToString(), this);
+                    ((Templates)listaTemplates[elSelezionato]).SYSTEM_ID.ToString(), this);
             PanelsVisibility = false;
 
             switch (e.CommandName)
@@ -3295,6 +3369,13 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                     btn_inEsercizio.Visible = true;
                     btn_inEsercizio.Text = template.IN_ESERCIZIO.Equals("NO") ? "In Esercizio" : "Sospendi";
 
+                    // Il pulsante replica è attivo solo per i SYSTEM ADMINISTRATOR
+                    DocsPAWA.DocsPaWR.InfoUtenteAmministratore _datiAmministratore = new DocsPAWA.DocsPaWR.InfoUtenteAmministratore();
+                    DocsPAWA.AdminTool.Manager.SessionManager session = new DocsPAWA.AdminTool.Manager.SessionManager();
+                    _datiAmministratore = session.getUserAmmSession();
+                    if (_datiAmministratore.tipoAmministratore.Equals("1"))
+                        btn_replica.Visible = true;
+                    
                     btn_CampiComuni.Visible = false;
                     if (template.IPER_FASC_DOC != "1")
                         btn_CampiComuni.Visible = verificaEsistenzaCampiComuni();
@@ -3305,11 +3386,6 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                         lbl_nameTypeFasc.Text = "";
                     }
                     dg_listaComponenti.SelectedIndex = -1;
-
-                    this.btn_Storico.Visible = true;
-                    this.btn_Storico.Enabled = template.ELENCO_OGGETTI.Length > 0;
-                    this.btn_Storico.OnClientClick = GetOpenScript(DocsPaWR.ObjectType.Folder);
-
                     break;
 
                 case "Diagrammi":
@@ -3322,7 +3398,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                     btn_anteprima.Visible = false;
                     btn_salvaTemplate.Visible = false;
                     btn_inEsercizio.Visible = false;
+                    btn_replica.Visible = false;
                     Panel_MesiCons.Visible = false;
+                    Panel_Procedimentale.Visible = false;
 
                     Session.Add("templateSelPerDiagrTrasm", template);
                     lbl_tipoFasc.Text = template.DESCRIZIONE;
@@ -3364,6 +3442,16 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                     LblTipoFascMesiCons.Text = template.DESCRIZIONE;
                     txt_ModMesiCons.Text = template.NUM_MESI_CONSERVAZIONE;
                     break;
+                case "Procedimentale":
+                    Panel_Procedimentale.Visible = true;
+                    Session.Add("templateSelPerProcedimentale", template);
+                    dg_listaTemplates.SelectedIndex = elSelezionato;
+                    LblTipoFascProcedimentale.Text = template.DESCRIZIONE;
+                    if (!string.IsNullOrEmpty(template.PROCEDIMENTALE) && template.PROCEDIMENTALE == "1")
+                        cb_ModProcedimentale.Checked = true;
+                    else
+                        cb_ModProcedimentale.Checked = false;
+                    break;
 
                 case "Struttura":
                     pnlTemplateStruttura.Visible = true;
@@ -3387,14 +3475,6 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             }
         }
 
-        public static String GetOpenScript(ObjectType objType)
-        {
-            return String.Format(
-                "window.showModalDialog('{0}/AdminTool/Gestione_ProfDinamica/GestioneStoricoProfDinamica.aspx?objType={1}', '', 'dialogWidth:588px;dialogHeight:350px; resizable: no;status:no;scroll:yes;help:no;close:no;center:yes;');",
-                Utils.getHttpFullPath(), objType == ObjectType.Document ? "D" : "F");
-
-        }
-
         #endregion DataGrid Lista Templates - btn_InEsercizio
 
         #region btn_up_1_Click - btn_down_1_Click
@@ -3408,7 +3488,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             if (dg_listaComponenti.SelectedIndex != 0)
             {
                 var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
-                var template = (Templates) Session["template"];
+                var template = (Templates)Session["template"];
                 Session.Add("template",
                     ProfilazioneFascManager.spostaOggettoFasc(template, oggettoSelezionato, "UP", this));
 
@@ -3430,7 +3510,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             if (dg_listaComponenti.SelectedIndex < dg_listaComponenti.Items.Count - 1)
             {
                 var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
-                var template = (Templates) Session["template"];
+                var template = (Templates)Session["template"];
                 Session.Add("template",
                     ProfilazioneFascManager.spostaOggettoFasc(template, oggettoSelezionato, "DOWN", this));
 
@@ -3466,16 +3546,16 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             for (var i = 0; i < dg.Count; i++)
             {
                 var item = new ListItem();
-                item.Text = ((DiagrammaStato) dg[i]).DESCRIZIONE;
-                item.Value = ((DiagrammaStato) dg[i]).SYSTEM_ID.ToString();
+                item.Text = ((DiagrammaStato)dg[i]).DESCRIZIONE;
+                item.Value = ((DiagrammaStato)dg[i]).SYSTEM_ID.ToString();
                 ddl_Diagrammi.Items.Add(item);
             }
-            var template = (Templates) Session["templateSelPerDiagrTrasm"];
+            var template = (Templates)Session["templateSelPerDiagrTrasm"];
             var idTipoFasc = template.SYSTEM_ID.ToString();
             var idDiagrammaAssociato = DiagrammiManager.getDiagrammaAssociatoFasc(idTipoFasc, this);
             if (idDiagrammaAssociato != 0)
                 for (var i = 0; i < dg.Count; i++)
-                    if (idDiagrammaAssociato == ((DiagrammaStato) dg[i]).SYSTEM_ID)
+                    if (idDiagrammaAssociato == ((DiagrammaStato)dg[i]).SYSTEM_ID)
                     {
                         ddl_Diagrammi.SelectedIndex = i + 1;
                         break;
@@ -3529,7 +3609,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 }
 
                 ProfilazioneFascManager.updateScadenzeTipoFasc(
-                    ((Templates) Session["templateSelPerDiagrTrasm"]).SYSTEM_ID, txt_scadenza.Text, txt_preScadenza.Text,
+                    ((Templates)Session["templateSelPerDiagrTrasm"]).SYSTEM_ID, txt_scadenza.Text, txt_preScadenza.Text,
                     this);
             }
             catch (Exception ex)
@@ -3539,7 +3619,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
                 return;
             }
 
-            var template = (Templates) Session["templateSelPerDiagrTrasm"];
+            var template = (Templates)Session["templateSelPerDiagrTrasm"];
             var idTipoFasc = template.SYSTEM_ID.ToString();
 
             if (ddl_Diagrammi.SelectedItem.Value != "0")
@@ -3558,7 +3638,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
         private void caricaDgStati()
         {
-            var template = (Templates) Session["templateSelPerDiagrTrasm"];
+            var template = (Templates)Session["templateSelPerDiagrTrasm"];
             var idTipoFasc = template.SYSTEM_ID.ToString();
             var idDiagrammaAssociato = DiagrammiManager.getDiagrammaAssociatoFasc(idTipoFasc, this);
             var diagrammaAssociato = DiagrammiManager.getDiagrammaById(idDiagrammaAssociato.ToString(), this);
@@ -3614,7 +3694,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
         private void btn_modelliTrasm_Click(object sender, EventArgs e)
         {
-            var template = (Templates) Session["templateSelPerDiagrTrasm"];
+            var template = (Templates)Session["templateSelPerDiagrTrasm"];
             var idTipoFasc = template.SYSTEM_ID.ToString();
             var idDiagrammaAssociato = DiagrammiManager.getDiagrammaAssociatoFasc(idTipoFasc, this);
             if (idDiagrammaAssociato == 0 && ddl_Diagrammi.SelectedIndex != 0)
@@ -3636,7 +3716,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
 
         private void dg_Stati_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var template = (Templates) Session["templateSelPerDiagrTrasm"];
+            var template = (Templates)Session["templateSelPerDiagrTrasm"];
             var idTipoFasc = template.SYSTEM_ID.ToString();
             var idDiagrammaAssociato = DiagrammiManager.getDiagrammaAssociatoFasc(idTipoFasc, this);
             if (idDiagrammaAssociato == 0 && ddl_Diagrammi.SelectedIndex != 0)
@@ -3663,7 +3743,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
             //Controllo se tutti i documenti con questa tipologia e associati a questo diagramma
             //si trovano in uno stato finale
             var result = false;
-            var template = (Templates) Session["templateSelPerDiagrTrasm"];
+            var template = (Templates)Session["templateSelPerDiagrTrasm"];
             var idTipoFasc = template.SYSTEM_ID.ToString();
 
             if (ddl_Diagrammi.SelectedIndex != 0)
@@ -3781,7 +3861,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             for (var i = 0; i < listaTemplates.Count; i++)
             {
-                var template = (Templates) listaTemplates[i];
+                var template = (Templates)listaTemplates[i];
                 if (template.IPER_FASC_DOC == "1")
                     return true;
             }
@@ -3796,9 +3876,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
                         if (valoreOggetto.VALORE == ddl_valoriMenuATendina.SelectedItem.Text &&
                             cb_Default_MenuATendina.Checked)
@@ -3812,9 +3892,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
                         if (valoreOggetto.VALORE == ddl_valoriSelezioneEsclusiva.SelectedItem.Text &&
                             cb_Default_SelezioneEsclusiva.Checked)
@@ -3828,9 +3908,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
                         if (valoreOggetto.VALORE == ddl_valoriCasellaSelezione.SelectedItem.Text &&
                             cb_Default_CasellaSelezione.Checked)
@@ -3848,9 +3928,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
                         if (valoreOggetto.VALORE == ddl_valoriCasellaSelezione.SelectedItem.Text)
                             if (cb_Disabilitato_CasellaSelezione.Checked)
@@ -3864,9 +3944,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
                         if (valoreOggetto.VALORE == ddl_valoriSelezioneEsclusiva.SelectedItem.Text)
                             if (cb_Disabilitato_SelezioneEsclusiva.Checked)
@@ -3880,9 +3960,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamicaFasc
         {
             var oggettoSelezionato = dg_listaComponenti.SelectedIndex;
             if (oggettoSelezionato != -1)
-                if (((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
+                if (((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato] != null)
                 {
-                    var oggettoCustom = ((Templates) Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
+                    var oggettoCustom = ((Templates)Session["template"]).ELENCO_OGGETTI[oggettoSelezionato];
                     foreach (var valoreOggetto in oggettoCustom.ELENCO_VALORI)
                         if (valoreOggetto.VALORE == ddl_valoriMenuATendina.SelectedItem.Text)
                             if (cb_Disabilitato_MenuATendina.Checked)

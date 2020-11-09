@@ -10,7 +10,6 @@ using System.Xml.Serialization;
 using log4net;
 using DocsPaVO.Conservazione;
 using DocsPaVO.Conservazione.PARER;
-using DocsPaVO.Conservazione.PARER.BigFiles;
 using DocsPaVO.areaConservazione;
 using DocsPaVO.documento;
 using DocsPaVO.fascicolazione;
@@ -21,8 +20,6 @@ using BusinessLogic.Documenti;
 using System.IO;
 using System.Web;
 using System.Data;
-using ICSharpCode.SharpZipLib.Zip;
-
 
 namespace BusinessLogic.Conservazione
 {
@@ -161,15 +158,7 @@ namespace BusinessLogic.Conservazione
                                 }
 
                                 //VERIFICo FORMATO e valido
-                                try
-                                {
-                                    ammesso = this.checkFormatItemConservazione(itemsCons, infoUtente, out convertibile, out daValidare);
-                                }
-                                catch(Exception ex)
-                                {
-                                    logger.Debug(">>> ", ex);
-                                    ammesso = false;
-                                }
+                                ammesso = this.checkFormatItemConservazione(itemsCons, infoUtente, out convertibile, out daValidare);
                                 rigaReportFromati.Ammesso = ammesso ? "1" : "0";
 
                                 //Verifica Consolidamento
@@ -272,15 +261,7 @@ namespace BusinessLogic.Conservazione
                                         }
 
                                         // Determina se il formato è valido per la conservazione
-                                        try
-                                        {
-                                            ammesso = this.checkFormatAllegato(all, infoUtente, rigaReportFromati.Estensione, out convertibile, out daValidare);
-                                        }
-                                        catch(Exception ex)
-                                        {
-                                            logger.Debug(">>> ", ex);
-                                            ammesso = false;
-                                        }
+                                        ammesso = this.checkFormatAllegato(all, infoUtente, rigaReportFromati.Estensione, out convertibile, out daValidare);
                                         rigaReportFromati.Ammesso = ammesso ? "1" : "0";
 
                                         firmato = !string.IsNullOrEmpty(all.firmato) && all.firmato.Equals("1");
@@ -1507,9 +1488,7 @@ namespace BusinessLogic.Conservazione
             Registro,
             FatturaElettronica,
             LottoDiFatture,
-            VerbaleSinteticoDiSeduta,
-            FatturaAttiva,
-            LottoDiFattureAttive
+            VerbaleSinteticoDiSeduta
         }
 
         public string getStatoConservazione(string idDoc)
@@ -1518,7 +1497,7 @@ namespace BusinessLogic.Conservazione
             return cons.getStatoConservazione(idDoc);
         }
 
-        public string insertDocInCons(string idDoc, InfoUtente infoUtente, string ente, string struttura)
+        public string insertDocInCons(string idDoc, InfoUtente infoUtente)
         {
             string result = string.Empty;
 
@@ -1533,7 +1512,7 @@ namespace BusinessLogic.Conservazione
                 if (stato.Equals("N") || stato.Equals("R") || stato.Equals("F"))
                 {
 
-                    result = this.AddDocToQueueConservazione(idDoc, infoUtente, stato, ente, struttura);
+                    result = this.AddDocToQueueConservazione(idDoc, infoUtente, stato);
 
                     // MEV Policy e responsabile conservazione
                     // In seguito all'inserimento in coda deve essere data visibilità del documento al responsabile della conservazione (se configurato)
@@ -1568,45 +1547,24 @@ namespace BusinessLogic.Conservazione
 
         }
 
-        private string AddDocToQueueConservazione(string idDoc, InfoUtente infoUtente, string stato, string ente, string struttura)
+        private string AddDocToQueueConservazione(string idDoc, InfoUtente infoUtente, string stato)
         {
             string result = string.Empty;
 
             DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
             if (stato.Equals("N"))
             {
-                if (!cons.addDocToQueueCons(idDoc, infoUtente, ente, struttura))
+                if (!cons.addDocToQueueCons(idDoc, infoUtente))
                     result = "INS_ERR";
                 else
                     result = "OK";
             }
             else
             {
-                using (DocsPaDB.TransactionContext context = new DocsPaDB.TransactionContext())
-                {
-                    if (!cons.updateQueueCons(idDoc, infoUtente, "V", false, string.Empty, "NULL"))
-                        result = "INS_ERR";
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(ente) || !string.IsNullOrEmpty(struttura))
-                        {
-                            if (!cons.updateQueueConsSetCustomParams(idDoc, ente, struttura))
-                            {
-                                result = "UPD_ERR";
-                            }
-                            else
-                            {
-                                result = "OK";
-                                context.Complete();
-                            }
-                        }
-                        else
-                        {
-                            result = "OK";
-                            context.Complete();
-                        }
-                    }                   
-                }
+                if (!cons.updateQueueCons(idDoc, infoUtente, "V", false, string.Empty, "NULL"))
+                    result = "INS_ERR";
+                else
+                    result = "OK";
             }
 
 
@@ -1645,9 +1603,6 @@ namespace BusinessLogic.Conservazione
                 // URL del web service del servizio di versamento
                 string uri = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_VERSAMENTO_URL");
 
-                // MEV BIG FILES
-                string maxFileSize = this.getConfigKey("0", "BE_VERSAMENTO_MAX_FILE_SIZE");
-
                 if (string.IsNullOrEmpty(uri))
                 {
                     logger.Info("Versamento non effettuato: errore nel reperimento dell'URL del servizio");
@@ -1660,10 +1615,8 @@ namespace BusinessLogic.Conservazione
                     foreach (ItemsVersamento item in docToSend)
                     {
                         logger.Info(string.Format("Inizio versamento per ID={0} ({1} di {2})", item.idProfile, counter, docToSend.Count));
-
                         if (this.GetStatoAttivazione(item.idAmm))
                         {
-
                             InfoUtente utente = this.getInfoUtenteVersamento(item);
                             if (utente != null)
                             {
@@ -1688,43 +1641,8 @@ namespace BusinessLogic.Conservazione
                                     result = false;
                                 }
 
-                                SchedaDocumento sch = null;
-                                try
-                                {
-                                    sch = BusinessLogic.Documenti.DocManager.getDettaglioNoSecurity(utente, item.idProfile);
-                                }
-                                catch(Exception)
-                                {
-                                    logger.Error("Errore reperimento scheda documento per ID=" + item.idProfile);
-                                    sch = null;
-                                }
-                                
-
-
-                                bool isBigFile = false;
-
-                                // MEV BIG FILES
-                                if (!string.IsNullOrEmpty(maxFileSize))
-                                {
-                                    int totalFileSize = DocManager.TotalFileSizeDocument(item.idProfile);
-                                    logger.Debug("Dimensione totale file: " + totalFileSize);
-
-                                    int maxTotalFileSize;
-                                    if (Int32.TryParse(maxFileSize, out maxTotalFileSize))
-                                    {
-                                        isBigFile = totalFileSize >= maxTotalFileSize;
-                                    }
-                                }
-                                if (isBigFile)
-                                {
-                                    //result = this.VersamentoBigFileUpload(utente, sch);
-                                    result = this.VersamentoBigFilePreIngest(item, utente, sch, maxTentativi, maxTentativiStampe);
-                                }
-                                else
-                                {
-                                    result = this.VersamentoDoc(item, utente, versamentoUserName, versamentoPwd, versamentoVer, uri, maxTentativi, maxTentativiStampe, sch);
-                                    counter++;
-                                }
+                                result = this.VersamentoDoc(item, utente, versamentoUserName, versamentoPwd, versamentoVer, uri, maxTentativi, maxTentativiStampe);
+                                counter++;
                                 if (result)
                                     logger.Info("RESULT: OK");
                                 else
@@ -1750,56 +1668,7 @@ namespace BusinessLogic.Conservazione
 
         }
 
-        public void ExecuteVersamentoBigFiles()
-        {
-            DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
-            List<ItemsVersamento> docList = null;
-
-            logger.Debug(">> 1 - Invio documenti via FTP");
-            docList = cons.getListaDocByStato(new string[1] { "B" });
-
-            if(docList == null)
-            {
-                logger.Debug(">> Errore nel reperimento della lista");
-            }
-            else if(docList.Count == 0)
-            {
-                logger.Debug(">> Non ci sono documenti in stato B (in attesa di versamento big files");
-            }
-            else
-            {
-                foreach(ItemsVersamento item in docList)
-                {
-                    InfoUtente utente = this.getInfoUtenteVersamento(item);
-                    SchedaDocumento doc = BusinessLogic.Documenti.DocManager.getDettaglioNoSecurity(utente, item.idProfile);
-
-                    this.VersamentoBigFileUpload(utente, doc);
-                }
-            }
-
-            docList = new List<ItemsVersamento>();
-            logger.Debug(">> 2 - Controllo documenti versati");
-            docList = cons.getListaDocByStato(new string[1] { "K" });
-
-            if(docList == null)
-            {
-                logger.Debug(">> Errore nel reperimento della lista");
-            }
-            else if(docList.Count == 0)
-            {
-                logger.Debug(">> Non ci sono documenti in stato K (in attesa di esito big files");
-            }
-            else
-            {
-                foreach(ItemsVersamento item in docList)
-                {
-                    InfoUtente utente = this.getInfoUtenteVersamento(item);
-                    this.VersamentoBigFileControllaEsito(item.idProfile, utente);
-                }
-            }
-
-        }
-
+        /* 11/02/19 Conservazione - MEV Reportistica */
         /// <summary>
         /// Metodo per il versamento di un singolo documento
         /// </summary>
@@ -1833,7 +1702,7 @@ namespace BusinessLogic.Conservazione
                     if (statoCons == "N")
                     {
                         // Inserimento in coda
-                        this.insertDocInCons(idProfile, respCons, string.Empty, string.Empty);
+                        this.insertDocInCons(idProfile, respCons);
                     }
 
                     cons.updateQueueCons(idProfile, respCons, "W", false, string.Empty, "NULL");
@@ -1858,11 +1727,8 @@ namespace BusinessLogic.Conservazione
                     // Estensione visibilità al responsabile della conservazione
                     this.SetVisibilitaRuoloResp(idProfile, respCons.idGruppo, string.Empty);
 
-                    // recupero scheda doc
-                    SchedaDocumento sch = BusinessLogic.Documenti.DocManager.getDettaglioNoSecurity(respCons, idProfile);
-
                     // Avvio versamento
-                    bool result = this.VersamentoDoc(item, respCons, versamentoUserName, versamentoPwd, versamentoVer, uri, maxTentativi, maxTentativiStampe, sch);
+                    bool result = this.VersamentoDoc(item, respCons, versamentoUserName, versamentoPwd, versamentoVer, uri, maxTentativi, maxTentativiStampe);
                     if (result)
                         logger.Info("RESULT: OK");
                     else
@@ -1884,7 +1750,8 @@ namespace BusinessLogic.Conservazione
             }
         }
 
-        public bool VersamentoDoc(ItemsVersamento item, InfoUtente utente, string userName, string pwd, string version, string uri, string maxTentativi, string maxTentativiStampe, SchedaDocumento sch)
+
+        public bool VersamentoDoc(ItemsVersamento item, InfoUtente utente, string userName, string pwd, string version, string uri, string maxTentativi, string maxTentativiStampe)
         {
 
             // valore da restituire
@@ -1901,11 +1768,15 @@ namespace BusinessLogic.Conservazione
 
             DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
 
+            /* 11/02/19 Conservazione - MEV Reportistica */
+            SchedaDocumento sch = new SchedaDocumento();
+
             try
             {
-
+                
+                /* 11/02/19 Conservazione - MEV Reportistica */
                 // recupero scheda doc
-                //sch = BusinessLogic.Documenti.DocManager.getDettaglioNoSecurity(utente, idDoc);
+                sch = BusinessLogic.Documenti.DocManager.getDettaglioNoSecurity(utente, idDoc);
 
                 if (sch != null)
                 {
@@ -1916,6 +1787,7 @@ namespace BusinessLogic.Conservazione
 
                     // XML metadati
                     XmlDocument xmlMeta = this.createXMLMetadati(sch, utente);
+                    //xmlMeta.Save("C:\\Windows\\Temp\\test_meta.xml"); // TEMP
 
                     // inserimento in DB file metadati
                     bool result = cons.insertFileXML("DPA_VERSAMENTO", idDoc, "VAR_FILE_METADATI", xmlMeta.InnerXml);
@@ -1923,7 +1795,7 @@ namespace BusinessLogic.Conservazione
                         throw new Exception("Errore nel salvataggio del file dei metadati PITre");
 
                     // XML versamento
-                    XmlDocument xmlDoc = this.createXMLDoc(sch, utente, userName, out filesToSend);
+                    XmlDocument xmlDoc = this.createXMLDoc(sch, utente, out filesToSend);
                     if (filesToSend.Equals(null))
                         throw new Exception("Errore nel reperimento dei file da versare");
                     
@@ -1931,12 +1803,29 @@ namespace BusinessLogic.Conservazione
                     logger.Debug(xmlDoc.InnerXml);
                     logger.Debug("----- fine CHIAMATA XML -----");
 
+                    // aggiungo nel dictionary
+                    /*
+                    foreach (KeyValuePair<string, FileDocumento> pair in filesToSend)
+                    {
+                        if (pair.Value.nomeOriginale.Equals("Metadati PITre.xml"))
+                        {
+                            pair.Value.content = Encoding.UTF8.GetBytes(xmlMeta.InnerXml);
+                            pair.Value.length = pair.Value.content.Length;
+                        }
+                    }
+                     * */
+
                     // impostazione parametri request
                     NameValueCollection formFields = new NameValueCollection();
                     formFields.Add("VERSIONE", version);
                     formFields.Add("LOGINNAME", userName);
                     formFields.Add("PASSWORD", pwd);
                     formFields.Add("XMLSIP", this.replaceSpecialChars(xmlDoc.InnerXml));
+
+                    // URL del web service del servizio di versamento
+                    //string uri = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_VERSAMENTO_URL");
+                    //if (string.IsNullOrEmpty(uri))
+                    //    throw new Exception("Impossibile recuperare l'URL del servizio di versamento");
 
                     string res = this.sendRequest(formFields, filesToSend, uri);
                     XmlDocument xmlResult = new XmlDocument();
@@ -1950,6 +1839,7 @@ namespace BusinessLogic.Conservazione
                         else
                         {
                             xmlResult.LoadXml(res);
+                            //xmlResult.Save("C:\\Windows\\Temp\\test_result.xml"); // TEMP
 
                             // recupero esito versamento
                             string esito = string.Empty;
@@ -2022,10 +1912,6 @@ namespace BusinessLogic.Conservazione
 
                     retVal = true;
                 }
-                else
-                {
-                    throw new Exception("SchedaDocumento null");
-                }
             }
             catch (Exception ex)
             {
@@ -2079,16 +1965,15 @@ namespace BusinessLogic.Conservazione
                                         }
                                     }
                                 }
-
-                                
                             }
                         }
                         else
                         {
                             numTentativi = "1";
                         }
-
                     }
+
+                    /* 11/02/19 Conservazione - MEV Reportistica */
                     if (isStampa)
                     {
                         if (cha_esito.Equals("E") || cha_esito.Equals("F") || cha_esito.Equals("R"))
@@ -2096,6 +1981,7 @@ namespace BusinessLogic.Conservazione
                             this.SendMailFailure(item.idAmm, cha_esito, item.idProfile);
                         }
                     }
+
                     // aggiorno la coda di versamento
                     bool result = cons.updateQueueCons(idDoc, utente, cha_esito, true, cha_warning, numTentativi);
 
@@ -2273,8 +2159,10 @@ namespace BusinessLogic.Conservazione
             //ente.InnerText = "Ente_Test_Parer";
             //struttura.InnerText = "PITre-test";
             ambiente.InnerText = this.getConfigKey(utente.idAmministrazione, "BE_VERSAMENTO_AMBIENTE");
-            ente.InnerText = this.replaceSpecialCharsHeader(amm.Codice);
-            struttura.InnerText = reg != null ? this.replaceSpecialChars(reg.codice) : this.replaceSpecialCharsHeader(amm.Codice);
+            //ente.InnerText = this.replaceSpecialCharsHeader(amm.Codice);
+            ente.InnerText = this.getConfigKey(utente.idAmministrazione, "BE_VERSAMENTO_ENTE");
+            //struttura.InnerText = reg != null ? this.replaceSpecialChars(reg.codice) : this.replaceSpecialCharsHeader(amm.Codice);
+            struttura.InnerText = this.getConfigKey(utente.idAmministrazione, "BE_VERSAMENTO_STRUTTURA");
             userId.InnerText = this.getConfigKey(utente.idAmministrazione, "BE_VERSAMENTO_USER");
 
             ChiaveVersamento c = this.getChiaveVersamento(doc, this.getTipoDocumento(doc, amm.Codice));
@@ -2499,7 +2387,7 @@ namespace BusinessLogic.Conservazione
             return retVal;
         }
 
-        private XmlDocument createXMLDoc(SchedaDocumento doc, InfoUtente infoUt, string userVersamento, out Dictionary<string, FileDocumento> filesToSend)
+        private XmlDocument createXMLDoc(SchedaDocumento doc, InfoUtente infoUt, out Dictionary<string, FileDocumento> filesToSend)
         {
 
             XmlDocument xml = new XmlDocument();
@@ -2555,14 +2443,6 @@ namespace BusinessLogic.Conservazione
                     xml.LoadXml(this.getTemplateXML(amm.IDAmm, "V"));
                     versioneDati = this.getVersioneDatiSpecifici(amm.IDAmm, "V");
                     break;
-                case TipologiaUnitaDocumentaria.FatturaAttiva:
-                    xml.LoadXml(this.getTemplateXML(amm.IDAmm, "A"));
-                    versioneDati = this.getVersioneDatiSpecifici(amm.IDAmm, "A");
-                    break;
-                case TipologiaUnitaDocumentaria.LottoDiFattureAttive:
-                    xml.LoadXml(this.getTemplateXML(amm.IDAmm, "B"));
-                    versioneDati = this.getVersioneDatiSpecifici(amm.IDAmm, "B");
-                    break;
             }
 
             // contatore progressivo componenti
@@ -2572,7 +2452,6 @@ namespace BusinessLogic.Conservazione
 
             ArrayList listaRegistri = BusinessLogic.Amministrazione.RegistroManager.GetRegistri(amm.Codice, "0");
             string strutturaParer = string.Empty;
-            string enteParer = this.replaceSpecialCharsHeader(amm.Codice);
 
             #region MEV STRUTTURA PER ENTI MULTI AOO
             if (listaRegistri != null && listaRegistri.Count > 1 && !string.IsNullOrEmpty(this.getConfigKey(amm.IDAmm, "BE_VERSAMENTO_MULTI_AOO")) && this.getConfigKey(amm.IDAmm, "BE_VERSAMENTO_MULTI_AOO").Equals("1"))
@@ -2669,23 +2548,6 @@ namespace BusinessLogic.Conservazione
 
             #endregion
 
-            #region CUSTOMIZZAZIONE ENTE E STRUTTURA
-            string customEnte = string.Empty;
-            string customStruttura = string.Empty;
-            if(this.getCustomParamsSacer(doc.systemId, out customEnte, out customStruttura))
-            {
-                if (!string.IsNullOrEmpty(customEnte))
-                {
-                    enteParer = customEnte;
-                    logger.Debug(">> Parametro custom per il campo ENTE: " + enteParer);
-                }
-                if(!string.IsNullOrEmpty(customStruttura))
-                {
-                    strutturaParer = customStruttura;
-                    logger.Debug(">> Parametro custom per il campo STRUTTURA: " + strutturaParer);
-                }
-            }
-            #endregion
 
             #region Intestazione
 
@@ -2697,14 +2559,15 @@ namespace BusinessLogic.Conservazione
             intestazioneNode.SelectSingleNode("Versione").InnerText = versione;
 
             intestazioneNode.SelectSingleNode("Versatore/Ambiente").InnerText = this.getConfigKey(amm.IDAmm, "BE_VERSAMENTO_AMBIENTE");
-            intestazioneNode.SelectSingleNode("Versatore/Ente").InnerText = enteParer;
-            intestazioneNode.SelectSingleNode("Versatore/Struttura").InnerText = strutturaParer;
+            intestazioneNode.SelectSingleNode("Versatore/Ente").InnerText = this.getConfigKey(amm.IDAmm, "BE_VERSAMENTO_ENTE");
+            intestazioneNode.SelectSingleNode("Versatore/Struttura").InnerText = this.getConfigKey(amm.IDAmm, "BE_VERSAMENTO_STRUTTURA");
+            //intestazioneNode.SelectSingleNode("Versatore/Ente").InnerText = this.replaceSpecialCharsHeader(amm.Codice);
+            //intestazioneNode.SelectSingleNode("Versatore/Struttura").InnerText = strutturaParer;
             // VALORI CABLATI UTILIZZATI IN TEST
             //intestazioneNode.SelectSingleNode("Versatore/Ambiente").InnerText = "PARER_TEST";
             //intestazioneNode.SelectSingleNode("Versatore/Ente").InnerText = "PAT";
             //intestazioneNode.SelectSingleNode("Versatore/Struttura").InnerText = "PAT";
-            //intestazioneNode.SelectSingleNode("Versatore/UserID").InnerText = this.getConfigKey(infoUt.idAmministrazione, "BE_VERSAMENTO_USER");
-            intestazioneNode.SelectSingleNode("Versatore/UserID").InnerText = userVersamento;
+            intestazioneNode.SelectSingleNode("Versatore/UserID").InnerText = this.getConfigKey(infoUt.idAmministrazione, "BE_VERSAMENTO_USER");
 
             #endregion
 
@@ -2713,7 +2576,7 @@ namespace BusinessLogic.Conservazione
             logger.Debug("Configurazione");
             XmlNode configurazioneNode = xml.SelectSingleNode("UnitaDocumentaria/Configurazione");
             configurazioneNode.SelectSingleNode("TipoConservazione").InnerText = "VERSAMENTO_ANTICIPATO";
-            if (tipoDoc == TipologiaUnitaDocumentaria.FatturaElettronica || tipoDoc == TipologiaUnitaDocumentaria.LottoDiFatture || tipoDoc == TipologiaUnitaDocumentaria.FatturaAttiva || tipoDoc == TipologiaUnitaDocumentaria.LottoDiFattureAttive)
+            if (tipoDoc == TipologiaUnitaDocumentaria.FatturaElettronica || tipoDoc == TipologiaUnitaDocumentaria.LottoDiFatture)
                 configurazioneNode.SelectSingleNode("TipoConservazione").InnerText = "FISCALE";
 
             configurazioneNode.SelectSingleNode("ForzaConservazione").InnerText = "true";
@@ -3018,9 +2881,7 @@ namespace BusinessLogic.Conservazione
             string docPrincDesc = "Documento Principale";
             if (tipoDoc == TipologiaUnitaDocumentaria.LottoDiFatture)
                 docPrincDesc = "LOTTO DI FATTURE";
-            if (tipoDoc == TipologiaUnitaDocumentaria.LottoDiFattureAttive)
-                docPrincDesc = "LOTTO DI FATTURE ATTIVE";
-            if (tipoDoc == TipologiaUnitaDocumentaria.FatturaElettronica || tipoDoc == TipologiaUnitaDocumentaria.FatturaAttiva)
+            if (tipoDoc == TipologiaUnitaDocumentaria.FatturaElettronica)
             {
                 if (doc.template != null && !string.IsNullOrEmpty(doc.template.DESCRIZIONE))
                 {
@@ -3187,7 +3048,8 @@ namespace BusinessLogic.Conservazione
                     }
                 }
             }
-            // MEV CONSERVAZIONE FIRMA ELETTRONICA COME SOTTOCOMPONENTE
+
+            /* 11/02/19 Conservazione */
             int sottocomponenti = 1;
             XmlElement sottoCompNode = xml.CreateElement("SottoComponenti");
             docPrincipaleNode.SelectSingleNode("StrutturaOriginale/Componenti/Componente").AppendChild(sottoCompNode);
@@ -3204,6 +3066,7 @@ namespace BusinessLogic.Conservazione
                         if (!string.IsNullOrEmpty(firma.Xml))
                         {
                             XmlNode sottoComp = docPrincipaleNode.SelectSingleNode("StrutturaOriginale/Componenti/Componente/SottoComponenti");
+                            //XmlElement sc = this.AddSottoComponenteFirma(ref xml, docPrincipale);
                             XmlElement sc = this.AddSottoComponenteFirma(ref xml, docPrincipale);
                             string idSottoComponente = doc.docNumber + "_C" + componenti.ToString() + "_SC" + sottocomponenti.ToString();
                             sc.SelectSingleNode("ID").InnerText = idSottoComponente;
@@ -3232,7 +3095,6 @@ namespace BusinessLogic.Conservazione
 
                 }
             }
-
             // verifico l'eventuale presenza di marche (SE NON E' TSD)
             if (!(BusinessLogic.Documenti.FileManager.getExtFileFromPath(fileDocPrincipale.name).ToUpper().Contains("TSD")) && !isTSD)
             {
@@ -3240,7 +3102,8 @@ namespace BusinessLogic.Conservazione
                 if (timestampArray != null && timestampArray.Count > 0)
                 {
                     //XmlElement sottoComp = xml.CreateElement("SottoComponenti");
-                    XmlNode sottoComp = docPrincipaleNode.SelectSingleNode("StrutturaOriginale/Componenti/Componente/SottoComponenti");
+                    /* 11/02/19 Conservazione */
+                    XmlNode sottoComp = docPrincipaleNode.SelectSingleNode("SottoComponenti");
 
                     // contatore sottocomponenti associate al componente
                     //int sottocomponenti = 1;
@@ -3271,17 +3134,18 @@ namespace BusinessLogic.Conservazione
                         sottoComp.AppendChild(sc);
 
                     }
+
                     docPrincipaleNode.SelectSingleNode("StrutturaOriginale/Componenti/Componente").AppendChild(sottoComp);
                 }
-
+                /* 11/02/19 Conservazione */
+                // Rimuovo l'elemento SottoComponenti se vuoto
+                if (docPrincipaleNode.SelectSingleNode("StrutturaOriginale/Componenti/Componente/SottoComponenti").ChildNodes == null || docPrincipaleNode.SelectSingleNode("StrutturaOriginale/Componenti/Componente/SottoComponenti").ChildNodes.Count == 0)
+                {
+                    XmlNode n = xml.SelectSingleNode("UnitaDocumentaria/DocumentoPrincipale/StrutturaOriginale/Componenti/Componente");
+                    n.RemoveChild(n.SelectSingleNode("SottoComponenti"));
+                }
+                
             }
-            // Rimuovo l'elemento SottoComponenti se vuoto
-            if (docPrincipaleNode.SelectSingleNode("StrutturaOriginale/Componenti/Componente/SottoComponenti").ChildNodes == null || docPrincipaleNode.SelectSingleNode("StrutturaOriginale/Componenti/Componente/SottoComponenti").ChildNodes.Count == 0)
-            {
-                XmlNode n = xml.SelectSingleNode("UnitaDocumentaria/DocumentoPrincipale/StrutturaOriginale/Componenti/Componente");
-                n.RemoveChild(n.SelectSingleNode("SottoComponenti"));
-            }
-
 
             #endregion
 
@@ -3329,9 +3193,11 @@ namespace BusinessLogic.Conservazione
                                 if (element.SelectSingleNode("StrutturaOriginale/Componenti/Componente/SottoComponenti") != null)
                                 {
                                     XmlNodeList sc = element.SelectNodes("StrutturaOriginale/Componenti/Componente/SottoComponenti/SottoComponente");
+                                    /* 11/02/19 Conservazione - MEV Reportistica */
                                     int sottocomponentiAll = 1;
                                     foreach (XmlNode n in sc)
                                     {
+                                        /* 11/02/19 Conservazione - MEV Reportistica */
                                         string idSc = doc.docNumber + "_C" + componenti.ToString() + "_SC" + sottocomponentiAll.ToString();
                                         n.SelectSingleNode("ID").InnerText = idSc;
                                         n.SelectSingleNode("OrdinePresentazione").InnerText = (sottocomponentiAll + 1).ToString();
@@ -3408,24 +3274,24 @@ namespace BusinessLogic.Conservazione
                     node.RemoveChild(node.SelectSingleNode("NumeroAllegati"));
                     node.RemoveChild(node.SelectSingleNode("Allegati"));
                 }
-                // Il primo annesso è il file XML con i metadati aggiuntivi dei documenti
-                XmlElement metadatiElement = this.AddMetadatiElement(ref xml, docPrincipale, "M", infoUt);
-                string idAnnMetadati = doc.docNumber + "_C" + componenti.ToString();
-                metadatiElement.SelectSingleNode("StrutturaOriginale/Componenti/Componente/ID").InnerText = idAnnMetadati;
+                //// Il primo annesso è il file XML con i metadati aggiuntivi dei documenti
+                //XmlElement metadatiElement = this.AddMetadatiElement(ref xml, docPrincipale, "M", infoUt);
+                //string idAnnMetadati = doc.docNumber + "_C" + componenti.ToString();
+                //metadatiElement.SelectSingleNode("StrutturaOriginale/Componenti/Componente/ID").InnerText = idAnnMetadati;
 
-                // Creo il FileDocumento e ci inserisco il file XML da DB
-                FileDocumento fdMeta = new FileDocumento();
-                fdMeta.estensioneFile = "XML";
-                fdMeta.nomeOriginale = "Metadati_PITre.xml";
-                fdMeta.fullName = "Metadati_PITre.xml";
-                fdMeta.content = Encoding.UTF8.GetBytes(this.getFileMetadati(doc.docNumber));
-                fdMeta.length = fdMeta.content.Length;
-                filesToSend.Add(idAnnMetadati, fdMeta);
+                //// Creo il FileDocumento e ci inserisco il file XML da DB
+                //FileDocumento fdMeta = new FileDocumento();
+                //fdMeta.estensioneFile = "XML";
+                //fdMeta.nomeOriginale = "Metadati_PITre.xml";
+                //fdMeta.fullName = "Metadati_PITre.xml";
+                //fdMeta.content = Encoding.UTF8.GetBytes(this.getFileMetadati(doc.docNumber));
+                //fdMeta.length = fdMeta.content.Length;
+                //filesToSend.Add(idAnnMetadati, fdMeta);
 
-                metadatiElement.SelectSingleNode("StrutturaOriginale/Componenti/Componente/HashVersato").InnerText = DocsPaUtils.Security.CryptographyManager.CalcolaImpronta256(fdMeta.content);
+                //metadatiElement.SelectSingleNode("StrutturaOriginale/Componenti/Componente/HashVersato").InnerText = DocsPaUtils.Security.CryptographyManager.CalcolaImpronta256(fdMeta.content);
 
-                componenti++;
-                xml.SelectSingleNode("UnitaDocumentaria/Annessi").AppendChild(metadatiElement);
+                //componenti++;
+                //xml.SelectSingleNode("UnitaDocumentaria/Annessi").AppendChild(metadatiElement);
 
                 // Allegati PEC, PITre e Sistemi Esterni
                 ArrayList annessi = new ArrayList();
@@ -3459,6 +3325,7 @@ namespace BusinessLogic.Conservazione
                             int sottocomponentiAll = 1;
                             foreach (XmlNode n in sc)
                             {
+                                /* 11/02/19 Conservazione */
                                 string idSc = doc.docNumber + "_C" + componenti.ToString() + "_SC" + sottocomponentiAll.ToString();
                                 n.SelectSingleNode("ID").InnerText = idSc;
                                 n.SelectSingleNode("OrdinePresentazione").InnerText = (sottocomponentiAll + 1).ToString();
@@ -3511,7 +3378,10 @@ namespace BusinessLogic.Conservazione
                 }
                 else
                 {
-                    xml.SelectSingleNode("UnitaDocumentaria/NumeroAnnessi").InnerText = "1";
+                    //xml.SelectSingleNode("UnitaDocumentaria/NumeroAnnessi").InnerText = "1";
+                    XmlNode node = xml.SelectSingleNode("UnitaDocumentaria");
+                    node.RemoveChild(node.SelectSingleNode("NumeroAnnessi"));
+                    node.RemoveChild(node.SelectSingleNode("Annessi"));
                 }
 
                 // Annotazioni
@@ -3655,8 +3525,19 @@ namespace BusinessLogic.Conservazione
                                     XmlNodeList sc = element.SelectNodes("StrutturaOriginale/Componenti/Componente/SottoComponenti/SottoComponente");
                                     int sottocomponentiAll = 1;
                                     foreach (XmlNode n in sc)
-                                    {                                        
+                                    {
                                         string idSc = doc.docNumber + "_C" + componenti.ToString() + "_SC" + sottocomponentiAll.ToString();
+                                        //if (!string.IsNullOrEmpty(n.SelectSingleNode("ID").InnerText))
+                                        //{
+                                        //    // costruisco il filedocumento da inserire nel dictionary
+                                        //    FileDocumento fdFirma = new FileDocumento();
+                                        //    fdFirma.estensioneFile = "XML";
+                                        //    fdFirma.nomeOriginale = all.versionId + "_firma_elettronica_" + sottocomponenti.ToString() + ".xml";
+                                        //    fdFirma.fullName = all.versionId + "_firma_elettronica_" + sottocomponenti.ToString() + ".xml";
+                                        //    fdFirma.content = Encoding.UTF8.GetBytes(n.SelectSingleNode("ID").InnerText);
+                                        //    fdFirma.length = fdFirma.content.Length;
+                                        //    filesToSend.Add(idSc, fdFirma);
+                                        //}
                                         n.SelectSingleNode("ID").InnerText = idSc;
                                         n.SelectSingleNode("OrdinePresentazione").InnerText = (sottocomponentiAll + 1).ToString();
                                         n.SelectSingleNode("NomeComponente").InnerText = n.SelectSingleNode("NomeComponente").InnerText.Replace("@@", sottocomponentiAll.ToString());
@@ -3889,6 +3770,21 @@ namespace BusinessLogic.Conservazione
                             foreach (XmlNode n in sc)
                             {
                                 n.SelectSingleNode("ID").InnerText = doc.docNumber + "_C" + componenti.ToString() + "_SC" + sottocomponentiAll.ToString();
+                                ///* 11/02/19 Conservazione */
+                                //string idSc = doc.docNumber + "_C" + componenti.ToString() + "_SC" + sottocomponentiAll.ToString();
+                                //if (!string.IsNullOrEmpty(n.SelectSingleNode("ID").InnerText))
+                                //{
+                                //    // costruisco il filedocumento da inserire nel dictionary
+                                //    FileDocumento fdFirma = new FileDocumento();
+                                //    fdFirma.estensioneFile = "XML";
+                                //    fdFirma.nomeOriginale = all.versionId + "_firma_elettronica_" + sottocomponenti.ToString() + ".xml";
+                                //    fdFirma.fullName = all.versionId + "_firma_elettronica_" + sottocomponenti.ToString() + ".xml";
+                                //    fdFirma.content = Encoding.UTF8.GetBytes(n.SelectSingleNode("ID").InnerText);
+                                //    fdFirma.length = fdFirma.content.Length;
+                                //    filesToSend.Add(idSc, fdFirma);
+                                //}
+
+                                //n.SelectSingleNode("ID").InnerText = idSc;
                                 n.SelectSingleNode("OrdinePresentazione").InnerText = (sottocomponentiAll + 1).ToString();
                                 n.SelectSingleNode("NomeComponente").InnerText = n.SelectSingleNode("NomeComponente").InnerText.Replace("@@", sottocomponentiAll.ToString());
                                 n.SelectSingleNode("IDComponenteVersato").InnerText = n.SelectSingleNode("IDComponenteVersato").InnerText.Replace("@@", sottocomponentiAll.ToString());
@@ -4171,6 +4067,7 @@ namespace BusinessLogic.Conservazione
             XmlElement idVersione = xml.CreateElement("IDComponenteVersato");
             XmlElement rifTermporale = xml.CreateElement("RiferimentoTemporale");
             XmlElement descrizioneRifTemporale = xml.CreateElement("DescrizioneRiferimentoTemporale");
+            /* 11/02/19 Conservazione */
             XmlElement sottocomponenti = xml.CreateElement("SottoComponenti");
 
             bool addSottoComponenti = false;
@@ -4190,9 +4087,9 @@ namespace BusinessLogic.Conservazione
                     addRifTemporale = true;
                 }
 
-                // MEV FIRMA
+                /* 11/02/19 Conservazione */
                 logger.Debug("Allegato firmato - ricerca info firma");
-                
+
                 List<DocsPaVO.LibroFirma.FirmaElettronica> listaFirme = BusinessLogic.Documenti.FileManager.GetElectronicSignatureDocument(doc.docNumber, doc.versionId, utente);
                 if (listaFirme != null && listaFirme.Count > 0)
                 {
@@ -4227,7 +4124,10 @@ namespace BusinessLogic.Conservazione
 
                 if (!BusinessLogic.Documenti.FileManager.getExtFileFromPath(doc.fileName).ToUpper().Contains("TSD"))
                 {
+                    // XmlElement sottocomponenti = xml.CreateElement("SottoComponenti");
+                    /* 11/02/19 Conservazione - MEV */
                     addSottoComponenti = true;
+
                     foreach (DocsPaVO.documento.TimestampDoc tsr in timestamps)
                     {
                         XmlElement sc = this.AddSottoComponente(ref xml, doc, tsr);
@@ -4291,6 +4191,7 @@ namespace BusinessLogic.Conservazione
                 element.AppendChild(rifTermporale);
                 element.AppendChild(descrizioneRifTemporale);
             }
+            /* 11/02/19 Conservazione - MEV */
             if (addSottoComponenti)
             {
                 element.AppendChild(sottocomponenti);
@@ -4332,6 +4233,7 @@ namespace BusinessLogic.Conservazione
             return element;
         }
 
+        /* 11/02/19 Conservazione */
         private XmlElement AddSottoComponenteFirma(ref XmlDocument xml, DocsPaVO.documento.FileRequest doc)
         {
             XmlElement element = xml.CreateElement("SottoComponente");
@@ -4345,9 +4247,12 @@ namespace BusinessLogic.Conservazione
             XmlElement idVersione = xml.CreateElement("IDComponenteVersato");
             XmlElement contentFirma = xml.CreateElement("ContentFirma"); // valorizzato fuori con stringa xml
 
+            //tipoComponente.InnerText = "FIRMA_ELETTRONICA";
+            /* 11/02/19 Conservazione */
             tipoComponente.InnerText = "Firma elettronica";
+
             tipoSupporto.InnerText = "FILE";
-            nome.InnerText = doc.versionId + "_firma_elettronica_@@.xml";
+            nome.InnerText = doc.versionLabel + "_firma_elettronica_@@.xml";
             formato.InnerText = "XML";
             idVersione.InnerText = doc.versionId + "_@@";
 
@@ -4544,7 +4449,7 @@ namespace BusinessLogic.Conservazione
 
                     if (oggContatore.TIPO_CONTATORE.Equals("T") || string.IsNullOrEmpty(oggContatore.ID_AOO_RF) || oggContatore.ID_AOO_RF == "0")
                     {
-                        tipoRegistro = doc.template.DESCRIZIONE.Trim();
+                        tipoRegistro = doc.template.DESCRIZIONE.Trim(); ;
                         nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
                         nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
                         nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
@@ -4554,7 +4459,7 @@ namespace BusinessLogic.Conservazione
                     {
                         logger.Debug("contatore AOO");
                         DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(oggContatore.ID_AOO_RF);
-                        tipoRegistro = reg.codRegistro + " - " + doc.template.DESCRIZIONE.Trim();
+                        tipoRegistro = reg.codRegistro + " - " + doc.template.DESCRIZIONE.Trim(); ;
                         //tipoRegistro = tipoRegistro + " - " + reg.codRegistro;
                         if (!reg.Equals(null))
                         {
@@ -4575,7 +4480,7 @@ namespace BusinessLogic.Conservazione
                         DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(oggContatore.ID_AOO_RF);
                         // MODIFICA 01-07-2015 per repertori RF
                         //tipoRegistro = reg.codRegistro + " - " + doc.template.DESCRIZIONE;
-                        tipoRegistro = doc.template.DESCRIZIONE.Trim();
+                        tipoRegistro = doc.template.DESCRIZIONE.Trim(); ;
                         nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = reg.codRegistro + " - " + oggContatore.VALORE_DATABASE;
                         if (!reg.Equals(null))
                         {
@@ -4849,13 +4754,7 @@ namespace BusinessLogic.Conservazione
                         {
                             reg = BusinessLogic.Utenti.RegistriManager.getRegistro(stampa.idRegistro);
 
-                            if(reg == null)
-                            {
-                                logger.Debug("Registro non estratto - TIPOLOGIA");
-                                contatore.TIPO_CONTATORE = "T";
-                                settings = BusinessLogic.utenti.RegistriRepertorioPrintManager.GetRegisterSettings(stampa.idRepertorio, "", "", DocsPaVO.utente.Repertori.RegistroRepertorio.TipologyKind.D, DocsPaVO.utente.Repertori.RegistroRepertorio.SettingsType.S);
-                            }
-                            else if (reg.chaRF.Equals("1"))
+                            if (reg.chaRF.Equals("1"))
                             {
                                 // RF
                                 logger.Debug("RF");
@@ -4882,7 +4781,7 @@ namespace BusinessLogic.Conservazione
                             settings = BusinessLogic.utenti.RegistriRepertorioPrintManager.GetRegisterSettings(stampa.idRepertorio, "", "", DocsPaVO.utente.Repertori.RegistroRepertorio.TipologyKind.D, DocsPaVO.utente.Repertori.RegistroRepertorio.SettingsType.S);
                         }
 
-                        if (contatore != null)
+                        if (settings != null && contatore != null)
                         {
                             logger.Debug("Impostazione dati specifici contatore");
                             // imposto il tipo registro
@@ -4939,12 +4838,12 @@ namespace BusinessLogic.Conservazione
                             //nodeDatiSpecifici.SelectSingleNode("TipoRegistro").InnerText = "Registro di repertorio";
                             // -------------------------
 
-                            if (settings != null && !string.IsNullOrEmpty(settings.RoleAndUserDescription))
+                            if (!string.IsNullOrEmpty(settings.RoleAndUserDescription))
                                 nodeDatiSpecifici.SelectSingleNode("RuoloResponsabileRegistro").InnerText = settings.RoleAndUserDescription.Split('-')[0].Trim();
                             else
                                 nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("RuoloResponsabileRegistro"));
 
-                            if (settings != null && !string.IsNullOrEmpty(settings.LongPrintFrequency))
+                            if (!string.IsNullOrEmpty(settings.LongPrintFrequency))
                                 nodeDatiSpecifici.SelectSingleNode("FrequenzaDiStampa").InnerText = settings.LongPrintFrequency;
                             else
                                 nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("FrequenzaDiStampa"));
@@ -5606,519 +5505,6 @@ namespace BusinessLogic.Conservazione
 
                     break;
                 #endregion
-
-                #region Fattura attiva
-                case TipologiaUnitaDocumentaria.FatturaAttiva:
-                    logger.Debug("Fattura elettronica attiva");
-                    nodeIntestazione.SelectSingleNode("TipologiaUnitaDocumentaria").InnerText = "FATTURA ELETTRONICA ATTIVA";
-                    #region Analisi protocollo
-                    if (doc.protocollo != null && !string.IsNullOrEmpty(doc.protocollo.numero))
-                    {
-                        logger.Debug("Fattura attiva protocollata");
-                        nodeDatiSpecifici.SelectSingleNode("NumeroProtocollo").InnerText = doc.protocollo.numero;
-                        nodeDatiSpecifici.SelectSingleNode("AnnoProtocollazione").InnerText = doc.protocollo.anno;
-                        nodeDatiSpecifici.SelectSingleNode("TipoRegistroProtocollo").InnerText = "Protocollo";
-                        nodeDatiSpecifici.SelectSingleNode("DataProtocollazione").InnerText = this.formatDate(doc.protocollo.dataProtocollazione);
-
-                        nodeDatiSpecifici.SelectSingleNode("SegnaturaProtocollo").InnerText = doc.protocollo.segnatura;
-                        nodeDatiSpecifici.SelectSingleNode("TipoProtocollo").InnerText = doc.tipoProto;
-                        nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_PROT").InnerText = doc.registro.codRegistro;
-                        nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_PROT").InnerText = doc.registro.descrizione;
-                        if (!string.IsNullOrEmpty(doc.registro.chaRF) && doc.registro.chaRF.Equals("1"))
-                        {
-                            nodeDatiSpecifici.SelectSingleNode("CodiceRF_PROT").InnerText = doc.registro.codRegistro;
-                            nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_PROT").InnerText = doc.registro.descrizione;
-                        }
-                        else
-                        {
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_PROT"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_PROT"));
-                        }
-                        
-                        if (doc.tipoProto.Equals("P") || doc.tipoProto.Equals("I"))
-                        {
-                            #region Destinatari
-                            if (((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatari != null)
-                            {
-                                logger.Debug("Analisi destinatari");
-                                string destinatari = string.Empty;
-
-                                foreach (object item in ((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatari)
-                                {
-                                    DocsPaVO.utente.Corrispondente destinatario = (DocsPaVO.utente.Corrispondente)item;
-                                    if (!string.IsNullOrEmpty(destinatari))
-                                        destinatari = destinatari + ";";
-
-                                    destinatari = destinatari + destinatario.descrizione;
-                                }
-
-                                if (((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatariConoscenza != null && ((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatariConoscenza.Count > 0)
-                                {
-                                    foreach (object item in ((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatariConoscenza)
-                                    {
-                                        DocsPaVO.utente.Corrispondente destinatario = (DocsPaVO.utente.Corrispondente)item;
-                                        if (!string.IsNullOrEmpty(destinatari))
-                                            destinatari = destinatari + ";";
-
-                                        destinatari = destinatari + destinatario.descrizione;
-                                    }
-                                }
-                            }
-                            #endregion
-
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DataSpedizione"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("OraSpedizione"));
-                        }
-                        if (doc.tipoProto.Equals("A"))
-                        {
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("Destinatario"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DataSpedizione"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("OraSpedizione"));
-                        }
-
-                    }
-                    else
-                    {
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("NumeroProtocollo"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("AnnoProtocollazione"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("TipoRegistroProtocollo"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DataProtocollazione"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("SegnaturaProtocollo"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("TipoProtocollo"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_PROT"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_PROT"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_PROT"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_PROT"));
-                    }
-                    #endregion
-                    #region Analisi repertorio
-                    DocsPaVO.ProfilazioneDinamica.OggettoCustom contatoreX3 = this.getContatoreRepertorio(doc);
-                    if (contatoreX3 != null && contatoreX3.CONS_REPERTORIO != null && contatoreX3.CONS_REPERTORIO.Equals("1"))
-                    {
-                        logger.Debug("Fattura repertoriata");
-                        nodeIntestazione.SelectSingleNode("TipologiaUnitaDocumentaria").InnerText = "FATTURA ELETTRONICA ATTIVA";
-                        string repertorioX = BusinessLogic.Documenti.DocManager.GetSegnaturaRepertorio(doc.docNumber, amm.Codice, false, out data);
-
-                        nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = contatoreX3.VALORE_DATABASE;
-                        nodeIntestazione.SelectSingleNode("Chiave/Anno").InnerText = contatoreX3.ANNO;
-
-                        nodeDatiSpecifici.SelectSingleNode("NumeroRepertorio").InnerText = contatoreX3.VALORE_DATABASE;
-                        nodeDatiSpecifici.SelectSingleNode("DataRepertorio").InnerText = this.formatDate(contatoreX3.DATA_INSERIMENTO);
-
-                        // Questo serve per versamenti di fatture vecchie nel caso in cui il tipo sia stato cambiato da AOO a RF (o viceversa)
-                        try
-                        {
-                            DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(contatoreX3.ID_AOO_RF);
-                            logger.DebugFormat("Tipo contatore: {0} - ID registro {1} - chaRF={2} ", contatoreX3.TIPO_CONTATORE, reg.systemId, reg.chaRF);
-                            if (contatoreX3.TIPO_CONTATORE.Equals("A") && reg.chaRF.Equals("1"))
-                            {
-                                contatoreX3.TIPO_CONTATORE = "R";
-                                logger.Debug("TipoContatore modificato in R");
-                            }
-                            else if (contatoreX3.TIPO_CONTATORE.Equals("R") && reg.chaRF.Equals("0"))
-                            {
-                                contatoreX3.TIPO_CONTATORE = "A";
-                                logger.Debug("TipoContatore modificato in A");
-                            }
-                        }
-                        catch (Exception exReg)
-                        {
-                            logger.Debug(exReg.Message);
-                        }
-
-                        string tipoRegistroX = string.Empty;
-                        if (contatoreX3.TIPO_CONTATORE.Equals("T"))
-                        {
-                            tipoRegistroX = doc.template.DESCRIZIONE;
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP"));
-                        }
-                        if (contatoreX3.TIPO_CONTATORE.Equals("A"))
-                        {
-                            logger.Debug("contatore AOO");
-                            DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(contatoreX3.ID_AOO_RF);
-                            tipoRegistroX = reg.codRegistro + " - " + doc.template.DESCRIZIONE;
-                            //tipoRegistro = tipoRegistro + " - " + reg.codRegistro;
-                            if (!reg.Equals(null))
-                            {
-                                nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP").InnerText = reg.codRegistro;
-                                nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP").InnerText = reg.descrizione;
-                            }
-                            else
-                            {
-                                nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
-                                nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP"));
-                            }
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
-                        }
-                        if (contatoreX3.TIPO_CONTATORE.Equals("R"))
-                        {
-                            logger.Debug("contatore RF");
-                            DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(contatoreX3.ID_AOO_RF);
-                            // MODIFICA 01-07-2015 per repertori RF
-                            //tipoRegistroX = reg.codRegistro + " - " + doc.template.DESCRIZIONE;
-                            tipoRegistroX = doc.template.DESCRIZIONE;
-                            nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = reg.codRegistro + " - " + contatoreX3.VALORE_DATABASE;
-                            //nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = contatoreX.VALORE_DATABASE;
-
-                            if (!reg.Equals(null))
-                            {
-                                nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP").InnerText = reg.codRegistro;
-                                nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP").InnerText = reg.descrizione;
-                            }
-                            else
-                            {
-                                nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
-                                nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
-                            }
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP"));
-                        }
-
-                        nodeIntestazione.SelectSingleNode("Chiave/TipoRegistro").InnerText = this.replaceSpecialCharsHeader(tipoRegistroX);
-                        //nodeIntestazione.SelectSingleNode("TipologiaUnitaDocumentaria").InnerText = "Documento Repertoriato";
-
-                        nodeUD.SelectSingleNode("Data").InnerText = this.formatDate(contatoreX3.DATA_INSERIMENTO);
-                        nodeDatiSpecifici.SelectSingleNode("SegnaturaRepertorio").InnerText = repertorioX;
-
-                    }
-                    else
-                    {
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("SegnaturaRepertorio"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("NumeroRepertorio"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DataRepertorio"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
-                        nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = doc.systemId;
-                        nodeIntestazione.SelectSingleNode("Chiave/Anno").InnerText = this.getDate(doc.dataCreazione.Trim()).Split('/').Last();
-                        nodeIntestazione.SelectSingleNode("Chiave/TipoRegistro").InnerText = "PITre";
-                    }
-                    #endregion
-                    #region Analisi tipologia
-                    if (doc.template != null && doc.template.DESCRIZIONE != null)
-                    {
-                        nodeDatiSpecifici.SelectSingleNode("TipologiaDocumentalePITre").InnerText = doc.template.DESCRIZIONE;
-                        string pIva = string.Empty;
-                        string cf = string.Empty;
-                        string pivaOrCfType = string.Empty;
-                        foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom oggetto in doc.template.ELENCO_OGGETTI)
-                        {
-                            if(!string.IsNullOrEmpty(oggetto.DESCRIZIONE))
-                            {
-                                string descOggetto = oggetto.DESCRIZIONE.ToUpper();
-                                switch(descOggetto)
-                                {
-                                    case "NUMERO FATTURA":
-                                        nodeDatiSpecifici.SelectSingleNode("NumeroEmissione").InnerText = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "DATA EMISSIONE":
-                                        nodeDatiSpecifici.SelectSingleNode("DataEmissione").InnerText = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "CLIENTE":
-                                        nodeDatiSpecifici.SelectSingleNode("DenominazioneDestinatario").InnerText = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "PARTITA IVA CLIENTE":
-                                        pIva = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "CODICE FISCALE CLIENTE":
-                                        cf = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "IDENTIFICATIVO SDI":
-                                        nodeDatiSpecifici.SelectSingleNode("IdentificativoSdI").InnerText = oggetto.VALORE_DATABASE;
-                                        break;
-                                }
-                            }
-                        }
-                        if(!string.IsNullOrEmpty(pIva) && pIva != "999")
-                        {
-                            nodeDatiSpecifici.SelectSingleNode("IdPaese").InnerText = "IT";
-                            nodeDatiSpecifici.SelectSingleNode("IdentificativoDestinatario").InnerText = pIva;
-                            nodeDatiSpecifici.SelectSingleNode("TipoIdentificativoDestinatario").InnerText = "PIVA";
-                        }
-                        else if(pIva == "999")
-                        {
-                            nodeDatiSpecifici.SelectSingleNode("IdPaese").InnerText = "Extra_IT";
-                            nodeDatiSpecifici.SelectSingleNode("IdentificativoDestinatario").InnerText = cf;
-                            nodeDatiSpecifici.SelectSingleNode("TipoIdentificativoDestinatario").InnerText = "CF";
-                        }
-                        else
-                        {
-                            nodeDatiSpecifici.SelectSingleNode("IdentificativoDestinatario").InnerText = cf;
-                            nodeDatiSpecifici.SelectSingleNode("TipoIdentificativoDestinatario").InnerText = "CF";
-                        }
-
-                        XmlNodeList nodesXFatt = nodeDatiSpecifici.SelectNodes(@"//*[not(node())]");
-                        if (nodesXFatt.Count > 0)
-                        {
-                            logger.Debug("presenti nodi vuoti");
-                            for (int i = nodesXFatt.Count - 1; i >= 0; i--)
-                            {
-                                nodesXFatt[i].ParentNode.RemoveChild(nodesXFatt[i]);
-                            }
-                        }
-
-
-                    }
-                    #endregion
-
-                    break;
-                #endregion
-
-                #region Lotto di fatture attive
-                case TipologiaUnitaDocumentaria.LottoDiFattureAttive:
-                    nodeIntestazione.SelectSingleNode("TipologiaUnitaDocumentaria").InnerText = "LOTTO DI FATTURE";
-                    #region Analisi protocollo
-                    if(doc.protocollo != null && !string.IsNullOrEmpty(doc.protocollo.numero))
-                    {
-                        logger.Debug("Lotto di fatture attive protocollato");
-                        nodeDatiSpecifici.SelectSingleNode("NumeroProtocollo").InnerText = doc.protocollo.numero;
-                        nodeDatiSpecifici.SelectSingleNode("AnnoProtocollazione").InnerText = doc.protocollo.anno;
-                        nodeDatiSpecifici.SelectSingleNode("DataProtocollazione").InnerText = this.formatDate(doc.protocollo.dataProtocollazione);
-
-                        nodeDatiSpecifici.SelectSingleNode("TipoRegistroProtocollo").InnerText = "Protocollo";
-                        nodeDatiSpecifici.SelectSingleNode("SegnaturaProtocollo").InnerText = doc.protocollo.segnatura;
-                        nodeDatiSpecifici.SelectSingleNode("TipoProtocollo").InnerText = doc.tipoProto;
-                        nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_PROT").InnerText = doc.registro.codRegistro;
-                        nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_PROT").InnerText = doc.registro.descrizione;
-                        if (!string.IsNullOrEmpty(doc.registro.chaRF) && doc.registro.chaRF.Equals("1"))
-                        {
-                            nodeDatiSpecifici.SelectSingleNode("CodiceRF_PROT").InnerText = doc.registro.codRegistro;
-                            nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_PROT").InnerText = doc.registro.descrizione;
-                        }
-                        else
-                        {
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_PROT"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_PROT"));
-                        }
-
-                        if (doc.tipoProto.Equals("P") || doc.tipoProto.Equals("I"))
-                        {
-                            #region Destinatari
-                            if (((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatari != null)
-                            {
-                                logger.Debug("Analisi destinatari");
-                                string destinatari = string.Empty;
-
-                                foreach (object item in ((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatari)
-                                {
-                                    DocsPaVO.utente.Corrispondente destinatario = (DocsPaVO.utente.Corrispondente)item;
-                                    if (!string.IsNullOrEmpty(destinatari))
-                                        destinatari = destinatari + ";";
-
-                                    destinatari = destinatari + destinatario.descrizione;
-                                }
-
-                                if (((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatariConoscenza != null && ((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatariConoscenza.Count > 0)
-                                {
-                                    foreach (object item in ((DocsPaVO.documento.ProtocolloUscita)doc.protocollo).destinatariConoscenza)
-                                    {
-                                        DocsPaVO.utente.Corrispondente destinatario = (DocsPaVO.utente.Corrispondente)item;
-                                        if (!string.IsNullOrEmpty(destinatari))
-                                            destinatari = destinatari + ";";
-
-                                        destinatari = destinatari + destinatario.descrizione;
-                                    }
-                                }
-                            }
-                            #endregion
-
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DataSpedizione"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("OraSpedizione"));
-                        }
-                        if (doc.tipoProto.Equals("A"))
-                        {
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("Destinatario"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DataSpedizione"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("OraSpedizione"));
-                        }
-                    }
-                    else
-                    {
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("NumeroProtocollo"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("AnnoProtocollazione"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("TipoRegistroProtocollo"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DataProtocollazione"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("SegnaturaProtocollo"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("TipoProtocollo"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_PROT"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_PROT"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_PROT"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_PROT"));
-                    }
-                    #endregion
-                    #region Analisi repertorio
-                    DocsPaVO.ProfilazioneDinamica.OggettoCustom contatoreX4 = this.getContatoreRepertorio(doc);
-                    if(contatoreX4 != null && contatoreX4.CONS_REPERTORIO != null && contatoreX4.CONS_REPERTORIO.Equals("1"))
-                    {
-                        logger.Debug("Lotto repertoriato");
-                        nodeIntestazione.SelectSingleNode("TipologiaUnitaDocumentaria").InnerText = "LOTTO DI FATTURE ATTIVE";
-                        string repertorioX = BusinessLogic.Documenti.DocManager.GetSegnaturaRepertorio(doc.docNumber, amm.Codice, false, out data);
-
-                        nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = contatoreX4.VALORE_DATABASE;
-                        nodeIntestazione.SelectSingleNode("Chiave/Anno").InnerText = contatoreX4.ANNO;
-
-                        nodeDatiSpecifici.SelectSingleNode("NumeroRepertorio").InnerText = contatoreX4.VALORE_DATABASE;
-                        nodeDatiSpecifici.SelectSingleNode("DataRepertorio").InnerText = this.formatDate(contatoreX4.DATA_INSERIMENTO);
-
-                        // Questo serve per versamenti di fatture vecchie nel caso in cui il tipo sia stato cambiato da AOO a RF (o viceversa)
-                        try
-                        {
-                            DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(contatoreX4.ID_AOO_RF);
-                            logger.DebugFormat("Tipo contatore: {0} - ID registro {1} - chaRF={2} ", contatoreX4.TIPO_CONTATORE, reg.systemId, reg.chaRF);
-                            if (contatoreX4.TIPO_CONTATORE.Equals("A") && reg.chaRF.Equals("1"))
-                            {
-                                contatoreX4.TIPO_CONTATORE = "R";
-                                logger.Debug("TipoContatore modificato in R");
-                            }
-                            else if (contatoreX4.TIPO_CONTATORE.Equals("R") && reg.chaRF.Equals("0"))
-                            {
-                                contatoreX4.TIPO_CONTATORE = "A";
-                                logger.Debug("TipoContatore modificato in A");
-                            }
-                        }
-                        catch (Exception exReg)
-                        {
-                            logger.Debug(exReg.Message);
-                        }
-
-                        string tipoRegistroX = string.Empty;
-                        if (contatoreX4.TIPO_CONTATORE.Equals("T"))
-                        {
-                            tipoRegistroX = doc.template.DESCRIZIONE;
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP"));
-                        }
-                        if (contatoreX4.TIPO_CONTATORE.Equals("A"))
-                        {
-                            logger.Debug("contatore AOO");
-                            DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(contatoreX4.ID_AOO_RF);
-                            tipoRegistroX = reg.codRegistro + " - " + doc.template.DESCRIZIONE;
-                            //tipoRegistro = tipoRegistro + " - " + reg.codRegistro;
-                            if (!reg.Equals(null))
-                            {
-                                nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP").InnerText = reg.codRegistro;
-                                nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP").InnerText = reg.descrizione;
-                            }
-                            else
-                            {
-                                nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
-                                nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP"));
-                            }
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
-                        }
-                        if (contatoreX4.TIPO_CONTATORE.Equals("R"))
-                        {
-                            logger.Debug("contatore RF");
-                            DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(contatoreX4.ID_AOO_RF);
-                            // MODIFICA 01-07-2015 per repertori RF
-                            //tipoRegistroX = reg.codRegistro + " - " + doc.template.DESCRIZIONE;
-                            tipoRegistroX = doc.template.DESCRIZIONE;
-                            nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = reg.codRegistro + " - " + contatoreX4.VALORE_DATABASE;
-                            //nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = contatoreX.VALORE_DATABASE;
-
-                            if (!reg.Equals(null))
-                            {
-                                nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP").InnerText = reg.codRegistro;
-                                nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP").InnerText = reg.descrizione;
-                            }
-                            else
-                            {
-                                nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
-                                nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
-                            }
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
-                            nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP"));
-                        }
-
-                        nodeIntestazione.SelectSingleNode("Chiave/TipoRegistro").InnerText = this.replaceSpecialCharsHeader(tipoRegistroX);
-                        //nodeIntestazione.SelectSingleNode("TipologiaUnitaDocumentaria").InnerText = "Documento Repertoriato";
-
-                        nodeUD.SelectSingleNode("Data").InnerText = this.formatDate(contatoreX4.DATA_INSERIMENTO);
-                        nodeDatiSpecifici.SelectSingleNode("SegnaturaRepertorio").InnerText = repertorioX;
-                    }
-                    else
-                    {
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("SegnaturaRepertorio"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("NumeroRepertorio"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DataRepertorio"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRegistro_REP"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRegistro_REP"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("CodiceRF_REP"));
-                        nodeDatiSpecifici.RemoveChild(nodeDatiSpecifici.SelectSingleNode("DescrizioneRF_REP"));
-                        nodeIntestazione.SelectSingleNode("Chiave/Numero").InnerText = doc.systemId;
-                        nodeIntestazione.SelectSingleNode("Chiave/Anno").InnerText = this.getDate(doc.dataCreazione.Trim()).Split('/').Last();
-                        nodeIntestazione.SelectSingleNode("Chiave/TipoRegistro").InnerText = "PITre";
-                    }
-                    #endregion
-                    #region Analisi tipologia
-                    if(doc.template != null && doc.template.DESCRIZIONE != null)
-                    {
-                        logger.Debug("Popolamento numeri fattura lotto");
-                        nodeDatiSpecifici.SelectSingleNode("NumeroEDataEmissione").InnerText = this.getNumeriFatturaLotto(doc, infoUt);
-                        nodeDatiSpecifici.SelectSingleNode("TipologiaDocumentalePITre").InnerText = doc.template.DESCRIZIONE;
-                        string pIva = string.Empty;
-                        string cf = string.Empty;
-                        string pivaOrCfType = string.Empty;
-                        foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom oggetto in doc.template.ELENCO_OGGETTI)
-                        {
-                            if (!string.IsNullOrEmpty(oggetto.DESCRIZIONE))
-                            {
-                                string descOggetto = oggetto.DESCRIZIONE.ToUpper();
-                                switch (descOggetto)
-                                {
-                                    case "NUMERO FATTURA":
-                                        nodeDatiSpecifici.SelectSingleNode("NumeroEmissione").InnerText = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "DATA EMISSIONE":
-                                        nodeDatiSpecifici.SelectSingleNode("DataEmissione").InnerText = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "CLIENTE":
-                                        nodeDatiSpecifici.SelectSingleNode("DenominazioneDestinatario").InnerText = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "PARTITA IVA CLIENTE":
-                                        pIva = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "CODICE FISCALE CLIENTE":
-                                        cf = oggetto.VALORE_DATABASE;
-                                        break;
-                                    case "IDENTIFICATIVO SDI":
-                                        nodeDatiSpecifici.SelectSingleNode("IdentificativoSdI").InnerText = oggetto.VALORE_DATABASE;
-                                        break;
-                                }
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(pIva) && pIva != "999")
-                        {
-                            nodeDatiSpecifici.SelectSingleNode("IdentificativoDestinatario").InnerText = pIva;
-                            nodeDatiSpecifici.SelectSingleNode("TipoIdentificativoDestinatario").InnerText = "PIVA";
-                        }
-                        else
-                        {
-                            nodeDatiSpecifici.SelectSingleNode("IdentificativoDestinatario").InnerText = cf;
-                            nodeDatiSpecifici.SelectSingleNode("TipoIdentificativoDestinatario").InnerText = "CF";
-                        }
-
-                        XmlNodeList nodesXFatt = nodeDatiSpecifici.SelectNodes(@"//*[not(node())]");
-                        if (nodesXFatt.Count > 0)
-                        {
-                            logger.Debug("presenti nodi vuoti");
-                            for (int i = nodesXFatt.Count - 1; i >= 0; i--)
-                            {
-                                nodesXFatt[i].ParentNode.RemoveChild(nodesXFatt[i]);
-                            }
-                        }
-                    }
-                    #endregion
-                    break;
-                #endregion
             }
 
             logger.Debug("END");
@@ -6241,6 +5627,7 @@ namespace BusinessLogic.Conservazione
 
             if (doc.template != null && !string.IsNullOrEmpty(doc.template.DESCRIZIONE) && doc.template.INVIO_CONSERVAZIONE != null && doc.template.INVIO_CONSERVAZIONE.Equals("1"))
             {
+                /* 11/02/19 Conservazione - MEV Reportistica */
                 DocsPaVO.ProfilazioneDinamica.OggettoCustom contatore = this.getContatoreRepertorio(doc);
 
                 if (doc.template.DESCRIZIONE.ToUpper() == "FATTURA ELETTRONICA" && contatore != null && string.IsNullOrEmpty(contatore.DATA_ANNULLAMENTO))
@@ -6250,14 +5637,6 @@ namespace BusinessLogic.Conservazione
                 else if (doc.template.DESCRIZIONE.ToUpper() == "LOTTO DI FATTURE")
                 {
                     result = TipologiaUnitaDocumentaria.LottoDiFatture;
-                }
-                else if(doc.template.DESCRIZIONE.ToUpper() == "FATTURA ELETTRONICA ATTIVA" && contatore != null && string.IsNullOrEmpty(contatore.DATA_ANNULLAMENTO))
-                {
-                    result = TipologiaUnitaDocumentaria.FatturaAttiva;
-                }
-                else if(doc.template.DESCRIZIONE.ToUpper() == "LOTTO DI FATTURE ATTIVE")
-                {
-                    result = TipologiaUnitaDocumentaria.LottoDiFattureAttive;
                 }
                 else if (doc.template.DESCRIZIONE.ToUpper() == "VERBALE DI SEDUTA ORGANI") 
                 {
@@ -6778,7 +6157,7 @@ namespace BusinessLogic.Conservazione
 
             logger.Debug("Doc principale");
             DocsPaVO.documento.Documento docPrincipale = (DocsPaVO.documento.Documento)doc.documenti[0];
-            DocsPaVO.documento.FileDocumento fd = BusinessLogic.Documenti.FileManager.getFileFirmato(docPrincipale, infoUtente, false);
+            DocsPaVO.documento.FileDocumento fd = BusinessLogic.Documenti.FileManager.getFile(docPrincipale, infoUtente);
             XmlElement elemFile = this.addFileElement(ref xml, docPrincipale, fd, infoUtente, false);
 
             return xml;
@@ -7685,11 +7064,6 @@ namespace BusinessLogic.Conservazione
             return manager.GetIdUtenteResponsabileConservazione(idAmm);
         }
 
-        private bool getCustomParamsSacer(string idProfile, out string ente, out string struttura)
-        {
-            DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
-            return cons.getCustomParamsSacer(idProfile, out ente, out struttura);
-        }
 
 
         /// <summary>
@@ -7757,7 +7131,6 @@ namespace BusinessLogic.Conservazione
                     {
                         file1 = BusinessLogic.Documenti.FileManager.getFileFirmato(fr, infoUt, false);
                     }
-
                     string stringaXml = Encoding.UTF8.GetString(file1.content);
                     //string byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
                     //if (stringaXml.StartsWith(byteOrderMarkUtf8))
@@ -7820,92 +7193,15 @@ namespace BusinessLogic.Conservazione
             return retval;
         }
 
-        private string getNumeriFatturaLotto(SchedaDocumento doc, InfoUtente utente)
-        {
-            string retVal = string.Empty;
-            logger.Debug("BEGIN");
-
-            string pattern = "N. {0} del {1}";
-
-            try
-            {
-                DocsPaVO.documento.Documento docPrincipale = (DocsPaVO.documento.Documento)doc.documenti[0];
-                FileDocumento file;
-                if (docPrincipale.fileName.ToUpper().EndsWith("XML"))
-                {
-                    file = Documenti.FileManager.getFileFirmato(docPrincipale, utente, false);
-                }
-                else if (docPrincipale.fileName.ToUpper().EndsWith("XML.P7M"))
-                {
-                    file = Documenti.FileManager.getFile(docPrincipale, utente);
-                }
-                else
-                {
-                    return string.Empty;
-                }
-
-                string stringaXml = Encoding.UTF8.GetString(file.content);
-                stringaXml = stringaXml.Trim();
-                System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
-                if (stringaXml.Contains("xml version=\"1.1\""))
-                {
-                    logger.Debug("Versione XML 1.1. Provo conversione");
-                    stringaXml = stringaXml.Replace("xml version=\"1.1\"", "xml version=\"1.0\"");
-                }
-
-                try
-                {
-                    xmlDoc.LoadXml(stringaXml);
-                }
-                catch (Exception bomUTF8)
-                {
-                    logger.Debug("Errore bomUTF8");
-                    string byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
-                    if (stringaXml.StartsWith(byteOrderMarkUtf8))
-                    {
-                        stringaXml = stringaXml.Remove(0, byteOrderMarkUtf8.Length);
-                    }
-                    xmlDoc.LoadXml(stringaXml);
-                }
-
-                logger.Debug("Stringa caricata in XML");
-                if (xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://www.fatturapa.gov.it/sdi/fatturapa/v1") ||
-                    xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/"))
-                {
-                    XmlNodeList datiGeneraliDocumentoList = xmlDoc.SelectNodes("//*[name()='DatiGeneraliDocumento']");
-                    if(datiGeneraliDocumentoList != null && datiGeneraliDocumentoList.Count > 0)
-                    {
-                        foreach(XmlNode node in datiGeneraliDocumentoList)
-                        {
-                            string numFattura = node.SelectSingleNode("Numero").InnerText;
-                            string dataFattura = node.SelectSingleNode("Data").InnerText;
-                            string[] dataFatturaArray = dataFattura.Split('-');
-                            string dataFatturaFormatted = dataFatturaArray[2] + "/" + dataFatturaArray[1] + "/" + dataFatturaArray[0];
-
-                            if (!string.IsNullOrEmpty(retVal))
-                                retVal = retVal + "; ";
-
-                            retVal = retVal + string.Format(pattern, numFattura, dataFatturaFormatted);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Debug("Errore in getNumeriFatturaLotto -", ex);
-                retVal = string.Empty;
-            }
-
-            logger.Debug("END");
-            return retVal;
-        }
-
         public string GetCodiceAOO(string idProfile)
         {
             DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
             return cons.GetCodiceAOO(idProfile);
         }
 
+        #endregion
+        #region /* 11/02/19 Conservazione - MEV Reportistica */
+        /* 11/02/19 Conservazione - MEV Reportistica */
         public void SendMailFailure(string idAmm, string stato, string idDoc)
         {
             try
@@ -7915,12 +7211,28 @@ namespace BusinessLogic.Conservazione
                 DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
                 DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
 
+                // Parametri casella
+                System.Data.DataSet ds = new DataSet();
+                utils.getSmtp(out ds, idAmm);
+
+                string server = ds.Tables["SERVER"].Rows[0]["VAR_SMTP"].ToString();
+                string port = ds.Tables["SERVER"].Rows[0]["NUM_PORTA_SMTP"].ToString();
+                string ssl = ds.Tables["SERVER"].Rows[0]["CHA_SMTP_SSL"].ToString();
+                string sta = ds.Tables["SERVER"].Rows[0]["CHA_SMTP_STA"].ToString();
+                string userName = ds.Tables["SERVER"].Rows[0]["VAR_USER_SMTP"].Equals(DBNull.Value) ? string.Empty : ds.Tables["SERVER"].Rows[0]["VAR_USER_SMTP"].ToString();
+                string password = ds.Tables["SERVER"].Rows[0]["VAR_PWD_SMTP"].Equals(DBNull.Value) ? string.Empty : ds.Tables["SERVER"].Rows[0]["VAR_PWD_SMTP"].ToString();
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(userName))
+                {
+                    password = DocsPaUtils.Security.Crypter.Decode(password, userName);
+                }
+
                 // Configurazione processo invio report
                 ReportConfiguration config = cons.GetReportConfiguration(idAmm);
                 if (config == null)
                 {
                     throw new Exception("Configurazione report conservazione assente o errata");
                 }
+                /* 11/02/19 Conservazione - MEV */
                 if (config.MailBoxConfiguration == null)
                 {
                     throw new Exception("Configurazione casella mail conservazione assente o errata");
@@ -7940,15 +7252,16 @@ namespace BusinessLogic.Conservazione
                 //{
                 //    password = DocsPaUtils.Security.Crypter.Decode(password, userName);
                 //}
-                
+
 
                 //string sender = amm.GetEmailAddress(idAmm);
                 string subject = string.Empty;
-
-                //if (string.IsNullOrEmpty(config.MailBoxConfiguration.From))
+                //if (string.IsNullOrEmpty(sender))
                 //{
                 //    sender = System.Configuration.ConfigurationManager.AppSettings["mittenteNotificaTrasmissione"];
                 //}
+
+
 
                 if (string.IsNullOrEmpty(config.Subject))
                 {
@@ -7970,6 +7283,7 @@ namespace BusinessLogic.Conservazione
                     subject = config.Subject;
                 }
 
+                /* 11/02/19 Conservazione - MEV */
                 string body = config.Body;
 
                 if (!string.IsNullOrEmpty(body))
@@ -8002,6 +7316,7 @@ namespace BusinessLogic.Conservazione
                     body = body.Replace("#DATA#", dataStampa);
                 }
 
+
                 // Destinatari del messaggio
                 ArrayList regRecipients = this.GetMailRecipientsReg(idAmm, idDoc);
                 string msgTo = string.Empty;
@@ -8010,6 +7325,7 @@ namespace BusinessLogic.Conservazione
                 // Responsabile conservazione
                 if (stato != "E")
                 {
+
                     foreach (string sTo in regRecipients)
                     {
                         if (!string.IsNullOrEmpty(msgTo))
@@ -8018,7 +7334,7 @@ namespace BusinessLogic.Conservazione
                         msgTo = msgTo + sTo;
                     }
                 }
-
+                /* 11/02/19 Conservazione - MEV */
                 // Destinatari fissi
                 if (config.FixedRecipients != null && config.FixedRecipients.Count() > 0)
                 {
@@ -8047,7 +7363,10 @@ namespace BusinessLogic.Conservazione
                 }
 
                 // Invio messaggio
+                //BusinessLogic.Interoperabilità.SvrPosta svr = new Interoperabilità.SvrPosta(server, userName, password, port, System.IO.Path.GetTempPath(), BusinessLogic.Interoperabilità.CMClientType.SMTP, ssl, string.Empty, sta);
+                /* 11/02/19 Conservazione - MEV */
                 BusinessLogic.Interoperabilità.SvrPosta svr = new Interoperabilità.SvrPosta(config.MailBoxConfiguration.Server, config.MailBoxConfiguration.Username, config.MailBoxConfiguration.Password, config.MailBoxConfiguration.Port, System.IO.Path.GetTempPath(), BusinessLogic.Interoperabilità.CMClientType.SMTP, (config.MailBoxConfiguration.UseSSL ? "1" : "0"), string.Empty, "0");
+
                 svr.connect();
                 if (!string.IsNullOrEmpty(msgTo))
                 {
@@ -8083,7 +7402,7 @@ namespace BusinessLogic.Conservazione
                     list.Add(mailResp);
                 }
 
-                #region CODICE COMMENTATO - reponsabile registro non più richiesto
+                #region CODICE COMMENTATO - reponsabile registro non più richiesto /* 11/02/19 Conservazione - MEV */
                 // Responsabile del registro
                 /*
                 string idUtenteRespReg = string.Empty;
@@ -8162,6 +7481,7 @@ namespace BusinessLogic.Conservazione
             return list;
         }
 
+        /* 11/02/19 Conservazione - MEV */
         private bool IsRepertorio(string idDoc, out string repName)
         {
             bool result = false;
@@ -8189,6 +7509,7 @@ namespace BusinessLogic.Conservazione
             return result;
         }
 
+
         public DocsPaVO.Conservazione.PARER.Mailbox GetMailStruttura(string idAmm)
         {
             DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
@@ -8198,7 +7519,7 @@ namespace BusinessLogic.Conservazione
         public bool SetMailStruttura(string idAmm, DocsPaVO.Conservazione.PARER.Mailbox mailbox)
         {
             bool result = false;
-            
+
             DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
             DocsPaVO.Conservazione.PARER.ReportConfiguration reportConfig = cons.GetReportConfiguration(idAmm);
 
@@ -8225,616 +7546,8 @@ namespace BusinessLogic.Conservazione
             DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
             return cons.SetStatoAttivazione(idAmm, stato);
         }
-
-        #region VERSAMENTO BIG FILES
-        public bool VersamentoBigFilePreIngest(ItemsVersamento item, InfoUtente utente, SchedaDocumento doc, string maxTentativi, string maxTentativiStampe)
-        {
-            bool result = false;
-            logger.Debug("BEGIN");
-
-            string esitoVersamento = string.Empty;
-            string errorCode = string.Empty;
-            string errorMessage = string.Empty;
-            string warning = string.Empty;
-            bool isStampa = (doc.tipoProto == "R" || doc.tipoProto == "C");
-
-            DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
-            ChiaveVersamento chiave;
-            string versioneDati = string.Empty;
-            string tipologiaUD = string.Empty;
-
-            try
-            {
-                DocsPaVO.amministrazione.InfoAmministrazione amm = BusinessLogic.Amministrazione.AmministraManager.AmmGetInfoAmmCorrente(utente.idAmministrazione);
-                TipologiaUnitaDocumentaria tipoDoc = this.getTipoDocumento(doc, amm.Codice);
-
-                #region Versione dati specifici
-                switch(tipoDoc)
-                {
-                    case TipologiaUnitaDocumentaria.DocProtocollato:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "P");
-                        tipologiaUD = "Documento Protocollato";
-                        break;
-                    case TipologiaUnitaDocumentaria.DocNP:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "G");
-                        tipologiaUD = "Documento Non Protocollato";
-                        break;
-                    case TipologiaUnitaDocumentaria.DocRepertoriato:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "R");
-                        tipologiaUD = "Documento Repertoriato";
-                        break;
-                    case TipologiaUnitaDocumentaria.Registro:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "S");
-                        tipologiaUD = "Stampa registro";
-                        break;
-                    case TipologiaUnitaDocumentaria.FatturaElettronica:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "F");
-                        tipologiaUD = "Fattura Elettronica";
-                        break;
-                    case TipologiaUnitaDocumentaria.LottoDiFatture:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "L");
-                        tipologiaUD = "LOTTO DI FATTURE";
-                        break;
-                    case TipologiaUnitaDocumentaria.FatturaAttiva:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "A");
-                        break;
-                    case TipologiaUnitaDocumentaria.LottoDiFattureAttive:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "B");
-                        break;
-                    case TipologiaUnitaDocumentaria.VerbaleSinteticoDiSeduta:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "V");
-                        tipologiaUD = "VERBALE SINTETICO DI SEDUTA";
-                        break;
-                }
-                #endregion
-
-                chiave = this.getChiaveVersamento(doc, tipoDoc);
-
-                string soapResult = PARER.BigFilesManager.InvioOggetto(item.idAmm, chiave, tipologiaUD, out errorCode, out errorMessage);
-
-                if (soapResult == "OK")
-                {
-                    esitoVersamento = "B";
-                }
-                else if (soapResult == "FAULT")
-                {
-                    esitoVersamento = "E";
-                }
-                else
-                {
-                    // Gestione casi di errore
-                    esitoVersamento = "R";
-                    if(errorCode == "PING-SENDOBJ-OBJ-001" || errorCode == "PING-SENDOBJ-OBJ-002" || errorCode == "PING-SENDOBJ-OBJ-010")
-                    {
-                        logger.Debug("Documento già presente o ancora in lavorazione");
-                        esitoVersamento = string.Empty;
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                result = false;
-                logger.Debug("Errore nel versamento: ", ex);
-                this.SaveErrorMessage(doc.docNumber, ex.ToString());
-                esitoVersamento = "E";
-                warning = string.Empty;
-            }
-            finally
-            {
-                #region Gestione stati E ed F
-                string numTentativi = string.Empty;
-                if (esitoVersamento.Equals("E") || esitoVersamento.Equals("T"))
-                {
-                    if (!string.IsNullOrEmpty(item.tentativiInvio))
-                    {
-                        int t = 0;
-                        int max = 0;
-                        t = Convert.ToInt32(item.tentativiInvio) + 1;
-                        numTentativi = t.ToString();
-
-                        if (!isStampa)
-                        {
-                            if (!string.IsNullOrEmpty(maxTentativi))
-                            {
-                                if (Int32.TryParse(maxTentativi, out max))
-                                {
-                                    if (max > 0 && t >= max)
-                                    {
-                                        // Si è raggiunto il numero massimo di tentativi di invio per il documento
-                                        // Modifico lo stato in "Versamento fallito
-                                        esitoVersamento = "F";
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(maxTentativiStampe))
-                            {
-                                if (Int32.TryParse(maxTentativiStampe, out max))
-                                {
-                                    if (max > 0 && t >= max)
-                                    {
-                                        // Si è raggiunto il numero massimo di tentativi di invio per il documento
-                                        // Modifico lo stato in "Versamento fallito
-                                        esitoVersamento = "F";
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        numTentativi = "1";
-                    }
-
-                }
-                else
-                {
-                    result = true;
-                }
-                #endregion
-
-                // aggiorno la coda di versamento
-                if (!string.IsNullOrEmpty(esitoVersamento))
-                {
-                    cons.updateQueueCons(doc.docNumber, utente, esitoVersamento, true, warning, numTentativi);
-                    if(esitoVersamento != "B" && !string.IsNullOrEmpty(errorMessage))
-                    {
-                        this.SaveErrorMessage(doc.docNumber, errorMessage);
-                    }
-                }               
-            }
-
-            logger.Debug("END");
-            return result;
-        }
-
-        public bool VersamentoBigFileUpload(InfoUtente utente, SchedaDocumento sch)
-        {
-            bool result = false;
-            logger.Debug("BEGIN");
-
-            try
-            {
-                DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
-
-                // Utente automa per il versamento
-                string userVersamento = this.getConfigKey("0", "BE_VERSAMENTO_BF_USERNAME");
-
-                // Amministrazione
-                DocsPaVO.amministrazione.InfoAmministrazione amm = BusinessLogic.Amministrazione.AmministraManager.AmmGetInfoAmmCorrente(utente.idAmministrazione);
-
-                // Tipologia unità documentaria
-                TipologiaUnitaDocumentaria tipoDoc = this.getTipoDocumento(sch, amm.Codice);
-
-                string versioneDati = string.Empty;
-                string tipologiaUD = string.Empty;
-
-                #region Versione dati specifici
-                switch (tipoDoc)
-                {
-                    case TipologiaUnitaDocumentaria.DocProtocollato:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "P");
-                        tipologiaUD = "Documento Protocollato";
-                        break;
-                    case TipologiaUnitaDocumentaria.DocNP:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "G");
-                        tipologiaUD = "Documento Non Protocollato";
-                        break;
-                    case TipologiaUnitaDocumentaria.DocRepertoriato:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "R");
-                        tipologiaUD = "Documento Repertoriato";
-                        break;
-                    case TipologiaUnitaDocumentaria.Registro:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "S");
-                        tipologiaUD = "Stampa registro";
-                        break;
-                    case TipologiaUnitaDocumentaria.FatturaElettronica:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "F");
-                        tipologiaUD = "Fattura Elettronica";
-                        break;
-                    case TipologiaUnitaDocumentaria.LottoDiFatture:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "L");
-                        tipologiaUD = "LOTTO DI FATTURE";
-                        break;
-                    case TipologiaUnitaDocumentaria.FatturaAttiva:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "A");
-                        tipologiaUD = "FATTURA ELETTRONICA ATTIVA";
-                        break;
-                    case TipologiaUnitaDocumentaria.LottoDiFattureAttive:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "B");
-                        tipologiaUD = "LOTTO DI FATTURE ATTIVE";
-                        break;
-                    case TipologiaUnitaDocumentaria.VerbaleSinteticoDiSeduta:
-                        versioneDati = this.getVersioneDatiSpecifici(utente.idAmministrazione, "V");
-                        tipologiaUD = "VERBALE SINTETICO DI SEDUTA";
-                        break;
-                }
-                #endregion
-
-                // File da inviare
-                Dictionary<string, FileDocumento> filesToSend = new Dictionary<string, FileDocumento>();
-
-                // XML metadati
-                logger.Debug("Creazione XML metadati PITRE...");
-                XmlDocument xmlMeta = this.createXMLMetadati(sch, utente);
-
-                // inserimento in DB file metadati
-                if (!cons.insertFileXML("DPA_VERSAMENTO", sch.systemId, "VAR_FILE_METADATI", xmlMeta.InnerXml))
-                    throw new Exception("Errore nel salvataggio del file dei metadati PITre");
-
-                // Indice SIP (utilizzo sempre il vecchio metodo)
-                XmlDocument xmlSIP = this.createXMLDoc(sch, utente, userVersamento, out filesToSend);
-
-                // Chiave di versamento
-                ChiaveVersamento chiave = this.getChiaveVersamento(sch, this.getTipoDocumento(sch, amm.Codice));
-
-                logger.Debug("Creazione SIP da normalizzare...");
-                string basePath = Path.Combine(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_TEMP_PATH"), "CONS_BIGFILE");
-
-                string rootPath = Path.Combine(basePath, amm.Codice);
-
-                if(!Directory.Exists(rootPath))
-                {
-                    Directory.CreateDirectory(rootPath);
-                }
-
-                string udPattern = string.Format("{0}-{1}-{2}", chiave.tipoRegistro, chiave.anno, chiave.numero);
-                string udPath = Path.Combine(Path.Combine(rootPath, udPattern), udPattern);
-                Directory.CreateDirectory(udPath);
-                logger.Debug("Creata directory " + udPath);
-
-                logger.Debug("Copia file nella directory...");
-                foreach(KeyValuePair<string, FileDocumento> kvp in filesToSend)
-                {
-                    if (kvp.Value != null && kvp.Value.content != null)
-                    {
-                        string filePath = Path.Combine(udPath, kvp.Key);
-                        logger.Debug("Scrittura file " + filePath + "...");
-                        File.WriteAllBytes(filePath, kvp.Value.content);
-                    }
-                }
-
-                logger.Debug("Copia indice SIP...");
-                xmlSIP.Save(Path.Combine(udPath, udPattern + ".xml"));
-
-                string zipFileName = Path.Combine(rootPath, sch.systemId + ".zip");
-                logger.Debug("Creazione pacchetto ZIP...");
-                logger.Debug(zipFileName);
-
-                FastZip zip = new FastZip();
-                zip.CreateZip(zipFileName, Path.Combine(rootPath, udPattern), true, string.Empty);
-
-                // Invio pacchetto via FTP
-                string ftpHost = this.getConfigKey("0", "BE_VERSAMENTO_BF_FTP_HOST");
-                string ftpUser = this.getConfigKey("0", "BE_VERSAMENTO_BF_FTP_USER");
-                string ftpPass = this.getConfigKey("0", "BE_VERSAMENTO_BF_FTP_PASS");
-                if(!this.ftpUploadSIP(ftpHost, ftpUser, ftpPass, zipFileName, udPattern))
-                {
-                    throw new Exception("Errore nell'invio del SIP via FTP");
-                }
-
-                // Calcolo hash file inviato
-
-                // Chiamata servizio notifica avvenuto trasferimento
-                string esito = PARER.BigFilesManager.NotificaTrasferimento(chiave, tipologiaUD, udPattern + ".zip", "");
-
-                // Aggiornamento stato (IN ATTESA ESITO)
-                if (esito == "OK")
-                {
-                    cons.updateQueueCons(sch.docNumber, utente, "K", false, string.Empty, string.Empty);
-                }
-
-                try
-                {
-                    logger.Debug("Rimozione cartella temporanea...");
-                    Directory.Delete(Path.Combine(rootPath, udPattern), true);
-
-                    logger.Debug("Rimozione archivio...");
-                    File.Delete(zipFileName);
-                }
-                catch(Exception dirEx)
-                {
-                    logger.Debug("Impossibile eliminare file e/o cartelle temporanee");
-                    logger.Debug(dirEx);
-                }
-
-
-            }
-            catch(Exception ex)
-            {
-
-            }
-
-            logger.Debug("END");
-            return result;
-        }
-
-        public bool VersamentoBigFileControllaEsito(string idProfile, InfoUtente utente)
-        {
-            bool result = false;
-            logger.Debug("BEGIN");
-
-            DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
-
-            try
-            {
-                SchedaDocumento sch = DocManager.getDettaglioNoSecurity(utente, idProfile);
-
-                // Amministrazione
-                DocsPaVO.amministrazione.InfoAmministrazione amm = BusinessLogic.Amministrazione.AmministraManager.AmmGetInfoAmmCorrente(utente.idAmministrazione);
-
-                // Chiave di versamento
-                ChiaveVersamento chiave = this.getChiaveVersamento(sch, this.getTipoDocumento(sch, amm.Codice));
-
-                logger.Debug("Recupero stato conservazione per ID=" + idProfile);
-
-                //logger.Debug("Estrazione stato conservazione SACER");
-                //string esitoSacer = PARER.BigFilesManager.RecuperoStatoOggetto(chiave);
-                //logger.Debug("Stato attuale: " + esitoSacer);
-                string esitoSacer = string.Empty;
-
-                switch (esitoSacer.ToUpper())
-                {
-                    case "CHIUSO_ERR_NOTIF":
-                    case "CHIUSO_ERR_SCHED":
-                        logger.Debug("Errore non recuperabile");
-                        cons.updateQueueCons(idProfile, utente, "F", false, string.Empty, string.Empty);
-                        break;
-                    case "CHIUSO_OK":
-                        logger.Debug("Aggiorno lo stato di conservazione a C");
-                        cons.updateQueueCons(idProfile, utente, "C", false, string.Empty, string.Empty);
-                        break;
-                    case "CHIUSO_WARNING":
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Debug("Errore in BersamentoBigFileControllaEsito");
-                logger.Debug(ex);
-                result = false;
-            }
-
-            logger.Debug("END");
-            return result;
-        }
-
-        //public string CreateXMLBigFile(SchedaDocumento doc, InfoUtente utente)
-        //{
-        //    string result = string.Empty;
-        //    logger.Debug("BEGIN");
-
-        //    try
-        //    {
-        //        logger.Debug("Creazione SIP per documento ID=" + doc.systemId);
-
-        //        DocsPaVO.amministrazione.InfoAmministrazione amm = BusinessLogic.Amministrazione.AmministraManager.AmmGetInfoAmmCorrente(utente.idAmministrazione);
-        //        TipologiaUnitaDocumentaria docType = this.getTipoDocumento(doc, amm.Codice);
-
-        //        // Definizione UD
-
-        //        UnitaDocumentariaType ud = new UnitaDocumentariaType();
-
-        //        #region Chiave
-        //        ChiaveVersamento chiave = this.getChiaveVersamento(doc, docType);
-        //        ud.Chiave = new ChiaveType()
-        //        {
-        //            Numero = chiave.numero,
-        //            Anno = chiave.anno,
-        //            TipoRegistro = chiave.tipoRegistro
-        //        };
-        //        #endregion
-
-        //        #region ProfiloArchivistico
-        //        // TO DO
-        //        #endregion
-
-        //        #region ProfiloUnitaDocumentaria
-        //        ud.ProfiloUnitaDocumentaria = new ProfiloUnitaDocumentariaType()
-        //        {
-        //            Oggetto = doc.oggetto.descrizione,
-        //            Data = this.formatDate(doc.dataCreazione)
-        //        };
-        //        #endregion
-
-        //        #region DatiSpecifici
-        //        #endregion
-
-        //        #region DocumentiCollegati
-        //        #endregion
-
-        //        #region Files
-
-        //        List<FileType> files = new List<FileType>();
-
-        //        #region Documento principale
-                
-                
-        //        #endregion
-
-        //        ud.Files = files.ToArray();
-
-        //        #endregion
-
-        //        ListaUnitaDocumentarieType listaUD = new ListaUnitaDocumentarieType();
-        //        listaUD.UnitaDocumentaria = new UnitaDocumentariaType[1] { ud };
-        //        listaUD.Versione = "1.0";
-
-        //        string xmlString = this.serializeToXml(listaUD);
-
-        //        logger.Debug("-- XML --");
-        //        logger.Debug(xmlString);
-
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        logger.Debug("Errore in CreateXMLBigFile");
-        //        logger.Debug(ex);
-        //    }
-
-        //    logger.Debug("END");
-        //    return result;
-        //}
-
-        private bool ftpUploadSIP(string ftpHost, string ftpUser, string ftpPass, string zipFilePath, string zipCode)
-        {
-            bool result = false;
-            logger.Debug("BEGIN");
-
-            FtpWebRequest ftpRequest;
-            FtpWebResponse ftpResponse;
-            Stream requestStream;
-            int bufferSize = 2048; // In una chiave?
-
-            try
-            {
-                bool dirExists = false;
-                string ftpFullPath = ftpHost + "/" + zipCode;
-                logger.Debug("FTP full path: " + ftpFullPath);
-                ftpRequest = (FtpWebRequest)FtpWebRequest.Create(ftpFullPath);
-                ftpRequest.Credentials = new NetworkCredential(ftpUser, ftpPass);
-                ftpRequest.UseBinary = true;
-                ftpRequest.UsePassive = true;
-                ftpRequest.EnableSsl = true;
-                ftpRequest.KeepAlive = true;
-                ftpRequest.Method = WebRequestMethods.Ftp.ListDirectory;
-                logger.Debug("Verifica esistenza directory...");
-                try
-                {
-                    ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
-                    logger.Debug("Risposta: " + ftpResponse.StatusCode + " - " + ftpResponse.StatusDescription);
-                    dirExists = true;
-                    ftpResponse = null;
-                }
-                catch(WebException wexDir)
-                {
-                    logger.Debug("> Eccezione gestita - verifica esistenza directory fallita");
-                    logger.Debug("> " + wexDir.Message);
-                    if (wexDir.Response != null && (FtpWebResponse)wexDir.Response != null)
-                    {
-                        ftpResponse = (FtpWebResponse)wexDir.Response;
-                        logger.Debug("Risposta: " + ftpResponse.StatusCode + " - " + ftpResponse.StatusDescription);
-                    }
-                    dirExists = false;
-                    ftpResponse = null;
-                }
-
-                if(!dirExists)
-                {
-                    logger.Debug(">> Creazione directory " + ftpFullPath);
-                    ftpRequest = (FtpWebRequest)FtpWebRequest.Create(ftpFullPath);
-                    ftpRequest.Credentials = new NetworkCredential(ftpUser, ftpPass);
-                    ftpRequest.UseBinary = true;
-                    ftpRequest.UsePassive = true;
-                    ftpRequest.EnableSsl = true;
-                    ftpRequest.KeepAlive = true;
-                    ftpRequest.Method = WebRequestMethods.Ftp.MakeDirectory;
-                    ftpResponse = (FtpWebResponse)ftpRequest.GetResponse();
-                    logger.Debug("Risposta: " + ftpResponse.StatusCode + " - " + ftpResponse.StatusDescription);
-                }
-
-                logger.Debug(">> Upload pacchetto");
-                ftpFullPath = ftpFullPath + "/" + zipCode + ".zip";
-                logger.Debug("FTP full path: " + ftpFullPath);
-                ftpRequest = (FtpWebRequest)FtpWebRequest.Create(ftpFullPath);
-
-                ftpRequest.Credentials = new NetworkCredential(ftpUser, ftpPass);
-                ftpRequest.UseBinary = true;
-                ftpRequest.UsePassive = true;
-                ftpRequest.EnableSsl = true;
-                ftpRequest.KeepAlive = true;
-                ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
-
-                logger.Debug("Creazione stream...");
-                requestStream = ftpRequest.GetRequestStream();
-
-                logger.Debug("Lettura file ZIP...");
-                byte[] buffer = new byte[bufferSize];
-
-                using (FileStream fs = File.OpenRead(zipFilePath))
-                {
-                    fs.Seek(0, SeekOrigin.End);
-                    long dataSize = fs.Position;
-                    fs.Seek(0, SeekOrigin.Begin);
-                    int bytesSent = fs.Read(buffer, 0, bufferSize);
-
-                    logger.Debug("Dimensioni totali pacchetto da inviare: " + dataSize);
-                    logger.Debug("Invio via FTP in corso...");
-                    while(bytesSent != 0)
-                    {
-                        requestStream.Write(buffer, 0, bufferSize);
-                        bytesSent = fs.Read(buffer, 0, bufferSize);
-                    }
-
-                    logger.Debug("Invio FTP completato!");
-                    fs.Close();
-                }
-
-                requestStream.Close();
-
-                result = true;
-            }
-            catch(WebException wEx)
-            {
-                logger.Debug("Errore nella risposta dal server FTP");
-                ftpResponse = (FtpWebResponse)wEx.Response;
-                string responseString;
-                if(ftpResponse != null)
-                {
-                    logger.DebugFormat("Risposta dal server: {0} - {1}", ftpResponse.StatusCode, ftpResponse.StatusDescription);
-                }
-
-                logger.Debug(wEx);
-            }
-            catch(Exception ex)
-            {
-                logger.Debug("Errore in ftpUploadSIP");
-                logger.Debug(ex);
-            }
-
-            logger.Debug("END");
-            return result;
-        }
-
-        private string serializeToXml(object _obj)
-        {
-            XmlSerializer serializer = new XmlSerializer(_obj.GetType());
-            string xml = string.Empty;
-
-            using (var stream = new MemoryStream())
-            {
-                using (var writer = XmlWriter.Create(stream))
-                {
-                    try
-                    {
-                        serializer.Serialize(stream, _obj);
-                        xml = Encoding.UTF8.GetString(stream.ToArray());
-
-                        string byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
-                        if (xml.StartsWith(byteOrderMarkUtf8))
-                        {
-                            logger.Debug(">> Rimuovo byteOrderMark");
-                            xml = xml.Remove(0, byteOrderMarkUtf8.Length);
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-                        logger.Debug(ex);
-                    }
-                }
-            }
-
-            return xml;
-
-        }
-
         #endregion
 
-        #endregion
     }
 
 

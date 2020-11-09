@@ -62,7 +62,6 @@ namespace BusinessLogic.Interoperabilità
 
             XmlDocument doc = new XmlDocument();
             InteropResolver my = new InteropResolver();
-            //XmlTextReader xtr = new XmlTextReader(new StreamReader(filepath + "\\" + filename)) { Namespaces = false };
             XmlTextReader xtr = new XmlTextReader(filepath + "\\" + filename) { Namespaces = false };
             xtr.WhitespaceHandling = WhitespaceHandling.None;
             XmlValidatingReader xvr = new XmlValidatingReader(xtr);
@@ -107,12 +106,6 @@ namespace BusinessLogic.Interoperabilità
                     //logger.addMessage("Sospensione non eseguita");
                     logger.Debug("Sospensione non eseguita");
                 };
-                return false;
-            }
-            catch (System.Xml.XmlException e)
-            {
-                logger.Error("La mail viene sospesa perche' il  file segnatura.xml non e' valido. Eccezione:" + e.Message);
-                err = "( CODINTEROP2 ) La mail viene sospesa perche' il  file segnatura.xml non e' valido. Eccezione:" + e.Message;
                 return false;
             }
             catch (Exception e)
@@ -247,9 +240,6 @@ namespace BusinessLogic.Interoperabilità
                     //					logger.addMessage("Mittente trovato"+mittente.GetType());
                     logger.Debug("Mittente trovato" + mittente.GetType());
 
-                    /* 12/03/2018: non aggiorno la mail impostandola come preferità poichè ogni volta che si riutilizza questo corrispondende
-                     * va a riaggiornare i dati rispetto a quelli di RC, reimpostando la vacchia mail come quella preferita ottendo come effotto continue
-                     * storicizzazioni (INC000001044145 Comune di Rovereto)
                     //AGGIORNAMENTO DELLA MAIL E DELL'INTEROPERABILITA' DELLA UO DEL MITTENTE
                     string mailMittente = elOrigine.SelectSingleNode("IndirizzoTelematico").InnerText.Trim();
                     updateUOMittente(mittente, mailMittente);
@@ -260,7 +250,6 @@ namespace BusinessLogic.Interoperabilità
                     //    users.resetCorrVarInsertIterop(mittente.systemId, "1");
                     //else if(rows!="0" && rows!="1")
                     //    users.resetCorrVarInsertIterop(mittente.systemId, "2");
-                    */
                 }
 
                 //DESTINATARI
@@ -333,7 +322,7 @@ namespace BusinessLogic.Interoperabilità
                 XmlElement descrizione = (XmlElement)doc.DocumentElement.SelectSingleNode("Descrizione");
                 if (descrizione.SelectSingleNode("TestoDelMessaggio") != null)
                 {
-                    docPrincipaleName = "body.html";
+                    docPrincipaleName = "body.rtf";
                 }
                 else
                 {
@@ -1435,7 +1424,6 @@ namespace BusinessLogic.Interoperabilità
                             all.fileName = getFileName(nomeAllegato);
                             all.version = "0";
                             all.numeroPagine = 1;
-                            all.TypeAttachment = 2;
                             //descrizione allegato
                             all.descrizione = "Ricevuta di ritorno delle Mail di tipo PEC - " + daticert.tipoRicevutaIntestazione + " - " + destinatario;
                         }
@@ -1605,19 +1593,18 @@ namespace BusinessLogic.Interoperabilità
                         if (listHistorySendDoc != null && listHistorySendDoc.Count > 0)
                         {
                             Object lastSendPec = (from record in listHistorySendDoc.ToArray()
-                                                  where ((ElStoricoSpedizioni)record).Mail.ToLower().Equals(not1.destinatario.ToLower()) && ((ElStoricoSpedizioni)record).Esito.Equals("Spedito")
+                                                  where ((ElStoricoSpedizioni)record).Mail.Equals(not1.destinatario) && ((ElStoricoSpedizioni)record).Esito.Equals("Spedito")
                                                   select record).ToList().FirstOrDefault();
                             if (lastSendPec != null)
                             {
                                 ruoloDestinatari = ((ElStoricoSpedizioni)lastSendPec).IdGroupSender;
                             }
                         }
-                        if (retval)
-                        {
-                            BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, ruoloDestinatari, infoUtente.idAmministrazione, "NO_DELIVERY_SEND_PEC", not1.docnumber, tiponotifica.descrizioneNotifica + " è stata inviata il '" + not1.data_ora + "'"
-                                + "'. Il destinatario '" + not1.destinatario + "' ha una mail di tipo: '" + (not1.tipoDestinatario.ToUpper().Equals("ESTERNO") ? "MAIL NON CERTIFICATA" : not1.tipoDestinatario) + "'."
-                                    + "Il codice identificatore del messaggio è: '" + not1.identificativo + "'.", DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1");
-                        }                        
+                        BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, ruoloDestinatari, infoUtente.idAmministrazione, "NO_DELIVERY_SEND_PEC", not1.docnumber, tiponotifica.descrizioneNotifica + " è stata inviata il '" + not1.data_ora + "'"
+                            + "'. Il destinatario '" + not1.destinatario + "' ha una mail di tipo: '" + (not1.tipoDestinatario.ToUpper().Equals("ESTERNO") ? "MAIL NON CERTIFICATA" : not1.tipoDestinatario) + "'."
+                                + "Il codice identificatore del messaggio è: '" + not1.identificativo + "'.", DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null),"1");
+
+                        
                     }
                 }
 
@@ -1651,19 +1638,17 @@ namespace BusinessLogic.Interoperabilità
                                 if (listHistorySendDoc != null && listHistorySendDoc.Count > 0)
                                 {
                                     Object lastSendPec = (from record in listHistorySendDoc.ToArray()
-                                                          where ((ElStoricoSpedizioni)record).Mail.ToLower().Equals(notifica[i].destinatario.ToLower()) && ((ElStoricoSpedizioni)record).Esito.Equals("Spedito")
+                                                          where ((ElStoricoSpedizioni)record).Mail.Equals(notifica[i].destinatario) && ((ElStoricoSpedizioni)record).Esito.Equals("Spedito")
                                                           select record).ToList().FirstOrDefault();
                                     if (lastSendPec != null)
                                     {
                                         ruoloDestinatari = ((ElStoricoSpedizioni)lastSendPec).IdGroupSender;
                                     }
                                 }
-                                if (retval)
-                                {
-                                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, ruoloDestinatari, infoUtente.idAmministrazione, "NO_DELIVERY_SEND_PEC", notifica[i].docnumber, tiponotifica.descrizioneNotifica + " è stata inviata il '" + notifica[i].data_ora + "'"
-                                   + "'. Il destinatario '" + notifica[i].destinatario + "' ha una mail di tipo: '" + (notifica[i].tipoDestinatario.ToUpper().Equals("ESTERNO") ? "MAIL NON CERTIFICATA" : notifica[i].tipoDestinatario) + "'."
-                                       + "Il codice identificatore del messaggio è: '" + notifica[i].identificativo + "'.", DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1");
-                                }
+
+                                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, ruoloDestinatari, infoUtente.idAmministrazione, "NO_DELIVERY_SEND_PEC", notifica[i].docnumber, tiponotifica.descrizioneNotifica + " è stata inviata il '" + notifica[i].data_ora + "'"
+                               + "'. Il destinatario '" + notifica[i].destinatario + "' ha una mail di tipo: '" + (notifica[i].tipoDestinatario.ToUpper().Equals("ESTERNO") ? "MAIL NON CERTIFICATA" : notifica[i].tipoDestinatario) + "'."
+                                   + "Il codice identificatore del messaggio è: '" + notifica[i].identificativo + "'.", DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null),"1");
                             }
                         }
                     }
@@ -1994,7 +1979,6 @@ namespace BusinessLogic.Interoperabilità
                         all.fileName = getFileName(nomeAllegato);
                         all.version = "0";
                         all.numeroPagine = 1;
-                        all.TypeAttachment = 2;
                         //descrizione allegato
                         all.descrizione = "Ricevuta di ritorno delle Mail di tipo PEC - " + daticert.tipoRicevutaIntestazione;
                     }
@@ -4776,25 +4760,6 @@ namespace BusinessLogic.Interoperabilità
                 {
                     //corrispondente = BusinessLogic.Utenti.UserManager.getCorrispondenteByEmail(qco.email, infoutente, reg);
                     corrispondente = BusinessLogic.Utenti.UserManager.getCorrispondenteByEmailCodiceAmmCodiceAoo(qco.email, infoutente, reg, codiceAmm, codiceAOO);
-
-                    //Se non trovo niente nel registro selezionato, cerco in tutte le rubriche visibili al ruolo
-                    if (corrispondente == null || corrispondente.codiceRubrica.Contains("@") || (corrispondente.codiceRubrica.Length > 8 && corrispondente.codiceRubrica.Substring(0, 8).ToUpper().Equals("INTEROP_")))
-                    {
-                        Registro[] registriRuolo = (Registro[])(Utenti.RegistriManager.getListaRegistriRfRuolo(infoutente.idCorrGlobali, null, null).ToArray(typeof(Registro)));
-                        DocsPaVO.utente.Corrispondente corrispondenteTemp = null;
-                        foreach (var registro in registriRuolo)
-                        {
-                            if (!registro.systemId.Equals(reg.systemId))
-                            {
-                                corrispondenteTemp = BusinessLogic.Utenti.UserManager.getCorrispondenteByEmailCodiceAmmCodiceAoo(qco.email, infoutente, registro, codiceAmm, codiceAOO);
-                                if (corrispondenteTemp != null && (!corrispondenteTemp.codiceRubrica.Contains("@") && (corrispondenteTemp.codiceRubrica.Length < 8 || !corrispondenteTemp.codiceRubrica.Substring(0, 8).ToUpper().Equals("INTEROP_"))))
-                                {
-                                    corrispondente = corrispondenteTemp;
-                                    break;
-                                }
-                            }
-                        }
-                    }
                 }
 
                 //FINE MODIFICA LULUCIANI

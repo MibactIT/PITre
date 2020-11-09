@@ -578,11 +578,6 @@ namespace BusinessLogic.interoperabilita.Semplificata
                             userInfo,
                             senderFileManagerUrl,
                             out errPutFile);
-
-                    if (!string.IsNullOrEmpty(errPutFile))
-                    {
-                        throw new Exception("Errore durante l'associazione dell'immagine al documento principale");
-                    }
                 }
                 catch (Exception e)
                 {
@@ -655,8 +650,6 @@ namespace BusinessLogic.interoperabilita.Semplificata
 
             // Creazione della ragione di trasmissione per interoperabilità semplificata
             RagioneTrasmissione reason = InteroperabilitaSegnatura.getRagioneTrasm(user.idAmministrazione, "S");
-            if (reason != null && privateDocument)
-                reason.eredita = "0";
 
             if(reason !=  null)
                 logger.DebugFormat("IS - Effettuato caricamento della ragione di trasmissione per interoperabilità. Id ragione: {0}; Eredita: {1}", reason.systemId, reason.eredita);

@@ -681,19 +681,8 @@ namespace DocsPaDB.Query_DocsPAWS
                 "Standard",
                 100
                 ));
+            
 
-            toReturn.Add(this.GetFieldProperties(
-                "Motivo AdL",
-                "Motivo AdL",
-                "MOTIVO_ADL",
-                false,
-                0,
-                35,
-                false,
-                "GetMotivoADL(a.docnumber, 'D', @idGruppo@, @idPeople@)",
-                "@dbuser@.GetMotivoADL (a.system_id, 'D', @idGruppo@, @idPeople@)",
-                "Standard",
-                100));
             // Restituzione della lista
             return toReturn;
 
@@ -1045,19 +1034,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     100));
             }
 
-            toReturn.Add(this.GetFieldProperties(
-            "Motivo AdL",
-            "Motivo AdL",
-            "MOTIVO_ADL",
-            false,
-            0,
-            25,
-            false,
-            "GetMotivoADL(a.system_id, 'F', @idGruppo@, @idPeople@)",
-            "@dbuser@.GetMotivoADL (a.system_id, 'D', @idGruppo@, @idPeople@)",
-            "Standard",
-            100));
-
+   
             // Restituzione della lista
             return toReturn;
         }

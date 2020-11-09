@@ -41,11 +41,7 @@ namespace DocsPaVO.LibroFirma
         private string _note;
         private string _utenteLocker;
         private string _descrizioneUtenteLocker;
-        private string _idAOO;
-        private string _idRF;
-        private string _idMailRegistro;
-        private bool _isAutomatico;
-        private string _errore;
+
         #endregion
 
         #region public property
@@ -289,83 +285,6 @@ namespace DocsPaVO.LibroFirma
             set
             {
                 _descrizioneUtenteLocker = value;
-            }
-        }
-
-        /// <summary>
-        /// Id del registro di AOO utilizzato per i passi automatici
-        /// </summary>
-        public string IdAOO
-        {
-            get
-            {
-                return _idAOO;
-            }
-            set
-            {
-                _idAOO = value;
-            }
-        }
-
-        /// <summary>
-        /// Id del registro di RF utilizzato per i passi automatici
-        /// </summary>
-        public string IdRF
-        {
-            get
-            {
-                return _idRF;
-            }
-            set
-            {
-                _idRF = value;
-            }
-        }
-
-        /// <summary>
-        /// Id Mail di registro
-        /// </summary>
-        public string IdMailRegistro
-        {
-            get
-            {
-                return _idMailRegistro;
-            }
-            set
-            {
-                _idMailRegistro = value;
-            }
-        }
-
-
-        /// <summary>
-        /// Indica se il passo è un passo automatico
-        /// </summary>
-        public bool IsAutomatico
-        {
-            get
-            {
-                return _isAutomatico;
-            }
-            set
-            {
-                _isAutomatico = value;
-            }
-
-        }
-
-        /// <summary>
-        /// Errore esecuzione del passo
-        /// </summary>
-        public string Errore
-        {
-            get
-            {
-                return _errore;
-            }
-            set
-            {
-                _errore = value;
             }
         }
         #endregion

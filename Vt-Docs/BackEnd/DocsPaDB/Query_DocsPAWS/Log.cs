@@ -763,7 +763,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     }
 
 
-                    descDelegante = " SOSTITUTO DI " + nomeDelegante;
+                    descDelegante = " DELEGATO DA " + nomeDelegante;
 
                     //utente delegato
                     string nomeDelegato = string.Empty;
@@ -806,12 +806,6 @@ namespace DocsPaDB.Query_DocsPAWS
                     //popolo il campo desc producer con le informazioni sul produttore
                     Producer = nomeProduttore +
                         (!string.IsNullOrEmpty(ruoloProduttore) ? " (" + ruoloProduttore + ")" : string.Empty).Replace("'", "''");
-
-                    //Se il log è tra i log definiti di tipo amministrazione scrivo come descrizione "Amministratore di sistema"
-                    if(IsLogAmministrazione(Cod_Azione))
-                    {
-                        Producer = "Amministratore di sistema";
-                    }
                 }
                 if (Cha_Esito != null)
                     ChaEsito = Convert.ToInt32(Cha_Esito);
@@ -837,15 +831,6 @@ namespace DocsPaDB.Query_DocsPAWS
             return Insert(userId, idPeople, idGruppo, idAmministrazione, VarOggetto, IdOggetto, VarDescOggetto, VarCodAzione, VarDescAzione, Producer, ChaEsito, VarCodWorkingApplication, CheckNotify, IdTrasm, DataAzione, idPeopleDelegante);
         }
 
-        /// <summary>
-        /// Verifica se il log in input è un log di amministrazione
-        /// </summary>
-        /// <param name="log"></param>
-        /// <returns></returns>
-        public static bool IsLogAmministrazione(string log)
-        {
-            return Enum.IsDefined(typeof(DocsPaVO.documento.LogAmministrazione), log.ToUpper());
-        }
 
         private static bool Insert(string userId, int idPeople, string idGruppo, int idAmministrazione, string VarOggetto, string IdOggetto, string VarDescOggetto, string VarCodAzione, string VarDescAzione, string Producer, int ChaEsito, string VarCodWorkingApplication, string CheckNotify, string IdTrasm, string DataAzione, string idPeopleDelegante)
         {
@@ -913,7 +898,6 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
 
         }
-
 
         /// <summary>
         /// 

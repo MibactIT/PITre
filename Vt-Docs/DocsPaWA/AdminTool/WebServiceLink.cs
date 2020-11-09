@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using DocsPAWA.utils;
 using DocsPAWA.DocsPaWR;
-using System.Linq;
 
 namespace AmmUtils
 {
@@ -52,6 +51,12 @@ namespace AmmUtils
         //    DocsPAWA.DocsPaWR.EsitoOperazione esito = new DocsPAWA.DocsPaWR.EsitoOperazione();
         //    return this.WS.UpdateLoginAmministrazione(userid, sessionID);
         //}
+
+        public DocsPAWA.DocsPaWR.EsitoOperazione LoginLDAP(DocsPAWA.DocsPaWR.UserLogin userLogin, bool forceLogin, out DocsPAWA.DocsPaWR.InfoUtenteAmministratore infoUtente)
+        {
+            DocsPAWA.DocsPaWR.EsitoOperazione esito = new DocsPAWA.DocsPaWR.EsitoOperazione();
+            return this.WS.LoginAmministratoreProfilatoLDAP(userLogin, forceLogin, out infoUtente);
+        }
 
         public DocsPAWA.DocsPaWR.InfoAmministrazione GetInfoAmmAppartenenzaUtente(string userid, string pwd)
         {
@@ -1019,34 +1024,6 @@ namespace AmmUtils
             return esito;
         }
 
-        public bool AmmExistsPassiFirmaByRuoloTitolareAndRegistro(DocsPAWA.DocsPaWR.RightRuoloMailRegistro[] listaRegistri, string idCorrGlobRuolo, string idGruppo)
-        {
-
-            return this.WS.AmmExistsPassiFirmaByRuoloTitolareAndRegistro(listaRegistri, idCorrGlobRuolo, idGruppo);
-
-        }
-
-        public bool AmmExistsPassiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro)
-        {
-
-            return this.WS.AmmExistsPassiFirmaByIdRegistroAndEmailRegistro(idRegistro, emailRegistro);
-
-        }
-
-        public bool AmmInvalidaProcessiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro, InfoUtente infoUtente)
-        {
-
-            return this.WS.AmmInvalidaProcessiFirmaByIdRegistroAndEmailRegistro(idRegistro, emailRegistro, infoUtente);
-
-        }
-
-        public bool AmmInvalidaProcessiRegistriCoinvolti(DocsPAWA.DocsPaWR.RightRuoloMailRegistro[] listaRegistri, string idCorrGlobRuolo, string idGruppo, InfoUtente infoUtente)
-        {
-
-            return this.WS.AmmInvalidaProcessiRegistriCoinvolti(listaRegistri, idCorrGlobRuolo, idGruppo, infoUtente);
-
-        }
-
         public DocsPAWA.DocsPaWR.EsitoOperazione AmmInsTipoFunzioni(DocsPAWA.DocsPaWR.OrgTipoFunzione[] listaFunzioni)
         {
 
@@ -1120,24 +1097,6 @@ namespace AmmUtils
 
             this.WS.Timeout = System.Threading.Timeout.Infinite;
             DocsPAWA.DocsPaWR.EsitoOperazione esito = this.WS.AmmRifiutaTrasmConWF(idCorrGlobRuolo, idGruppo);
-
-            return esito;
-        }
-
-        public DocsPAWA.DocsPaWR.EsitoOperazione AmmAccettaTrasmConWFRuolo(string idCorrGlobRuolo)
-        {
-
-            this.WS.Timeout = System.Threading.Timeout.Infinite;
-            DocsPAWA.DocsPaWR.EsitoOperazione esito = this.WS.AmmAccettaTrasmConWFRuolo(idCorrGlobRuolo);
-
-            return esito;
-        }
-
-        public DocsPAWA.DocsPaWR.EsitoOperazione AmmAccettaTrasmConWFUtente(string idPeople, string idCorrGlobaliRuolo)
-        {
-
-            this.WS.Timeout = System.Threading.Timeout.Infinite;
-            DocsPAWA.DocsPaWR.EsitoOperazione esito = this.WS.AmmAccettaTrasmConWFUtente(idPeople, idCorrGlobaliRuolo);
 
             return esito;
         }
@@ -1872,18 +1831,6 @@ namespace AmmUtils
             return this.WS.ExportDettaglioPolicyPARER(id, formato, tipo);
         }
 
-        public DocsPAWA.DocsPaWR.FileDocumento ReportMonitoraggioPolicy(DocsPAWA.DocsPaWR.ReportMonitoraggioPolicyRequest request)
-        {
-            try
-            {
-                return this.WS.ReportMonitoraggioPolicy(request).Document;
-            }
-            catch(Exception)
-            {
-                return null;
-            }
-        }
-
         internal System.Data.DataTable GetTemplateStruttura(string idAmministrazione)
         {
             return WS.GetStruttureSottofascicoli(idAmministrazione);
@@ -1899,69 +1846,11 @@ namespace AmmUtils
             return WS.GetDatiAmministratore(userId, idAmm);
         }
 
-        #region LIBRO FIRMA
-
-        public DocsPAWA.DocsPaWR.ProcessoFirma[] GetProcessiFirmaByRuoloCoinvolto(string idRuolo)
-        {
-            return WS.GetProcessiDiFirmaByRuoloTitolare(idRuolo);
-        }
-
-
-        public DocsPAWA.DocsPaWR.ProcessoFirma[] GetProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            numTotPage = 0;
-            nRec = 0;
-            return WS.GetProcessiDiFirmaByTitolarePaging(idRuoloTitolare, idUtenteTitolare, numPage, pageSize, out numTotPage, out nRec);
-        }
-
-        public int GetCountProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare)
-        {
-            return WS.GetCountProcessiDiFirmaByTitolare(idRuoloTitolare, idUtenteTitolare);
-        }
-
-        public bool VerificaPresenzaTrasmissioniPendentiUtente(string idPeople, string idCorrGlobali)
-        {
-            return WS.ExistsTrasmissioniPendentiConWorkflowUtente(idCorrGlobali, idPeople);
-        }
-
-        public List<string> GetIdRuoliProcessiUltimoUtente(string idPeople)
-        {
-            return WS.GetIdRuoliProcessiUltimoUtente(idPeople).ToList();
-        }
-
-        public DocsPAWA.DocsPaWR.IstanzaProcessoDiFirma[] GetIstanzeProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            numTotPage = 0;
-            nRec = 0;
-            return WS.GetIstanzeProcessiDiFirmaByTitolarePaging(idRuoloTitolare, idUtenteTitolare, numPage, pageSize, out numTotPage, out nRec);
-        }
-
-        public int GetCountIstanzaProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare)
-        {
-            return WS.GetCountIstanzaProcessiDiFirmaByTitolare(idRuoloTitolare, idUtenteTitolare);
-        }
-
-        public DocsPAWA.DocsPaWR.FileDocumento GetReportProcessiFirma(string idRuolo, string idUtente, string formato)
-        {
-            return this.WS.GetReportProcessiFirma(idRuolo, idUtente, formato);
-        }
-        public DocsPAWA.DocsPaWR.FileDocumento GetReportTrasmissioniPendentiUtente(string idPeople, string idCorrGlobali, string formato)
-        {
-            return this.WS.GetReportTrasmissioniPendentiUtente(idPeople, idCorrGlobali, formato);
-        }
-
-        public bool AmmSostituisciUtentePassiCorrelati(string idRuolo, string idOldPeople, string idNewPeople)
+        public bool AmmImpostaRuoloPubblico(string idCorrGlobali, string idGruppo, string idAmm)
         {
             this.WS.Timeout = System.Threading.Timeout.Infinite;
-            return this.WS.AmmSostituisciUtentePassiCorrelati(idRuolo, idOldPeople, idNewPeople);
+            return this.WS.AmmImpostaRuoloPubblico(idCorrGlobali, idGruppo, idAmm);
         }
-
-        public bool AmmStoricizzaRuoloPassiCorrelati(string idRuoloOld, string idRuoloNew)
-        {
-            this.WS.Timeout = System.Threading.Timeout.Infinite;
-            return this.WS.AmmStoricizzaRuoloPassiCorrelati(idRuoloOld, idRuoloNew);
-        }
-        #endregion
 
         public bool SbloccoCasella(string email, string idRegistro)
         {

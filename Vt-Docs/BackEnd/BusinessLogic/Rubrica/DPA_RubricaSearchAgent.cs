@@ -1687,13 +1687,13 @@ namespace BusinessLogic.Rubrica
                         string idAmm = infoUtente.idAmministrazione;
 
                         //Devo recuperare il registro in base alla descrizione
-                        string id_registro = utenti.GetRegistroDaCodice(codRegistro);
+                        string id_registro = utenti.GetRegistroDaCodice(codRegistro, idAmm);
                         if ("0".Equals(id_registro)) id_registro = "";
                         //Nuovo registro
                         string id_registroNuovo = string.Empty;
                         if (!string.IsNullOrEmpty(codRegistroNuovo))
                         {
-                            id_registroNuovo = utenti.GetRegistroDaCodice(codRegistroNuovo);
+                            id_registroNuovo = utenti.GetRegistroDaCodice(codRegistroNuovo, idAmm);
                         }
 
                         //Valore del campo storicizza:

@@ -119,19 +119,19 @@
   <!-- Gestione deleghe -->
   <messaggio>
     <codice>DELEGA_REVOCA</codice>
-    <descrizione>Le sostituzioni selezionate verranno revocate.\nVuoi continuare?</descrizione>
+    <descrizione>Le deleghe selezionate verranno revocate.\nVuoi continuare?</descrizione>
   </messaggio>
   <messaggio>
     <codice>DELEGA_CHIUDINUOVA</codice>
-    <descrizione>La sostituzione impostata non è stata salvata.\nVuoi salvare?</descrizione>
+    <descrizione>La delega impostata non è stata salvata.\nVuoi salvare?</descrizione>
   </messaggio>
   <messaggio>
     <codice>DELEGA_PERMANENTE</codice>
-    <descrizione>Attenzione, si sta per creare una sostituzione permanente.\nVuoi continuare?</descrizione>
+    <descrizione>Attenzione, si sta per creare una delega permanente.\nVuoi continuare?</descrizione>
   </messaggio>
   <messaggio>
     <codice>ESERCITA_DELEGA</codice>
-    <descrizione>Hai almeno una sostituzione assegnata. Premi Ok per esercitarla.</descrizione>
+    <descrizione>Hai almeno una delega assegnata. Premi Ok per esercitarla.</descrizione>
   </messaggio>
   <messaggio>
     <codice>STOP_WORD</codice>

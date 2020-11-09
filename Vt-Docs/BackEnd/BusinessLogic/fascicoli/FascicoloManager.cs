@@ -97,13 +97,13 @@ namespace BusinessLogic.Fascicoli
 		/// <param name="infoUtente"></param>
 		/// <param name="debug"></param>
 		/// <returns></returns>
-      public static ArrayList getListaFolderDaCodiceFascicolo(DocsPaVO.utente.InfoUtente infoUtente, string codiceFascicolo, string descrFolder, DocsPaVO.utente.Registro registro, bool enableUffRef, bool enableProfilazione) 
+      public static ArrayList getListaFolderDaCodiceFascicolo(DocsPaVO.utente.InfoUtente infoUtente, string codiceFascicolo, string descrFolder, DocsPaVO.utente.Registro registro, bool enableUffRef, bool enableProfilazione, string insRic = "R") 
 		{
 
 			ArrayList listaFolder = null;
 			DocsPaDB.Query_DocsPAWS.Fascicoli fascicoli = new DocsPaDB.Query_DocsPAWS.Fascicoli();
 
-         listaFolder = fascicoli.GetFolderByCodFasc(infoUtente, codiceFascicolo, descrFolder, registro, enableUffRef, enableProfilazione);
+         listaFolder = fascicoli.GetFolderByCodFasc(infoUtente, codiceFascicolo, descrFolder, registro, enableUffRef, enableProfilazione, insRic);
 
          if (listaFolder == null)
 			{
@@ -1130,7 +1130,7 @@ namespace BusinessLogic.Fascicoli
 
         public static bool DeleteFascicoloAndFigli(DocsPaVO.fascicolazione.Fascicolo fascicolo)
         {
-            
+
             bool retVal = false;
 
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
@@ -1152,7 +1152,6 @@ namespace BusinessLogic.Fascicoli
 
             return retVal;
         }
-
 
         public static void eliminaRiscontroMittente(DocsPaVO.fascicolazione.RiscontroMittente riscontroMittente)
         {
@@ -1406,103 +1405,116 @@ namespace BusinessLogic.Fascicoli
             return new DocsPaDB.Query_DocsPAWS.Fascicoli().GetCreatoreFascicolo(systemID);
         }
 
-        #region DESCRIZIONE FASCICOLO
-        public static bool InsertDescrizioneFascicolo(DescrizioneFascicolo descFasc, DocsPaVO.utente.InfoUtente infoUtente, out DocsPaVO.fascicolazione.ResultDescrizioniFascicolo resultInsertDescrizioniFascicolo)
+
+        public static String GetClassificaPerSegnatura(string docNumber, InfoUtente infoUtente, DocsPaVO.amministrazione.InfoAmministrazione currAmm)
         {
-            bool result = false;
-            resultInsertDescrizioniFascicolo = ResultDescrizioniFascicolo.OK;
+            logger.Info("START");
+            ArrayList _fascicoli = null;
+            ArrayList _folders = null;
+
+            string _classifica = String.Empty;
+            string separatore = " ";
+            string escape = String.Empty;
             try
             {
-                DocsPaDB.Query_DocsPAWS.Fascicoli fasc = new DocsPaDB.Query_DocsPAWS.Fascicoli();
+                _fascicoli = Fascicoli.FascicoloManager.getFascicoliDaDoc(infoUtente, docNumber);
+                logger.Debug("#123# Fascicoli count:" + _fascicoli.Count);
 
-                //Verifico se la descrizione o il codice è già presente nel registro e amministrazione
-                if (fasc.CheckPresenzaDescrizione(descFasc, infoUtente))
+
+
+                if(_fascicoli == null) { return string.Empty; }
+                string key_beprojectlevel = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROJECT_LEVEL");
+                if (!string.IsNullOrEmpty(key_beprojectlevel) && key_beprojectlevel.Equals("1"))
+                    _folders = Fascicoli.FolderManager.GetFoldersDocument(docNumber);
+
+                DocsPaVO.fascicolazione.Fascicolo fascicolo = null;
+                for (int i = 0; i < _fascicoli.Count; i++)
                 {
-                    resultInsertDescrizioniFascicolo = ResultDescrizioniFascicolo.DESCRIZIONE_PRESENTE;
-                    result = false;
-                    return result;
+                    fascicolo = (DocsPaVO.fascicolazione.Fascicolo)_fascicoli[i];
+                    if (string.IsNullOrWhiteSpace(fascicolo.codice)) { continue; }
+                    DocsPaVO.fascicolazione.Folder folder = null;
+                    foreach (DocsPaVO.fascicolazione.Folder f in _folders)
+                    {
+                        if(f.idFascicolo == fascicolo.systemID)
+                        {
+                            folder = f;
+                            break;
+                        }
+                    }
+                    string temp = string.Empty;
+                    if (folder != null)
+                    {
+                        for (int j = 1; j < folder.codicelivello.Length / 4; j++)
+                        {
+                            string val = folder.codicelivello.Substring(j * 4, 4);
+                            temp += string.Format(".{0}", Convert.ToInt32(val));
+                        }
+                        _classifica += separatore + (i == 0 ? "[" : "; ") +
+                                        GetCodiceFascicolo(currAmm.Fascicolatura, fascicolo.codice, temp) + escape;
+                    }
+                    if (!string.IsNullOrEmpty(key_beprojectlevel) && key_beprojectlevel.Equals("1"))
+                    {
+                        _classifica +=  separatore + (i == 0 ? "[" : "; ") + fascicolo.codice + escape;
+                        
+                    }
+                    else
+                    {
+                        _classifica = _classifica + separatore + fascicolo.codice + escape;
+                    }
+                } // fine for
+
+                if (!String.IsNullOrWhiteSpace(_classifica))
+                {
+                    _classifica += "]";
                 }
-                result = fasc.InsertDescrioneFascicolo(descFasc, infoUtente);
+
             }
             catch(Exception ex)
             {
-                logger.Error("Errore in InsertDescrizioneFascicolo " + ex.Message);
-                resultInsertDescrizioniFascicolo = ResultDescrizioniFascicolo.KO;
-                result = false;
+                logger.Error(ex.Message, ex);
+                throw ex;
             }
-            return result;
+            logger.Info("END");
+
+            return _classifica;
         }
 
-        public static List<DescrizioneFascicolo> GetListDescrizioniFascicolo(List<DocsPaVO.fascicolazione.FiltroDescrizioniFascicolo> filters, DocsPaVO.utente.InfoUtente infoUtente, int numPage, int pageSize, out int numTotPage, out int nRec)
+        public static string GetCodiceFascicolo(string fascicolatura, string codice, string temp)
         {
-            List<DescrizioneFascicolo> listDescrizioniFasc = new List<DescrizioneFascicolo>();
-            numTotPage = 0;
-            nRec = 0;
-            try
-            {
-                DocsPaDB.Query_DocsPAWS.Fascicoli fasc = new DocsPaDB.Query_DocsPAWS.Fascicoli();
-                listDescrizioniFasc = fasc.GetListDescrizioniFascicolo(filters, infoUtente, numPage, pageSize, out numTotPage, out nRec);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in metodo: GetListDescrizioniFascicolo ", e);
-            }
-            return listDescrizioniFasc;
-        }
+            int startfasc = fascicolatura.IndexOf("NUM_PROG");
+            startfasc = (startfasc == 0 ? 0 : startfasc - 1);
+            char cstartfasc = startfasc == 0 ? char.MinValue : fascicolatura[startfasc];
 
-        public static bool AggiornaDescrizioneFascicolo(DescrizioneFascicolo descFasc, DocsPaVO.utente.InfoUtente infoUtente, out DocsPaVO.fascicolazione.ResultDescrizioniFascicolo resultUpdateDescrizioniFascicolo)
-        {
-            bool result = false;
-            resultUpdateDescrizioniFascicolo = ResultDescrizioniFascicolo.OK;
-            try
+            int index = 0, rep = 0;
+            while (index <= startfasc)
             {
-                DocsPaDB.Query_DocsPAWS.Fascicoli fasc = new DocsPaDB.Query_DocsPAWS.Fascicoli();
-                
-                //Verifico se la descrizione o il codice è già presente nel registro e amministrazione
-                if(fasc.CheckPresenzaDescrizione(descFasc, infoUtente))
+                if (fascicolatura[index] == fascicolatura[startfasc])
+                    rep++;
+
+                index++;
+            }
+
+            int endfasc = fascicolatura.IndexOf("NUM_PROG") + "NUM_PROG".Length;
+            endfasc = endfasc >= fascicolatura.Length ? fascicolatura.Length - 1 : endfasc;
+            char cendfasc = endfasc == fascicolatura.Length - 1 ? char.MinValue : fascicolatura[endfasc];
+
+            int startcod = 0;
+            if (cstartfasc != char.MinValue)
+            {
+                if (cendfasc == char.MinValue)
+                    startcod = codice.LastIndexOf(cstartfasc);
+                else
                 {
-                    resultUpdateDescrizioniFascicolo = ResultDescrizioniFascicolo.DESCRIZIONE_PRESENTE;
-                    result = false;
-                    return result;
+                    for (int i = 0; i < rep; i++)
+                    {
+                        startcod = codice.IndexOf(cstartfasc, startcod + 1);
+                    }
                 }
-                result = fasc.AggiornaDescrizioneFascicolo(descFasc, infoUtente);
             }
-            catch (Exception ex)
-            {
-                resultUpdateDescrizioniFascicolo = ResultDescrizioniFascicolo.DESCRIZIONE_PRESENTE;
-                logger.Error("Errore in AggiornaDescrizioneFascicolo " + ex.Message);
-                result = false;
-            }
-            return result;
+
+            int endcod = cendfasc == char.MinValue ? codice.Length : codice.IndexOf(cendfasc, startcod + 1);
+            return codice.Insert(endcod, temp);
         }
 
-        public static bool EliminaDescrizioneFascicolo(string systemId, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            try
-            {
-                DocsPaDB.Query_DocsPAWS.Fascicoli fasc = new DocsPaDB.Query_DocsPAWS.Fascicoli();
-                result = fasc.EliminaDescrizioneFascicolo(systemId, infoUtente);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore in EliminaDescrizioneFascicolo " + ex.Message);
-                result = false;
-            }
-            return result;
-        }
-        #endregion
-
-        public static bool ExistsTrasmPendenteConWorkflowFascicolo(string idProject, string idRuoloInUO, string idPeople)
-        {
-            DocsPaDB.Query_DocsPAWS.Fascicoli fasc = new DocsPaDB.Query_DocsPAWS.Fascicoli();
-            return fasc.ExistsTrasmPendenteConWorkflowFascicolo(idProject, idRuoloInUO, idPeople);
-        }
-
-        public static bool ExistsTrasmPendenteSenzaWorkflowFascicolo(string idProject, string idRuoloInUO, string idPeople)
-        {
-            DocsPaDB.Query_DocsPAWS.Fascicoli fasc = new DocsPaDB.Query_DocsPAWS.Fascicoli();
-            return fasc.ExistsTrasmPendenteSenzaWorkflowFascicolo(idProject, idRuoloInUO, idPeople);
-        }
     }
 }

@@ -36,7 +36,7 @@
 </head>
 <body bottommargin="0" leftmargin="0" topmargin="0">
     <form id="deleghe" method="post" runat="server">
-    <uct:AppTitleProvider ID="appTitleProvider" runat="server" PageName="AMMINISTRAZIONE > Gestione Sostituzioni" />
+    <uct:AppTitleProvider ID="appTitleProvider" runat="server" PageName="AMMINISTRAZIONE > Gestione Deleghe" />
     <!-- Gestione del menu a tendina -->
     <uc2:MenuTendina ID="MenuTendina" runat="server"></uc2:MenuTendina>
     <input id="hd_returnValueModal" type="hidden" name="hd_returnValueModal" runat="server">
@@ -57,7 +57,7 @@
         <tr>
             <!-- TITOLO PAGINA -->
             <td class="titolo" style="height: 20px" align="center" bgcolor="#e0e0e0" height="34">
-                Gestione Sostituzioni
+                Gestione Deleghe
             </td>
         </tr>
         <tr>
@@ -75,7 +75,7 @@
                     </tr>
                     <tr>
                         <td class="testo_grigio_scuro" align="left">
-                            Stato sostituzioni:&nbsp;
+                            Stato deleghe:&nbsp;
                             <asp:DropDownList AutoPostBack="true" CssClass="testo_piccolo" ID="ddl_stato" runat="server">
                                 <asp:ListItem Value="A" Text="Attive" Selected="True"></asp:ListItem>
                                 <asp:ListItem Value="I" Text="Impostate"></asp:ListItem>
@@ -102,7 +102,7 @@
                             <table width="900">
                                 <tr>
                                     <td align="left">
-                                        <asp:Label ID="lbl_titolo" runat="server" CssClass="titolo">Lista Sostituzioni</asp:Label>
+                                        <asp:Label ID="lbl_titolo" runat="server" CssClass="titolo">Lista Deleghe</asp:Label>
                                     </td>
                                     <td align="right">
                                         &nbsp;
@@ -144,19 +144,19 @@
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Center" />
                                         <asp:BoundColumn DataField="id_utente_delegato" HeaderText="Utente" Visible="false"
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
-                                        <asp:BoundColumn DataField="cod_utente_delegato" HeaderText="Sostituto" ItemStyle-Width="40%"
+                                        <asp:BoundColumn DataField="cod_utente_delegato" HeaderText="Delegato" ItemStyle-Width="40%"
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
                                         <asp:BoundColumn DataField="id_ruolo_delegato" HeaderText="Ruolo" Visible="false"
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
-                                        <asp:BoundColumn DataField="cod_ruolo_delegato" HeaderText="Ruolo sostituto" Visible="false"
+                                        <asp:BoundColumn DataField="cod_ruolo_delegato" HeaderText="Ruolo delegato" Visible="false"
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
                                         <asp:BoundColumn DataField="id_utente_delegante" HeaderText="Utente" Visible="false"
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
-                                        <asp:BoundColumn DataField="cod_utente_delegante" HeaderText="Titolare" ItemStyle-Width="40%"
+                                        <asp:BoundColumn DataField="cod_utente_delegante" HeaderText="Delegante" ItemStyle-Width="40%"
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
                                         <asp:BoundColumn DataField="id_ruolo_delegante" HeaderText="Ruolo" Visible="false"
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
-                                        <asp:BoundColumn DataField="cod_ruolo_delegante" HeaderText="Ruolo titolare" Visible="false"
+                                        <asp:BoundColumn DataField="cod_ruolo_delegante" HeaderText="Ruolo delegante" Visible="false"
                                             ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
                                         <asp:BoundColumn DataField="id_delega" Visible="false" ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
                                         <asp:BoundColumn DataField="id_uo_delegato" Visible="false" ReadOnly="true" HeaderStyle-HorizontalAlign="Left" />
@@ -227,8 +227,8 @@
                                                     <td class="testo_piccoloB" width="134px">
                                                         <asp:DropDownList ID="chklst_utente" runat="server" Width="100" CssClass="testo_grigio_scuro"
                                                             AutoPostBack="True">
-                                                            <asp:ListItem Text="titolare"></asp:ListItem>
-                                                            <asp:ListItem Text="sostituto"></asp:ListItem>
+                                                            <asp:ListItem Text="delegante"></asp:ListItem>
+                                                            <asp:ListItem Text="delegato"></asp:ListItem>
                                                         </asp:DropDownList>
                                                         &nbsp;
                                                     </td>
@@ -269,13 +269,13 @@
                                     </tr>
                                     <tr>
                                         <td align="right">
-                                            <asp:Label ID="lbl_delegante" runat="server" Width="120px" CssClass="testo_grigio_scuro">Titolare &nbsp;</asp:Label>
+                                            <asp:Label ID="lbl_delegante" runat="server" Width="120px" CssClass="testo_grigio_scuro">Delegante &nbsp;</asp:Label>
                                         </td>
                                         <td>
                                             <asp:TextBox ID="txt_delegante" Enabled="false" runat="server" Width="160px" CssClass="testo_piccolo"></asp:TextBox>&nbsp;&nbsp;&nbsp;&nbsp;
                                             <asp:CheckBox ID="chkTutti" TextAlign="left" runat="server" Text="Tutti i ruoli"
                                                 AutoPostBack="true" CssClass="testo_grigio_scuro" />&nbsp;&nbsp;&nbsp;&nbsp;
-                                            <asp:Label ID="lbl_ruolo_delegante" runat="server" CssClass="testo_grigio_scuro">Ruolo titolare</asp:Label>&nbsp;
+                                            <asp:Label ID="lbl_ruolo_delegante" runat="server" CssClass="testo_grigio_scuro">Ruolo delegante</asp:Label>&nbsp;
                                             <asp:DropDownList ID="chklst_ruoli" runat="server" Width="200px" CssClass="testo_piccolo"
                                                 AutoPostBack="True">
                                             </asp:DropDownList>
@@ -287,7 +287,7 @@
                                     </tr>
                                     <tr>
                                         <td align="right">
-                                            <asp:Label ID="lbl_delegato" Width="120px" runat="server" CssClass="testo_grigio_scuro">Sostituto &nbsp;</asp:Label>
+                                            <asp:Label ID="lbl_delegato" Width="120px" runat="server" CssClass="testo_grigio_scuro">Delegato &nbsp;</asp:Label>
                                         </td>
                                         <td>
                                             <asp:TextBox ID="txt_delegato" Enabled="false" runat="server" Width="160px" CssClass="testo_piccolo"></asp:TextBox>

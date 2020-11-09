@@ -467,39 +467,6 @@ namespace BusinessLogic.Documenti.DigitalSignature.Pades_Utils
             return false;
         }
 
-        public static bool CheckNumSignature(DocsPaVO.documento.FileDocumento fileDoc)
-        {
-            bool result = true;
-            int numSign = 0;
-            try
-            {
-                if (fileDoc != null && fileDoc.signatureResult != null && fileDoc.signatureResult.PKCS7Documents != null)
-                {
-                    numSign = fileDoc.signatureResult.PKCS7Documents.Count();
-                    dpaItextSharp.text.pdf.PdfReader pdfReader = new dpaItextSharp.text.pdf.PdfReader(fileDoc.content);
-
-                    PdfDictionary top = (PdfDictionary)PdfReader.GetPdfObjectRelease(pdfReader.Catalog.Get(PdfName.ACROFORM));
-                    if (top == null)
-                        return true;
-                    PdfArray arrfds = (PdfArray)PdfReader.GetPdfObjectRelease(top.Get(PdfName.FIELDS));
-                    if (arrfds != null && arrfds.Size > numSign)
-                    {
-                        for (int i = 0; i < arrfds.Size; i++)
-                        {   
-                            if(arrfds.ArrayList[i].GetType() == typeof(dpaItextSharp.text.pdf.PdfNull))                       
-                                return false;                      
-                        }
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                result = true;
-            }
-
-            return result;
-        }
-
 
 	}
 

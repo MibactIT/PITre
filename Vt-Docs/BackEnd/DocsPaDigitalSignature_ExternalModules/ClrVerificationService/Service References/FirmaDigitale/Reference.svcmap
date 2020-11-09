@@ -18,10 +18,10 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://localhost/FirmaDigitale/VerificaFirmeDigitaliSvil.wsdl" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://localhost/wsdl/FirmaDigitale.serviceagent_r.wsdl" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="VerificaFirmeDigitali.wsdl" MetadataType="Wsdl" ID="658e5b34-821c-42d7-852c-0d9fcc833c20" SourceId="1" SourceUrl="http://localhost/FirmaDigitale/VerificaFirmeDigitaliSvil.wsdl" />
+    <MetadataFile FileName="Untitled3.wsdl" MetadataType="Wsdl" ID="ff12d698-3dd2-41a7-89e5-744c16a7e558" SourceId="1" SourceUrl="http://localhost/wsdl/FirmaDigitale.serviceagent_r.wsdl" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

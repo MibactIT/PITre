@@ -2943,17 +2943,17 @@ namespace DocsPaWS.Mobile
                 message = string.Empty;
                 if (BusinessLogic.LibroFirma.LibroFirmaManager.PutElectronicSignature(fileReq, infoUtente, isAdvancementProcess, out message))
                 {
+                    if (fileReq.inLibroFirma)
+                    {
+                        BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fileReq.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
+                    }
+
                     string method2 = "DOC_VERIFIED";
                     string description2 = "Il documento è stato firmato elettronicamente";
                     if (isAdvancementProcess)
                     {
                         description2 = "Eseguito passo avanzamento iter";
                         method2 = "DOC_STEP_OVER";
-                    }
-                    if (fileReq.inLibroFirma)
-                    {
-                        BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fileReq.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                        BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(fileReq.docNumber, description2, infoUtente);
                     }
 
                     BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method2, fileReq.docNumber,
@@ -3088,7 +3088,6 @@ namespace DocsPaWS.Mobile
                         if (fr.inLibroFirma)
                         {
                             BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fr.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                            BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(fr.docNumber, description, infoUtente);
                         }
 
                         BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, fr.docNumber,

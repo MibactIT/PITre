@@ -15,6 +15,13 @@ namespace DocsPaDocumentale.Interfaces
 		bool LoginUser(DocsPaVO.utente.UserLogin userLogin, out DocsPaVO.utente.Utente utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult);
 
         /// <summary>
+        /// Effettua il login di un utente riconosciuto in LDAP
+        /// </summary>
+        /// <param name="utente">Oggetto Utente connesso</param>
+        /// <returns>True = OK; False = Si è verificato un errore</returns>
+        bool LoginUserLDAP(DocsPaVO.utente.UserLogin userLogin, out DocsPaVO.utente.Utente utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult);
+
+        /// <summary>
         /// Effettua il login di un utente amministratore
         /// </summary>
         /// <param name="forceLogin"></param>
@@ -22,6 +29,15 @@ namespace DocsPaDocumentale.Interfaces
         /// <param name="loginResult"></param>
         /// <returns></returns>
         bool LoginAdminUser(DocsPaVO.utente.UserLogin userLogin, bool forceLogin, out DocsPaVO.amministrazione.InfoUtenteAmministratore utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult);
+
+        /// <summary>
+        /// Effettua il login di un utente amministratore riconosciuto in LDAP
+        /// </summary>
+        /// <param name="forceLogin"></param>
+        /// <param name="utente"></param>
+        /// <param name="loginResult"></param>
+        /// <returns></returns>
+        bool LoginAdminUserLDAP(DocsPaVO.utente.UserLogin userLogin, bool forceLogin, out DocsPaVO.amministrazione.InfoUtenteAmministratore utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult);
 
         /// <summary>
         /// Modifica password utente

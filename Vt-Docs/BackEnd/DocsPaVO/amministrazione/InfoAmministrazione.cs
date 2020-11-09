@@ -17,6 +17,9 @@ namespace DocsPaVO.amministrazione
 		public string Descrizione=string.Empty;
 		public string LibreriaDB=string.Empty;
 		public string Segnatura=string.Empty;
+        public string SegnaturaNP = string.Empty; // Alessandro
+        public string Segnatura_IsPermanente = string.Empty; // Alessandro
+        public string SegnaturaNP_IsPermanente = string.Empty; // Alessandro
         public string Timbro_pdf=string.Empty;
 		public string Fascicolatura=string.Empty;
 		public string Dominio=string.Empty;

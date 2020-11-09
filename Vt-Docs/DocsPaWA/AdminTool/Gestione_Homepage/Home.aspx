@@ -39,7 +39,7 @@
                     hlp.close();
             }
         }
-
+       
     </script>
     <script language="javascript" id="btn_test_Click" event="onclick()" for="btn_test">
 			window.document.body.style.cursor='wait';
@@ -49,6 +49,14 @@
     </script>
     <script language="javascript" id="btn_salva_click" event="onclick()" for="btn_salva">
 			window.document.body.style.cursor='wait';
+    </script>
+    <script>
+        //window.attachEvent('onbeforeunload', function (event) {
+        //    alert('BEFORE UNLOAD');
+        //});
+        //window.attachEvent('onunload', function (event) {
+        //    alert('UNLOAD');
+        //});
     </script>
 </head>
 <body bottommargin="0" leftmargin="0" topmargin="0" rightmargin="0" onunload="Init();ClosePopUp()">
@@ -181,6 +189,7 @@
                                                         </td>
                                                     </tr>
                                                 </asp:Panel>
+                                                <!-- Segnatura -->
                                                 <tr>
                                                     <td class="testo_grigio_scuro" align="right">
                                                         <asp:Label ID="lbl_segnatura" CssClass="testo" runat="server">Segnatura *</asp:Label>
@@ -191,7 +200,29 @@
                                                         <asp:ImageButton ID="btn_segn" runat="server" ToolTip="Seleziona Opzioni" ImageUrl="../../images/proto/RispProtocollo/freccina_dx.gif"
                                                             ImageAlign="AbsBottom"></asp:ImageButton>
                                                     </td>
+                                                    
+                                                    <td style="text-align: center; font-size: 11px; font-family:Arial">
+                                                        <asp:CheckBox ID="cbx_segnatura_permanente" runat="server" Text="permanente" />
+                                                    </td>
                                                 </tr>
+                                                <!-- Segnatura NP -->
+                                                <%--<tr>
+                                                    <td class="testo_grigio_scuro" align="right">
+                                                        <asp:Label ID="lbl_segnaturaNP" CssClass="testo" runat="server">Segnatura NP</asp:Label>
+                                                    </td>
+                                                    <td>
+                                                        <asp:TextBox ID="txt_segnaturaNP" runat="server" CssClass="testo" Width="392px" MaxLength="255"></asp:TextBox>&nbsp;
+                                                        <asp:ImageButton ID="btn_segNP" runat="server" ToolTip="Seleziona Opzioni" ImageUrl="../../images/proto/RispProtocollo/freccina_dx.gif"
+                                                            ImageAlign="AbsBottom" onclick="btn_segNP_Click" />
+                                                        
+                                                    </td>
+                                                    <td style="text-align: center; font-size: 11px; font-family:Arial">
+                                                        <asp:CheckBox ID="cbx_segnaturaNP_permanente" runat="server" Text="permanente" />
+                                                    </td>
+                                                </tr>--%>
+
+
+                                                <!-- Timbro -->
                                                 <tr>
                                                     <td class="testo_grigio_scuro" align="right">
                                                         <asp:Label ID="lbl_timbro_su_pdf" CssClass="testo" runat="server">Timbro su pdf *</asp:Label>
@@ -559,6 +590,8 @@
                         <td width="10">
                             &nbsp;
                         </td>
+
+                        <!-- Colonna destra -->
                         <td valign="top" width="220">
                             <asp:Panel ID="pnl_fasc_segn" runat="server" Visible="False">
                                 <table class="info" width="100%">

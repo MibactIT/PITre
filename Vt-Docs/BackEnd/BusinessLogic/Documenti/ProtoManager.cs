@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using DocsPaDB;
 using System.Configuration;
 using log4net;
-using System.Linq;
 
 namespace BusinessLogic.Documenti 
 {
@@ -74,7 +73,59 @@ namespace BusinessLogic.Documenti
 		{
             // Verifica stato di consolidamento del documento
             DocumentConsolidation.CanExecuteAction(infoUtente, schedaDocumento.systemId, DocumentConsolidation.ConsolidationActionsDeniedEnum.CancelProtocol, true);
+            if (schedaDocumento.template != null && schedaDocumento.template.PATH_XSD_ASSOCIATO == "CIRC_MIBACT_BACHECA")
+            {
+                int idDiagramma = 0;
+                DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = null;
+                DocsPaVO.DiagrammaStato.Stato statoAttuale = null;
+                idDiagramma = BusinessLogic.DiagrammiStato.DiagrammiStato.getDiagrammaAssociato(schedaDocumento.template.SYSTEM_ID.ToString());
+                if (idDiagramma != 0)
+                {
+                    diagramma = BusinessLogic.DiagrammiStato.DiagrammiStato.getDiagrammaById(idDiagramma.ToString());
+                    if (diagramma != null)
+                    {
+                        if (diagramma.STATI != null && diagramma.STATI.Count > 0)
+                        {
+                            statoAttuale = BusinessLogic.DiagrammiStato.DiagrammiStato.getStatoDoc(schedaDocumento.docNumber);
 
+                            if (statoAttuale == null)
+                            {
+                                foreach (DocsPaVO.DiagrammaStato.Stato stato in diagramma.STATI)
+                                {
+                                    if (stato.DESCRIZIONE.ToUpper().Equals("AGGIORNA IL SISTEMA BACHECA"))
+                                    {
+                                        BusinessLogic.DiagrammiStato.DiagrammiStato.salvaModificaStato(schedaDocumento.docNumber, stato.SYSTEM_ID.ToString(), diagramma, infoUtente.idPeople, infoUtente, string.Empty);
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < diagramma.PASSI.Count; i++)
+                                {
+                                    DocsPaVO.DiagrammaStato.Passo step = (DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[i];
+                                    if (step.STATO_PADRE.SYSTEM_ID == statoAttuale.SYSTEM_ID)
+                                    {
+                                        for (int j = 0; j < step.SUCCESSIVI.Count; j++)
+                                        {
+                                            if (((DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[j]).DESCRIZIONE.ToUpper().Equals("AGGIORNA IL SISTEMA BACHECA"))
+                                            {
+                                                BusinessLogic.DiagrammiStato.DiagrammiStato.salvaModificaStato(schedaDocumento.docNumber, ((DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[j]).SYSTEM_ID.ToString(), diagramma, infoUtente.idPeople, infoUtente, string.Empty);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Diagramma di stato non trovato");
+                }
+            }
             DocsPaDocumentale.Documentale.DocumentManager documentManager = new DocsPaDocumentale.Documentale.DocumentManager(infoUtente);
             
             bool retValue = false;
@@ -168,30 +219,6 @@ namespace BusinessLogic.Documenti
             if (!associato)
                 throw new Exception("il ruolo " + objRuolo.descrizione + " non è associato al registro" + schedaDoc.registro.descrizione);
 
-            //Verifico se il documento è in libro firma e in caso se il passo in attesa è quello di protocollazione ed il titolare è l'utente che sta effettuando la protocollazione
-            #region CHECK_LIBRO_FIRMA
-            if(!string.IsNullOrEmpty(schedaDoc.systemId) && (LibroFirma.LibroFirmaManager.IsDocInLibroFirma(schedaDoc.systemId)))
-            {
-                //Controllo che il documento non sia da repertoriare, non posso protocollare e repertoriare insieme, quindi anche se era prevista la repertoriazione, lancio eccezione
-                bool daRepertoriare = false;
-                if (schedaDoc.template != null && !string.IsNullOrEmpty(schedaDoc.template.ID_TIPO_ATTO)
-                    && schedaDoc.template.ELENCO_OGGETTI != null && schedaDoc.template.ELENCO_OGGETTI.Count > 0)
-                {
-                    DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg = (from o in schedaDoc.template.ELENCO_OGGETTI.Cast<DocsPaVO.ProfilazioneDinamica.OggettoCustom>()
-                                                                       where o.TIPO.DESCRIZIONE_TIPO.Equals("Contatore") && o.REPERTORIO.Equals("1")
-                                                                       && o.CONTATORE_DA_FAR_SCATTARE && string.IsNullOrEmpty(o.VALORE_DATABASE)
-                                                                       select o).FirstOrDefault();
-                    if (ogg != null)
-                        daRepertoriare = true;
-                }
-
-                if (!LibroFirma.LibroFirmaManager.IsTitolarePassoInAttesa(schedaDoc.systemId, objSicurezza, DocsPaVO.LibroFirma.Azione.RECORD_PREDISPOSED) || daRepertoriare)
-                {
-                    risultatoProtocollazione = DocsPaVO.documento.ResultProtocollazione.DOCUMENTO_IN_LIBRO_FIRMA_PASSO_NON_ATTESO;
-                    throw new Exception();
-                }
-            }
-            #endregion
 
             #region Controlli su Mancanza Mitt/Dest
             //controllo se presente Mitt/Dest dati obligatori.
@@ -867,7 +894,7 @@ namespace BusinessLogic.Documenti
 			return schedaDoc;
 		}*/
 
-        internal static DocsPaVO.documento.SchedaDocumento getDataProtocollo(DocsPaVO.documento.SchedaDocumento schedaDoc)
+        private static DocsPaVO.documento.SchedaDocumento getDataProtocollo(DocsPaVO.documento.SchedaDocumento schedaDoc)
         {
 
             string data = schedaDoc.protocollo.dataProtocollazione;

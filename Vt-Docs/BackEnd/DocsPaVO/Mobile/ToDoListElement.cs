@@ -96,7 +96,7 @@ namespace DocsPaVO.Mobile
             res.Extension = input.cha_img;
             // modifica per vedere il mittente delegato in todolist
             if (!string.IsNullOrEmpty(input.ut_delegato))
-                res.Mittente = input.ut_delegato + " sostituto di " + input.utenteMittente;
+                res.Mittente = input.ut_delegato + " delegato da " + input.utenteMittente;
             else
                 res.Mittente = input.utenteMittente;
             res.Ragione = input.ragione;
@@ -314,7 +314,7 @@ namespace DocsPaVO.Mobile
                     eventTypeExtended = "Conclusione processo Doc";
                     break;
                 case "TRONCAMENTO_PROCESSO":
-                    eventTypeExtended = "Anomalia nel processo";
+                    eventTypeExtended = "Troncamento del processo";
                     break;
                 case "INTERROTTO_PROCESSO_DOCUMENTO_DA_ADMIN":
                     eventTypeExtended = "Interrotto processo da Amministratore Doc";

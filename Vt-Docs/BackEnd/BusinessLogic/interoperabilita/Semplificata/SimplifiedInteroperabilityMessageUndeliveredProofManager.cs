@@ -99,7 +99,7 @@ namespace BusinessLogic.interoperabilita.Semplificata
             a.docNumber = documentId;
             a.version = "0";
             a.numeroPagine = 1;
-            a.TypeAttachment = 3;
+
             try
             {
                 // Aggiunta dell'allegato al documento principale

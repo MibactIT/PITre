@@ -99,7 +99,7 @@ namespace VtDocsWS.Manager
                 {
                     throw new PisException("MISSING_PARAMETER");
                 }
-                if (!string.IsNullOrEmpty(request.CodeApplication) && string.IsNullOrEmpty(request.UserName))
+                if (!string.IsNullOrEmpty(request.CodeApplication))
                 {
                     sysExt = true;
                 }

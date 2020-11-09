@@ -529,12 +529,13 @@ namespace BusinessLogic.Amministrazione
             else
                 registro.idRuoloResp = string.Empty;
 
+            /* 11/02/19 Conservazione - MEV Reportistica */
             if (rowRegistro.Table.Columns.Contains("ID_UTENTE_RESP") && rowRegistro["ID_UTENTE_RESP"] != DBNull.Value)
                 registro.idUtenteResp = rowRegistro["ID_UTENTE_RESP"].ToString();
             else
                 registro.idUtenteResp = string.Empty;
 
-			return registro;
+            return registro;
 		}
 
 		private enum DBActionTypeRegistroEnum
@@ -876,8 +877,6 @@ namespace BusinessLogic.Amministrazione
             mail.Note = rowMailRegistro["VAR_NOTE"].ToString();
             // Per gestione pendenti tramite PEC
             mail.MailRicevutePendenti = rowMailRegistro["VAR_MAIL_RIC_PENDENTE"].ToString();
-            mail.MessageSendMail = rowMailRegistro["VAR_MESSAGE_SEND_MAIL"].ToString();
-            mail.OverwriteMessageAmm = (string.IsNullOrEmpty(rowMailRegistro["CHA_OVERWRITE_MESSAGE_AMM"].ToString()) || rowMailRegistro["CHA_OVERWRITE_MESSAGE_AMM"].ToString().Equals("0")) ? false : true;
             return mail;
         }
 

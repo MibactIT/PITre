@@ -343,9 +343,9 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
 			{                
 				string [] pathUno = uploadPathUno.Value.Split('.');
                 extPathUno = pathUno[pathUno.Length - 1];
-                if (pathUno.Length != 0 && pathUno[pathUno.Length - 1] != "rtf" && pathUno[pathUno.Length - 1].ToUpper() != "PPT" && pathUno[pathUno.Length - 1].ToUpper() != "PPTX")
+                if (pathUno.Length != 0 && pathUno[pathUno.Length - 1] != "rtf" && pathUno[pathUno.Length - 1].ToUpper() != "PPT" && pathUno[pathUno.Length - 1].ToUpper() != "PPTX" && pathUno[pathUno.Length - 1].ToUpper() != "ODT")
 				{
-					RegisterStartupScript("selezioneNonValida","<script>alert('E possibile selezionare solo modelli in formato RTF o PPT. Selezionare un altro modello !');</script>");
+					RegisterStartupScript("selezioneNonValida", "<script>alert('E possibile selezionare solo modelli in formato RTF, PPT oppure ODT. Selezionare un altro modello !');</script>");
 					return;
 				}
 			}

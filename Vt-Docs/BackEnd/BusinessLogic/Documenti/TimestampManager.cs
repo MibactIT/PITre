@@ -218,7 +218,7 @@ namespace BusinessLogic.Documenti
 
             tsdFileReq.docNumber = fileRequest.docNumber;
             tsdFileReq.descrizione = "Versione creata per conversione in TSD";
-            tsdFileReq.firmato = fileRequest.firmato;
+            tsdFileReq.firmato = "1";
             tsdFileReq = BusinessLogic.Documenti.VersioniManager.addVersion(tsdFileReq, infoUtente, false);
             
               if (tsdFileReq != null)

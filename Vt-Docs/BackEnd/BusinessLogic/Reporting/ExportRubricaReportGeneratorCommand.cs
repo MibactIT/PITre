@@ -63,8 +63,6 @@ namespace BusinessLogic.Reporting
             report.AdditionalInformation = request.AdditionalInformation;
             report.ReportMapRow = new ReportMapRow();
             report.ReportHeader = new HeaderColumnCollection();
-            report.SectionName = "RUBRICA";
-            report.ShowHeaderRow = false;
             report.Summary = string.Empty;
 
             bool store = request.SearchFilters.Where(f => f.argomento == "store").FirstOrDefault().valore.Equals("1") ? true : false;

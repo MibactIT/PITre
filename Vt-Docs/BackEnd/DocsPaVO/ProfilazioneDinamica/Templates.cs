@@ -28,6 +28,8 @@ namespace DocsPaVO.ProfilazioneDinamica
 
         public string INVIO_CONSERVAZIONE = "0";
 
+        public string PROCEDIMENTALE = "0";
+
         [XmlArray()]
         [XmlArrayItem(typeof(DocsPaVO.ProfilazioneDinamica.OggettoCustom))]
         public ArrayList ELENCO_OGGETTI = new ArrayList();

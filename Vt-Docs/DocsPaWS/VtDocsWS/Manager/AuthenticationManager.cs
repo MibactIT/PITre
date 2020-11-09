@@ -5,6 +5,7 @@ using System.Web;
 using DocsPaVO.utente;
 using VtDocsWS.WebServices;
 using log4net;
+using System.Collections;
 
 namespace VtDocsWS.Manager
 {
@@ -290,5 +291,275 @@ namespace VtDocsWS.Manager
                 return null;
             }
         }
+
+        #region ESPIVIEWER
+        public static Services.AddressBook.SearchUsers.SearchUsersResponse GetAllUsers()
+        {
+            Services.AddressBook.SearchUsers.SearchUsersResponse response = new Services.AddressBook.SearchUsers.SearchUsersResponse();
+            try
+            {
+                ArrayList result = BusinessLogic.Utenti.UserManager.getListaUtenti();
+
+                Domain.User[] userResponse = null;
+                userResponse = new Domain.User[result.Count];
+
+                for (int i = 0; i < result.Count; i++)
+                {
+                    VtDocsWS.Domain.User u = new VtDocsWS.Domain.User();
+                    u.Id = ((DocsPaVO.utente.Utente)result[i]).idPeople;
+                    u.UserId = ((DocsPaVO.utente.Utente)result[i]).userId;
+                    u.Name = ((DocsPaVO.utente.Utente)result[i]).nome;
+                    u.Surname = ((DocsPaVO.utente.Utente)result[i]).cognome;
+                    //u.Description = ((DocsPaVO.utente.Utente)result[i]).codiceAmm;
+                    userResponse[i] = u;
+                }
+
+                response.Users = userResponse;
+
+
+                response.Success = true;
+            }
+            catch (PisException pisEx)
+            {
+                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
+                response.Error = new Services.ResponseError
+                {
+                    Code = pisEx.ErrorCode,
+                    Description = pisEx.Description
+                };
+
+                response.Success = false;
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
+                response.Error = new Services.ResponseError
+                {
+                    Code = "APPLICATION_ERROR",
+                    Description = ex.Message
+                };
+
+                response.Success = false;
+            }
+
+            return response;
+        }
+
+        /* REPERIMENTO AOO ASSOCIATE A UN UTENTE */
+        public static Services.Authentication.GetAooListForUser.AooUserAssociationResponse GetUserAooAssociationList(string username)
+        {
+            Services.Authentication.GetAooListForUser.AooUserAssociationResponse response = new Services.Authentication.GetAooListForUser.AooUserAssociationResponse();
+
+            try
+            {
+                ArrayList result = BusinessLogic.Utenti.UserManager.GetUserAooAssociationList(username);
+                Domain.AooUserAssociation[] aooResponse = null;
+                aooResponse = new Domain.AooUserAssociation[result.Count];
+
+                for (int i = 0; i < result.Count; i++)
+                {
+                    VtDocsWS.Domain.AooUserAssociation u = new VtDocsWS.Domain.AooUserAssociation();
+                    u.aooId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).aooId;
+                    u.aooName = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).aooName;
+                    u.associationId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).associationId;
+                    u.allowRestrictedAccess = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).allowRestrictedAccess;
+                    u.userId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).userId;
+                    u.userName = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).userName;
+                    aooResponse[i] = u;
+                }
+
+                response.AooUserAssociations = aooResponse;
+
+
+                response.Success = true;
+
+
+            }
+            catch (PisException pisEx)
+            {
+                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
+                response.Error = new Services.ResponseError
+                {
+                    Code = pisEx.ErrorCode,
+                    Description = pisEx.Description
+                };
+
+                response.Success = false;
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
+                response.Error = new Services.ResponseError
+                {
+                    Code = "APPLICATION_ERROR",
+                    Description = ex.Message
+                };
+
+                response.Success = false;
+            }
+            return response;
+        }
+
+        /* REPERIMENTO LISTA UTENTI IN BASE ALL'AOO */
+        public static Services.Authentication.GetAooListForUser.AooUserAssociationResponse GetUsersForAoo(string aooId)
+        {
+            Services.Authentication.GetAooListForUser.AooUserAssociationResponse response = new Services.Authentication.GetAooListForUser.AooUserAssociationResponse();
+            try
+            {
+                ArrayList result = BusinessLogic.Utenti.UserManager.GetUsersForAoo(aooId);
+
+                Domain.AooUserAssociation[] aooResponse = null;
+                aooResponse = new Domain.AooUserAssociation[result.Count];
+
+                for (int i = 0; i < result.Count; i++)
+                {
+                    VtDocsWS.Domain.AooUserAssociation u = new VtDocsWS.Domain.AooUserAssociation();
+                    u.aooId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).aooId;
+                    u.aooName = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).aooName;
+                    u.associationId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).associationId;
+                    u.allowRestrictedAccess = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).allowRestrictedAccess;
+                    u.userId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).userId;
+                    u.userName = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).userName;
+                    aooResponse[i] = u;
+                }
+
+                response.AooUserAssociations = aooResponse;
+
+                response.Success = true;
+            }
+            catch (PisException pisEx)
+            {
+                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
+                response.Error = new Services.ResponseError
+                {
+                    Code = pisEx.ErrorCode,
+                    Description = pisEx.Description
+                };
+
+                response.Success = false;
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
+                response.Error = new Services.ResponseError
+                {
+                    Code = "APPLICATION_ERROR",
+                    Description = ex.Message
+                };
+
+                response.Success = false;
+            }
+
+            return response;
+        }
+
+
+        /* LISTA AOO */
+        public static Services.Authentication.GetAooListForUser.AooUserAssociationResponse GetAllAoo()
+        {
+            Services.Authentication.GetAooListForUser.AooUserAssociationResponse response = new Services.Authentication.GetAooListForUser.AooUserAssociationResponse();
+            try
+            {
+                ArrayList result = BusinessLogic.Utenti.UserManager.GetAllAoo();
+
+                Domain.AooUserAssociation[] aooResponse = null;
+                aooResponse = new Domain.AooUserAssociation[result.Count];
+
+                for (int i = 0; i < result.Count; i++)
+                {
+                    VtDocsWS.Domain.AooUserAssociation u = new VtDocsWS.Domain.AooUserAssociation();
+                    u.aooId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).aooId;
+                    u.aooName = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).aooName;
+                    u.associationId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).associationId;
+                    u.allowRestrictedAccess = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).allowRestrictedAccess;
+                    u.userId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).userId;
+                    u.userName = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).userName;
+                    aooResponse[i] = u;
+                }
+
+                response.AooUserAssociations = aooResponse;
+
+                response.Success = true;
+            }
+            catch (PisException pisEx)
+            {
+                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
+                response.Error = new Services.ResponseError
+                {
+                    Code = pisEx.ErrorCode,
+                    Description = pisEx.Description
+                };
+
+                response.Success = false;
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
+                response.Error = new Services.ResponseError
+                {
+                    Code = "APPLICATION_ERROR",
+                    Description = ex.Message
+                };
+
+                response.Success = false;
+            }
+
+            return response;
+        }
+
+        /* REPERIMENTO ASSOCIAZIONE UTENTE - AOO */
+        public static Services.Authentication.GetAooListForUser.AooUserAssociationResponse GetAssociationUserAooFromGiada(string id, string username)
+        {
+            Services.Authentication.GetAooListForUser.AooUserAssociationResponse response = new Services.Authentication.GetAooListForUser.AooUserAssociationResponse();
+            try
+            {
+                ArrayList result = BusinessLogic.Utenti.UserManager.GetAssociationUserAooFromGiada(id, username);
+
+                Domain.AooUserAssociation[] aooResponse = null;
+                aooResponse = new Domain.AooUserAssociation[result.Count];
+
+                for (int i = 0; i < result.Count; i++)
+                {
+                    VtDocsWS.Domain.AooUserAssociation u = new VtDocsWS.Domain.AooUserAssociation();
+                    u.aooId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).aooId;
+                    u.aooName = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).aooName;
+                    u.associationId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).associationId;
+                    u.allowRestrictedAccess = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).allowRestrictedAccess;
+                    u.userId = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).userId;
+                    u.userName = ((DocsPaVO.utente.AssociazioneAooUtente)result[i]).userName;
+                    aooResponse[i] = u;
+                }
+
+                response.AooUserAssociations = aooResponse;
+
+                response.Success = true;
+            }
+            catch (PisException pisEx)
+            {
+                logger.ErrorFormat("PISException: {0}, {1}", pisEx.ErrorCode, pisEx.Description);
+                response.Error = new Services.ResponseError
+                {
+                    Code = pisEx.ErrorCode,
+                    Description = pisEx.Description
+                };
+
+                response.Success = false;
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorFormat("Eccezione Generica: APPLICATION_ERROR, {0}", ex.Message);
+                response.Error = new Services.ResponseError
+                {
+                    Code = "APPLICATION_ERROR",
+                    Description = ex.Message
+                };
+
+                response.Success = false;
+            }
+
+            return response;
+        }
+
+        #endregion
     }
 }

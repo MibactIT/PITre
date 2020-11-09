@@ -8,7 +8,6 @@ using BusinessLogic.Amministrazione;
 using System.Xml.Serialization;
 using System.Collections;
 using VtDocsWS.Domain;
-using VtDocsWS.WebServices;
 
 namespace DocsPaWS.Pubblicazioni
 {
@@ -233,13 +232,11 @@ namespace DocsPaWS.Pubblicazioni
             C3Document docX = null;
             ArrayList listaDocs = new ArrayList();
             Correspondent corrTemp = null, corrMitt = null;
-            DocsPaVO.ProfilazioneDinamica.Templates templateDocX;
             ArrayList mitts = new ArrayList(), dest = new ArrayList(), destCC = new ArrayList();
             if (fromDB != null && fromDB.Rows != null && fromDB.Rows.Count > 0)
             {
                 foreach (System.Data.DataRow r in fromDB.Rows)
                 {
-                    templateDocX = null;
                     docX = new C3Document();
                     docX.Id = r["SYSTEM_ID"].ToString();
                     docX.DocumentType = r["CHA_TIPO_PROTO"].ToString();
@@ -300,8 +297,6 @@ namespace DocsPaWS.Pubblicazioni
                         docX.Template = new Template();
                         docX.Template.Id = r["TIPOLOGIA"].ToString().Split('§')[0];
                         docX.Template.Name = r["TIPOLOGIA"].ToString().Split('§')[1];
-                        templateDocX = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getTemplateDettagli(docX.Id);
-                        docX.Template = Utils.GetDetailsTemplateDoc(templateDocX, docX.Id);
                     }
 
                     if (r["DOC_PRINCIPALE"] != null && !string.IsNullOrEmpty(r["DOC_PRINCIPALE"].ToString()))

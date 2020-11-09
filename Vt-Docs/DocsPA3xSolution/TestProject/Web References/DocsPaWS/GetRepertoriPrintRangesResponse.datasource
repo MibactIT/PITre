@@ -6,5 +6,5 @@
     cause the file to be unrecognizable by the program.
 -->
 <GenericObjectDataSource DisplayName="GetRepertoriPrintRangesResponse" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
-   <TypeInfo>TestProject.DocsPaWS.GetRepertoriPrintRangesResponse</TypeInfo>
+   <TypeInfo>TestProject.DocsPaWS.GetRepertoriPrintRangesResponse, Web References.DocsPaWS.Reference.cs.dll, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
 </GenericObjectDataSource>

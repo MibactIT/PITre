@@ -486,5 +486,82 @@ namespace BusinessLogic.Amministrazione
 
             return esito;
         }
+
+        #region visualizzatore espi
+
+        /*Verifica se l'utente è abilitato alla visualizzazione di ESPIViewer*/
+        public static DocsPaVO.amministrazione.EsitoVerificaUtenteEspi CheckUtenteAbilitatoEspi(string idAmm, string userName)
+        {
+            DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
+            DocsPaVO.amministrazione.EsitoVerificaUtenteEspi result = new DocsPaVO.amministrazione.EsitoVerificaUtenteEspi();
+            try
+            {
+                result = amm.CheckUtenteAbilitatoEspi(idAmm, userName);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Errore in CheckUtenteAbilitatoEspi: " + ex.Message);
+            }
+            return result;
+        }
+
+        /* Abilita l'utente alla visualizzazione di EspiViewer */
+        public static bool AbilitaEspi(string idAmm, string username, int abilitaRiservati)
+        {
+            bool esito = false;
+            DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
+
+            try
+            {
+                esito = amm.AbilitaEspi(idAmm, username, abilitaRiservati);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Errore in AbilitaEspi: " + ex.Message);
+            }
+
+            return esito;
+
+        }
+
+        /* Disabilita l'utente alla visualizzazione di EspiViewer */
+        public static bool DisabilitaEspi(string idAmm, string username)
+        {
+            bool esito = false;
+            DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
+
+            try
+            {
+                esito = amm.DisabilitaEspi(idAmm, username);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Errore in DisabilitaEspi: " + ex.Message);
+            }
+
+            return esito;
+
+        }
+
+        /* Abilita l'utente alla visualizzazione di EspiViewer */
+        public static bool UpdateRiservati(string idAmm, string username, int abilitaRiservati)
+        {
+            bool esito = false;
+            DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
+
+            try
+            {
+                esito = amm.UpdateRiservati(idAmm, username, abilitaRiservati);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Errore in UpdateRiservati: " + ex.Message);
+            }
+
+            return esito;
+
+        }
+
+        #endregion
     }
 }

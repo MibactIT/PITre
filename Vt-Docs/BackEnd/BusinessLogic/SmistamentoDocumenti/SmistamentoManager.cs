@@ -203,27 +203,14 @@ namespace BusinessLogic.SmistamentoDocumenti
                 return null;
 		}
 
-        /// <summary>
-        /// Restituisce la lista degli id_corr_globali all'interno della UO di Appartenenza, per cui il documento è stato già trasmesso
-        /// </summary>
-        /// <param name="idCorrGlobali"></param>
-        /// <param name="docnumber"></param>
-        /// <param name="mittente"></param>
-        /// <returns></returns>
-        public static string[] GetIdDestinatariTrasmDocInUo(string idUo, string docnumber)
-        {
-            DocsPaDB.Query_DocsPAWS.SmistamentoDocumenti dbSmistaDoc = new DocsPaDB.Query_DocsPAWS.SmistamentoDocumenti();
-            return dbSmistaDoc.GetIdDestinatariTrasmDocInUo(idUo, docnumber);
-        }
-
-        /// <summary>
-        /// Reperimento array di oggetti "DocsPaVO.SmistamentoDocumenti.UnitaOrganizzativa" 
-        /// contenente i ruoli gerarchicamente inferiori definiti nell'ambito
-        /// delle UO direttamente inferiori
-        /// </summary>
-        /// <param name="IDUO"></param>
-        /// <returns></returns>
-        public static ArrayList GetUOInferiori(string idUOAppartenenza, DocsPaVO.Smistamento.MittenteSmistamento mittente)
+		/// <summary>
+		/// Reperimento array di oggetti "DocsPaVO.SmistamentoDocumenti.UnitaOrganizzativa" 
+		/// contenente i ruoli gerarchicamente inferiori definiti nell'ambito
+		/// delle UO direttamente inferiori
+		/// </summary>
+		/// <param name="IDUO"></param>
+		/// <returns></returns>
+		public static ArrayList GetUOInferiori(string idUOAppartenenza, DocsPaVO.Smistamento.MittenteSmistamento mittente)
 		{
 			ArrayList UoList = null;
 
@@ -414,6 +401,7 @@ namespace BusinessLogic.SmistamentoDocumenti
 
                                 //DataSet ds = dbSmistaDoc.
                                 bool eredita = dbSmistaDoc.IsRagioneEreditaByTrasmSingola(datiDocumentoTrasmesso.IDTrasmissioneSingola);
+
                                 if (
                                     (ragioneSmistamento.tipo.Equals("W") && !IsEnabledVisibPosticipataInTrasmConWF()
                                     //||
@@ -565,23 +553,6 @@ namespace BusinessLogic.SmistamentoDocumenti
                                         if(!string.IsNullOrEmpty(ruolo.ID)) //nelle trasmissioni a singolo UTENTE, il ruolo.ID è null
                                             // perchè non c'è alcun ruolo, ma c'è solo un utente. E' giusto così,  infatti,  quando la trasmissione è a utente, non deve essere calcolata alcuna gerarchia dei superiori.
                                         smistaDoc.SetVisibilitaRuoliSup(mittente, datiDocumentoTrasmesso, ruolo, accessRights);
-                                    }
-                                    DocsPaDB.Query_DocsPAWS.SmistamentoDocumenti dbSmistaDoc = new DocsPaDB.Query_DocsPAWS.SmistamentoDocumenti();
-                                    DocsPaDB.Query_DocsPAWS.Trasmissione trasmDb = new DocsPaDB.Query_DocsPAWS.Trasmissione();
-                                    bool eredita = dbSmistaDoc.IsRagioneEreditaByTrasmSingola(datiDocumentoTrasmesso.IDTrasmissioneSingola);
-                                    string tipoTrasmSing = trasmDb.getTipoTrasmSing(datiDocumentoTrasmesso.IDTrasmissioneSingola);
-
-                                    //PACCHETTO ZANOTTI
-                                    if (tipoTrasmSing.Equals("R") && datiDocumentoTrasmesso.TrasmissioneConWorkflow && IsEnabledVisibPosticipataInTrasmConWF() && eredita)
-                                    {
-                                        DocsPaDB.Query_DocsPAWS.Utenti dbUser = new DocsPaDB.Query_DocsPAWS.Utenti();
-                                        DocsPaVO.utente.Ruolo tempRuolo = dbUser.GetRuoloByIdGruppo(mittente.IDGroup);
-                                        DocsPaVO.Smistamento.RuoloSmistamento newRuolo = new DocsPaVO.Smistamento.RuoloSmistamento();
-                                        newRuolo.Codice = tempRuolo.codiceRubrica;
-                                        newRuolo.ID = tempRuolo.systemId;
-                                        newRuolo.Registri = tempRuolo.registri;
-                                        DocsPaVO.Smistamento.MittenteSmistamento newMittente = dbSmistaDoc.getMittenteSmistamentoByIdTrasm(datiDocumentoTrasmesso.IDTrasmissione);
-                                        smistaDoc.SetVisibilitaRuoliSup(newMittente, datiDocumentoTrasmesso, newRuolo, accessRights);
                                     }
 
                                     // Notifica al documentale dell'avvenuta impostazione di visibilità

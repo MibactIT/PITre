@@ -241,9 +241,34 @@ namespace Amministrazione.Gestione_Organigramma
         private void InvalidaPassiCorrelati()
         {
             DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
-            DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
             wws.Timeout = System.Threading.Timeout.Infinite;
-            wws.InvalidaPassiCorrelatiTitolare(this._idGruppoDaSpostare, "", "R", sessionManager.getUserAmmSession());
+            List<DocsPaWR.ProcessoFirma> processiCoinvolti_R = (Session["processiCoinvolti_R"] != null && ((int)Session["processiCoinvolti_R"]) > 0 ? wws.GetProcessiDiFirmaByRuoloTitolare(this._idGruppoDaSpostare).ToList() : new List<DocsPaWR.ProcessoFirma>());
+            List<DocsPaWR.IstanzaProcessoDiFirma> istazaProcessiCoinvolti_R = (Session["istazaProcessiCoinvolti_R"] != null && ((int)Session["istazaProcessiCoinvolti_R"]) > 0 ? wws.GetIstanzeProcessiDiFirmaByRuoloCoinvolto(this._idGruppoDaSpostare).ToList() : new List<DocsPaWR.IstanzaProcessoDiFirma>());
+
+            if (processiCoinvolti_R.Count > 0)
+            {
+                List<string> idPassi = new List<string>();
+                foreach (DocsPaWR.ProcessoFirma processo in processiCoinvolti_R)
+                {
+                    foreach (DocsPaWR.PassoFirma passo in processo.passi)
+                    {
+                        if (!idPassi.Contains(passo.idPasso))
+                        {
+                            idPassi.Add(passo.idPasso);
+                        }
+                    }
+                }
+
+                wws.TickPasso(idPassi.ToArray(), "R");
+                Session["processiCoinvolti_R"] = null;
+            }
+
+            if (istazaProcessiCoinvolti_R.Count > 0)
+            {
+                DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
+                wws.TickIstanze(istazaProcessiCoinvolti_R.ToArray(), "R", sessionManager.getUserAmmSession());
+                Session["istazaProcessiCoinvolti_R"] = null;
+            }
         }
 		#endregion		
 

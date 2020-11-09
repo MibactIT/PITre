@@ -21,7 +21,8 @@
 				var myUrl = "Navigazione_Organigramma.aspx?readonly=0&navigazione=1&selezione=1&subselezione=&idAmm="+idAmm;			
 				rtnValue = window.showModalDialog(myUrl,"","dialogWidth:600px;dialogHeight:600px;status:no;resizable:yes;scroll:yes;center:yes;help:no;"); 
 				Form1.hd_returnValueModal.value = rtnValue;		
-				window.document.Form1.submit();	
+				//window.document.Form1.submit();
+				Form1.submit();
 			}								
 		</SCRIPT>
 		<base target="_self">

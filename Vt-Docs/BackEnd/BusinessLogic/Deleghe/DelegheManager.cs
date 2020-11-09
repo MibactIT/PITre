@@ -70,13 +70,8 @@ namespace BusinessLogic.Deleghe
             loginResult = DocsPaVO.utente.UserLogin.LoginResult.OK;
             try
             {
-                //INC000001112977 PAT gestione deleghe
-                //Dismetto le deleghe rimaste in esercizio
-                DocsPaDB.Query_DocsPAWS.Deleghe deleghe = new DocsPaDB.Query_DocsPAWS.Deleghe();
-                deleghe.DismettiDelegheInEsercizio(infoUtente);
-                 
                 // Get User
-
+                
                 // ricostruzione informazioni utente delegante
                 logger.DebugFormat("username {0} idAmm {1}", objLogin.UserName, objLogin.IdAmministrazione);
                 utente = BusinessLogic.Utenti.UserManager.getUtente(objLogin.UserName, objLogin.IdAmministrazione);

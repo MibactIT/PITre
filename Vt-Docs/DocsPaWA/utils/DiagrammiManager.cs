@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using DocsPAWA.DocsPaWR;
@@ -574,6 +575,133 @@ namespace DocsPAWA
                 return false;
             }
         }
+        #endregion
+
+        #region Fasi
+        public static List<DocsPaWR.Phases> GetFasi(Page page)
+        {
+            try
+            {
+                List<Phases> list = new List<Phases>();
+                list.AddRange(docsPaWS.GetFasi());
+                return list;
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return null;
+            }
+        }
+
+        public static List<DocsPaWR.AssPhaseStatoDiagramma> GetFasiStatiDiagramma(string idDiagramma, Page page)
+        {
+            try
+            {
+                List<AssPhaseStatoDiagramma> list = new List<AssPhaseStatoDiagramma>();
+                list.AddRange(docsPaWS.GetFasiStatiDiagramma(idDiagramma, new InfoUtente()));
+                return list;
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return null;
+            }
+        }
+
+        public static bool SetFasiStatiDiagramma(List<AssPhaseStatoDiagramma> list, string idDiagramma, Page page)
+        {
+            try
+            {
+                return docsPaWS.SetFasiStatiDiagramma(list.ToArray(), idDiagramma);
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return false;
+            }
+        }
+
+        public static List<DocsPaWR.AssStatoScadenza> GetAssociazioneStatoScadenza(string idDiagramma, Page page)
+        {
+            try
+            {
+                List<AssStatoScadenza> list = new List<AssStatoScadenza>(docsPaWS.GetAssociazioneStatoScadenza(idDiagramma));
+                return list;
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return null;
+            }
+        }
+
+        public static List<DocsPaWR.EventoCambioStato> GetEventiCambioStato(Page page)
+        {
+            try
+            {
+                List<EventoCambioStato> list = new List<EventoCambioStato>(docsPaWS.GetEventiCambioStatoAutomatico());
+                return list;
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return null;
+            }
+        }
+
+        public static List<DocsPaWR.CambioStatoAutomatico> GetCambiAutomaticiStato(string idStato, Page page)
+        {
+            try
+            {
+                List<CambioStatoAutomatico> list = new List<CambioStatoAutomatico>(docsPaWS.GetCambiAutomaticiStato(idStato));
+                return list;
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return null;
+            }
+        }
+
+        public static bool CreaCambioStatoAutomatico(DocsPaWR.CambioStatoAutomatico item, Page page)
+        {
+            try
+            {
+                return docsPaWS.CreaCambioStatoAutomatico(item);
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return false;
+            }
+        }
+
+        public static bool EliminaCambioStatoAutomatico(DocsPaWR.CambioStatoAutomatico item, Page page)
+        {
+            try
+            {
+                return docsPaWS.EliminaCambioStatoAutomatico(item);
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return false;
+            }
+        }
+
+        public static bool SetAssociazioneStatoScadenza(string idDiagramma, List<AssStatoScadenza> list, Page page)
+        {
+            try
+            {
+                return docsPaWS.SetAssociazioneStatoScadenza(idDiagramma, list.ToArray());
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+                return false;
+            }
+        }
+
         #endregion
     }
 }

@@ -13,8 +13,6 @@ namespace DocsPAWA.AdminTool.Gestione_Organigramma
 {
     public partial class SaveChangesToRole : System.Web.UI.Page, System.Web.UI.ICallbackEventHandler
     {
-        private InvalidaPassiCorrelatiDelegate invalidaPassiCorrelati;
-        private StoricizzaPassiCorrelatiDelegate storicizzaPassiCorrelati;
         /// <summary>
         /// Dettaglio del ruolo da spostare
         /// </summary>
@@ -98,9 +96,11 @@ namespace DocsPAWA.AdminTool.Gestione_Organigramma
         {
             get
             {
-                return String.Format(
-                    "var retVal = window.showModalDialog('{0}/AdminTool/Gestione_Organigramma/SaveChangesToRole.aspx', '', 'dialogHeight: 270px; dialogWidth:750px; resizable: no;status:no;scroll:yes;help:no;close:no;center:yes;');Form1.hfRetValModSposta.value = retVal;document.forms[0].submit();",
-                    Utils.getHttpFullPath());
+                //return String.Format(
+                //    "var retVal = window.showModalDialog('{0}/AdminTool/Gestione_Organigramma/SaveChangesToRole.aspx', '', 'dialogHeight: 270px; dialogWidth:750px; resizable: no;status:no;scroll:yes;help:no;close:no;center:yes;');Form1.hfRetValModSposta.value = retVal;document.forms[0].submit();",
+                //    Utils.getHttpFullPath());
+
+                return "var retVal = window.showModalDialog('SaveChangesToRole.aspx', '', 'dialogHeight: 270px; dialogWidth:750px; resizable: no;status:no;scroll:yes;help:no;close:no;center:yes;');Form1.hfRetValModSposta.value = retVal;document.forms[0].submit();";
             }
         }
 
@@ -384,30 +384,45 @@ namespace DocsPAWA.AdminTool.Gestione_Organigramma
                     };
 
             //ABBATANGELI-PANICI LIBRO FIRMA
-            if (SaveChangesRequest.Phase == SaveChangesToRolePhase.Finish)
+            if (result == SaveChangesToRoleReportResult.OK)
             {
-                SaveChangesToRoleRequest saveChangesRequest = CallContextStack.CurrentContext.ContextState["SaveChangesRequest"] as SaveChangesToRoleRequest;
-                string idRuoloOld = saveChangesRequest.IdOldRole;
-                bool interrompiProcessi = GetSessionInterrompiProcessi();
-                bool storicizzaProcessi = GetSessionStoricizzaProcessi();
-                if (interrompiProcessi)
-                {
-                    AsyncCallback callback = new AsyncCallback(CallBack);
-                    invalidaPassiCorrelati = new InvalidaPassiCorrelatiDelegate(InvalidaPassiCorrelati);
-                    DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                    invalidaPassiCorrelati.BeginInvoke("R", idRuoloOld, string.Empty, sessionManager.getUserAmmSession(), callback, null);
-                }
-                else if (storicizzaProcessi)
-                {
-                    string idRuoloNew = SaveChangesRequest.ModifiedRole.IDGruppo;
-                    AsyncCallback callback = new AsyncCallback(CallBackStoricizza);
-                    storicizzaPassiCorrelati = new StoricizzaPassiCorrelatiDelegate(StoricizzaPassiCorrelati);
-                    storicizzaPassiCorrelati.BeginInvoke(idRuoloOld, idRuoloNew, callback, null);
-                }
+                InvalidaPassiCorrelati();
             }
             //FINE
         }
 
+        private void InvalidaPassiCorrelati()
+        {
+            DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
+            wws.Timeout = System.Threading.Timeout.Infinite;
+            List<ProcessoFirma> processiCoinvolti_R = (Session["processiCoinvolti_R"] != null && ((int)Session["processiCoinvolti_R"]) > 0? wws.GetProcessiDiFirmaByRuoloTitolare(SaveChangesRequest.ModifiedRole.IDGruppo).ToList() : new List<ProcessoFirma>());
+            List<IstanzaProcessoDiFirma> istazaProcessiCoinvolti_R = (Session["istazaProcessiCoinvolti_R"] != null && ((int)Session["istazaProcessiCoinvolti_R"]) > 0? wws.GetIstanzeProcessiDiFirmaByRuoloCoinvolto(SaveChangesRequest.ModifiedRole.IDGruppo).ToList() : new List<IstanzaProcessoDiFirma>());
+
+            if (processiCoinvolti_R.Count > 0)
+            {
+                List<string> idPassi = new List<string>();
+                foreach (ProcessoFirma processo in processiCoinvolti_R)
+                {
+                    foreach(PassoFirma passo in processo.passi) 
+                    {
+                        if (!idPassi.Contains(passo.idPasso))
+                        {
+                            idPassi.Add(passo.idPasso);
+                        }
+                    }
+                }
+
+                wws.TickPasso(idPassi.ToArray(), "R");
+                Session["processiCoinvolti_R"] = null;
+            }
+
+            if (istazaProcessiCoinvolti_R.Count > 0)
+            {
+                DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
+                wws.TickIstanze(istazaProcessiCoinvolti_R.ToArray(), "R", sessionManager.getUserAmmSession());
+                Session["istazaProcessiCoinvolti_R"] = null;
+            }
+        }
 
         /// <summary>
         /// Metodo per la chiusura di un report dovuta ad eccezioni
@@ -436,78 +451,7 @@ namespace DocsPAWA.AdminTool.Gestione_Organigramma
                 "ClosePage",
                 String.Format("window.returnValue='{0}_{1}';window.close();", SaveChangesRequest.ModifiedRole.IDCorrGlobale, SaveChangesRequest.ModifiedRole.IDUo),
                 true);
-
-            RemoveSessionInterrompiProcessi();
-            RemoveSessionStoricizzaProcessi();
         }
-
-        #region Libro firma
-
-
-        private void InvalidaPassiCorrelati(string tipoNodo, string idRuolo, string idPeople, InfoUtenteAmministratore infoAmm)
-        {
-            DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
-            wws.Timeout = System.Threading.Timeout.Infinite;
-            wws.InvalidaPassiCorrelatiTitolare(idRuolo, idPeople, tipoNodo, infoAmm);
-        }
-
-        public delegate void InvalidaPassiCorrelatiDelegate(string tipoNodo, string idRuolo, string idPeople, InfoUtenteAmministratore infoAmm);
-
-        private void CallBack(IAsyncResult result)
-        {
-            invalidaPassiCorrelati.EndInvoke(result);
-        }
-
-        private void StoricizzaPassiCorrelati(string idRuoloOld, string idRuoloNew)
-        {
-            Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-            theManager.StoricizzaRuoloPassiCorrelati(idRuoloOld, idRuoloNew);
-        }
-
-        public delegate void StoricizzaPassiCorrelatiDelegate(string idRuoloOld, string idRuoloNew);
-
-        private void CallBackStoricizza(IAsyncResult result)
-        {
-            storicizzaPassiCorrelati.EndInvoke(result);
-        }
-
-        private void SetSessionInterrompiProcessi(bool interrompi)
-        {
-            Session["INTERROMPIPROCESSILF"] = interrompi;
-        }
-
-        private bool GetSessionInterrompiProcessi()
-        {
-            if (Session["INTERROMPIPROCESSILF"] == null)
-                return false;
-            else
-                return (bool)Session["INTERROMPIPROCESSILF"];
-        }
-
-        private void RemoveSessionInterrompiProcessi()
-        {
-            Session.Remove("INTERROMPIPROCESSILF");
-        }
-
-        private void SetSessionStoricizzaProcessi(bool storicizza)
-        {
-            Session["STORICIZZAPROCESSILF"] = storicizza;
-        }
-
-        private bool GetSessionStoricizzaProcessi()
-        {
-            if (Session["STORICIZZAPROCESSILF"] == null)
-                return false;
-            else
-                return (bool)Session["STORICIZZAPROCESSILF"];
-        }
-
-        private void RemoveSessionStoricizzaProcessi()
-        {
-            Session.Remove("STORICIZZAPROCESSILF");
-        }
-
-        #endregion
 
     }
 

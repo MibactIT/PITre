@@ -80,7 +80,7 @@ namespace DocsPAWA.popup
             for (int i = 0; i < infoCons.Length; i++)
             {
                 this.dataSetRcons.DataTable1.AddDataTable1Row(infoCons[i].SystemID, infoCons[i].StatoConservazione, infoCons[i].decrSupporto,
-                    infoCons[i].Note, infoCons[i].Descrizione, infoCons[i].Data_Apertura, infoCons[i].Data_Invio, infoCons[i].Data_Conservazione, infoCons[i].TipoConservazione, infoCons[i].automatica, infoCons[i].noteRifiuto, (infoCons[i].consolida).ToString(), infoCons[i].idPolicyValidata,(infoCons[i].predefinita).ToString());
+                    infoCons[i].Note, infoCons[i].Descrizione, infoCons[i].Data_Apertura, infoCons[i].Data_Invio, infoCons[i].Data_Conservazione, infoCons[i].TipoConservazione, infoCons[i].noteRifiuto);
             }
             gv.DataSource = this.dataSetRcons.Tables[0];
             gv.DataBind();

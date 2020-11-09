@@ -53,7 +53,7 @@ namespace VtDocsWS.Domain
         }
 
         /// <summary>
-        /// Tipologia fascicolo
+        /// Tipologia fascicolo - DEPRECATO
         /// </summary>
         [DataMember]
         public int IdFolderTypology
@@ -63,7 +63,7 @@ namespace VtDocsWS.Domain
         }
 
         /// <summary>
-        /// Tipologia documento
+        /// Tipologia documento - DEPRECATO
         /// </summary>
         [DataMember]
         public int IdDocumentTypology
@@ -86,10 +86,10 @@ namespace VtDocsWS.Domain
         /// Contenuto del documento
         /// </summary>
         [DataMember]
-        public byte[] Content 
-        { 
-            get; 
-            set; 
+        public byte[] Content
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -107,6 +107,36 @@ namespace VtDocsWS.Domain
         /// </summary>
         [DataMember]
         public int UnreadDocuments
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Descrizione della tipologia fascicolo
+        /// </summary>
+        [DataMember]
+        public String DescFolderTypology
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Descrizione della tipologia documento
+        /// </summary>
+        [DataMember]
+        public String DescDocTypology
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Campo Contenuto da riportare nella tipologia
+        /// </summary>
+        [DataMember]
+        public String ContentMetadata
         {
             get;
             set;

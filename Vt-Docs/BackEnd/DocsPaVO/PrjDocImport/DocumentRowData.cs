@@ -47,11 +47,6 @@ namespace DocsPaVO.PrjDocImport
         public DateTime ProtocolDate { get; set; }
 
         /// <summary>
-        /// Booleano che indica se è un predisposto
-        /// </summary>
-        public bool Predisposto { get; set; }
-
-        /// <summary>
         /// Codice utente creatore del protocollo. Sviluppo per abilitare Documenti pregressi.
         /// </summary>
         public String CodiceUtenteCreatore { get; set; }
@@ -105,6 +100,11 @@ namespace DocsPaVO.PrjDocImport
         /// La nota da aggiungere al documento
         /// </summary>
         public InfoNota Note { get; set; }
+
+        /// <summary>
+        /// Tipo protocollo
+        /// </summary>
+        public string ProtoType { get; set; }
 
         /// <summary>
         /// I codici dei modelli di trasmissione da utilizzare per inviare

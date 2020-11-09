@@ -249,27 +249,7 @@ namespace VtDocsWS.Manager
 
                 if (result)
                 {
-                    //DocsPaVO.utente.Corrispondente corrRes = BusinessLogic.Utenti.UserManager.getCorrispondenteBySystemIDDisabled(request.Correspondent.Id);
-                    //DocsPaVO.utente.Corrispondente corrRes = BusinessLogic.Utenti.UserManager.getCorrispondenteByCodRubricaNotDisabled(request.Correspondent.Code, request.Correspondent.Type == "E" ? DocsPaVO.addressbook.TipoUtente.ESTERNO : DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
-
-                    DocsPaVO.utente.Corrispondente corrRes = BusinessLogic.Utenti.UserManager.getCorrispondenteByCodRubricaNotDisabled(request.Correspondent.Code, DocsPaVO.addressbook.TipoUtente.GLOBALE, infoUtente);
-                    if (corrRes == null)
-                        corrRes = BusinessLogic.Utenti.UserManager.getCorrispondenteByCodRubricaNotDisabled(request.Correspondent.Code, DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
-                    if (corrRes != null && corrRes.tipoIE == "E" && !string.IsNullOrEmpty(corrRes.email))
-                    {
-                        if (!string.IsNullOrEmpty(corrRes.email))
-                        {
-                            List<DocsPaVO.utente.MailCorrispondente> casella = new List<DocsPaVO.utente.MailCorrispondente>();
-                            casella.Add(new DocsPaVO.utente.MailCorrispondente()
-                            {
-                                Email = corrRes.email,
-                                Note = "",
-                                Principale = "1"
-                            });
-
-                            BusinessLogic.Utenti.addressBookManager.InsertMailCorrispondente(casella, corrRes.systemId);
-                        }
-                    }
+                    DocsPaVO.utente.Corrispondente corrRes = BusinessLogic.Utenti.UserManager.getCorrispondenteBySystemIDDisabled(request.Correspondent.Id);
                     response.Correspondent = Utils.GetCorrespondent(corrRes, infoUtente);
                     response.Success = true;
                 }

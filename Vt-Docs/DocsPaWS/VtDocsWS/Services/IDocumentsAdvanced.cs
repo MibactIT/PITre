@@ -32,13 +32,5 @@ namespace VtDocsWS.Services
 
         [OperationContract]
         bool BachecaCircolarePubblicata(VtDocsWS.Services.DocumentsAdvanced.CircolarePubblicata.CircolarePubblicataRequest request);
-
-        [OperationContract]
-        VtDocsWS.Services.DocumentsAdvanced.CaricaLottoInPi3.CaricaLottoInPi3Response NuovoLottoAttivo(VtDocsWS.Services.DocumentsAdvanced.CaricaLottoInPi3.CaricaLottoInPi3Request request);
-
-        [OperationContract]
-        VtDocsWS.Services.DocumentsAdvanced.NuovaFattura.NuovaFatturaResponse NuovaFatturaAttiva(VtDocsWS.Services.DocumentsAdvanced.NuovaFattura.NuovaFatturaRequest request);
-
-
     }
 }

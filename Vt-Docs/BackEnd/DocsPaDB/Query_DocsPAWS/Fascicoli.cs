@@ -463,7 +463,7 @@ namespace DocsPaDB.Query_DocsPAWS
             return Convert.ToInt32(dsResult.Tables[0].Rows[0][0]);
         }
 
-        public ArrayList GetFolderByCodFasc(DocsPaVO.utente.InfoUtente infoUtente, string codiceFascicolo, string descrizioneFolder, DocsPaVO.utente.Registro registro, bool enableUffRef, bool enableProfilazione)
+        public ArrayList GetFolderByCodFasc(DocsPaVO.utente.InfoUtente infoUtente, string codiceFascicolo, string descrizioneFolder, DocsPaVO.utente.Registro registro, bool enableUffRef, bool enableProfilazione, string insRic = "R")
         {
             DocsPaVO.fascicolazione.Folder folderObject = null;
             DocsPaVO.fascicolazione.Fascicolo fascicolo = null;
@@ -472,7 +472,7 @@ namespace DocsPaDB.Query_DocsPAWS
             int inizio = 0;
             try
             {
-                string queryString = GetQueryFascicoli(infoUtente.idAmministrazione, infoUtente.idGruppo, infoUtente.idPeople, registro, enableUffRef, enableProfilazione, codiceFascicolo, "R");
+                string queryString = GetQueryFascicoli(infoUtente.idAmministrazione, infoUtente.idGruppo, infoUtente.idPeople, registro, enableUffRef, enableProfilazione, codiceFascicolo, insRic);
 
 
                 System.Data.DataSet dataSet;
@@ -1610,7 +1610,20 @@ namespace DocsPaDB.Query_DocsPAWS
                     objFascicolo.isFascicolazioneConsentita = true;
                 }
             }
-
+            
+            //Gestione fascicolo pubblico
+            if (dataRow.Table.Columns.Contains("CHA_PUBBLICO"))
+            {
+                if (dataRow["CHA_PUBBLICO"] != DBNull.Value)
+                {
+                    objFascicolo.pubblico = dataRow["CHA_PUBBLICO"].ToString().Equals("1") ? true : false;
+                }
+                else
+                {
+                    objFascicolo.pubblico = false;
+                }
+            }
+            
             //Profilazione dinamica fascicolo
             if (enableProfilazione)
             {
@@ -2497,7 +2510,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 query = q.getSQL();
                 logger.Debug(query);
                 System.Data.DataSet dataSet;
-                this.ExecuteQuery(out dataSet, "PROJECT", query);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(out dataSet, "PROJECT", query);
+                }
+
                 if (dataSet.Tables["PROJECT"].Rows.Count > 0)
                 {
                     fascicolo = GetFascicolo(infoUtente, dataSet, dataSet.Tables["PROJECT"].Rows[0]);
@@ -4701,7 +4719,7 @@ namespace DocsPaDB.Query_DocsPAWS
             //fine modifica
             try
             {
-                this.BeginTransaction();
+                //this.BeginTransaction();
 
                 logger.Debug("INIZIO SetDataVistaSP per i fascicoli");
 
@@ -4721,30 +4739,35 @@ namespace DocsPaDB.Query_DocsPAWS
 
                 parameters.Add(outParam);
 
-                if (Cfg_SET_DATA_VISTA_GRD == "2")
-                    this.ExecuteStoredProcedure("SPsetDataVista_V2", parameters, null);
-                else
-                    this.ExecuteStoredProcedure("SPsetDataVista", parameters, null);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (Cfg_SET_DATA_VISTA_GRD == "2")
+                        dbProvider.ExecuteStoredProcedure("SPsetDataVista_V2", parameters, null);
+                    else
+                        dbProvider.ExecuteStoredProcedure("SPsetDataVista", parameters, null);
+                }
+                
 
                 if (outParam.Valore != null && outParam.Valore.ToString() != "" && outParam.Valore.ToString() != "1")
                 {
                     retValue = true;
                     logger.Debug("STORE PROCEDURE SetDataVistaSP per i fascicoli: esito positivo");
                 }
-                if (retValue)
-                    this.CommitTransaction();
-                else
-                    this.RollbackTransaction();
+                //if (retValue)
+                //    this.CommitTransaction();
+                //else
+                //    this.RollbackTransaction();
             }
             catch (Exception e)
             {
                 logger.Debug("STORE PROCEDURE SetDataVistaSP per i fascicoli: esito negativo" + e.Message);
-                this.RollbackTransaction();
+                //this.RollbackTransaction();
                 retValue = false;
             }
             finally
             {
-                this.CloseConnection();
+                //this.CloseConnection();
                 logger.Debug("FINE SetDataVistaSP per i fascicoli");
             }
 
@@ -5127,10 +5150,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("param2", idPeople);
                 q.setParam("param3", idGruppo);
                 q.setParam("param4", " AND UPPER(P.DESCRIPTION) LIKE '%" + descrFolder.ToUpper() + "%'");
-                //if (inizio == 0)
-                //   q.setParam("param5", " AND P.ID_PARENT in (select system_id from project where id_parent=" + fascicolo.systemID + ")");
-                //else
-                //   q.setParam("param5", " AND P.ID_PARENT = " + ((DocsPaVO.fascicolazione.Folder)lstFolder[i - 1]).systemID);
 
                 string idAmm = "0";
                 if (!string.IsNullOrEmpty(idPeople))
@@ -5143,6 +5162,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 if (string.IsNullOrEmpty(idRuoloPubblico))
                     idRuoloPubblico = "0";
                 q.setParam("idRuoloPubblico", idRuoloPubblico);
+
+                //if (inizio == 0)
+                //   q.setParam("param5", " AND P.ID_PARENT in (select system_id from project where id_parent=" + fascicolo.systemID + ")");
+                //else
+                //   q.setParam("param5", " AND P.ID_PARENT = " + ((DocsPaVO.fascicolazione.Folder)lstFolder[i - 1]).systemID);
 
                 updateString = q.getSQL();
                 logger.Debug(updateString);
@@ -5231,7 +5255,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Debug(updateString);
 
                 //database.fillTable(updateString,dataSet,"FOLDER");
-                this.ExecuteQuery(out dataSet, "FOLDER", updateString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(out dataSet, "FOLDER", updateString);
+                }
 
                 System.Data.DataRow[] folderRootRows = dataSet.Tables["FOLDER"].Select("ID_PARENT=" + idFascicolo);
                 if (folderRootRows.Length > 0)
@@ -6375,6 +6403,7 @@ namespace DocsPaDB.Query_DocsPAWS
             queryDef.setParam("param2", objFolderID);
             queryDef.setParam("param4", idGruppo);
             queryDef.setParam("param3", idPeople);
+            queryDef.setParam("idPeople", idPeople);
             queryDef.setParam("idRuoloPubblico", idRuoloPubblico);
             queryDef.setParam("param5", filterString);
             queryDef.setParam("param6", queryFrom);
@@ -6479,14 +6508,16 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Debug(queryString);
 
                 string resOut;
-
-                this.ExecuteScalar(out resOut, queryString);
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteScalar(out resOut, queryString);
+                }
 
                 if (resOut.Equals("0"))//caso in cui il documento non è stato fasciolato nella folder corrente
                 {
                     string insertString = "";
 
-                    this.BeginTransaction();
+                    //this.BeginTransaction();
 
                     //NUOVO REQUISITO: FASCICOLAZIONE PRIMARIA
                     //Prima di inserire il doc in fascicolo, si verifica che non sia già stato inserito in un altro
@@ -6498,7 +6529,10 @@ namespace DocsPaDB.Query_DocsPAWS
                     queryFascPrimaria = queryFascPrim.getSQL();
                     logger.Debug(queryFascPrimaria);
                     string fascPrimaria;
-                    this.ExecuteScalar(out fascPrimaria, queryFascPrimaria);
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        dbProvider.ExecuteScalar(out fascPrimaria, queryFascPrimaria);
+                    }
                     if (Convert.ToInt32(fascPrimaria) > 0)
                         fascPrimaria = "0";
                     else
@@ -6512,19 +6546,22 @@ namespace DocsPaDB.Query_DocsPAWS
                     qInsert.setParam("fascPrimaria", fascPrimaria);
                     insertString = qInsert.getSQL();
                     logger.Debug(insertString);
-                    if (!this.ExecuteNonQuery(insertString))
-                        throw new Exception();
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        if (!dbProvider.ExecuteNonQuery(insertString))
+                            throw new Exception();
+                    }
 
                     string updateString = "";
                     DocsPaUtils.Query qUpdate = DocsPaUtils.InitQuery.getInstance().getQuery("U_PROFILE_CHA_FASCICOLATO");
                     qUpdate.setParam("param1", idProfile);
                     updateString = qUpdate.getSQL();
                     logger.Debug(updateString);
-                    if (!this.ExecuteNonQuery(updateString))
-                        throw new Exception();
-
-
-
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        if (!dbProvider.ExecuteNonQuery(updateString))
+                            throw new Exception();
+                    }
 
                     //REQUISITO: visibilità dei documenti slegata dai fascicoli in cui devono essere inseriti
                     //Se il fascicolo è controllato i documenti in esso inseriti non ne ereditano le ACL
@@ -6534,7 +6571,10 @@ namespace DocsPaDB.Query_DocsPAWS
                     queryControllato = queryC.getSQL();
                     logger.Debug(queryControllato);
                     string isControllato;
-                    this.ExecuteScalar(out isControllato, queryControllato);
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        dbProvider.ExecuteScalar(out isControllato, queryControllato);
+                    }
                     //Se il fascicolo è controllato allora il documento non eredita le ACL
                     if (string.IsNullOrEmpty(isControllato) || isControllato.Equals("0"))
                     {
@@ -6544,7 +6584,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
                     result = true;
 
-                    this.CommitTransaction();
+                    //this.CommitTransaction();
                 }
                 else
                 {
@@ -6557,7 +6597,7 @@ namespace DocsPaDB.Query_DocsPAWS
             catch (Exception e)
             {
                 string ErrMsg = e.Message;
-                this.RollbackTransaction();
+                //this.RollbackTransaction();
 
                 logger.Debug("F_System");
 
@@ -6565,7 +6605,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             finally
             {
-                this.CloseConnection();
+                //this.CloseConnection();
             }
             logger.Info("END");
             return result;
@@ -6751,7 +6791,10 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param1", idFolder);
             queryString = q.getSQL();
             string result = "";
-            this.ExecuteScalar(out result, queryString);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteScalar(out result, queryString);
+            }
 
             if (!result.ToUpper().Equals("P"))
             {
@@ -6781,7 +6824,10 @@ namespace DocsPaDB.Query_DocsPAWS
             q1.setParam("param1", idFolder);
             queryString = q1.getSQL();
             string idFascicolo = string.Empty;
-            this.ExecuteScalar(out idFascicolo, queryString);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteScalar(out idFascicolo, queryString);
+            }
             // aggiungo al documento tutti i diritti dati al fascicolo		
             string updateString = "";
             DocsPaUtils.Query qUpdate = DocsPaUtils.InitQuery.getInstance().getQuery("I_SECURITY_SELECT_MODIFICATA");
@@ -6829,7 +6875,10 @@ namespace DocsPaDB.Query_DocsPAWS
             //  qUpdate.setParam("param7", union); 
             updateString = qUpdate.getSQL();
             logger.Debug(updateString);
-            this.ExecuteNonQuery(updateString);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(updateString);
+            }
 
             //SE C'E' PIU' DI UN DOCUMENTO CON ACCESSRIGHTS A 255
 
@@ -6838,8 +6887,10 @@ namespace DocsPaDB.Query_DocsPAWS
             qUpdateDocSec.setParam("idProfile", idProfile);
             updateStringDoc = qUpdateDocSec.getSQL();
             logger.Debug(updateStringDoc);
-            this.ExecuteNonQuery(updateStringDoc);
-
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(updateStringDoc);
+            }
         }
 
         /// <summary>
@@ -6914,7 +6965,13 @@ namespace DocsPaDB.Query_DocsPAWS
                 }
                 DocString = qSelect.getSQL();
                 //db.fillTable(queryDocString,ds,"DOC");
-                this.ExecuteQuery(ds, "DOC", DocString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(ds, "DOC", DocString);
+                }
+
+
                 for (int k = 0; k < ds.Tables["DOC"].Rows.Count; k++)
                 {
                     lista.Add(ds.Tables["DOC"].Rows[k]["LINK"].ToString());
@@ -8972,7 +9029,6 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-
         public string GetProjectID(string codice, string tipo, string idAmm)
         {
             string queryStr = "";
@@ -9025,23 +9081,23 @@ namespace DocsPaDB.Query_DocsPAWS
 
             using (DocsPaDB.DBProvider dbProvider = new DBProvider())
             {
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_SECURITY_PROJECT_AND_CHILD");
-                q.setParam("idFasc", idProject);
-                string commandText = q.getSQL();
-                
-                dbProvider.ExecuteNonQuery(commandText);
+                try
+                {
+                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_SECURITY_PROJECT_AND_CHILD");
+                    q.setParam("idFasc", idProject);
+                    string commandText = q.getSQL();
 
-                DocsPaUtils.Query q2 = DocsPaUtils.InitQuery.getInstance().getQuery("D_PROJECT_AND_CHILD");
-                q2.setParam("idFasc", idProject);
-                commandText = q2.getSQL();
-                //int ret = Int32.Parse(db.executeScalar(queryString).ToString());
+                    dbProvider.ExecuteNonQuery(commandText);
 
-                dbProvider.ExecuteNonQuery(commandText);
-                dbProvider.CommitTransaction();
+                    DocsPaUtils.Query q2 = DocsPaUtils.InitQuery.getInstance().getQuery("D_PROJECT_AND_CHILD");
+                    q2.setParam("idFasc", idProject);
+                    commandText = q2.getSQL();
+                    //int ret = Int32.Parse(db.executeScalar(queryString).ToString());
 
-                retVal = true;
+                    dbProvider.ExecuteNonQuery(commandText);
+                    dbProvider.CommitTransaction();
+
+                    retVal = true;
                 }
                 catch (Exception ex)
                 {
@@ -10097,7 +10153,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             return "SOSPESO";
                         else
                             if (fascDir.tipoDiritto.Equals(DocsPaVO.fascicolazione.TipoDiritto.TIPO_DELEGATO))
-                                return "SOSTITUTO";
+                                return "DELEGATO";
             return "";
         }
 
@@ -11777,7 +11833,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("param1", idFascicolo);
 
                 queryFolderString = q.getSQL();
-                this.ExecuteQuery(ds, "FOLDER", queryFolderString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(ds, "FOLDER", queryFolderString);
+                }
 
                 string queryDocString = "";
                 string DocString = "";
@@ -11793,8 +11853,10 @@ namespace DocsPaDB.Query_DocsPAWS
                 }
                 qSelect.setParam("param1", queryDocString);
                 DocString = qSelect.getSQL();
-
-                this.ExecuteQuery(ds, "DOC", DocString);
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(ds, "DOC", DocString);
+                }
                 for (int k = 0; k < ds.Tables["DOC"].Rows.Count; k++)
                 {
                     SearchResultInfo temp = new SearchResultInfo();
@@ -11888,7 +11950,10 @@ namespace DocsPaDB.Query_DocsPAWS
                     string commandText = q.getSQL();
                     logger.Debug("Protocollo Titolario creaProtTitRifMitt :" + commandText);
                     DataSet ds = new DataSet();
-                    this.ExecuteQuery(ds, commandText);
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        dbProvider.ExecuteQuery(ds, commandText);
+                    }
 
                     //Protocollo Titolario Attivo
                     //Creo il Protocollo Titolario e il Riferimento Mittente che sarà un protocollo di titolario senza sottonumero progressivo
@@ -11917,7 +11982,10 @@ namespace DocsPaDB.Query_DocsPAWS
                                 commandText = q.getSQL();
                                 logger.Debug("Protocollo Titolario creaProtTitRifMitt :" + commandText);
                                 DataSet dsNumDocInFasc = new DataSet();
-                                this.ExecuteQuery(dsNumDocInFasc, commandText);
+                                using (DBProvider dbProvider = new DBProvider())
+                                {
+                                    dbProvider.ExecuteQuery(dsNumDocInFasc, commandText);
+                                }
                                 if (dsNumDocInFasc.Tables[0].Rows.Count > 0 && !string.IsNullOrEmpty(dsNumDocInFasc.Tables[0].Rows[0]["NUM_DOC_IN_FASC"].ToString()))
                                 {
                                     //Incremento e aggiorno il numero di documenti in un fascicolo
@@ -11929,7 +11997,10 @@ namespace DocsPaDB.Query_DocsPAWS
                                     q.setParam("numDocInFasc", docInFasc.ToString());
                                     commandText = q.getSQL();
                                     logger.Debug("Protocollo Titolario creaProtTitRifMitt :" + commandText);
-                                    this.ExecuteNonQuery(commandText);
+                                    using (DBProvider dbProvider = new DBProvider())
+                                    {
+                                        dbProvider.ExecuteNonQuery(commandText);
+                                    }
                                 }
                                 else
                                 {
@@ -11942,7 +12013,10 @@ namespace DocsPaDB.Query_DocsPAWS
                                     q.setParam("numDocInFasc", "1");
                                     commandText = q.getSQL();
                                     logger.Debug("Protocollo Titolario creaProtTitRifMitt :" + commandText);
-                                    this.ExecuteNonQuery(commandText);
+                                    using (DBProvider dbProvider = new DBProvider())
+                                    {
+                                        dbProvider.ExecuteNonQuery(commandText);
+                                    }
                                     numDocInFasc = "0";
                                 }
 
@@ -11986,7 +12060,10 @@ namespace DocsPaDB.Query_DocsPAWS
                                 q.setParam("param1", " SYSTEM_ID = " + idProfile);
                                 commandText = q.getSQL();
                                 logger.Debug("Protocollo Titolario creaProtTitRifMitt :" + commandText);
-                                this.ExecuteNonQuery(commandText);
+                                using (DBProvider dbProvider = new DBProvider())
+                                {
+                                    dbProvider.ExecuteNonQuery(commandText);
+                                }
 
                                 //Provvedo ad inserire il protocollo titolario nella project components
                                 q = DocsPaUtils.InitQuery.getInstance().getQuery("U_PROJC_PROTO_TIT");
@@ -11994,7 +12071,10 @@ namespace DocsPaDB.Query_DocsPAWS
                                 q.setParam("param1", " LINK = " + idProfile + " AND PROJECT_ID = " + folder.systemID);
                                 commandText = q.getSQL();
                                 logger.Debug("Protocollo Titolario creaProtTitRifMitt :" + commandText);
-                                this.ExecuteNonQuery(commandText);
+                                using (DBProvider dbProvider = new DBProvider())
+                                {
+                                    dbProvider.ExecuteNonQuery(commandText);
+                                }
 
                                 //Solo se il protocollo è in uscita
                                 if (ds.Tables[0].Rows[0]["CHA_TIPO_PROTO"].ToString() == "P")
@@ -12025,7 +12105,10 @@ namespace DocsPaDB.Query_DocsPAWS
                                     q.setParam("param1", " SYSTEM_ID = " + idProfile);
                                     commandText = q.getSQL();
                                     logger.Debug("Protocollo Titolario creaProtTitRifMitt :" + commandText);
-                                    this.ExecuteNonQuery(commandText);
+                                    using (DBProvider dbProvider = new DBProvider())
+                                    {
+                                        dbProvider.ExecuteNonQuery(commandText);
+                                    }
                                 }
                             }
                         }
@@ -12092,7 +12175,10 @@ namespace DocsPaDB.Query_DocsPAWS
                             q.setParam("param1", " SYSTEM_ID = " + idProfile);
                             commandText = q.getSQL();
                             logger.Debug("Protocollo Titolario creaProtTitRifMitt :" + commandText);
-                            this.ExecuteNonQuery(commandText);
+                            using (DBProvider dbProvider = new DBProvider())
+                            {
+                                dbProvider.ExecuteNonQuery(commandText);
+                            }
                         }
                     }
                 }
@@ -12300,7 +12386,7 @@ namespace DocsPaDB.Query_DocsPAWS
             return string.Empty;
         }
         //fine modifica
-        
+
         public void creaRiscontroMittente(DocsPaVO.fascicolazione.RiscontroMittente riscontroMittente)
         {
             using (DocsPaDB.DBProvider dbProvider = new DBProvider())
@@ -14632,13 +14718,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 objField.SearchObjectFieldID = "DTA_ADL";
                 objDoc.SearchObjectField.Add(objField);
             }
-            if (dataRow.Table.Columns.Contains("var_motivo_adl"))
-            {
-                objField = new DocsPaVO.Grids.SearchObjectField();
-                objField.SearchObjectFieldValue = dataRow["var_motivo_adl"].ToString();
-                objField.SearchObjectFieldID = "MOTIVO_ADL";
-                objDoc.SearchObjectField.Add(objField);
-            }
 
             objField = new DocsPaVO.Grids.SearchObjectField();
             if (!String.IsNullOrEmpty(dataRow["cha_cod_t_a"].ToString()))
@@ -15906,289 +15985,6 @@ namespace DocsPaDB.Query_DocsPAWS
             catch (Exception ex)
             {
                 logger.Debug("DocsPaDB.Query_DocssPAWS.Fascicoli.RenameFolder",ex);
-            }
-
-            return result;
-        }
-
-        #region DESCRIZIONE FASCICOLO
-
-        public bool InsertDescrioneFascicolo(DescrizioneFascicolo descrizioneFasc, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_DESCRIZIONI_FASC");
-                string idProcesso = string.Empty;
-                if (DBType.ToUpper().Equals("ORACLE"))
-                    q.setParam("systemId", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DESCRIZIONI_FASC"));
-                q.setParam("descrizione", descrizioneFasc.Descrizione.Replace("'", "''"));
-                q.setParam("codice", descrizioneFasc.Codice.Replace("'", "''"));
-                q.setParam("idRegistro", string.IsNullOrEmpty(descrizioneFasc.IdRegistro) ? "0" : descrizioneFasc.IdRegistro);
-                q.setParam("idAmm", infoUtente.idAmministrazione);
-
-                query = q.getSQL();
-                logger.Debug("InsertDescrioneFascicolo: " + query);
-                if (!ExecuteNonQuery(query))
-                    result = false;
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in InsertDescrioneFascicolo " + e.Message);
-                result = false;
-            }
-            return result;
-        }
-
-        public List<DescrizioneFascicolo> GetListDescrizioniFascicolo(List<DocsPaVO.fascicolazione.FiltroDescrizioniFascicolo> filters, DocsPaVO.utente.InfoUtente infoUtente, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            logger.Debug("Inizio Metodo GetListDescrizioniFascicolo");
-            List<DescrizioneFascicolo> listDescFasc = new List<DescrizioneFascicolo>();
-            DescrizioneFascicolo desc;
-            numTotPage = 0;
-            nRec = 0;
-            try
-            {
-                string query;
-                string idTrasmSingola = string.Empty;
-                string dtaAccettata = string.Empty;
-                DataSet ds = new DataSet();
-                string condition = BindConditionFiltersDescFasc(filters);
-                nRec = GetListDescrizioniFascicoloCount(condition, infoUtente.idAmministrazione);
-                if (nRec > 0)
-                {
-                    numTotPage = (nRec / pageSize);
-                    int startRow = ((numPage * pageSize) - pageSize) + 1;
-                    int endRow = (startRow - 1) + pageSize;
-                    string paging = string.Empty;
-
-                    if (DBType == "SQL")
-                    {
-                        paging = "WHERE Row <= " + endRow.ToString() + " AND Row >=" + startRow.ToString();
-                    }
-                    else
-                    {
-                        paging = "WHERE ROWNUM <= " + endRow.ToString() + " ) a WHERE rnum >=" + startRow.ToString();
-                    }
-
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_DESCRIZIONI_FASC");
-                    q.setParam("idAmm", infoUtente.idAmministrazione);
-                    q.setParam("condition", condition);
-                    q.setParam("paging", paging);
-                    query = q.getSQL();
-                    logger.Debug("GetListDescrizioniFascicolo: " + query);
-
-                    if (ExecuteQuery(out ds, query))
-                    {
-                        if (ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
-                        {
-                            foreach (DataRow row in ds.Tables[0].Rows)
-                            {
-                                desc = new DescrizioneFascicolo();
-                                desc.SystemId = row["SYSTEM_ID"].ToString();
-                                desc.IdAmm = row["ID_AMM"].ToString();
-                                desc.Descrizione = !string.IsNullOrEmpty(row["VAR_DESCRIZIONE"].ToString()) ? row["VAR_DESCRIZIONE"].ToString() : string.Empty;
-                                desc.Codice = !string.IsNullOrEmpty(row["VAR_CODICE"].ToString()) ? row["VAR_CODICE"].ToString() : string.Empty;
-                                desc.IdRegistro = !string.IsNullOrEmpty(row["ID_REGISTRO"].ToString()) ? row["ID_REGISTRO"].ToString() : string.Empty;
-                                desc.CodRegistro = !string.IsNullOrEmpty(row["CODICE_REGISTRO"].ToString()) ? row["CODICE_REGISTRO"].ToString() : string.Empty;
-
-                                listDescFasc.Add(desc);
-                            }
-                        }
-                    }
-                }
-
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo GetListDescrizioniFascicolo " + e.Message);
-                return null;
-            }
-            logger.Debug("FINE Metodo GetListDescrizioniFascicolo");
-            return listDescFasc;
-
-        }
-
-        private int GetListDescrizioniFascicoloCount(string condition, string idAmm)
-        {
-            int nRec = 0;
-            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_DESCRIZIONI_FASC_COUNT");
-            q.setParam("condition", condition);
-            q.setParam("idAmm", idAmm);
-
-            string query = q.getSQL();
-            logger.Debug("GetListDescrizioniFascicoloCount: " + query);
-
-            string field;
-            if (ExecuteScalar(out field, query))
-                Int32.TryParse(field, out nRec);
-
-            return nRec;
-        }
-
-        private string BindConditionFiltersDescFasc(List<DocsPaVO.fascicolazione.FiltroDescrizioniFascicolo> filters)
-        {
-            string condition = string.Empty;
-            foreach (FiltroDescrizioniFascicolo f in filters)
-            {
-                switch (f.Argomento)
-                {
-                    case "CODICE":
-                        condition += " AND UPPER(D.VAR_CODICE) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") +"%'";
-                        break;
-                    case "DESCRIZIONE":
-                        condition += " AND UPPER(D.VAR_DESCRIZIONE) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
-                        break;
-                    case "REGISTRO":
-                        string[] listaIdRegRf = f.Valore.Split('_');
-                        string idRfReg = string.Empty;
-                        foreach(string id in listaIdRegRf)
-                        {
-                            if (!string.IsNullOrEmpty(idRfReg))
-                                idRfReg += ", ";
-                            idRfReg += id;
-                        }
-                        condition += " AND D.ID_REGISTRO IN (" +idRfReg + ")";
-                        break;
-                }
-            }
-
-            
-            return condition;
-        }
-
-        public bool AggiornaDescrizioneFascicolo(DescrizioneFascicolo descFasc, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_DESCRIZIONI_FASC");
-                q.setParam("systemId", descFasc.SystemId);
-                q.setParam("codice", descFasc.Codice.Replace("'","''"));
-                q.setParam("descrizione", descFasc.Descrizione.Replace("'", "''"));
-
-                string query = q.getSQL();
-                logger.Debug("AggiornaDescrizioneFascicolo: " + query);
-                int rows = 0;
-                if (!ExecuteNonQuery(query, out rows))
-                {
-                    result = false;
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Error("Errore in AggiornaDescrizioneFascicolo " + ex.Message);
-            }
-            return result;
-        }
-
-        public bool EliminaDescrizioneFascicolo(string systemId, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = true;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_DPA_DESCRIZIONI_FASC");
-                q.setParam("systemId", systemId);
-
-                string query = q.getSQL();
-                logger.Debug("EliminaDescrizioneFascicolo: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    result = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore in EliminaDescrizioneFascicolo " + ex.Message);
-            }
-            return result;
-        }
-
-        public bool CheckPresenzaDescrizione(DescrizioneFascicolo descFasc, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = false;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_DESCRIZIONI_FASC_BY_DESC");
-                if(!string.IsNullOrEmpty(descFasc.Codice))
-                    q.setParam("descrizione", " (UPPER(D.VAR_DESCRIZIONE) = '" + descFasc.Descrizione.ToUpper().Replace("'", "''") + "' OR UPPER(D.VAR_CODICE) ='" + descFasc.Codice.ToUpper().Replace("'", "''") + "')");
-                else
-                    q.setParam("descrizione", " UPPER(D.VAR_DESCRIZIONE) = '" + descFasc.Descrizione.ToUpper().Replace("'", "''") + "'");
-                q.setParam("idRegistro", descFasc.IdRegistro);
-                q.setParam("idAmm", descFasc.IdAmm);
-                q.setParam("systemId", descFasc.SystemId);
-
-                string query = q.getSQL();
-                logger.Debug("CheckPresenzaDescrizione: " + query);
-                string res; ;
-                ExecuteScalar(out res, query);
-                if (!string.IsNullOrEmpty(res) && Convert.ToInt32(res) > 0)
-                    result = true;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore in CheckPresenzaDescrizione " + ex.Message);
-            }
-            return result;
-        }
-        #endregion
-
-        public bool ExistsTrasmPendenteConWorkflowFascicolo(string idProject, string idRuoloInUO, string idPeople)
-        {
-            bool result = false;
-
-            try
-            {
-
-                Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_PENDENTI_FASC_COUNT");
-                query.setParam("idProject", idProject);
-                query.setParam("idCorrGlobali", idRuoloInUO);
-                query.setParam("idPeople", idPeople);
-
-                string commandText = query.getSQL();
-                logger.Debug("QUERY - " + commandText);
-
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    string field;
-                    if (dbProvider.ExecuteScalar(out field, commandText))
-                        if (field != "0") result = true;
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in ExistsTrasmPendenteConWorkflowFascicolo: " + e);
-            }
-
-            return result;
-        }
-
-        public bool ExistsTrasmPendenteSenzaWorkflowFascicolo(string idProject, string idRuoloInUO, string idPeople)
-        {
-            bool result = false;
-
-            try
-            {
-
-                Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_IN_TODOLIST_FASC_COUNT");
-                query.setParam("idProject", idProject);
-                query.setParam("idCorrGlobali", idRuoloInUO);
-                query.setParam("idPeople", idPeople);
-
-                string commandText = query.getSQL();
-                logger.Debug("QUERY - " + commandText);
-
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    string field;
-                    if (dbProvider.ExecuteScalar(out field, commandText))
-                        if (field != "0") result = true;
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in ExistsTrasmPendenteSenzaWorkflowFascicolo: " + e);
             }
 
             return result;

@@ -15,6 +15,7 @@ namespace DocsPaVO.documento
     [XmlInclude(typeof(DocsPaVO.ProfilazioneDinamica.Templates))]
     [XmlInclude(typeof(DocsPaVO.Security.InfoAtipicita))]
     [XmlInclude(typeof(DocsPaVO.Spedizione.SpedizioneDocumento))]
+    [XmlInclude(typeof(DettaglioSegnatura))]
     [Serializable()]
 	public class SchedaDocumento 
 	{
@@ -272,5 +273,7 @@ namespace DocsPaVO.documento
 
         public string inConservazione = string.Empty;
         public bool isRiprodotto = false;
-	}
+
+        public DettaglioSegnatura DettaglioSegnatura { get; set; }
+    }
 }

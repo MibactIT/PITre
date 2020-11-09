@@ -75,7 +75,7 @@ namespace DocsPaDB.Query_DocsPAWS
         }
 
         //OK
-		public ArrayList getCorrispondentiByCodRF (string codiceRF) 
+		public ArrayList getCorrispondentiByCodRF (string codiceRF, string idAmm) 
 		{
 			ArrayList corr = new ArrayList();
 			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
@@ -85,7 +85,8 @@ namespace DocsPaDB.Query_DocsPAWS
 				//semaforo.WaitOne();
                 DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("GET_CORRISPONDENTE_BY_RF");	
 				queryMng.setParam("param1",codiceRF.ToUpper().Replace("'", "''"));
-				string commandText=queryMng.getSQL();
+                queryMng.setParam("idAmm", !string.IsNullOrEmpty(idAmm) ? " AND A.ID_AMM=" + idAmm : "");
+                string commandText=queryMng.getSQL();
 				System.Diagnostics.Debug.WriteLine("SQL - getCorrispondentiByCodRF - RF.cs - QUERY : "+commandText);
                 logger.Debug("SQL - getCorrispondentiByCodRF - RF.cs - QUERY : " + commandText);
 

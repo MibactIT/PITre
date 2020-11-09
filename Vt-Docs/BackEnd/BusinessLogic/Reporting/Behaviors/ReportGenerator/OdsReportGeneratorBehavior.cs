@@ -32,34 +32,18 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
             SpreadsheetDocument spreadSheetDocument = new SpreadsheetDocument();
             spreadSheetDocument.New();
 
-            
-
             // Generazione di un foglio per ogni report
             foreach (var report in reports)
                 // Generazione di un foglio con i dati contenuti nel report
-                this.AddWorksheet(spreadSheetDocument, report, request.ReportKey);
+                this.AddWorksheet(spreadSheetDocument, report);
 
             // Inizializzazione del file name
             String fileName = String.Format("Report_{0}.ods", DateTime.Now.ToString("dd-MM-yyyy"));
 
             // Inizializzazione del path del file
-            String filePath;
-            if(!String.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_TEMP_PATH")))
-            {
-                filePath = Path.Combine(
-                DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_TEMP_PATH"),
-                String.Format(@"AODF\{0}", Guid.NewGuid()));
-            }
-            else
-            {
-                filePath = Path.Combine(
+            String filePath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.InternetCache),
                 String.Format(@"AODF\{0}", Guid.NewGuid()));
-            }
-
-            //String filePath = Path.Combine(
-            //    Environment.GetFolderPath(Environment.SpecialFolder.InternetCache),
-            //    String.Format(@"AODF\{0}", Guid.NewGuid()));
 
             // Creazione della cartella
             DirectoryInfo dirInfo = Directory.CreateDirectory(filePath);
@@ -94,33 +78,18 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
         /// </summary>
         /// <param name="spreadsheetDocument">Documento Open Office</param>
         /// <param name="report">Report da renderizzare</param>
-        private void AddWorksheet(SpreadsheetDocument spreadsheetDocument, DocsPaVO.Report.Report report, String reportKey)
+        private void AddWorksheet(SpreadsheetDocument spreadsheetDocument, DocsPaVO.Report.Report report)
         {
             // Aggiunta di un foglio al report
-            String sheetName = String.Empty;
-            if (!String.IsNullOrEmpty(report.SectionName))
-            {
-                sheetName = report.SectionName;
-            }
-            else
-            {
-                sheetName = String.Format("Foglio {0}", spreadsheetDocument.TableCount);
-            }
-            Table sheet = new Table(spreadsheetDocument, String.Format(sheetName, spreadsheetDocument.TableCount), String.Empty);
+            Table sheet = new Table(spreadsheetDocument, String.Format("Foglio {0}", spreadsheetDocument.TableCount), String.Empty);
             spreadsheetDocument.TableCollection.Add(sheet);
 
             // Aggiunta del titolo e del sottotitolo
-            this.SetTitle(report.Title, sheet, reportKey);
-            this.SetSubtitle(report.Subtitle, sheet, reportKey);
-
-            // Aggiunta delle informazioni aggiuntive
-            if(reportKey == "RegistroAccessiPublish")
-            {
-                this.SetAdditionalInformation(report.AdditionalInformation, sheet, reportKey);
-            }
+            this.SetTitle(report.Title, sheet);
+            this.SetSubtitle(report.Subtitle, sheet);
 
             // Aggiunta dell'header
-            this.AddHeaderRow(report.ReportHeader, sheet, reportKey);
+            this.AddHeaderRow(report.ReportHeader, sheet);
 
             // Aggiunta dei dati al report
             this.AddReportData(sheet, report.ReportMapRow);
@@ -132,19 +101,14 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
         /// </summary>
         /// <param name="title">Titolo da assegnare al foglio</param>
         /// <param name="sheet">Foglio a cui aggiungere il titolo</param>
-        private void SetTitle(String title, Table sheet, String reportKey)
+        private void SetTitle(String title, Table sheet)
         {
             Cell titleCell = new Cell(sheet.Document, "cell001");
             titleCell.OfficeValueType = "string";
             Paragraph titleParagraph = ParagraphBuilder.CreateSpreadsheetParagraph(sheet.Document);
             FormatedText fText = new FormatedText(sheet.Document, "T1", title);
             fText.TextStyle.TextProperties.Bold = "bold";
-            fText.TextStyle.TextProperties.FontSize = "16pt";
-            if (reportKey == "RegistroAccessiPublish")
-            {
-                fText.TextStyle.TextProperties.Bold = String.Empty;
-                titleCell.CellStyle.CellProperties.BackgroundColor = "#DDDDDD";
-            }
+            fText.TextStyle.TextProperties.FontSize = "20pt";
             titleParagraph.TextContent.Add(fText);
             titleCell.Content.Add(titleParagraph);
             sheet.Rows.Add(new Row(sheet));
@@ -156,7 +120,7 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
         /// </summary>
         /// <param name="subtitle">Sottotitolo da assegnare al foglio</param>
         /// <param name="sheet">Foglio a cui aggiungere il sottotitolo</param>
-        private void SetSubtitle(String subtitle, Table sheet, String reportKey)
+        private void SetSubtitle(String subtitle, Table sheet)
         {
             Cell subTitleCell = new Cell(sheet.Document, "cell002");
             subTitleCell.OfficeValueType = "string";
@@ -164,40 +128,11 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
             FormatedText fText = new FormatedText(sheet.Document, "T2", subtitle);
             fText.TextStyle.TextProperties.Bold = "bold";
             fText.TextStyle.TextProperties.FontSize = "15pt";
-            if (reportKey == "RegistroAccessiPublish")
-            {
-                fText.TextStyle.TextProperties.Bold = String.Empty;
-                subTitleCell.CellStyle.CellProperties.BackgroundColor = "#DDDDDD";
-            }
             subTitleParagraph.TextContent.Add(fText);
             subTitleCell.Content.Add(subTitleParagraph);
             sheet.Rows.Add(new Row(sheet));
             sheet.Rows[1].Cells.Add(subTitleCell);
-        }
 
-        /// <summary>
-        /// Metodo per l'impostazione delle informazioni aggiuntive di un report
-        /// </summary>
-        /// <param name="additionalInformation"></param>
-        /// <param name="sheet"></param>
-        /// <param name="reportKey"></param>
-        private void SetAdditionalInformation(String additionalInformation, Table sheet, String reportKey)
-        {
-            Cell addInfoCell = new Cell(sheet.Document, "cell002");
-            addInfoCell.OfficeValueType = "string";
-            Paragraph subTitleParagraph = ParagraphBuilder.CreateSpreadsheetParagraph(sheet.Document);
-            FormatedText fText = new FormatedText(sheet.Document, "T2", additionalInformation);
-            fText.TextStyle.TextProperties.Bold = "bold";
-            fText.TextStyle.TextProperties.FontSize = "15pt";
-            if (reportKey == "RegistroAccessiPublish")
-            {
-                fText.TextStyle.TextProperties.Bold = String.Empty;
-                addInfoCell.CellStyle.CellProperties.BackgroundColor = "#DDDDDD";
-            }
-            subTitleParagraph.TextContent.Add(fText);
-            addInfoCell.Content.Add(subTitleParagraph);
-            sheet.Rows.Add(new Row(sheet));
-            sheet.Rows[2].Cells.Add(addInfoCell);
         }
 
         /// <summary>
@@ -205,45 +140,25 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
         /// </summary>
         /// <param name="header">Header da aggiungere</param>
         /// <param name="sheet">Foglio a cui aggiungere l'instestazione</param>
-        private void AddHeaderRow(DocsPaVO.Report.HeaderColumnCollection header, Table sheet, String reportKey)
+        private void AddHeaderRow(DocsPaVO.Report.HeaderColumnCollection header, Table sheet)
         {
             sheet.Rows.Add(new Row(sheet));
             int actualRow = sheet.Rows.Count - 1;
-            int actualCol = 0;
             foreach (var headerColumn in header)
             {
                 Cell headerCell = new Cell(sheet.Document, "cell003");
                 headerCell.OfficeValueType = "string";
                 headerCell.CellStyle.CellProperties.Border = Border.HeavySolid;
                 headerCell.CellStyle.CellProperties.BackgroundColor = "#D0B1A1";
-
                 Paragraph paragraph = ParagraphBuilder.CreateSpreadsheetParagraph(sheet.Document);
                 FormatedText fText = new FormatedText(sheet.Document, "T3", headerColumn.ColumnName);
                 fText.TextStyle.TextProperties.Bold = "bold";
-                fText.TextStyle.TextProperties.FontName = "Arial";
-                fText.TextStyle.TextProperties.FontSize = "11pt";
+                fText.TextStyle.TextProperties.FontSize = "10pt";
                 paragraph.TextContent.Add(fText);
                 headerCell.Content.Add(paragraph);
                 sheet.Rows[actualRow].Cells.Add(headerCell);
-                if (reportKey == "RegistroAccessiPublish")
-                {
-                    headerCell.CellStyle.CellProperties.BackgroundColor = String.Empty;
-                    fText.TextStyle.TextProperties.FontName = "ArialNarrow";
-                    fText.TextStyle.TextProperties.FontColor = "#006699";
-                    sheet.ColumnCollection[actualCol].ColumnStyle.ColumnProperties.Width = String.Format("{0}px", (headerColumn.ColumnSize * 2).ToString());
-
-                    Cell titleCell = new Cell(sheet.Document, "cell001");
-                    Cell subTitleCell = new Cell(sheet.Document, "cell002");
-                    Cell addInfoCell = new Cell(sheet.Document, "cell000");
-                    titleCell.CellStyle.CellProperties.BackgroundColor = "#DDDDDD";
-                    subTitleCell.CellStyle.CellProperties.BackgroundColor = "#DDDDDD";
-                    addInfoCell.CellStyle.CellProperties.BackgroundColor = "#DDDDDD";
-                    sheet.Rows[0].Cells.Add(titleCell);
-                    sheet.Rows[1].Cells.Add(subTitleCell);
-                    sheet.Rows[2].Cells.Add(addInfoCell);
-                }
-                actualCol++;
             }
+
         }
 
         /// <summary>
@@ -263,8 +178,8 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
                     columnItem.CellStyle.CellProperties.Border = Border.HeavySolid;
                     Paragraph paragraph = ParagraphBuilder.CreateSpreadsheetParagraph(sheet.Document);
                     FormatedText fText = new FormatedText(sheet.Document, "T4", column.Value);
-                    //fText.TextStyle.TextProperties.Bold = "bold";
-                    fText.TextStyle.TextProperties.FontSize = "11pt";
+                    fText.TextStyle.TextProperties.Bold = "bold";
+                    fText.TextStyle.TextProperties.FontSize = "10pt";
                     paragraph.TextContent.Add(fText);
                     columnItem.Content.Add(paragraph);
                     int rowNum = sheet.Rows.Count - 1;

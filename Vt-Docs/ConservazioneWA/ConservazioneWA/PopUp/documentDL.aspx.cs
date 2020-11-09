@@ -35,7 +35,7 @@ namespace ConservazioneWA.PopUp
                 
                 WSConservazioneLocale.FileDocumento fd = ConservazioneWA.Utils.ConservazioneManager.sbustaFileFirmato(idConservazione, path,localStore );
                 Response.AddHeader("content-disposition", "inline;filename="+fd.name);
-                Response.ContentType = !string.IsNullOrEmpty(fd.contentType) ? fd.contentType : "application/octet-stream";
+                Response.ContentType = fd.contentType;
                 bincontent = fd.content;
                 Response.AddHeader("content-length", bincontent.Length.ToString());
                 Response.BinaryWrite(bincontent);
@@ -48,9 +48,8 @@ namespace ConservazioneWA.PopUp
                 bincontent = ConservazioneWA.Utils.ConservazioneManager.getFileFromStore(infoUtente, idConservazione, path,localStore );
                 Response.AddHeader("content-length", bincontent.Length.ToString());
                 Response.BinaryWrite(bincontent);
-                Response.Flush();
             }
-            //Response.Flush();
+            Response.Flush();
             Response.End();
         }
     }

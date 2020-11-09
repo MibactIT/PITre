@@ -93,7 +93,6 @@
             <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
             <s:element minOccurs="1" maxOccurs="1" name="dataverificaDT" nillable="true" type="s:dateTime" />
             <s:element minOccurs="1" maxOccurs="1" name="ancheFile" type="s:boolean" />
-            <s:element minOccurs="1" maxOccurs="1" name="isCadesPades" type="s:boolean" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -110,7 +109,6 @@
             <s:element minOccurs="0" maxOccurs="1" name="content" type="s:base64Binary" />
             <s:element minOccurs="1" maxOccurs="1" name="dataverificaDT" nillable="true" type="s:dateTime" />
             <s:element minOccurs="1" maxOccurs="1" name="ancheFile" type="s:boolean" />
-            <s:element minOccurs="1" maxOccurs="1" name="isCadesPades" type="s:boolean" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -395,10 +393,10 @@
   </wsdl:binding>
   <wsdl:service name="ClrVerification">
     <wsdl:port name="ClrVerificationSoap" binding="tns:ClrVerificationSoap">
-      <soap:address location="http://localhost/Vt-Docs/BackEnd/DocsPaDigitalSignature_ExternalModules/ClrVerificationService/ClrVerification.asmx" />
+      <soap:address location="http://localhost/Vt-Docs/ClrVerificationService/ClrVerification.asmx" />
     </wsdl:port>
     <wsdl:port name="ClrVerificationSoap12" binding="tns:ClrVerificationSoap12">
-      <soap12:address location="http://localhost/Vt-Docs/BackEnd/DocsPaDigitalSignature_ExternalModules/ClrVerificationService/ClrVerification.asmx" />
+      <soap12:address location="http://localhost/Vt-Docs/ClrVerificationService/ClrVerification.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

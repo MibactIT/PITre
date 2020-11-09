@@ -171,7 +171,7 @@ namespace DocsPaDocumentale_ETDOCS.Documentale
 						logger.Debug("Documenti presenti");
 						int lastDocNum = schedaDoc.documenti.Count - 1;
 					
-						if(((DocsPaVO.documento.Documento)schedaDoc.documenti[lastDocNum]).dataArrivo!=null && !((DocsPaVO.documento.Documento)schedaDoc.documenti[lastDocNum]).dataArrivo.ToString().Trim().Equals(""))
+						if(((DocsPaVO.documento.Documento)schedaDoc.documenti[lastDocNum]).dataArrivo!=null && !((DocsPaVO.documento.Documento)schedaDoc.documenti[lastDocNum]).dataArrivo.Equals(""))
 						{
 							firstParam += ", DTA_ARRIVO =" + DocsPaDbManagement.Functions.Functions.ToDate(((DocsPaVO.documento.Documento)schedaDoc.documenti[lastDocNum]).dataArrivo);
 						}
@@ -1132,12 +1132,8 @@ namespace DocsPaDocumentale_ETDOCS.Documentale
                     fileRequest.fileName = fileName;
                     fileRequest.fileSize = fileDocumento.content.Length.ToString();
                 }
-            }
-            catch (System.IO.PathTooLongException e)
-            {
-                throw new PathTooLongException();
-            }
-            catch (Exception ex)
+            } 
+			catch (Exception ex)
 			{
                 logger.Debug(string.Format("Errore durante la scrittura del documento: {0}", ex.Message));
 

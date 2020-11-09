@@ -68,8 +68,6 @@ namespace BusinessLogic.Reporting
             report.AdditionalInformation = request.AdditionalInformation;
             report.ReportMapRow = new ReportMapRow();
             report.ReportHeader = new HeaderColumnCollection();
-            report.SectionName = "RUBRICA";
-            report.ShowHeaderRow = false;
             report.Summary = string.Empty;
 
             // Generazione delle righe del report

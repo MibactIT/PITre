@@ -339,27 +339,6 @@
                             </div>
                         </ContentTemplate>
                     </asp:UpdatePanel>
-                    <asp:Panel id="PanelStructure" runat="server">
-                        <div class="contenitore_box_due">
-                            <fieldset>
-                                <legend>Configurazione custom SACER</legend>
-                                <table class="tabInput">
-                                    <tr>
-                                        <td class="legend">Ente</td>
-                                        <td>
-                                            <asp:TextBox ID="txt_custom_ente" runat="server" Width="60%" CssClass="testo_grigio" MaxLength="64"></asp:TextBox>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="legend">Struttura</td>
-                                        <td>
-                                            <asp:TextBox ID="txt_custom_struttura" runat="server" Width="60%" CssClass="testo_grigio" MaxLength="64"></asp:TextBox>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        </div>
-                    </asp:Panel>
                     <asp:UpdatePanel ID="UpdatePanelPeriodicity" runat="server" UpdateMode="Conditional">
                         <ContentTemplate>
                             <div class="contenitore_box_due">

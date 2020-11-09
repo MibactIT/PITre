@@ -128,6 +128,75 @@ namespace DocsPaDocumentale_CDC.Documentale
  */
             #endregion
         }
+
+        /// <summary>
+        /// Effettua il login di un utente LDAP
+        /// </summary>
+        /// <param name="utente">Oggetto Utente connesso</param>
+        /// <returns>True = OK; False = Si è verificato un errore</returns>
+        public bool LoginUserLDAP(DocsPaVO.utente.UserLogin userLogin, out DocsPaVO.utente.Utente utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult)
+        {
+            bool result = true;
+            utente = null;
+            loginResult = DocsPaVO.utente.UserLogin.LoginResult.OK;
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.Utenti utenti = new DocsPaDB.Query_DocsPAWS.Utenti();
+
+                string name = System.String.Empty;
+                int idAmm = 0;
+
+                if (!string.IsNullOrEmpty(userLogin.UserName))
+                    name = userLogin.UserName;
+                if (!string.IsNullOrEmpty(userLogin.IdAmministrazione))
+                    idAmm = Convert.ToInt32(userLogin.IdAmministrazione);
+
+                if (utenti.IsUtenteDisabled(userLogin.UserName, userLogin.Modulo, userLogin.IdAmministrazione))
+                {
+                    loginResult = DocsPaVO.utente.UserLogin.LoginResult.DISABLED_USER;
+                    result = false;
+                    logger.Debug("Utente disabilitato");
+                }
+
+                //verifica userId su tabella utenti
+                string peopleId = string.Empty;
+
+                if (result && !utenti.UserLogin(out peopleId, name, idAmm.ToString(), userLogin.Modulo))
+                {
+                    loginResult = DocsPaVO.utente.UserLogin.LoginResult.UNKNOWN_USER;
+                    result = false;
+                    logger.Debug("Utente sconosciuto");
+                }
+
+                if (result && !string.IsNullOrEmpty(peopleId))
+                {
+                    if (!utenti.CheckLdapLogin(userLogin.UserName))
+                    {
+                        result = false;
+                    }
+                }
+
+                if (result)
+                {
+                    // Reperimento metadati dell'utente
+                    utente = utenti.GetUtente(name, userLogin.IdAmministrazione, userLogin.Modulo);
+
+                    // Associazione token di autenticazione
+                    //utente.dst = this.CreateUserToken();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore nella login.", ex);
+                result = false;
+                utente = null;
+            }
+
+            return result;
+        }
+
         public virtual bool Checkconnection()
         {
             return true;
@@ -256,6 +325,74 @@ namespace DocsPaDocumentale_CDC.Documentale
             }
         }
 
+        /// <summary>
+        /// Effettua il login di un utente amministratore LDAP
+        /// </summary>
+        /// <param name="utente"></param>
+        /// <param name="loginResult"></param>
+        /// <returns></returns>
+        public bool LoginAdminUserLDAP(DocsPaVO.utente.UserLogin userLogin, bool forceLogin, out DocsPaVO.amministrazione.InfoUtenteAmministratore utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult)
+        {
+            utente = null;
+            loginResult = UserLogin.LoginResult.UNKNOWN_USER;
+
+            try
+            {
+                DocsPaVO.amministrazione.InfoUtenteAmministratore infoAdmin = null;
+
+                using (DocsPaDB.Query_DocsPAWS.Amministrazione amministrazioneDb = new DocsPaDB.Query_DocsPAWS.Amministrazione())
+                {
+                    // Reperimento metadati dell'utente amministratore (senza gestione password criptate)
+                    infoAdmin = amministrazioneDb.GetDatiAmministratore(userLogin.UserName);
+
+                    if (infoAdmin != null)
+                    {
+                        // Connessione al sistema CDC se altro tipo di amministratore
+                        if (this.UserManagerOCS.LoginAdminUserLDAP(userLogin, forceLogin, out utente, out loginResult))
+                        {
+                            // L'utente si è connesso con successo al sistema mediante i servizi forniti da CDC,
+                            // pertanto vengono fatte le opportune operazioni in etdocs per validare la connessione
+                            bool userAlreadyConnected;
+
+                            if (!amministrazioneDb.LoginAmministratore(utente, userLogin.IPAddress, userLogin.SessionId, forceLogin, out userAlreadyConnected))
+                            {
+                                utente.dst = null;
+
+                                if (userAlreadyConnected)
+                                    // Utente già connesso
+                                    loginResult = DocsPaVO.utente.UserLogin.LoginResult.USER_ALREADY_LOGGED_IN;
+                                else
+                                    loginResult = DocsPaVO.utente.UserLogin.LoginResult.UNKNOWN_USER;
+                            }
+                            else
+                            {
+                                utente.idPeople = infoAdmin.idPeople;
+                                utente.tipoAmministratore = infoAdmin.tipoAmministratore;
+                                utente.nome = infoAdmin.nome;
+                                utente.cognome = infoAdmin.cognome;
+                                utente.idAmministrazione = infoAdmin.idAmministrazione;
+                                utente.idCorrGlobali = infoAdmin.idCorrGlobali;
+
+                                loginResult = DocsPaVO.utente.UserLogin.LoginResult.OK;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        loginResult = UserLogin.LoginResult.UNKNOWN_USER;
+                    }
+                }
+
+                return (loginResult == UserLogin.LoginResult.OK);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = string.Format("Errore nella login dell'utente al sistema documentale: {0}", ex.Message);
+                logger.Debug(errorMessage);
+
+                throw new ApplicationException(errorMessage, ex);
+            }
+        }
 
         #region Protected methods
 

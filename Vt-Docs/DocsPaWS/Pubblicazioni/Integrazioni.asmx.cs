@@ -69,6 +69,8 @@ namespace DocsPaWS.Pubblicazioni
                                             if (stato.DESCRIZIONE.ToUpper().Equals(statoDest.ToUpper()))
                                             {
                                                 BusinessLogic.DiagrammiStato.DiagrammiStato.salvaModificaStato(documento.docNumber, stato.SYSTEM_ID.ToString(), diagramma, infoUtente.idPeople, infoUtente, string.Empty);
+                                                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, "DOC_CAMBIO_STATO", documento.docNumber, String.Format("Stato passato a  {0}", statoDest.ToUpper()), DocsPaVO.Logger.CodAzione.Esito.OK, infoUtente.delegato, "1");
+                                                        
                                                 retVal = true;
                                                 break;
                                             }
@@ -86,6 +88,7 @@ namespace DocsPaWS.Pubblicazioni
                                                     if (((DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[j]).DESCRIZIONE.ToUpper().Equals(statoDest.ToUpper()))
                                                     {
                                                         BusinessLogic.DiagrammiStato.DiagrammiStato.salvaModificaStato(documento.docNumber, ((DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[j]).SYSTEM_ID.ToString(), diagramma, infoUtente.idPeople, infoUtente, string.Empty);
+                                                        BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, "DOC_CAMBIO_STATO", documento.docNumber, String.Format("Stato passato a  {0}", statoDest.ToUpper()), DocsPaVO.Logger.CodAzione.Esito.OK, infoUtente.delegato, "1");
                                                         retVal = true;
                                                         break;
                                                     }
@@ -139,45 +142,6 @@ namespace DocsPaWS.Pubblicazioni
         }
    
 
-        #endregion
-
-        #region BigFiles FTP
-        [WebMethod]
-        [XmlInclude(typeof(DocsPaVO.ExternalServices.FileFtpUpInfo))]
-        [return: XmlArray()]
-        [return: XmlArrayItem(typeof(DocsPaVO.ExternalServices.FileFtpUpInfo))]
-        public virtual ArrayList BigFilesFTP_getFiles()
-        {
-            return BusinessLogic.Amministrazione.SistemiEsterni.BigFilesFTP_GetFilesToTransfer();
-        }
-
-        [WebMethod]
-        public virtual bool BigFilesFtp_updateTable(DocsPaVO.ExternalServices.FileFtpUpInfo infoFile)
-        {
-            return BusinessLogic.Amministrazione.SistemiEsterni.BigFilesFTP_updateTable(infoFile);
-        }
-        #endregion
-
-        #region Fattura milano
-        [WebMethod]
-        public string GetIdAutFatturaPassiva(string numAutorizzazione, string idCampo, string idTemplate)
-        {
-            string retval = null;
-            ArrayList items = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getIdDocByAssTemplates(idCampo, numAutorizzazione, "DESC", idTemplate);
-            if (items != null && items.Count > 0)
-            {
-                retval = items[0].ToString();
-            }
-            return retval;
-        }
-
-        [WebMethod]
-        [return: XmlArray()]
-        [return: XmlArrayItem(typeof(string))]
-        public ArrayList GetIdDocsByDiagramStatus(string descStato, string descDiagramma, string codAmm)
-        {
-            return BusinessLogic.DiagrammiStato.DiagrammiStato.GetIdDocsByDiagramStatus(descStato, descDiagramma, codAmm);
-        }
         #endregion
     }
 }

@@ -626,7 +626,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 nota.IdPeopleDelegato = idPeopleDelegato;
                 Utenti utente = new Utenti();
-                nota.DescrPeopleDelegato = utente.GetUtenteNoFiltroDisabled(idPeopleDelegato).descrizione;
+                nota.DescrPeopleDelegato = utente.GetUtente(idPeopleDelegato).descrizione;
             }
             else
             {

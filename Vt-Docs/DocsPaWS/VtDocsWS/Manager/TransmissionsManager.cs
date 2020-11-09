@@ -141,11 +141,7 @@ namespace VtDocsWS.Manager
                 //if (model != null)
                 if(model.SYSTEM_ID!=0)
                 {
-                    string pathFE = "";
-                    if (System.Configuration.ConfigurationManager.AppSettings["URL_PATH_IS"] != null)
-                        pathFE = System.Configuration.ConfigurationManager.AppSettings["URL_PATH_IS"].ToString();
-
-                    result = BusinessLogic.Trasmissioni.TrasmManager.TransmissionExecuteDocTransmFromModelCodeSoloConNotifica(infoUtente, pathFE, documento, model.CODICE, ruolo, out model);
+                    result = BusinessLogic.Trasmissioni.TrasmManager.TransmissionExecuteDocTransmFromModelCodeSoloConNotifica(infoUtente, string.Empty, documento, model.CODICE, ruolo, out model);
                 }
                 else
                 {

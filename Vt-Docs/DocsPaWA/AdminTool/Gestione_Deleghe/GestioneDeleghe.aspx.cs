@@ -348,7 +348,7 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
             ddl_ricTipo_SelectedIndexChanged(null, null);
             this.InizializeTree();
             lbl_messaggio.Visible = false;
-            lbl_operazione.Text = "Nuova sostituzione";
+            lbl_operazione.Text = "Nuova delega";
             this.pnl_nuovaDelega.Visible = true;
             this.chkTutti.Checked = false;
             this.lbl_ruolo_delegante.Visible = true;
@@ -361,7 +361,7 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
             this.ddl_ricTipo.SelectedIndex = 0;
             this.txt_ricCod.Text = "";
             this.txt_ricDesc.Text = "";
-            btn_conferma.ToolTip = "Conferma creazione nuova sostituzione";
+            btn_conferma.ToolTip = "Conferma creazione nuova delega";
             //setInfoRuolo();
             chklst_utente.SelectedIndex = 0;
             this.treeViewUO.AutoPostBack = true;
@@ -390,8 +390,8 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
                 //imposto interfaccia grafica
                 abilita_pulsanti(false);
                 lbl_messaggio.Visible = false;
-                lbl_operazione.Text = "Modifica sostituzione";
-                btn_conferma.ToolTip = "Conferma modifica sostituzione";
+                lbl_operazione.Text = "Modifica delega";
+                btn_conferma.ToolTip = "Conferma modifica delega";
                 this.pnl_nuovaDelega.Visible = true;
                 this.ddl_ricTipo.SelectedIndex = 0;
                 this.txt_ricCod.Text = "";
@@ -505,7 +505,7 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
             {
                 string messaggio = string.Empty;
                 if (string.IsNullOrEmpty(msg))
-                    messaggio = "Impossibile revocare le sostituzioni selezionate";
+                    messaggio = "Impossibile revocare le deleghe selezionate";
                 else
                     messaggio = msg;
                 disabilitaCheckDataGrid();
@@ -538,7 +538,7 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
             {
                 this.dgDeleghe.Visible = false;
                 this.lbl_messaggio.Visible = true;
-                this.lbl_messaggio.Text = "Nessuna sostituzione presente";
+                this.lbl_messaggio.Text = "Nessuna delega presente";
             }
             for (int i = 0; i < numDeleghe; i++)
             {
@@ -564,9 +564,9 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
                 {
                     this.dgDeleghe.Items[i].Font.Strikeout = true;
                     if (data[i].utDeleganteDismesso.Equals("1"))
-                        this.dgDeleghe.Items[i].ToolTip = "Utente titolare dismesso";
+                        this.dgDeleghe.Items[i].ToolTip = "Utente delegante dismesso";
                     else
-                        this.dgDeleghe.Items[i].ToolTip = "Utente sostituto dismesso";
+                        this.dgDeleghe.Items[i].ToolTip = "Utente delegato dismesso";
                 }
 
                 statoDelega = "I";
@@ -781,11 +781,11 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
         private void btn_conferma_Click(object sender, EventArgs e)
         {
             lbl_avviso.Text = "";
-            if (lbl_operazione.Text == "Nuova sostituzione")
+            if (lbl_operazione.Text == "Nuova delega")
             {
                 confermaNuova();
             }
-            if (lbl_operazione.Text == "Modifica sostituzione")
+            if (lbl_operazione.Text == "Modifica delega")
             {
                 confermaModifica();
             }
@@ -858,17 +858,17 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
                 }
                 if (string.IsNullOrEmpty(txt_delegante.Text))
                 {
-                    Response.Write("<script>alert('Selezionare il titolare!');</script>");
+                    Response.Write("<script>alert('Selezionare il delegante!');</script>");
                     return;
                 }
                 if (string.IsNullOrEmpty(txt_delegato.Text))
                 {
-                    Response.Write("<script>alert('Selezionare il sostituto!');</script>");
+                    Response.Write("<script>alert('Selezionare il delegato!');</script>");
                     return;
                 }
                 if (txt_delegato.Text.Equals(txt_delegante.Text))
                 {
-                    Response.Write("<script>alert('Attenzione il titolare e il sostituto non possono essere la stessa persona!');</script>");
+                    Response.Write("<script>alert('Attenzione il delegante e il delegato non possono essere la stessa persona!');</script>");
                     return;
                 }
                 CreaDelega();
@@ -936,14 +936,14 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
                     }
                     else
                     {
-                        Response.Write("<script>alert('Attenzione, impossibile creare la sostituzione. Riprovare più tardi.');</script>");
+                        Response.Write("<script>alert('Attenzione, impossibile creare la delega. Riprovare più tardi.');</script>");
                         return;
                     }
                 }
             }
             else
             {
-                Response.Write("<script>alert('Attenzione, impossibile assegnare più sostituzioni in periodi temporali sovrapposti per lo stesso ruolo!');</script>");
+                Response.Write("<script>alert('Attenzione, impossibile assegnare più deleghe in periodi temporali sovrapposti per lo stesso ruolo!');</script>");
                 return;
             }
         }
@@ -988,17 +988,17 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
 
                 if (string.IsNullOrEmpty(txt_delegante.Text))
                 {
-                    Response.Write("<script>alert('Selezionare il titolare!');</script>");
+                    Response.Write("<script>alert('Selezionare il delegante!');</script>");
                     return;
                 }
                 if (string.IsNullOrEmpty(txt_delegato.Text))
                 {
-                    Response.Write("<script>alert('Selezionare il sostituto!');</script>");
+                    Response.Write("<script>alert('Selezionare il delegato!');</script>");
                     return;
                 }
                 if (txt_delegato.Text.Equals(txt_delegante.Text))
                 {
-                    Response.Write("<script>alert('Attenzione il titolare e il sostituto non possono essere la stessa persona!');</script>");
+                    Response.Write("<script>alert('Attenzione il delegante e il delegato non possono essere la stessa persona!');</script>");
                     return;
                 }
 
@@ -1086,7 +1086,7 @@ namespace DocsPAWA.AdminTool.Gestione_Deleghe
             }
             else
             {
-                Response.Write("<script>alert('Attenzione, impossibile modificare la sostituzione selezionata!');</script>");
+                Response.Write("<script>alert('Attenzione, impossibile modificare la delega selezionata!');</script>");
                 return;
             }
 

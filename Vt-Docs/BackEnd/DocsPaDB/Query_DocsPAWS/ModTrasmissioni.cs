@@ -1271,58 +1271,8 @@ namespace DocsPaDB.Query_DocsPAWS
 			return modelli;
 		}
 
-        public ArrayList getModelliByAmmLite(string idAmm)
-        {
-            ArrayList modelli = new ArrayList();
-            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
-
-            try
-            {
-                //semaforo.WaitOne();
-                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("MT_GET_MODELLI_2");
-                queryMng.setParam("param1", idAmm);
-                queryMng.setParam("dbUser", DocsPaDbManagement.Functions.Functions.GetDbUserSession());
-                string commandText = queryMng.getSQL();
-                logger.Debug("SQL - getModelliByAmm - ModTrasmissioni.cs - QUERY : " + commandText);
-
-                DataSet ds = new DataSet();
-                dbProvider.ExecuteQuery(ds, commandText);
-
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                {
-                    //dati modello
-                    DocsPaVO.Modelli_Trasmissioni.ModelloTrasmissione modello = new DocsPaVO.Modelli_Trasmissioni.ModelloTrasmissione();
-                    modello.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[i]["SYSTEM_ID"].ToString());
-                    modello.NOME = ds.Tables[0].Rows[i]["NOME"].ToString();
-                    modello.CHA_TIPO_OGGETTO = ds.Tables[0].Rows[i]["CHA_TIPO_OGGETTO"].ToString();
-                    modello.ID_REGISTRO = ds.Tables[0].Rows[i]["ID_REGISTRO"].ToString();
-                    modello.VAR_NOTE_GENERALI = ds.Tables[0].Rows[i]["VAR_NOTE_GENERALI"].ToString();
-                    modello.ID_PEOPLE = ds.Tables[0].Rows[i]["ID_PEOPLE"].ToString();
-                    modello.SINGLE = ds.Tables[0].Rows[i]["SINGLE"].ToString();
-                    modello.ID_AMM = ds.Tables[0].Rows[i]["ID_AMM"].ToString();
-                    modello.CEDE_DIRITTI = ds.Tables[0].Rows[i]["CHA_CEDE_DIRITTI"].ToString();
-                    modello.ID_PEOPLE_NEW_OWNER = ds.Tables[0].Rows[i]["ID_PEOPLE_NEW_OWNER"].ToString();
-                    modello.ID_GROUP_NEW_OWNER = ds.Tables[0].Rows[i]["ID_GROUP_NEW_OWNER"].ToString();
-                    modello.NO_NOTIFY = ds.Tables[0].Rows[i]["NO_NOTIFY"].ToString();
-                    modello.CODICE = "MT_" + modello.SYSTEM_ID;
-
-                    modelli.Add(modello);
-
-                }
-            }
-            catch
-            {
-                return null;
-            }
-            finally
-            {
-                dbProvider.Dispose();
-            }
-            return modelli;
-        }
-
-        //OK
-        public ArrayList getModelliByAmmPaging(string idAmm, int nPagina, string ricerca, string codice, out int numTotPag)
+		//OK
+		public ArrayList getModelliByAmmPaging(string idAmm, int nPagina, string ricerca, string codice, out int numTotPag)
 		{
 			ArrayList modelli = new ArrayList();
 			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
@@ -2429,7 +2379,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                             utNotifica.CODICE_UTENTE = row["CODICE"].ToString();
                                             utNotifica.NOME_COGNOME_UTENTE = row["UTENTE"].ToString();
                                             utNotifica.FLAG_NOTIFICA = row["FLAG_NOTIFICA"].ToString();
-                                            utNotifica.ID_MODELLO_MITT_DEST = mittDest.SYSTEM_ID.ToString();
 
                                             mittDest.UTENTI_NOTIFICA.Add(utNotifica);
                                         }
@@ -2446,43 +2395,44 @@ namespace DocsPaDB.Query_DocsPAWS
                                     //dbProvider.ExecuteNonQuery(commandText);
 
                                     // quindi inserisco i record sul db
-                                    if (utentiDaInserire != null && utentiDaInserire.Count > 0)
+                                    foreach (DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm ut in mittDest.UTENTI_NOTIFICA)
                                     {
-                                        foreach (DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm utIns in utentiDaInserire)
+                                        if (utentiDaInserire != null && utentiDaInserire.Count > 0)
                                         {
-                                            string resSystemId = "0";
-                                            string queryStr = "SELECT SYSTEM_ID FROM DPA_MODELLI_DEST_CON_NOTIFICA WHERE ID_PEOPLE = " + utIns.ID_PEOPLE + " AND ID_MODELLO_MITT_DEST = " + utIns.ID_MODELLO_MITT_DEST + " AND ID_MODELLO = " + mittDest.ID_MODELLO.ToString();
-                                            dbProvider.ExecuteScalar(out resSystemId, queryStr);
-                                            if (resSystemId == null)
+                                            foreach (DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm utIns in utentiDaInserire)
                                             {
-                                                query = DocsPaUtils.InitQuery.getInstance().getQuery("MODELLI_TRASM_INS_UT_CON_NOTIFICA");
+                                                string resSystemId = "0";
+                                                string queryStr = "SELECT SYSTEM_ID FROM DPA_MODELLI_DEST_CON_NOTIFICA WHERE ID_PEOPLE = " + utIns.ID_PEOPLE + " AND ID_MODELLO_MITT_DEST = " + mittDest.SYSTEM_ID.ToString() + " AND ID_MODELLO = " + mittDest.ID_MODELLO.ToString();
+                                                dbProvider.ExecuteScalar(out resSystemId, queryStr);
+                                                if (resSystemId == null)
+                                                {
+                                                    query = DocsPaUtils.InitQuery.getInstance().getQuery("MODELLI_TRASM_INS_UT_CON_NOTIFICA");
 
-                                                query.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-                                                query.setParam("system_id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_MODELLI_MITT_DEST"));
-                                                query.setParam("id_mod_mitt_dest", utIns.ID_MODELLO_MITT_DEST);
-                                                query.setParam("id_people", utIns.ID_PEOPLE);
-                                                query.setParam("id_modello", mittDest.ID_MODELLO.ToString());
+                                                    query.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                                                    query.setParam("system_id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_MODELLI_MITT_DEST"));
+                                                    query.setParam("id_mod_mitt_dest", mittDest.SYSTEM_ID.ToString());
+                                                    query.setParam("id_people", utIns.ID_PEOPLE);
+                                                    query.setParam("id_modello", mittDest.ID_MODELLO.ToString());
+                                                    commandText = query.getSQL();
+                                                    logger.Debug("UtentiConNotificaTrasm QUERY : " + commandText);
+                                                    dbProvider.ExecuteNonQuery(commandText);
+                                                }
+                                            }
+                                        }
+
+                                        if (utentiDaCancellare != null && utentiDaCancellare.Count > 0)
+                                        {
+                                            foreach (DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm utCanc in utentiDaCancellare)
+                                            {
+                                                query = DocsPaUtils.InitQuery.getInstance().getQuery("MODELLI_TRASM_DEL_UT_CON_NOTIFICA");
+                                                query.setParam("id", "ID_MODELLO_MITT_DEST = " + mittDest.SYSTEM_ID.ToString() + " AND ID_PEOPLE = " + utCanc.ID_PEOPLE);
                                                 commandText = query.getSQL();
                                                 logger.Debug("UtentiConNotificaTrasm QUERY : " + commandText);
                                                 dbProvider.ExecuteNonQuery(commandText);
                                             }
                                         }
-                                    }
 
-                                    if (utentiDaCancellare != null && utentiDaCancellare.Count > 0)
-                                    {
-                                        foreach (DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm utCanc in utentiDaCancellare)
-                                        {
-                                            query = DocsPaUtils.InitQuery.getInstance().getQuery("MODELLI_TRASM_DEL_UT_CON_NOTIFICA");
-                                            query.setParam("id", "ID_MODELLO_MITT_DEST = " + utCanc.ID_MODELLO_MITT_DEST + " AND ID_PEOPLE = " + utCanc.ID_PEOPLE);
-                                            commandText = query.getSQL();
-                                            logger.Debug("UtentiConNotificaTrasm QUERY : " + commandText);
-                                            dbProvider.ExecuteNonQuery(commandText);
-                                        }
-                                    }
-                                    if (utentiDaInserire == null && utentiDaCancellare == null)
-                                    {
-                                        foreach (DocsPaVO.Modelli_Trasmissioni.UtentiConNotificaTrasm ut in mittDest.UTENTI_NOTIFICA)
+                                        if (utentiDaInserire == null && utentiDaCancellare == null)
                                         {
                                             if (ut.FLAG_NOTIFICA.Equals("1"))
                                             {
@@ -2526,7 +2476,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                             utNotifica.CODICE_UTENTE = row["CODICE"].ToString();
                                             utNotifica.NOME_COGNOME_UTENTE = row["UTENTE"].ToString();
                                             utNotifica.FLAG_NOTIFICA = row["FLAG_NOTIFICA"].ToString();
-                                            utNotifica.ID_MODELLO_MITT_DEST = mittDest.SYSTEM_ID.ToString();
 
                                             mittDest.UTENTI_NOTIFICA.Add(utNotifica);
                                         }
@@ -3584,7 +3533,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                             utNotifica.CODICE_UTENTE = row["CODICE"].ToString();
                                             utNotifica.NOME_COGNOME_UTENTE = row["UTENTE"].ToString();
                                             utNotifica.FLAG_NOTIFICA = row["FLAG_NOTIFICA"].ToString();
-                                            utNotifica.ID_MODELLO_MITT_DEST = mittDest.SYSTEM_ID.ToString();
 
                                             mittDest.UTENTI_NOTIFICA.Add(utNotifica);
                                         }
@@ -3682,7 +3630,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                             utNotifica.CODICE_UTENTE = row["CODICE"].ToString();
                                             utNotifica.NOME_COGNOME_UTENTE = row["UTENTE"].ToString();
                                             utNotifica.FLAG_NOTIFICA = row["FLAG_NOTIFICA"].ToString();
-                                            utNotifica.ID_MODELLO_MITT_DEST = mittDest.SYSTEM_ID.ToString();
 
                                             mittDest.UTENTI_NOTIFICA.Add(utNotifica);
                                         }

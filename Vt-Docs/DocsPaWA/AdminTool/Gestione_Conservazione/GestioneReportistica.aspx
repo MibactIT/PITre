@@ -85,71 +85,54 @@
                                                     <asp:Label runat="server" Text="Destinatari report errori:<br />(è possibile inserire più indirizzi separati da ';') "></asp:Label>
                                                 </td>
                                                 <td>
-                                                    <asp:TextBox runat="server" ID="txt_mail_struttura" CssClass="inp2" Width="600px" TextMode="MultiLine" Rows="5"></asp:TextBox>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </ContentTemplate>
-                                </asp:UpdatePanel>
-                                <asp:UpdatePanel runat="server" ID="pnlRecipientsPolicy" UpdateMode="Conditional">
-                                    <ContentTemplate>
-                                        <table width="80%">
-                                            <tr style="height: 25px; margin: 10px;">
-                                                <td>&nbsp;</td>
-                                            </tr>
-                                            <tr style="height: 25px; margin: 10px;">
-                                                <td style="width: 20%; text-align: left"  valign="top" class="testo_grigio_scuro">
-                                                    <asp:Label runat="server" Text="Destinatari alert policy:"></asp:Label>
-                                                </td>
-                                                <td>
-                                                    <asp:TextBox runat="server" ID="txt_mail_policy" CssClass="inp2" Width="600px" TextMode="MultiLine" Rows="3"></asp:TextBox>
+                                                    <asp:TextBox runat="server" ID="txt_mail_struttura" CssClass="inp2" Width="80%" TextMode="MultiLine" Rows="5"></asp:TextBox>
                                                 </td>
                                             </tr>
                                         </table>
                                     </ContentTemplate>
                                 </asp:UpdatePanel>
                                 <div style="margin-top: 30px">
-                                <asp:UpdatePanel runat="server" ID="pnlMailbox" UpdateMode="Conditional">
-                                    <ContentTemplate>
-                                        <table width="55%" valign="middle" align="center">
-                                            <tr align="center" style="margin-bottom:10px;">
-                                                <td colspan="3" class="testo_grigio_scuro_grande">Configurazione casella</td>
-                                            </tr>
-                                            <tr align="left">
-                                                <td class="testo_grigio_scuro" colspan="2">
-                                                    <asp:label runat="server" ID="lbl_smtp" Text="Server SMTP"></asp:label>
-                                                    <asp:TextBox runat="server" ID="txt_smtp" CssClass="testo" Width="350px"></asp:TextBox>
-                                                </td>
-                                                <td class="testo_grigio_scuro">
-                                                    <asp:Literal ID="lbl_port" runat="server">Porta</asp:Literal>
-                                                    <asp:TextBox runat="server" ID="txt_port" CssClass="testo" Width="50" MaxLength="5"></asp:TextBox>&nbsp;&nbsp;
-                                                    <asp:CheckBox runat="server" ID="chk_ssl" Text="SSL" TextAlign="Left" />
-                                                </td>
-                                            </tr>
-                                            <tr align="left">
-                                                <td class="testo_grigio_scuro">
-                                                    <asp:label runat="server" ID="lbl_user" Text="Username"></asp:label>
-                                                    <asp:TextBox runat="server" ID="txt_username" CssClass="testo" Width="100px"></asp:TextBox>
-                                                </td>
-                                                <td class="testo_grigio_scuro">
-                                                    <asp:Label runat="server" ID="lbl_pass" Text="Password"></asp:Label>
-                                                    <asp:TextBox runat="server" ID="txt_password" CssClass="testo" TextMode="Password" Width="100px"></asp:TextBox>
-                                                </td>
-                                                <td class="testo_grigio_scuro">
-                                                    <asp:Label runat="server" ID="lbl_conf_pass" Text="Conferma"></asp:Label>
-                                                    <asp:TextBox runat="server" ID="txt_conf_pass" CssClass="testo" TextMode="Password" Width="100px"></asp:TextBox>
-                                                </td>
-                                            </tr>
-                                            <tr align="left">
-                                                <td class="testo_grigio_scuro" colspan="3">
-                                                    <asp:label runat="server" ID="lbl_from" Text="Indirizzo e-mail From:"></asp:label>
-                                                    <asp:TextBox runat="server" ID="txt_from" CssClass="testo" Width="250px"></asp:TextBox>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </ContentTemplate>
-                                </asp:UpdatePanel>
-                                    </div>
+                                    <asp:UpdatePanel runat="server" ID="pnlMailbox" UpdateMode="Conditional">
+                                        <ContentTemplate>
+                                            <table width="55%" valign="middle" align="center">
+                                                <tr align="center" style="margin-bottom:10px;">
+                                                    <td colspan="3" class="testo_grigio_scuro_grande">Configurazione casella</td>
+                                                </tr>
+                                                <tr align="left">
+                                                    <td class="testo_grigio_scuro" colspan="2">
+                                                        <asp:label runat="server" ID="lbl_smtp" Text="Server SMTP"></asp:label>
+                                                        <asp:TextBox runat="server" ID="txt_smtp" CssClass="testo" Width="350px"></asp:TextBox>
+                                                    </td>
+                                                    <td class="testo_grigio_scuro">
+                                                        <asp:Literal ID="lbl_port" runat="server">Porta</asp:Literal>
+                                                        <asp:TextBox runat="server" ID="txt_port" CssClass="testo" Width="50" MaxLength="5"></asp:TextBox>&nbsp;&nbsp;
+                                                        <asp:CheckBox runat="server" ID="chk_ssl" Text="SSL" TextAlign="Left" />
+                                                    </td>
+                                                </tr>
+                                                <tr align="left">
+                                                    <td class="testo_grigio_scuro">
+                                                        <asp:label runat="server" ID="lbl_user" Text="Username"></asp:label>
+                                                        <asp:TextBox runat="server" ID="txt_username" CssClass="testo" Width="100px"></asp:TextBox>
+                                                    </td>
+                                                    <td class="testo_grigio_scuro">
+                                                        <asp:Label runat="server" ID="lbl_pass" Text="Password"></asp:Label>
+                                                        <asp:TextBox runat="server" ID="txt_password" CssClass="testo" TextMode="Password" Width="100px"></asp:TextBox>
+                                                    </td>
+                                                    <td class="testo_grigio_scuro">
+                                                        <asp:Label runat="server" ID="lbl_conf_pass" Text="Conferma"></asp:Label>
+                                                        <asp:TextBox runat="server" ID="txt_conf_pass" CssClass="testo" TextMode="Password" Width="100px"></asp:TextBox>
+                                                    </td>
+                                                </tr>
+                                                <tr align="left">
+                                                    <td class="testo_grigio_scuro" colspan="3">
+                                                        <asp:label runat="server" ID="lbl_from" Text="Indirizzo e-mail From:"></asp:label>
+                                                        <asp:TextBox runat="server" ID="txt_from" CssClass="testo" Width="250px"></asp:TextBox>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </ContentTemplate>
+                                    </asp:UpdatePanel>
+                                </div>
                                 <div id="button_new">
                                     <asp:Button ID="btn_save" runat="server" CssClass="cbtn" Text="Salva" OnClick="btnSalva_Click" />
                                 </div>

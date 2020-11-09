@@ -7,13 +7,13 @@ using System.Collections.Generic;
 
 namespace BusinessLogic.DiagrammiStato
 {
-	public class DiagrammiStato
-	{
+    public class DiagrammiStato
+    {
         private static ILog logger = LogManager.GetLogger(typeof(DiagrammiStato));
-		public DiagrammiStato(){}
+        public DiagrammiStato() { }
 
-		public static void salvaDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg, string idAmm)
-		{
+        public static void salvaDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg, string idAmm)
+        {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
                 try
@@ -27,55 +27,55 @@ namespace BusinessLogic.DiagrammiStato
                     logger.Debug("Errore in DiagrammiStato  - metodo: salvaDiagramma", e);
                 }
             }
-		}
+        }
 
-		public static DocsPaVO.DiagrammaStato.DiagrammaStato getDiagrammaById(string idDiagramma)
-		{
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = diagrammaStatoDB.getDiagrammaById(idDiagramma);
-                    return diagramma;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaById", e);
-                    return null;
-                }
-		}
+        public static DocsPaVO.DiagrammaStato.DiagrammaStato getDiagrammaById(string idDiagramma)
+        {
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = diagrammaStatoDB.getDiagrammaById(idDiagramma);
+                return diagramma;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaById", e);
+                return null;
+            }
+        }
 
-		public static ArrayList getDiagrammi(string idAmm)
-		{
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    ArrayList diagrammi = diagrammaStatoDB.getDiagrammi(idAmm);
-                    return diagrammi;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDiagramma", e);
-                    return null;
-                }
-		}
+        public static ArrayList getDiagrammi(string idAmm)
+        {
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                ArrayList diagrammi = diagrammaStatoDB.getDiagrammi(idAmm);
+                return diagrammi;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDiagramma", e);
+                return null;
+            }
+        }
 
-		public static bool isUniqueNameDiagramma(string nomeDiagramma)
-		{
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    bool result = diagrammaStatoDB.isUniqueNameDiagramma(nomeDiagramma);
-                    return result;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: isUniqueNameDiagramma", e);
-                    return false;
-                }
-		}
+        public static bool isUniqueNameDiagramma(string nomeDiagramma)
+        {
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                bool result = diagrammaStatoDB.isUniqueNameDiagramma(nomeDiagramma);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: isUniqueNameDiagramma", e);
+                return false;
+            }
+        }
 
-		public static void delDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg)
-		{
+        public static void delDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg)
+        {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
                 try
@@ -89,10 +89,10 @@ namespace BusinessLogic.DiagrammiStato
                     logger.Debug("Errore in DiagrammiStato  - metodo: delDiagramma", e);
                 }
             }
-		}
+        }
 
-		public static void updateDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg)
-		{
+        public static void updateDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg)
+        {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
                 try
@@ -106,10 +106,10 @@ namespace BusinessLogic.DiagrammiStato
                     logger.Debug("Errore in DiagrammiStato  - metodo: updateDiagramma", e);
                 }
             }
-		}
+        }
 
-		public static bool associaTipoDocDiagramma(string idTipoDoc, string idDiagramma)
-		{
+        public static bool associaTipoDocDiagramma(string idTipoDoc, string idDiagramma)
+        {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
                 try
@@ -125,25 +125,25 @@ namespace BusinessLogic.DiagrammiStato
                     return false;
                 }
             }
-		}
+        }
 
         public static bool getDocOrFascInStato(string idStato)
-		{
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    bool result = diagrammaStatoDB.getDocOrFascInStato(idStato);
-                    return result;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDocOrFascInStato", e);
-                    return false;
-                }
-		}
+        {
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                bool result = diagrammaStatoDB.getDocOrFascInStato(idStato);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDocOrFascInStato", e);
+                return false;
+            }
+        }
 
-		public static void disassociaTipoDocDiagramma(string idTipoDoc)
-		{
+        public static void disassociaTipoDocDiagramma(string idTipoDoc)
+        {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
                 try
@@ -157,128 +157,57 @@ namespace BusinessLogic.DiagrammiStato
                     logger.Debug("Errore in DiagrammiStato  - metodo: disassociaTipoDocDiagramma", e);
                 }
             }
-		}
+        }
 
-		public static int getDiagrammaAssociato(string idTipoDoc)
-		{
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    int diagrammaAssociato = diagrammaStatoDB.getDiagrammaAssociato(idTipoDoc);
-                    return diagrammaAssociato;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaAssociato", e);
-                    return 0;
-                }
-		}
-
-		public static bool isModificabile(int systemIdDiagramma)
-		{
-            
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    bool result = diagrammaStatoDB.isModificabile(systemIdDiagramma);
-                   return result;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: isModificabile", e);
-                    return false;
-                }
-            
-		}
-
-		public static DocsPaVO.DiagrammaStato.DiagrammaStato getDgByIdTipoDoc(string systemIdTipoDoc, string idAmm)
-		{
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = diagrammaStatoDB.getDgByIdTipoDoc(systemIdTipoDoc, idAmm);
-                    return diagramma;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDgByIdTipoDoc", e);
-                    return null;
-                }
-		}
-
-		public static void salvaModificaStato(string docNumber, string idStato, DocsPaVO.DiagrammaStato.DiagrammaStato diagramma, string idUtente, DocsPaVO.utente.InfoUtente user,string dataScadenza)
-		{
-            using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
-            {
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    diagrammaStatoDB.salvaModificaStato(docNumber, idStato, diagramma, idUtente, user, dataScadenza);
-
-                    DocsPaVO.DiagrammaStato.Stato[] stati = (DocsPaVO.DiagrammaStato.Stato[])diagramma.STATI.ToArray(typeof(DocsPaVO.DiagrammaStato.Stato));
-
-                    DocsPaVO.DiagrammaStato.Stato stato = stati.Where(e => e.SYSTEM_ID.ToString() == idStato).First();
-
-                    DocsPaDB.Query_DocsPAWS.LibroFirma librofirma = new DocsPaDB.Query_DocsPAWS.LibroFirma();
-                    //Avvio il processo Automatico di firma
-                    if (!string.IsNullOrEmpty(stato.ID_PROCESSO_FIRMA) && !librofirma.IsModelloDiFirma(stato.ID_PROCESSO_FIRMA))
-                    {
-                        DocsPaVO.LibroFirma.ProcessoFirma processo = librofirma.GetProcessoDiFirmaById(stato.ID_PROCESSO_FIRMA, user);
-                        string modalita = "A";
-                        string note = string.Empty;
-                        DocsPaVO.LibroFirma.OpzioniNotifica opzioniNotifiche = new DocsPaVO.LibroFirma.OpzioniNotifica();
-                        opzioniNotifiche.Notifica_interrotto = true;
-                        opzioniNotifiche.Notifica_concluso = false;
-                        DocsPaVO.LibroFirma.ResultProcessoFirma resultAvvioProcesso = DocsPaVO.LibroFirma.ResultProcessoFirma.OK;
-                        if (!AvviaProcessoFirma(processo, docNumber, user, modalita, note, opzioniNotifiche, out resultAvvioProcesso))
-                        {
-                            logger.Debug(string.Format("Errore nel passaggio allo stato {0} per il documento con id {1}: non è stato possibile avviare il processo di firma.", stato.DESCRIZIONE, docNumber));
-                            throw new Exception(string.Format("Errore nel passaggio allo stato {0} per il documento con id {1}: non è stato possibile avviare il processo di firma.", stato.DESCRIZIONE, docNumber));
-                        }
-
-                    }
-                    if (BusinessLogic.Documenti.DocumentConsolidation.IsConfigEnabled())
-                    {
-                        if (stato.STATO_CONSOLIDAMENTO > DocsPaVO.documento.DocumentConsolidationStateEnum.None)
-                        {
-                            DocsPaVO.documento.DocumentConsolidationStateInfo actualState = BusinessLogic.Documenti.DocumentConsolidation.GetState(user, docNumber);
-
-                            if (actualState.State >= stato.STATO_CONSOLIDAMENTO)
-                            {
-                                logger.Debug(string.Format("Il documento con id {0} non può essere consolidato allo stato '{1}' in quanto risulta già consolidato in stato '{2}': documento consolidato allo stato {2}", 
-                                        stato.DESCRIZIONE, 
-                                        docNumber, 
-                                        DocsPaVO.documento.DocumentConsolidationStateDescriptionAttribute.GetDescription(stato.STATO_CONSOLIDAMENTO),
-                                        DocsPaVO.documento.DocumentConsolidationStateDescriptionAttribute.GetDescription(actualState.State)));
-                            }
-                            else
-                            {
-                                DocsPaVO.documento.DocumentConsolidationStateInfo info = BusinessLogic.Documenti.DocumentConsolidation.Consolidate(user, docNumber, stato.STATO_CONSOLIDAMENTO, true);
-
-                                logger.Debug(string.Format("Passaggio allo stato {0} per il documento con id {1}: documento consolidato allo stato {2}", stato.DESCRIZIONE, docNumber, DocsPaVO.documento.DocumentConsolidationStateDescriptionAttribute.GetDescription(stato.STATO_CONSOLIDAMENTO)));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        logger.Debug(string.Format("Errore nel passaggio allo stato {0} per il documento con id {1}: l'utente non dispone dei diritti sufficenti per consolidare il documento", stato.DESCRIZIONE, docNumber));
-                    }
-
-                    transactionContext.Complete();
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: salvaModificaStato", e);
-                }
-            }
-		}
-
-        public static bool SalvaModificaStatoAvviaProcesso(string docNumber, string idStato, DocsPaVO.DiagrammaStato.DiagrammaStato diagramma, string idUtente, 
-            DocsPaVO.utente.InfoUtente user, string dataScadenza, DocsPaVO.LibroFirma.ProcessoFirma processo, string modalita, 
-            string note, DocsPaVO.LibroFirma.OpzioniNotifica opzioniNotifiche, out DocsPaVO.LibroFirma.ResultProcessoFirma resultAvvioProcesso)
+        public static int getDiagrammaAssociato(string idTipoDoc)
         {
-            bool result = true;
-            resultAvvioProcesso = DocsPaVO.LibroFirma.ResultProcessoFirma.OK;
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                int diagrammaAssociato = diagrammaStatoDB.getDiagrammaAssociato(idTipoDoc);
+                return diagrammaAssociato;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaAssociato", e);
+                return 0;
+            }
+        }
+
+        public static bool isModificabile(int systemIdDiagramma)
+        {
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                bool result = diagrammaStatoDB.isModificabile(systemIdDiagramma);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: isModificabile", e);
+                return false;
+            }
+
+        }
+
+        public static DocsPaVO.DiagrammaStato.DiagrammaStato getDgByIdTipoDoc(string systemIdTipoDoc, string idAmm)
+        {
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = diagrammaStatoDB.getDgByIdTipoDoc(systemIdTipoDoc, idAmm);
+                return diagramma;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDgByIdTipoDoc", e);
+                return null;
+            }
+        }
+
+        public static void salvaModificaStato(string docNumber, string idStato, DocsPaVO.DiagrammaStato.DiagrammaStato diagramma, string idUtente, DocsPaVO.utente.InfoUtente user, string dataScadenza)
+        {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
                 try
@@ -289,12 +218,7 @@ namespace BusinessLogic.DiagrammiStato
                     DocsPaVO.DiagrammaStato.Stato[] stati = (DocsPaVO.DiagrammaStato.Stato[])diagramma.STATI.ToArray(typeof(DocsPaVO.DiagrammaStato.Stato));
 
                     DocsPaVO.DiagrammaStato.Stato stato = stati.Where(e => e.SYSTEM_ID.ToString() == idStato).First();
-                    if (!AvviaProcessoFirma(processo, docNumber, user, modalita, note, opzioniNotifiche, out resultAvvioProcesso))
-                    {
-                        result = false;
-                        logger.Debug(string.Format("Errore nel passaggio allo stato {0} per il documento con id {1}: non è stato possibile avviare il processo di firma.", stato.DESCRIZIONE, docNumber));
-                        throw new Exception(string.Format("Errore nel passaggio allo stato {0} per il documento con id {1}: non è stato possibile avviare il processo di firma.", stato.DESCRIZIONE, docNumber));
-                    }
+
                     if (BusinessLogic.Documenti.DocumentConsolidation.IsConfigEnabled())
                     {
                         if (stato.STATO_CONSOLIDAMENTO > DocsPaVO.documento.DocumentConsolidationStateEnum.None)
@@ -327,81 +251,45 @@ namespace BusinessLogic.DiagrammiStato
                 catch (Exception e)
                 {
                     logger.Debug("Errore in DiagrammiStato  - metodo: salvaModificaStato", e);
-                    result = false;
                 }
             }
-            return result;
         }
-
-        public static bool AvviaProcessoFirma(DocsPaVO.LibroFirma.ProcessoFirma processo, string docNumber, DocsPaVO.utente.InfoUtente user,
-            string modalita, string note, DocsPaVO.LibroFirma.OpzioniNotifica opzioniNotifiche, out DocsPaVO.LibroFirma.ResultProcessoFirma resultAvvioProcesso)
-        {
-            bool result = true;
-            resultAvvioProcesso = DocsPaVO.LibroFirma.ResultProcessoFirma.OK;
-            try
-            {
-                DocsPaDB.Query_DocsPAWS.LibroFirma librofirma = new DocsPaDB.Query_DocsPAWS.LibroFirma();
-
-                DocsPaVO.documento.Documento[] docs = BusinessLogic.Documenti.DocManager.GetVersionsMainDocument(user, docNumber);
-                result = BusinessLogic.LibroFirma.LibroFirmaManager.StartProcessoDiFirma(processo, docs[0], user, modalita, note, opzioniNotifiche, out resultAvvioProcesso, true);
-                if (result)
-                {
-                    string method = "AVVIATO_PROCESSO_DI_FIRMA_DOCUMENTO";
-                    string description = "Avviato processo di firma per la versione " + docs[0].version;
-                    BusinessLogic.UserLog.UserLog.WriteLog(user.userId, user.idPeople, user.idGruppo, user.idAmministrazione, method, docs[0].docNumber,
-                        description, DocsPaVO.Logger.CodAzione.Esito.OK, (user != null && user.delegato != null ? user.delegato : null), "1");
-                }
-                else
-                {
-                    logger.Debug(string.Format("Errore nel passaggio di stato. Impossibile avviare il processo di firma per il documento con id {0}: {1} ", docNumber, resultAvvioProcesso.ToString()));
-                    throw new Exception((string.Format("Errore nel passaggio di stato. Impossibile avviare il processo di firma per il documento con id {0}: {1} ", docNumber, resultAvvioProcesso.ToString())));
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nell'avvio del processo di firma " + ex.Message);
-                result = false;
-            }
-
-            return result;
-        }
-
 
         public static ArrayList isStatoTrasmAuto(string idAmm, string idStato, string idTemplate)
-		{
-               try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    ArrayList modelliTrasm = diagrammaStatoDB.isStatoTrasmAuto(idAmm, idStato, idTemplate);
-                    return modelliTrasm;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: isStatoTrasmAuto", e);
-                    return null;
-                }
-            
-		}
+        {
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                ArrayList modelliTrasm = diagrammaStatoDB.isStatoTrasmAuto(idAmm, idStato, idTemplate);
+                return modelliTrasm;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: isStatoTrasmAuto", e);
+                return null;
+            }
 
-		public static bool isStatoAuto(string idStato, string idDiagramma)
-		{
-            
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    bool result = diagrammaStatoDB.isStatoAuto(idStato, idDiagramma);
-                    return result;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: isStatoAuto", e);
-                    return false;
-                }
-          
-		}
+        }
 
-		public static DocsPaVO.DiagrammaStato.Stato getStatoDoc(string docNumber)
-		{
+        public static bool isStatoAuto(string idStato, string idDiagramma)
+        {
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                bool result = diagrammaStatoDB.isStatoAuto(idStato, idDiagramma);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: isStatoAuto", e);
+                return false;
+            }
+
+        }
+
+        public static DocsPaVO.DiagrammaStato.Stato getStatoDoc(string docNumber)
+        {
 
             try
             {
@@ -418,44 +306,44 @@ namespace BusinessLogic.DiagrammiStato
                 logger.Debug("Errore in DiagrammiStato  - metodo: getStatoDoc", e);
                 return null;
             }
-           
-		}
 
-		public static string getStatoDocStorico(string docNumber)
-		{
-            
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    string stato = diagrammaStatoDB.getStatoDocStorico(docNumber);
-                    return stato;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getStatoDocStorico", e);
-                    return null;
-                }
-            
-		}
+        }
 
-		public static DataSet getDiagrammaStoricoDoc(string docNumber)
-		{
-            
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    DataSet dataSet = diagrammaStatoDB.getDiagrammaStoricoDoc(docNumber);
-                   return dataSet;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaStoricoDoc", e);
-                    return null;
-                }
-            		}
+        public static string getStatoDocStorico(string docNumber)
+        {
 
-		public static void salvaStoricoTrasmDiagrammi(string idTrasm, string docNumber, string idStato)
-		{
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                string stato = diagrammaStatoDB.getStatoDocStorico(docNumber);
+                return stato;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getStatoDocStorico", e);
+                return null;
+            }
+
+        }
+
+        public static DataSet getDiagrammaStoricoDoc(string docNumber)
+        {
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                DataSet dataSet = diagrammaStatoDB.getDiagrammaStoricoDoc(docNumber);
+                return dataSet;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaStoricoDoc", e);
+                return null;
+            }
+        }
+
+        public static void salvaStoricoTrasmDiagrammi(string idTrasm, string docNumber, string idStato)
+        {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
                 try
@@ -469,10 +357,10 @@ namespace BusinessLogic.DiagrammiStato
                     logger.Debug("Errore in DiagrammiStato  - metodo: salvaStoricoTrasmDiagrammi", e);
                 }
             }
-		}
+        }
 
-		public static void deleteStoricoTrasmDiagrammi(string docNumber, string idStato)
-		{
+        public static void deleteStoricoTrasmDiagrammi(string docNumber, string idStato)
+        {
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
                 try
@@ -486,74 +374,74 @@ namespace BusinessLogic.DiagrammiStato
                     logger.Debug("Errore in DiagrammiStato  - metodo: deleteStoricoTrasmDiagrammi", e);
                 }
             }
-		}
+        }
 
-		public static DocsPaVO.DiagrammaStato.Stato getStatoSuccessivoAutomatico(string docNumber)
-		{
-           
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    DocsPaVO.DiagrammaStato.Stato stato = diagrammaStatoDB.getStatoSuccessivoAutomatico(docNumber);
-                   return stato;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getStatoSuccessivoAutomatico", e);
-                    return null;
-                }
-         
-		}
+        public static DocsPaVO.DiagrammaStato.Stato getStatoSuccessivoAutomatico(string docNumber)
+        {
 
-		public static bool isUltimaDaAccettare(string idTrasmissione)
-		{
-           
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    bool result = diagrammaStatoDB.isUltimaDaAccettare(idTrasmissione);
-                   return result;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: isUltimaDaAccettare", e);
-                    return false;
-                }
-          
-		}
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                DocsPaVO.DiagrammaStato.Stato stato = diagrammaStatoDB.getStatoSuccessivoAutomatico(docNumber);
+                return stato;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getStatoSuccessivoAutomatico", e);
+                return null;
+            }
 
-		public static bool isDocumentiInStatoFinale(string idDiagramma, string idTemplate)
-		{
-         
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    bool result = diagrammaStatoDB.isDocumentiInStatoFinale(idDiagramma, idTemplate);
-                  return result;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: isDocumentiInStatoFinale", e);
-                    return false;
-                }
-            
-		}
+        }
+
+        public static bool isUltimaDaAccettare(string idTrasmissione)
+        {
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                bool result = diagrammaStatoDB.isUltimaDaAccettare(idTrasmissione);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: isUltimaDaAccettare", e);
+                return false;
+            }
+
+        }
+
+        public static bool isDocumentiInStatoFinale(string idDiagramma, string idTemplate)
+        {
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                bool result = diagrammaStatoDB.isDocumentiInStatoFinale(idDiagramma, idTemplate);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: isDocumentiInStatoFinale", e);
+                return false;
+            }
+
+        }
 
         public static int getDiagrammaAssociatoFasc(string idTipoFasc)
         {
-            
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    int diagrammaAssociato = diagrammaStatoDB.getDiagrammaAssociatoFasc(idTipoFasc);
-                   return diagrammaAssociato;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaAssociatoFasc", e);
-                    return 0;
-                }
-           
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                int diagrammaAssociato = diagrammaStatoDB.getDiagrammaAssociatoFasc(idTipoFasc);
+                return diagrammaAssociato;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaAssociatoFasc", e);
+                return 0;
+            }
+
         }
 
         public static bool associaTipoFascDiagramma(string idTipoFasc, string idDiagramma)
@@ -577,19 +465,19 @@ namespace BusinessLogic.DiagrammiStato
 
         public static bool isFascicoliInStatoFinale(string idDiagramma, string idTemplate)
         {
-           
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    bool result = diagrammaStatoDB.isFascicoliInStatoFinale(idDiagramma, idTemplate);
-                    return result;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: isFascicoliInStatoFinale", e);
-                    return false;
-                }
-            
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                bool result = diagrammaStatoDB.isFascicoliInStatoFinale(idDiagramma, idTemplate);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: isFascicoliInStatoFinale", e);
+                return false;
+            }
+
         }
 
         public static void disassociaTipoFascDiagramma(string idTipoFasc)
@@ -612,17 +500,17 @@ namespace BusinessLogic.DiagrammiStato
         public static DocsPaVO.DiagrammaStato.DiagrammaStato getDgByIdTipoFasc(string systemIdTipoFasc, string idAmm)
         {
             try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = diagrammaStatoDB.getDgByIdTipoFasc(systemIdTipoFasc, idAmm);
-                    return diagramma;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDgByIdTipoFasc", e);
-                    return null;
-                }
-           
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = diagrammaStatoDB.getDgByIdTipoFasc(systemIdTipoFasc, idAmm);
+                return diagramma;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDgByIdTipoFasc", e);
+                return null;
+            }
+
         }
 
         public static void salvaModificaStatoFasc(string idProject, string idStato, DocsPaVO.DiagrammaStato.DiagrammaStato diagramma, string idUtente, DocsPaVO.utente.InfoUtente user, string dataScadenza)
@@ -631,15 +519,53 @@ namespace BusinessLogic.DiagrammiStato
             {
                 try
                 {
+                    DocsPaVO.DiagrammaStato.Stato stato = getStatoFasc(idProject);
+
                     DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
                     diagrammaStatoDB.salvaModificaStatoFasc(idProject, idStato, diagramma, idUtente, user, dataScadenza);
-                    // Se si tratta di un procedimento è necessario tracciare la data di cambio stato
+                    
                     if (DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ENABLE_PORTALE_PROCEDIMENTI").Equals("1") && Procedimenti.ProcedimentiManager.IsProcedimento(idProject))
                     {
+                        // E' necessario verificare se lo stato di partenza è uno stato di tipo sospensivo o interruttivo
+                        // In questi casi andrà gestita la data di scadenza del procedimento
+                        if (stato != null)
+                        {
+                            DocsPaVO.DiagrammaStato.AssStatoScadenza assStatoScadenza = GetTipoStatoProcedimento(stato.SYSTEM_ID.ToString());
+                            if (assStatoScadenza == null)
+                            {
+                                throw new Exception(" Errore nella ricerca del tipo di stato");
+                            }
+
+                            if (!string.IsNullOrEmpty(assStatoScadenza.Tipo))
+                            {
+                                BusinessLogic.Procedimenti.ProcedimentiManager.UpdateDataScadenzaProcedimento(idProject, assStatoScadenza.Tipo, user);
+                            }
+                        }
+                        // Se si tratta di un procedimento è necessario tracciare la data di cambio stato
                         if (!Procedimenti.ProcedimentiManager.InsertFaseProcedimento(idProject, idStato))
                         {
                             throw new Exception(" Errore nell'associazione fase-procedimento ");
                         }
+                        // Se il procedimento va nella fase CHIUSO deve essere impostata la relativa data
+                        if(Procedimenti.ProcedimentiManager.CheckStatoChisuraProcedimento(idStato))
+                        {
+                            DocsPaVO.ProfilazioneDinamica.Templates template = ProfilazioneDinamica.ProfilazioneFascicoli.getTemplateFascDettagli(idProject);
+                            if(template != null && template.ELENCO_OGGETTI != null)
+                            {
+                                foreach(DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg in template.ELENCO_OGGETTI)
+                                {
+                                    if(ogg.DESCRIZIONE.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_PROCEDIMENTO_DATA_CHIUSURA").ToUpper())
+                                    {
+                                        logger.Debug("Data chiusura procedimento impostata - ID = " + idProject);
+                                        ogg.VALORE_DATABASE = DateTime.Now.ToString("dd/MM/yyyy");
+                                        break;
+                                    }
+                                }
+
+                                ProfilazioneDinamica.ProfilazioneFascicoli.salvaInserimentoUtenteProfDimFasc(template, idProject);
+                            }
+                        }
+
                     }
 
                     transactionContext.Complete();
@@ -653,19 +579,19 @@ namespace BusinessLogic.DiagrammiStato
 
         public static ArrayList isStatoTrasmAutoFasc(string idAmm, string idStato, string idTipoFasc)
         {
-            
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    ArrayList modelliTrasm = diagrammaStatoDB.isStatoTrasmAutoFasc(idAmm, idStato, idTipoFasc);
-                    return modelliTrasm;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: isStatoTrasmAutoFasc", e);
-                    return null;
-                }
-           
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                ArrayList modelliTrasm = diagrammaStatoDB.isStatoTrasmAutoFasc(idAmm, idStato, idTipoFasc);
+                return modelliTrasm;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: isStatoTrasmAutoFasc", e);
+                return null;
+            }
+
         }
 
         public static void salvaStoricoTrasmDiagrammiFasc(string idTrasm, string idProject, string idStato)
@@ -687,20 +613,20 @@ namespace BusinessLogic.DiagrammiStato
 
         public static DocsPaVO.DiagrammaStato.Stato getStatoFasc(string idProject)
         {
-          
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    DocsPaVO.DiagrammaStato.Stato stato = diagrammaStatoDB.getStatoFasc(idProject);
-                 
-                   return stato;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getStatoFasc", e);
-                    return null;
-                }
-         
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                DocsPaVO.DiagrammaStato.Stato stato = diagrammaStatoDB.getStatoFasc(idProject);
+
+                return stato;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getStatoFasc", e);
+                return null;
+            }
+
         }
 
         public static void salvaDataScadenzaFasc(string idProject, string dataScadenza, string idTipoFasc)
@@ -739,19 +665,19 @@ namespace BusinessLogic.DiagrammiStato
 
         public static DataSet getDiagrammaStoricoFasc(string idProject)
         {
-            
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    DataSet dataSet = diagrammaStatoDB.getDiagrammaStoricoFasc(idProject);
-                    return dataSet;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaStoricoFasc", e);
-                    return null;
-                }
-           
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                DataSet dataSet = diagrammaStatoDB.getDiagrammaStoricoFasc(idProject);
+                return dataSet;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getDiagrammaStoricoFasc", e);
+                return null;
+            }
+
         }
 
         public static void deleteStoricoTrasmDiagrammiFasc(string idProject, string idStato)
@@ -773,19 +699,19 @@ namespace BusinessLogic.DiagrammiStato
 
         public static DocsPaVO.DiagrammaStato.Stato getStatoSuccessivoAutomaticoFasc(string idProject)
         {
-           
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                    DocsPaVO.DiagrammaStato.Stato stato = diagrammaStatoDB.getStatoSuccessivoAutomaticoFasc(idProject);
-                   return stato;
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in DiagrammiStato  - metodo: getStatoSuccessivoAutomaticoFasc", e);
-                    return null;
-                }
-          
+
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+                DocsPaVO.DiagrammaStato.Stato stato = diagrammaStatoDB.getStatoSuccessivoAutomaticoFasc(idProject);
+                return stato;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DiagrammiStato  - metodo: getStatoSuccessivoAutomaticoFasc", e);
+                return null;
+            }
+
         }
 
         public static ArrayList getStatiPerRicerca(string idDiagramma, string docOrFasc)
@@ -794,7 +720,7 @@ namespace BusinessLogic.DiagrammiStato
             try
             {
                 DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrammaStatoDB = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-                return diagrammaStatoDB.getStatiPerRicerca(idDiagramma, docOrFasc);                
+                return diagrammaStatoDB.getStatiPerRicerca(idDiagramma, docOrFasc);
             }
             catch (Exception e)
             {
@@ -911,7 +837,7 @@ namespace BusinessLogic.DiagrammiStato
                         ArrayList updatedRoles = new ArrayList();
 
                         //foreach (string r in missingRoles)
-                        for (int i = missingRoles.Count - 1; i >= 0; i-- )
+                        for (int i = missingRoles.Count - 1; i >= 0; i--)
                         {
                             string r = missingRoles[i].ToString();
                             string corr = r.Split('(')[0].Trim();
@@ -946,7 +872,7 @@ namespace BusinessLogic.DiagrammiStato
                             bool toUpdate = false;
 
                             //foreach (DocsPaVO.trasmissione.TrasmissioneSingola ts in trasm.trasmissioniSingole)
-                            for(int i = trasm.trasmissioniSingole.Count - 1; i >=0; i--)
+                            for (int i = trasm.trasmissioniSingole.Count - 1; i >= 0; i--)
                             {
                                 DocsPaVO.trasmissione.TrasmissioneSingola ts = (DocsPaVO.trasmissione.TrasmissioneSingola)trasm.trasmissioniSingole[i];
 
@@ -1159,7 +1085,7 @@ namespace BusinessLogic.DiagrammiStato
                         }
                     }
                 }
-            }         
+            }
         }
 
         public static List<string> GetRagioniCambioStato(string idStato)
@@ -1171,7 +1097,7 @@ namespace BusinessLogic.DiagrammiStato
         private static void CAPServicesInsertRoleInProfField(string role, string reason, DocsPaVO.ProfilazioneDinamica.Templates template, DocsPaVO.utente.InfoUtente infoUtente)
         {
             DocsPaVO.ProfilazioneDinamica.OggettoCustom field = null;
-            
+
             if (reason.ToUpper() == "AUTHORIZER")
             {
                 field = (from DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg in template.ELENCO_OGGETTI where ogg.DESCRIZIONE.ToUpper() == DocsPaUtils.Configuration.InitConfigurationKeys.GetValue(infoUtente.idAmministrazione, "BE_CAP_AUTHORIZER_FIELD") select ogg).FirstOrDefault();
@@ -1296,6 +1222,8 @@ namespace BusinessLogic.DiagrammiStato
             }
         }
 
+        #region FASI
+
         public static List<DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma> GetFasiStatiDiagramma(string idDiagramma, DocsPaVO.utente.InfoUtente infoUtente)
         {
             try
@@ -1324,6 +1252,77 @@ namespace BusinessLogic.DiagrammiStato
             }
         }
 
+        public static List<DocsPaVO.DiagrammaStato.Phases> GetFasi()
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato ds = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return ds.GetFasi();
+        }
+
+        public static bool SetFasiStatiDiagramma(List<DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma> list, string idDiagramma)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.SetFasiStatiDiagramma(list, idDiagramma);
+        }
+
+        public static List<DocsPaVO.DiagrammaStato.AssStatoScadenza> GetAssociazioneStatoScadenza(string idDiagramma)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.GetAssociazioneStatoScadenza(idDiagramma);
+        }
+
+        public static bool SetAssociazioneStatoScadenza(string idDiagramma, List<DocsPaVO.DiagrammaStato.AssStatoScadenza> list)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.SetAssociazioneStatoScadenza(idDiagramma, list);
+        }
+
+        public static DocsPaVO.DiagrammaStato.AssStatoScadenza GetTipoStatoProcedimento(String idStato)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.GetTipoStatoProcedimento(idStato);
+        }
+
+        public static string GetDataUltimoCambioStato(string idProject)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.GetDataUltimoCambioStato(idProject);
+        }
+
+
+        #endregion
+
+        #region Automatismi per cambio stato
+        public static List<DocsPaVO.DiagrammaStato.EventoCambioStato> GetEventiCambioStatoAutomatico()
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.GetEventiCambioStatoAutomatico();
+        }
+
+        public static List<DocsPaVO.DiagrammaStato.CambioStatoAutomatico> GetCambiAutomaticiStato(string idStato)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.GetCambiAutomaticiStato(idStato);
+        }
+
+        public static bool CreaCambioStatoAutomatico(DocsPaVO.DiagrammaStato.CambioStatoAutomatico item)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.CreaCambioStatoAutomatico(item);
+        }
+
+        public static DocsPaVO.DiagrammaStato.CambioStatoAutomatico GetCambioAutomaticoStatoFasc(string idFascicolo)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.GetCambioAutomaticoStatoFasc(idFascicolo);
+        }
+
+        public static bool EliminaCambioStatoAutomatico(DocsPaVO.DiagrammaStato.CambioStatoAutomatico item)
+        {
+            DocsPaDB.Query_DocsPAWS.DiagrammiStato diagrStato = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
+            return diagrStato.EliminaCambioStatoAutomatico(item);
+        }
+        #endregion
+
         public static DocsPaVO.DiagrammaStato.Stato GetStatoById(string idStato, DocsPaVO.utente.InfoUtente infoUtente)
         {
             try
@@ -1338,12 +1337,6 @@ namespace BusinessLogic.DiagrammiStato
             }
         }
         #endregion
-
-        public static ArrayList GetIdDocsByDiagramStatus(string descStato, string descDiagramma, string codAmm)
-        {
-            DocsPaDB.Query_DocsPAWS.DiagrammiStato dBds = new DocsPaDB.Query_DocsPAWS.DiagrammiStato();
-            return dBds.GetIdDocsByDiagramStatus(descStato, descDiagramma, codAmm);
-        }
 
     }
 }

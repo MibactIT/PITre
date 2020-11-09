@@ -109,12 +109,7 @@
 			                            'px;dialogHeight:' + pageHeight +
 			                            'px;status:no;resizable:yes;scroll:no;center:yes;help:no;close:no') == 'true');
         }
-        function AvvisoUtenteConLF(tipoTitolare, idRuolo, idUtente, numProcessi, numIstanze) {
-            var myUrl = "../Gestione_Organigramma/AvvisoRuoloConLF.aspx?tipoTitolare=" + tipoTitolare + "&idRuolo=" + idRuolo + "&idUtente=" + idUtente + "&numProcessi=" + numProcessi + "&numIstanze=" + numIstanze;
-            rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:450px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;");
-            Form1.hd_returnValueModalLF.value = rtnValue;
-            window.document.Form1.submit();	
-        }
+		
     </script>
     <script language="javascript" id="btn_aggiungi_click" event="onclick()" for="btn_aggiungi">
 			window.document.body.style.cursor='wait';
@@ -150,7 +145,6 @@
     <form id="Form1" method="post" runat="server">
     <uct:AppTitleProvider ID="appTitleProvider" runat="server" PageName="AMMINISTRAZIONE > Utenti" />
     <input id="hd_returnValueModal" type="hidden" name="hd_returnValueModal" runat="server">
-    <input id="hd_returnValueModalLF" type="hidden" name="hd_returnValueModalLF" runat="server">
     <!-- Gestione del menu a tendina -->
     <uc2:MenuTendina ID="MenuTendina" runat="server"></uc2:MenuTendina>
     <table style="width: 100%; height: 100%" cellspacing="1" cellpadding="0" width="100%"
@@ -362,7 +356,7 @@
                                         </td>
                                         <td align="left" style="width: 25%">
                                             <asp:TextBox ID="txt_userid" TabIndex="8" CssClass="testo" runat="server" Width="100%"
-                                                MaxLength="32" AutoPostBack="True"></asp:TextBox>
+                                                MaxLength="256" AutoPostBack="True"></asp:TextBox>
                                         </td>
                                         <td class="style3" align="right">
                                             Abilitato&nbsp;
@@ -371,8 +365,6 @@
                                             <asp:CheckBox ID="cb_abilitato" TabIndex="9" CssClass="testo" runat="server" OnCheckedChanged="chkAbilitato_OnCheckedChanged">
                                             </asp:CheckBox>
                                             <asp:CheckBox ID="chkUserPasswordNeverExpire" runat="server" Text="Nessuna scadenza"
-                                                CssClass="testo" TextAlign="Left" />
-                                            <asp:CheckBox ID="chkUserAutomatic" runat="server" Text="Automatico"
                                                 CssClass="testo" TextAlign="Left" />
                                             <asp:CheckBox ID="cb_abilitatoCentroServizi" CssClass="testo" runat="server" Text="Abilitato al Centro Servizi"
                                                 TextAlign="Left"></asp:CheckBox>

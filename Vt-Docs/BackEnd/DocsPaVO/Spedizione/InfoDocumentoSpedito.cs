@@ -138,7 +138,7 @@ namespace DocsPaVO.Spedizione
 
     public class FiltriReportSpedizioni
     {
-        public enum TipoFiltroData {ValoreSingolo,Intervallo,Oggi,SettimanaCorrente,MeseCorrente,None}
+        public enum TipoFiltroData {ValoreSingolo,Intervallo,Oggi,SettimanaCorrente,MeseCorrente}
         public enum TipoVisibilitaDocumenti {AllDoc,AllDocByRuolo}
         public bool TipoRicevuta_Accettazione;
         public bool TipoRicevuta_AvvenutaConsegna;

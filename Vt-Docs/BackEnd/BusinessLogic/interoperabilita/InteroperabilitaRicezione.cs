@@ -1625,7 +1625,10 @@ namespace BusinessLogic.Interoperabilità
             retval = retval.Replace("#", string.Empty);
             try
             {
-                BusinessLogic.Documenti.DocManager.GetTipoDocumento(retval);
+                if (!string.IsNullOrEmpty(retval))
+                    BusinessLogic.Documenti.DocManager.GetTipoDocumento(retval);
+                else
+                    throw new Exception("extractDocNumberFromSubject: docnumber nullo o vuoto");
             }
             catch (Exception e)
             {
@@ -2006,6 +2009,22 @@ namespace BusinessLogic.Interoperabilità
 
         #region Check mailbox new UI
 
+        public static bool CheckScaricoOtherRole(string idReg, string email)
+        {
+            bool result = false;
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.Interoperabilita docsPaDB = new DocsPaDB.Query_DocsPAWS.Interoperabilita();
+                result = docsPaDB.CheckScaricoOtherRole(idReg, email);
+            }
+            catch(Exception e)
+            {
+                result = false;
+            }
+
+            return result;
+        } 
+
         /// <summary>
         /// 
         /// </summary>
@@ -2188,13 +2207,14 @@ namespace BusinessLogic.Interoperabilità
                     }
                 }
                 //salvo le informazioni sul mail server, mail user id ed errormessage in DPA_CHECK_MAILBOX
-                docsPaDB.UpdateInfoCheckMailbox(idCheckMailbox, checkResponse.MailUserID == null ? string.Empty : checkResponse.MailUserID,
+                bool result = docsPaDB.UpdateInfoCheckMailbox(idCheckMailbox, checkResponse.MailUserID == null ? string.Empty : checkResponse.MailUserID,
                     checkResponse.ErrorMessage == null ? string.Empty : checkResponse.ErrorMessage,
                     checkResponse.MailServer == null ? string.Empty : checkResponse.MailServer);
 
                 //metto concluded a 1 in DPA_CHECK_MAILBOX
                 //questa operazione ovviamente va sempre fatta anche nel caso di eventuali problemi durante l'interrogazione della casella
-                docsPaDB.ConcludedCheckMailbox(idCheckMailbox);
+                if(!result)
+                    docsPaDB.ConcludedCheckMailbox(idCheckMailbox);
             }
             if (checkResponse != null && checkResponse.MailProcessedList != null)
             {
@@ -2210,6 +2230,7 @@ namespace BusinessLogic.Interoperabilità
         /// <returns>MailAccountCheckResponse</returns>
         private static DocsPaVO.Interoperabilita.MailAccountCheckResponse CheckMailbox(string serverName, string mailAddress, string userId, string password, string server, int port, DocsPaVO.utente.Registro reg, DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.utente.Ruolo ruolo, string SmtpSsl, string PopSsl, string smtpSTA, string tipoPosta, string mailbox, string mailelaborate, string mailNonElaborate, string idCheckMailbox)
         {
+            logger.Info("START checkmailbox");
             DocsPaDB.Query_DocsPAWS.Interoperabilita docsPaDB = new DocsPaDB.Query_DocsPAWS.Interoperabilita();
             DocsPaVO.Interoperabilita.MailAccountCheckResponse retValue =
               new DocsPaVO.Interoperabilita.MailAccountCheckResponse(userId, server, mailAddress, (reg.codRegistro + " - " + reg.descrizione));
@@ -2281,7 +2302,16 @@ namespace BusinessLogic.Interoperabilità
 
                 //se la chiave è abilitata, estraggo l'email con l'uidl e non con l'indice
                 bool getMessageByUIDL = false;
-                string[] uidls = svr.getUidls();
+                string[] uidls = null;
+                try
+                {
+                    uidls = svr.getUidls();
+                    logger.Info("get Uidls OK");
+                }
+                catch(Exception ex)
+                {
+                    logger.Error("Eccezione uidls interoperabilitaRicezione: " + ex.Message);
+                }
                 if( !string.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_CHECK_MAIL_BY_UIDL")) &&
                     !DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_CHECK_MAIL_BY_UIDL").ToString().Equals("0"))
                 {
@@ -2300,6 +2330,7 @@ namespace BusinessLogic.Interoperabilità
                     bool.Parse(ConfigurationManager.AppSettings["SALVA_RICEVUTE_PEC"]))
                     salvaAllegatiPec = true;
                 logger.Debug("gestioneRicevutePec: " + gestioneRicevutePec + " salvaAllegatiPec: " + salvaAllegatiPec);
+                logger.Info("CheckMailbox -> START - INIZIO CICLO");
                 for (int i = 1; i <= num_mess; i++)
                 {
                     bool protocolla_con_segnatura = false;
@@ -2324,7 +2355,6 @@ namespace BusinessLogic.Interoperabilità
                     bool mailSignatureIsValid = true;
 
                     bool fatturaElDaPEC = false;
-                    bool isFatturaAttiva = false;
 
                     //Andrea De Marco - Gestione Eccezione PEC
                     bool controlloBloccante = false;
@@ -2339,15 +2369,26 @@ namespace BusinessLogic.Interoperabilità
                         {
                             uidl = uidls[i-1];
                         }
-                        mc = !string.IsNullOrEmpty(uidl) ? svr.getMessage(uidl) : svr.getMessage(i);
+                        logger.Info("CheckMailbox -> controllo messaggio con id: " + uidl);
+                        try
+                        {
+                            mc = !string.IsNullOrEmpty(uidl) ? svr.getMessage(uidl) : svr.getMessage(i);
+                            logger.Info("CheckMailbox -> mc != null OK");
+                        }
+                        catch(Exception ex)
+                        {
+                            logger.Error("eccezione getMessage interoperabilitaRicezione -> id: " + uidl + ", " + ex.Message, ex);
+                        }
 
-                        //byte[] mymail = System.IO.File.ReadAllBytes("c:\\postacert.eml");
+                        //byte[] mymail = System.IO.File.ReadAllBytes("c:\\mibac.eml");
                         //mc = svr.getMessage(mymail);
 
                         if (mc == null || !string.IsNullOrEmpty(mc.errorMessage))
                         {
                             mailProcessed.ErrorMessage = "Mail non elaborata. " + mc.errorMessage;
                             mailSignatureIsValid = false;
+
+                            logger.Info("CheckMailbox -> mc == null-> id: " + uidl + ", " + mc.errorMessage);
                         }
                         for (int j = 0; j < mc.attachments.Count; j++)
                         {
@@ -2439,9 +2480,9 @@ namespace BusinessLogic.Interoperabilità
                                         datasend = DateTime.Parse(datasend).ToString("dd/MM/yyyy HH:mm:ss");
                                     }
                                 }
-                                catch
+                                catch(Exception ex)
                                 {
-                                    logger.Debug("errore nel formato della data di spedizione delle mail");
+                                    logger.Error(ex.Message + " > errore nel formato della data di spedizione delle mail", ex);
                                 }
                             }
 
@@ -2450,8 +2491,9 @@ namespace BusinessLogic.Interoperabilità
                             {
                                 datareceived = mailProcessed.Date.ToString("dd/MM/yyyy HH:mm:ss");
                             }
-                            catch
+                            catch(Exception ex)
                             {
+                                logger.Error(ex.Message, ex);
                                 //fallback
                                 datareceived = mc.DateReceivedMail();
                                 if (!string.IsNullOrEmpty(datareceived))
@@ -2464,10 +2506,10 @@ namespace BusinessLogic.Interoperabilità
                                             dataRic = dataRic.Split('(')[0];
                                         datareceived = DateTime.Parse(dataRic).ToString("dd/MM/yyyy HH:mm:ss");
                                     }
-                                    catch
+                                    catch(Exception exInner)
                                     {
                                         datareceived = String.Empty;
-                                        logger.Debug("errore nel formato della data di ricezione delle mail");
+                                        logger.Error(exInner.Message + " > errore nel formato della data di ricezione delle mail", exInner);
                                     }
                                 }
                             }
@@ -2577,64 +2619,62 @@ namespace BusinessLogic.Interoperabilità
 
                                             try
                                             {
-                                                if (checkId)
+                                                if (checkId && mailSignatureIsValid)
                                                 {
-                                                    if (mailSignatureIsValid)
+                                                    logger.Debug("Esame del messaggio");
+
+                                                    string path = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_TEMP_PATH");
+                                                    //path = path.Replace("%DATA", DateTime.Now.ToString("yyyyMMdd"));
+                                                    path = path + @"\" + DateTime.Now.ToString("yyyyMMdd") + @"\Attachments\" + userId;
+                                                    DocsPaUtils.Functions.Functions.CheckEsistenzaDirectory(path);
+
+                                                    string nomeEmail = string.Empty;
+                                                    string salvataggiomail = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_SALVA_EMAIL_IN_LOCALE");
+
+                                                    // MEV Gestione scarico mail completa a livello di RF
+                                                    DocsPaDB.Query_DocsPAWS.Interoperabilita iop = new DocsPaDB.Query_DocsPAWS.Interoperabilita();
+                                                    string salvaMailRF = iop.isEnabledSaveMail(reg.systemId);
+                                                    if (!string.IsNullOrEmpty(salvaMailRF) && (salvaMailRF.Equals("0") || salvaMailRF.Equals("1")))
                                                     {
-                                                        logger.Debug("Esame del messaggio");
+                                                        salvataggiomail = salvaMailRF;
+                                                    }
+                                                    // ------------------------
 
-                                                        string path = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_TEMP_PATH");
-                                                        //path = path.Replace("%DATA", DateTime.Now.ToString("yyyyMMdd"));
-                                                        path = path + @"\" + DateTime.Now.ToString("yyyyMMdd") + @"\Attachments\" + userId;
-                                                        DocsPaUtils.Functions.Functions.CheckEsistenzaDirectory(path);
+                                                    if (BusinessLogic.interoperabilita.InteroperabilitaManager.isRicevutaPec(mc))
+                                                    {
+                                                        logger.Debug("gestioneRicevutePec: " + gestioneRicevutePec.ToString());
+                                                        logger.Debug("salvaAllegatiPec: " + salvaAllegatiPec.ToString());
 
-                                                        string nomeEmail = string.Empty;
-                                                        string salvataggiomail = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_SALVA_EMAIL_IN_LOCALE");
-
-                                                        // MEV Gestione scarico mail completa a livello di RF
-                                                        DocsPaDB.Query_DocsPAWS.Interoperabilita iop = new DocsPaDB.Query_DocsPAWS.Interoperabilita();
-                                                        string salvaMailRF = iop.isEnabledSaveMail(reg.systemId);
-                                                        if (!string.IsNullOrEmpty(salvaMailRF) && (salvaMailRF.Equals("0") || salvaMailRF.Equals("1")))
+                                                        if (gestioneRicevutePec &&
+                                                            salvaAllegatiPec)
                                                         {
-                                                            salvataggiomail = salvaMailRF;
-                                                        }
-                                                        // ------------------------
+                                                            logger.Debug("Salvo la mail in locale");
+                                                            nomeEmail = System.Guid.NewGuid().ToString().Substring(0, 25) + ".eml";
 
-                                                        if (BusinessLogic.interoperabilita.InteroperabilitaManager.isRicevutaPec(mc))
-                                                        {
-                                                            logger.Debug("gestioneRicevutePec: " + gestioneRicevutePec.ToString());
-                                                            logger.Debug("salvaAllegatiPec: " + salvaAllegatiPec.ToString());
-
-                                                            if (gestioneRicevutePec &&
-                                                                salvaAllegatiPec)
+                                                            //Se UIDL non è vuoto salvo la mail estraendola con l'uidl altrimenti tramite l'indice
+                                                            bool salvaMail = !string.IsNullOrEmpty(uidl) ? svr.salvaMailInLocale(uidl, path, nomeEmail) : svr.salvaMailInLocale(i, path, nomeEmail);
+                                                            if (salvaMail)
                                                             {
-                                                                logger.Debug("Salvo la mail in locale");
-                                                                nomeEmail = System.Guid.NewGuid().ToString().Substring(0, 25) + ".eml";
-
-                                                                //Se UIDL non è vuoto salvo la mail estraendola con l'uidl altrimenti tramite l'indice
-                                                                bool salvaMail = !string.IsNullOrEmpty(uidl) ? svr.salvaMailInLocale(uidl, path, nomeEmail) : svr.salvaMailInLocale(i, path, nomeEmail);
-                                                                if (salvaMail)
-                                                                {
-                                                                    logger.Debug("la mail si chiama: " + nomeEmail);
-                                                                    listaAllegati.Add(nomeEmail);
-                                                                }
-                                                                else
-                                                                {
-                                                                    erroreNelMessaggio = true;
-                                                                    mailProcessed.ErrorMessage = "Errore nel salvataggio della mail.";
-                                                                    logger.Debug("Errore nel salvataggio della mail in locale");
-                                                                    throw new Exception("Mail non elaborata. Errore nel salvataggio della mail.");
-                                                                }
-
+                                                                logger.Debug("la mail si chiama: " + nomeEmail);
+                                                                listaAllegati.Add(nomeEmail);
                                                             }
+                                                            else
+                                                            {
+                                                                erroreNelMessaggio = true;
+                                                                mailProcessed.ErrorMessage = "Errore nel salvataggio della mail.";
+                                                                logger.Debug("Errore nel salvataggio della mail in locale");
+                                                                throw new Exception("Mail non elaborata. Errore nel salvataggio della mail.");
+                                                            }
+                                                            
                                                         }
-                                                        else
-                                                            if (!string.IsNullOrEmpty(salvataggiomail) && salvataggiomail.Equals("1"))
+                                                    }
+                                                    else
+                                                        if (!string.IsNullOrEmpty(salvataggiomail) && salvataggiomail.Equals("1"))
                                                         {
                                                             logger.Debug("Salvo la mail in locale");
                                                             nomeEmail = System.Guid.NewGuid().ToString().Substring(0, 25);
-                                                            //PURTROPPO E' ACCADUTO CHE CI FOSSERO DUEGUID CON IN PRIMI 25 CARATTERI UGUALI..
-                                                            nomeEmail += DateTime.Now.ToString("ss.ff") + ".eml";
+                                                               //PURTROPPO E' ACCADUTO CHE CI FOSSERO DUEGUID CON IN PRIMI 25 CARATTERI UGUALI..
+                                                            nomeEmail+= DateTime.Now.ToString("ss.ff") + ".eml";
                                                             bool salvaMail = !string.IsNullOrEmpty(uidl) ? svr.salvaMailInLocale(uidl, path, nomeEmail) : svr.salvaMailInLocale(i, path, nomeEmail);
                                                             if (salvaMail)
                                                                 logger.Debug("la mail si chiama: " + nomeEmail);
@@ -2647,450 +2687,376 @@ namespace BusinessLogic.Interoperabilità
                                                             }
                                                         }
 
-                                                        salvaBody(userId, mc, path, out erroreNelMessaggio);
+                                                    salvaBody(userId, mc, path, out erroreNelMessaggio);
 
-                                                        #region easme degli allegati della mail e gestione dei tipi
-                                                        string xmlFileName = null;
-                                                        try
+                                                    #region easme degli allegati della mail e gestione dei tipi
+                                                    string xmlFileName = null;
+                                                    try
+                                                    {
+                                                        mailProcessed.CountAttatchments = mc.attachments.Count;
+                                                        //esame degli attachments della mail
+
+                                                        string num_reg_mit = "";
+                                                        string not_ecc = "";
+
+                                                        for (int j = 0; j < mc.attachments.Count; j++)
                                                         {
-                                                            mailProcessed.CountAttatchments = mc.attachments.Count;
-                                                            //esame degli attachments della mail
-
-                                                            string num_reg_mit = "";
-                                                            string not_ecc = "";
-
-                                                            for (int j = 0; j < mc.attachments.Count; j++)
+                                                            #region controllo allegati generici
+                                                            logger.Debug("allegato numero: " + j.ToString());
+                                                            try
                                                             {
-                                                                #region controllo allegati generici
-                                                                logger.Debug("allegato numero: " + j.ToString());
-                                                                try
+                                                                string nomeAttach = mc.attachments[j].name;
+                                                                Regex regExpr = new System.Text.RegularExpressions.Regex("[:*?\\<>|\"/]");
+                                                                if (regExpr.IsMatch(nomeAttach))
                                                                 {
-                                                                    string nomeAttach = mc.attachments[j].name;
-                                                                    Regex regExpr = new System.Text.RegularExpressions.Regex("[:*?\\<>|\"/]");
-                                                                    if (regExpr.IsMatch(nomeAttach))
-                                                                    {
-                                                                        nomeAttach = regExpr.Replace(nomeAttach, "_");
-                                                                        mc.attachments[j].name = nomeAttach;
-                                                                    }
-                                                                    string fileName = Path.Combine(path, nomeAttach);
-                                                                    logger.Debug(fileName);
-                                                                    if (nomeAttach != null && !nomeAttach.Equals(""))
-                                                                    {
-                                                                        mc.attachments[j].SaveToFile(fileName);
-                                                                    }
+                                                                    nomeAttach = regExpr.Replace(nomeAttach, "_");
+                                                                    mc.attachments[j].name = nomeAttach;
                                                                 }
-                                                                catch (Exception ex11)
+                                                                string fileName = Path.Combine(path, nomeAttach);
+                                                                logger.Debug(fileName);
+                                                                if (nomeAttach != null && !nomeAttach.Equals(""))
                                                                 {
-                                                                    if (!tipoPosta.Equals("POP") && !spostato)
-                                                                    {
-                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                        if (!moveImap)
-                                                                        {
-                                                                            logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            spostato = true;
-                                                                        }
-                                                                    }
-                                                                    if (!erroreNelMessaggio)
-                                                                        erroreNelMessaggio = true;
-                                                                    logger.Error("errore nel reperimento dell'allegato. l'allegato è corrotto o inesistente" + ex11.Message);
+                                                                    mc.attachments[j].SaveToFile(fileName);
                                                                 }
-                                                                #endregion
-
-                                                                #region  controllo eccezione.xml
-                                                                //controllo se il file è confermaRicezione.xml
-                                                                try
+                                                            }
+                                                            catch (Exception ex11)
+                                                            {
+                                                                if (!tipoPosta.Equals("POP") && !spostato)
                                                                 {
-                                                                    if (mc.attachments[j].name.ToLower() == "eccezione.xml")
+                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                    if (!moveImap)
                                                                     {
-                                                                        logger.Debug("Trovato file eccezione");
-                                                                        xmlFileName = mc.attachments[j].name;
-                                                                        //a questo punto si esce dal metodo
-                                                                        eccezione = true;
-
-                                                                        mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Eccezione;
+                                                                        logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
                                                                     }
                                                                     else
                                                                     {
-                                                                        logger.Debug("l'allegato non è file eccezione");
+                                                                        spostato = true;
                                                                     }
                                                                 }
-                                                                catch (Exception ex12)
-                                                                {
-                                                                    if (!tipoPosta.Equals("POP") && !spostato)
-                                                                    {
-                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                        if (!moveImap)
-                                                                        {
-                                                                            logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            spostato = true;
-                                                                        }
-                                                                    }
-                                                                    if (!erroreNelMessaggio)
-                                                                        erroreNelMessaggio = true;
-                                                                    logger.Error("nelal verifica dell'allegato di tipo confermaricezione.xml l'erroe è il seguente: " + ex12.Message);
-                                                                }
-                                                                #endregion
+                                                                if (!erroreNelMessaggio)
+                                                                    erroreNelMessaggio = true;
+                                                                logger.Error("errore nel reperimento dell'allegato. l'allegato è corrotto o inesistente" + ex11.Message);
+                                                            }
+                                                            #endregion
 
-                                                                #region  controllo confermaRicezione.xml
-                                                                //controllo se il file è confermaRicezione.xml
-                                                                try
+                                                            #region  controllo eccezione.xml
+                                                            //controllo se il file è confermaRicezione.xml
+                                                            try
+                                                            {
+                                                                if (mc.attachments[j].name.ToLower() == "eccezione.xml")
                                                                 {
-                                                                    if ((mc.attachments[j].name.ToLower() == "conferma.xml") || (mc.attachments[j].name.ToLower() == "confermaricezione.xml"))
-                                                                    {
-                                                                        logger.Debug("Trovato file conferma");
-                                                                        xmlFileName = mc.attachments[j].name;
-                                                                        //a questo punto si esce dal metodo
-                                                                        conferma_ricezione = true;
-
-                                                                        mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.ConfirmReception;
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        logger.Debug("l'allegato non è file conferma");
-                                                                    }
-                                                                }
-                                                                catch (Exception ex12)
-                                                                {
-                                                                    if (!tipoPosta.Equals("POP") && !spostato)
-                                                                    {
-                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                        if (moveImap)
-                                                                        {
-                                                                            logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            spostato = true;
-                                                                        }
-                                                                    }
-                                                                    if (!erroreNelMessaggio)
-                                                                        erroreNelMessaggio = true;
-                                                                    logger.Error("nelal verifica dell'allegato di tipo confermaricezione.xml l'erroe è il seguente: " + ex12.Message);
-                                                                }
-                                                                #endregion
-
-                                                                #region controllo segnatura.xml
-                                                                //controllo se il file è segnatura.xml
-                                                                //try
-                                                                //{
-                                                                if (mc.attachments[j].name.ToLower() == "segnatura.xml")
-                                                                {
-                                                                    logger.Debug("Trovato file segnatura");
+                                                                    logger.Debug("Trovato file eccezione");
                                                                     xmlFileName = mc.attachments[j].name;
+                                                                    //a questo punto si esce dal metodo
+                                                                    eccezione = true;
 
-                                                                    mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Signature;
-
-                                                                    //a questo punto si imposta il flag protocolla_con_segnatura;
-                                                                    protocolla_con_segnatura = true;
-
-                                                                    //TODO SANDALI Scommentare quando fatto
-
-                                                                    //Qui si controlla se segnatura è ok e gli altri allegati pure, nel caso di problemi 
-                                                                    interoperabilita.InteroperabilitaEccezioni ie = new interoperabilita.InteroperabilitaEccezioni(mc);
-
-                                                                    if (ie.eccezione_xml != null)
-                                                                    {
-                                                                        string numRegMitt = ie.numRegMitt;
-                                                                        num_reg_mit = numRegMitt;
-                                                                        //Andrea De Marco - Gestione Eccezione Segnatura.xml Controlli non Bloccanti - per ripristino commentare De Marco e decommentare il resto
-                                                                        if (ie.controlloBloccante)
-                                                                        {
-                                                                            generataEccezione = true;
-                                                                            controlloBloccante = true;
-                                                                            logger.DebugFormat("Invio Eccezione.xml, per il documento protocollato nr {0} a {1} ", numRegMitt, mc.from);
-                                                                            interoperabilita.InteroperabilitaEccezioni.sendNotificaEccezione(reg, ie.eccezione_xml, numRegMitt, mc.from);
-                                                                            msg_mail_elaborata = true;
-                                                                            protocolla_con_segnatura = false;
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            //Il bool è utilizzato come parametro opzionale per indicare il verificarsi dell'eccezione
-                                                                            //è utilizzato per impostare schedaDoc.interop = E
-                                                                            generataEccezione = true;
-
-                                                                            //Verifico se il messaggio è di PEC
-                                                                            //string isPec = "0";
-                                                                            //if (svr.getMessagePec(i))
-                                                                            //    isPec = "1";
-
-                                                                            //Occorre aggiungere Segnatura.xml tra gli allegati pec - Utilizzo il parametro opzionale generataEccezione per Gestione Eccezioni PEC
-                                                                            //msg_mail_elaborata = InteroperabilitaSegnatura.eseguiSenzaSegnatura(serverName, path, reg, infoUtente, ruolo, messageId, mc, isPec, out err, nomeEmail, datareceived, mailAddress, generataEccezione);
-
-                                                                            //Replico il comportamento del controllo bloccante per non alterare il comportamento successivo del metodo
-                                                                            //generataEccezione = true;
-                                                                            controlloBloccante = false;
-
-                                                                            //logger.DebugFormat("Invio Eccezione.xml, per il documento protocollato nr {0} a {1} ", numRegMitt, mc.from);
-                                                                            //if (msg_mail_elaborata)
-                                                                            //{
-                                                                            //    interoperabilita.InteroperabilitaEccezioni.sendNotificaEccezione(reg, ie.eccezione_xml, numRegMitt, mc.from);
-                                                                            //}
-
-                                                                            not_ecc = ie.eccezione_xml;
-
-                                                                            protocolla_con_segnatura = false;
-                                                                        }
-                                                                        //End Andrea De Marco
-
-                                                                        //generataEccezione = true;
-                                                                        //logger.DebugFormat("Invio Eccezione.xml, per il documento protocollato nr {0} a {1} ", numRegMitt, mc.from);
-                                                                        //interoperabilita.InteroperabilitaEccezioni.sendNotificaEccezione(reg, ie.eccezione_xml, numRegMitt,mc.from);
-                                                                        //msg_mail_elaborata = true;
-                                                                        //protocolla_con_segnatura = false;
-
-                                                                    }
-
+                                                                    mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Eccezione;
                                                                 }
                                                                 else
                                                                 {
-                                                                    logger.Debug("l'allegato non è file segnatura");
+                                                                    logger.Debug("l'allegato non è file eccezione");
                                                                 }
-                                                                #endregion
-
-                                                                #region controllo annullamento.xml
-                                                                //controllo se il file è annullamento.xml
-                                                                try
+                                                            }
+                                                            catch (Exception ex12)
+                                                            {
+                                                                if (!tipoPosta.Equals("POP") && !spostato)
                                                                 {
-                                                                    if (mc.attachments[j].name.ToLower() == "annullamento.xml")
+                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                    if (!moveImap)
                                                                     {
-                                                                        logger.Debug("Trovato file annullamento");
-                                                                        xmlFileName = mc.attachments[j].name;
-
-
-                                                                        mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NotifyCancellation;
-
-                                                                        //a questo punto si imposta il flag protocolla_con_segnatura;
-                                                                        notifica_annullamento = true;
+                                                                        logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
                                                                     }
                                                                     else
                                                                     {
-                                                                        logger.Debug("l'allegato non è file annullamento");
+                                                                        spostato = true;
                                                                     }
                                                                 }
-                                                                catch (Exception ex16)
+                                                                if (!erroreNelMessaggio)
+                                                                    erroreNelMessaggio = true;
+                                                                logger.Error("nelal verifica dell'allegato di tipo confermaricezione.xml l'erroe è il seguente: " + ex12.Message);
+                                                            }
+                                                            #endregion
+
+                                                            #region  controllo confermaRicezione.xml
+                                                            //controllo se il file è confermaRicezione.xml
+                                                            try
+                                                            {
+                                                                if ((mc.attachments[j].name.ToLower() == "conferma.xml") || (mc.attachments[j].name.ToLower() == "confermaricezione.xml"))
                                                                 {
-                                                                    if (!tipoPosta.Equals("POP") && !spostato)
+                                                                    logger.Debug("Trovato file conferma");
+                                                                    xmlFileName = mc.attachments[j].name;
+                                                                    //a questo punto si esce dal metodo
+                                                                    conferma_ricezione = true;
+
+                                                                    mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.ConfirmReception;
+                                                                }
+                                                                else
+                                                                {
+                                                                    logger.Debug("l'allegato non è file conferma");
+                                                                }
+                                                            }
+                                                            catch (Exception ex12)
+                                                            {
+                                                                if (!tipoPosta.Equals("POP") && !spostato)
+                                                                {
+                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                    if (moveImap)
                                                                     {
-                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                        if (!moveImap)
+                                                                        logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        spostato = true;
+                                                                    }
+                                                                }
+                                                                if (!erroreNelMessaggio)
+                                                                    erroreNelMessaggio = true;
+                                                                logger.Error("nelal verifica dell'allegato di tipo confermaricezione.xml l'erroe è il seguente: " + ex12.Message);
+                                                            }
+                                                            #endregion
+
+                                                            #region controllo segnatura.xml
+                                                            //controllo se il file è segnatura.xml
+                                                            //try
+                                                            //{
+                                                            if (mc.attachments[j].name.ToLower() == "segnatura.xml")
+                                                            {
+                                                                logger.Debug("Trovato file segnatura");
+                                                                xmlFileName = mc.attachments[j].name;
+
+                                                                mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.Signature;
+
+                                                                //a questo punto si imposta il flag protocolla_con_segnatura;
+                                                                protocolla_con_segnatura = true;
+
+                                                                //TODO SANDALI Scommentare quando fatto
+
+                                                                //Qui si controlla se segnatura è ok e gli altri allegati pure, nel caso di problemi 
+                                                                interoperabilita.InteroperabilitaEccezioni ie = new interoperabilita.InteroperabilitaEccezioni(mc);
+
+                                                                if (ie.eccezione_xml != null)
+                                                                {
+                                                                    string numRegMitt = ie.numRegMitt;
+                                                                    num_reg_mit = numRegMitt;
+                                                                    //Andrea De Marco - Gestione Eccezione Segnatura.xml Controlli non Bloccanti - per ripristino commentare De Marco e decommentare il resto
+                                                                    if (ie.controlloBloccante)
+                                                                    {
+                                                                        generataEccezione = true;
+                                                                        controlloBloccante = true;
+                                                                        logger.DebugFormat("Invio Eccezione.xml, per il documento protocollato nr {0} a {1} ", numRegMitt, mc.from);
+                                                                        interoperabilita.InteroperabilitaEccezioni.sendNotificaEccezione(reg, ie.eccezione_xml, numRegMitt, mc.from);
+                                                                        msg_mail_elaborata = true;
+                                                                        protocolla_con_segnatura = false;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        //Il bool è utilizzato come parametro opzionale per indicare il verificarsi dell'eccezione
+                                                                        //è utilizzato per impostare schedaDoc.interop = E
+                                                                        generataEccezione = true;
+
+                                                                        //Verifico se il messaggio è di PEC
+                                                                        //string isPec = "0";
+                                                                        //if (svr.getMessagePec(i))
+                                                                        //    isPec = "1";
+
+                                                                        //Occorre aggiungere Segnatura.xml tra gli allegati pec - Utilizzo il parametro opzionale generataEccezione per Gestione Eccezioni PEC
+                                                                        //msg_mail_elaborata = InteroperabilitaSegnatura.eseguiSenzaSegnatura(serverName, path, reg, infoUtente, ruolo, messageId, mc, isPec, out err, nomeEmail, datareceived, mailAddress, generataEccezione);
+
+                                                                        //Replico il comportamento del controllo bloccante per non alterare il comportamento successivo del metodo
+                                                                        //generataEccezione = true;
+                                                                        controlloBloccante = false;
+
+                                                                        //logger.DebugFormat("Invio Eccezione.xml, per il documento protocollato nr {0} a {1} ", numRegMitt, mc.from);
+                                                                        //if (msg_mail_elaborata)
+                                                                        //{
+                                                                        //    interoperabilita.InteroperabilitaEccezioni.sendNotificaEccezione(reg, ie.eccezione_xml, numRegMitt, mc.from);
+                                                                        //}
+
+                                                                        not_ecc = ie.eccezione_xml;
+
+                                                                        protocolla_con_segnatura = false;
+                                                                    }
+                                                                    //End Andrea De Marco
+
+                                                                    //generataEccezione = true;
+                                                                    //logger.DebugFormat("Invio Eccezione.xml, per il documento protocollato nr {0} a {1} ", numRegMitt, mc.from);
+                                                                    //interoperabilita.InteroperabilitaEccezioni.sendNotificaEccezione(reg, ie.eccezione_xml, numRegMitt,mc.from);
+                                                                    //msg_mail_elaborata = true;
+                                                                    //protocolla_con_segnatura = false;
+
+                                                                }
+
+                                                            }
+                                                            else
+                                                            {
+                                                                logger.Debug("l'allegato non è file segnatura");
+                                                            }
+                                                            #endregion
+
+                                                            #region controllo annullamento.xml
+                                                            //controllo se il file è annullamento.xml
+                                                            try
+                                                            {
+                                                                if (mc.attachments[j].name.ToLower() == "annullamento.xml")
+                                                                {
+                                                                    logger.Debug("Trovato file annullamento");
+                                                                    xmlFileName = mc.attachments[j].name;
+
+
+                                                                    mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.NotifyCancellation;
+
+                                                                    //a questo punto si imposta il flag protocolla_con_segnatura;
+                                                                    notifica_annullamento = true;
+                                                                }
+                                                                else
+                                                                {
+                                                                    logger.Debug("l'allegato non è file annullamento");
+                                                                }
+                                                            }
+                                                            catch (Exception ex16)
+                                                            {
+                                                                if (!tipoPosta.Equals("POP") && !spostato)
+                                                                {
+                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                    if (!moveImap)
+                                                                    {
+                                                                        logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        spostato = true;
+                                                                    }
+                                                                }
+                                                                if (!erroreNelMessaggio)
+                                                                    erroreNelMessaggio = true;
+                                                                logger.Error("errore nel file annullamento.xml: " + ex16.Message);
+                                                            }
+                                                            #endregion
+
+                                                            #region controllo daticert.xml
+                                                            //controllo se il file è daticert.xml
+                                                            try
+                                                            {
+                                                                if (gestioneRicevutePec)
+                                                                {
+                                                                    if (mc.attachments[j].name.ToLower() == "daticert.xml")
+                                                                    {
+                                                                        logger.Debug("Trovato file daticert");
+                                                                        xmlFileName = mc.attachments[j].name;
+
+
+                                                                        // mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.DatiCert;
+
+                                                                        //a questo punto si imposta il flag daticert;
+                                                                        daticert = true;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        logger.Debug("l'allegato non è daticert");
+                                                                    }
+                                                                }
+                                                            }
+                                                            catch (Exception ex16)
+                                                            {
+                                                                if (!tipoPosta.Equals("POP") && !spostato)
+                                                                {
+                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                    if (!moveImap)
+                                                                    {
+                                                                        logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        spostato = true;
+                                                                    }
+                                                                }
+                                                                if (!erroreNelMessaggio)
+                                                                    erroreNelMessaggio = true;
+                                                                logger.Error("errore nel file annullamento.xml: " + ex16.Message);
+                                                            }
+                                                            #endregion
+
+                                                            #region Controllo presenza fattura elettronica
+                                                            try
+                                                            {
+                                                                if (mc.attachments[j].name.ToLower().Contains(".xml") && 
+                                                                    !((mc.attachments[j].name.ToLower() == "conferma.xml") || 
+                                                                    (mc.attachments[j].name.ToLower() == "confermaricezione.xml") ||
+                                                                    (mc.attachments[j].name.ToLower() == "daticert.xml") ||
+                                                                    (mc.attachments[j].name.ToLower() == "eccezione.xml") ||
+                                                                    (mc.attachments[j].name.ToLower() == "annullamento.xml") ||
+                                                                    (mc.attachments[j].name.ToLower() == "segnatura.xml")
+                                                                    ))
+                                                                {
+                                                                    logger.Debug("Trovato file xml non di tipo conosciuto: " + mc.attachments[j].name);
+                                                                    if (BusinessLogic.Amministrazione.SistemiEsterni.FattElCtrlPresenzaFattura(infoUtente.idAmministrazione))
+                                                                    {
+                                                                        if (mc.attachments[j].name.ToLower().Contains(".p7m"))
                                                                         {
-                                                                            logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                            // non posso sbustarlo, quindi analizzerò in seguito.
+                                                                            fatturaElDaPEC = true;
                                                                         }
                                                                         else
                                                                         {
-                                                                            spostato = true;
-                                                                        }
-                                                                    }
-                                                                    if (!erroreNelMessaggio)
-                                                                        erroreNelMessaggio = true;
-                                                                    logger.Error("errore nel file annullamento.xml: " + ex16.Message);
-                                                                }
-                                                                #endregion
-
-                                                                #region controllo daticert.xml
-                                                                //controllo se il file è daticert.xml
-                                                                try
-                                                                {
-                                                                    if (gestioneRicevutePec)
-                                                                    {
-                                                                        if (mc.attachments[j].name.ToLower() == "daticert.xml")
-                                                                        {
-                                                                            logger.Debug("Trovato file daticert");
-                                                                            xmlFileName = mc.attachments[j].name;
-
-
-                                                                            // mailProcessed.ProcessedType = DocsPaVO.Interoperabilita.MailAccountCheckResponse.MailProcessed.MailProcessedType.DatiCert;
-
-                                                                            //a questo punto si imposta il flag daticert;
-                                                                            daticert = true;
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            logger.Debug("l'allegato non è daticert");
-                                                                        }
-                                                                    }
-                                                                }
-                                                                catch (Exception ex16)
-                                                                {
-                                                                    if (!tipoPosta.Equals("POP") && !spostato)
-                                                                    {
-                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                        if (!moveImap)
-                                                                        {
-                                                                            logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            spostato = true;
-                                                                        }
-                                                                    }
-                                                                    if (!erroreNelMessaggio)
-                                                                        erroreNelMessaggio = true;
-                                                                    logger.Error("errore nel file annullamento.xml: " + ex16.Message);
-                                                                }
-                                                                #endregion
-
-                                                                #region Controllo presenza fattura elettronica
-                                                                try
-                                                                {
-                                                                    if (mc.attachments[j].name.ToLower().Contains(".xml") &&
-                                                                        !((mc.attachments[j].name.ToLower() == "conferma.xml") ||
-                                                                        (mc.attachments[j].name.ToLower() == "confermaricezione.xml") ||
-                                                                        (mc.attachments[j].name.ToLower() == "daticert.xml") ||
-                                                                        (mc.attachments[j].name.ToLower() == "eccezione.xml") ||
-                                                                        (mc.attachments[j].name.ToLower() == "annullamento.xml") ||
-                                                                        (mc.attachments[j].name.ToLower() == "segnatura.xml")
-                                                                        ))
-                                                                    {
-                                                                        logger.Debug("Trovato file xml non di tipo conosciuto: " + mc.attachments[j].name);
-                                                                        if (BusinessLogic.Amministrazione.SistemiEsterni.FattElCtrlPresenzaFattura(infoUtente.idAmministrazione))
-                                                                        {
-                                                                            if (mc.attachments[j].name.ToLower().Contains(".p7m"))
+                                                                            string xmlFatt = System.Text.Encoding.UTF8.GetString(mc.attachments[j]._data);
+                                                                            xmlFatt = xmlFatt.Trim();
+                                                                            System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
+                                                                            if (xmlFatt.Contains("xml version=\"1.1\""))
                                                                             {
-                                                                                // non posso sbustarlo, quindi analizzerò in seguito.
+                                                                                logger.Debug("Versione XML 1.1. Provo conversione");
+                                                                                xmlFatt = xmlFatt.Replace("xml version=\"1.1\"", "xml version=\"1.0\"");
+                                                                            }
+                                                                            xmlDoc.LoadXml(xmlFatt);
+                                                                            if (xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://www.fatturapa.gov.it/sdi/fatturapa/v1") ||
+                                                                                xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/"))
+                                                                            {
                                                                                 fatturaElDaPEC = true;
                                                                             }
                                                                             else
                                                                             {
-                                                                                string xmlFatt = System.Text.Encoding.UTF8.GetString(mc.attachments[j]._data);
-                                                                                xmlFatt = xmlFatt.Trim();
-                                                                                System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
-                                                                                if (xmlFatt.Contains("xml version=\"1.1\""))
-                                                                                {
-                                                                                    logger.Debug("Versione XML 1.1. Provo conversione");
-                                                                                    xmlFatt = xmlFatt.Replace("xml version=\"1.1\"", "xml version=\"1.0\"");
-                                                                                }
-                                                                                xmlDoc.LoadXml(xmlFatt);
-                                                                                if (xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://www.fatturapa.gov.it/sdi/fatturapa/v1") ||
-                                                                                    xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/"))
-                                                                                {
-                                                                                    fatturaElDaPEC = true;
-
-                                                                                    //Se la fattura elettronica è una fattura attiva blocco lo scarico della PEC
-                                                                                    string mappFornitore = string.Format("//*[name()='{0}']/*[name()='{1}']/*[name()='{2}']/*[name()='{3}']", "CedentePrestatore", "DatiAnagrafici", "IdFiscaleIVA", "IdCodice");
-                                                                                    string codFornitore = (xmlDoc.DocumentElement.SelectSingleNode(mappFornitore)).InnerXml;
-
-                                                                                    if (!string.IsNullOrEmpty(codFornitore))
-                                                                                    {
-                                                                                        DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-                                                                                        System.Collections.ArrayList fornitori = dbAmm.FattElAttive_getCodFornitore(infoUtente.idAmministrazione);
-                                      
-                                                                                        foreach (DocsPaVO.ExternalServices.FornitoreFattAttiva forn in fornitori)
-                                                                                        {
-                                                                                            if (!string.IsNullOrEmpty(forn.CodFornitore) && forn.CodFornitore.ToUpper() == codFornitore.ToUpper())
-                                                                                            {
-                                                                                                //SE FATTURA ATTIVA BLOCCO LO SCARICO DELLA PEC
-                                                                                                isFatturaAttiva = true;
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    logger.Debug("Il file xml non è una fattura.");
-                                                                                }
-
+                                                                                logger.Debug("Il file xml non è una fattura.");
                                                                             }
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            logger.Debug("Non è previsto il popolamento di una tipologia fattura elettronica per questa amministrazione");
+
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        logger.Debug("Non è presente una possibile fattura elettronica");
+                                                                        logger.Debug("Non è previsto il popolamento di una tipologia fattura elettronica per questa amministrazione");
                                                                     }
                                                                 }
-                                                                catch (Exception ex12)
+                                                                else
                                                                 {
-                                                                    if (!tipoPosta.Equals("POP") && !spostato)
+                                                                    logger.Debug("Non è presente una possibile fattura elettronica");
+                                                                }
+                                                            }
+                                                            catch (Exception ex12)
+                                                            {
+                                                                if (!tipoPosta.Equals("POP") && !spostato)
+                                                                {
+                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                    if (!moveImap)
                                                                     {
-                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                        if (!moveImap)
-                                                                        {
-                                                                            logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            spostato = true;
-                                                                        }
+                                                                        logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
                                                                     }
-                                                                    if (!erroreNelMessaggio)
-                                                                        erroreNelMessaggio = true;
-                                                                    logger.Error("nelal verifica dell'allegato di tipo confermaricezione.xml l'erroe è il seguente: " + ex12.Message);
+                                                                    else
+                                                                    {
+                                                                        spostato = true;
+                                                                    }
                                                                 }
-
-                                                                #endregion
-
-                                                            }//for allegati
-
-                                                            //21-12-2012
-                                                            //Se Eccezione non bloccante - Esegui senza segnatura e send eccezione
-                                                            //27/06/2016 - aggiunto daticert per catturare un caso di errore dove tra gli allegati inserisco anche un file daticert
-                                                            if (generataEccezione && !controlloBloccante && !daticert)
-                                                            {
-                                                                string isPec = "0";
-                                                                //if (svr.getMessagePec(i))
-                                                                //    isPec = "1";
-                                                                if (!string.IsNullOrEmpty(uidl))
-                                                                {
-                                                                    if (svr.getMessagePec(uidl))
-                                                                        isPec = "1";
-                                                                }
-                                                                else
-                                                                {
-                                                                    if (svr.getMessagePec(i))
-                                                                        isPec = "1";
-                                                                }
-
-                                                                msg_mail_elaborata = InteroperabilitaSegnatura.eseguiSenzaSegnatura(serverName, path, reg, infoUtente, ruolo, messageId, fatturaElDaPEC, mc, isPec, out err, out docnumber, nomeEmail, datareceived, mailAddress, generataEccezione);
-
-                                                                if (msg_mail_elaborata)
-                                                                {
-                                                                    logger.DebugFormat("Invio Eccezione.xml, per il documento protocollato nr {0} a {1} ", num_reg_mit, mc.from);
-                                                                    interoperabilita.InteroperabilitaEccezioni.sendNotificaEccezione(reg, not_ecc, num_reg_mit, mc.from);
-                                                                }
+                                                                if (!erroreNelMessaggio)
+                                                                    erroreNelMessaggio = true;
+                                                                logger.Error("nelal verifica dell'allegato di tipo confermaricezione.xml l'erroe è il seguente: " + ex12.Message);
                                                             }
-                                                            //21-12-2012
 
-                                                        }
-                                                        catch (Exception ex10)
-                                                        {
-                                                            if (!tipoPosta.Equals("POP") && !spostato)
-                                                            {
-                                                                bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                if (!moveImap)
-                                                                {
-                                                                    logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                }
-                                                                else
-                                                                {
-                                                                    spostato = true;
-                                                                }
-                                                            }
-                                                            if (!erroreNelMessaggio)
-                                                                erroreNelMessaggio = true;
-                                                            logger.Error("errore nella gestione degli allegati - errore: " + ex10.Message);
-                                                        }
-                                                        #endregion
+                                                            #endregion
 
-                                                        if (isFatturaAttiva)
-                                                        {
-                                                            erroreNelMessaggio = true;
-                                                            mailProcessed.ErrorMessage = "Mail non elaborata. Il documento è una Fattura attiva.";
-                                                            throw new Exception("Mail non elaborata. Il documento è una Fattura attiva.");
-                                                        }
+                                                        }//for allegati
 
-                                                        try
+                                                        //21-12-2012
+                                                        //Se Eccezione non bloccante - Esegui senza segnatura e send eccezione
+                                                        //27/06/2016 - aggiunto daticert per catturare un caso di errore dove tra gli allegati inserisco anche un file daticert
+                                                        if (generataEccezione && !controlloBloccante && !daticert)
                                                         {
-                                                            //modifica 
                                                             string isPec = "0";
                                                             //if (svr.getMessagePec(i))
                                                             //    isPec = "1";
@@ -3104,60 +3070,108 @@ namespace BusinessLogic.Interoperabilità
                                                                 if (svr.getMessagePec(i))
                                                                     isPec = "1";
                                                             }
-                                                            //fine modifca
 
+                                                            msg_mail_elaborata = InteroperabilitaSegnatura.eseguiSenzaSegnatura(serverName, path, reg, infoUtente, ruolo, messageId, fatturaElDaPEC, mc, isPec, out err, out docnumber, nomeEmail, datareceived, mailAddress, generataEccezione);
 
-                                                            if (daticert)
+                                                            if (msg_mail_elaborata)
                                                             {
-                                                                try
-                                                                {
-                                                                    logger.Debug("Elaboro i dati cert  per il messaggio:" + i.ToString());
-                                                                    msg_mail_elaborata = InteroperabilitaSegnatura.leggiFileDatiCert(path, xmlFileName, out err, out docnumber, listaAllegati, infoUtente, messageId);
-                                                                    if (msg_mail_elaborata && !string.IsNullOrEmpty(err))
-                                                                    {
-                                                                        mailProcessed.ErrorMessage = "Ok. " + err;
-                                                                        err = "";
-                                                                        if (!erroreNelMessaggio)
-                                                                            erroreNelMessaggio = true;
-                                                                    }
-                                                                    else
-                                                                        if (!msg_mail_elaborata && !string.IsNullOrEmpty(err))
-                                                                    {
-                                                                        mailProcessed.ErrorMessage = err;
-                                                                        err = "";
-                                                                        if (!erroreNelMessaggio)
-                                                                            erroreNelMessaggio = true;
-                                                                    }
-                                                                }
-                                                                catch (Exception e)//erreo con nel daticert
-                                                                {
-                                                                    if (!erroreNelMessaggio)
-                                                                        erroreNelMessaggio = true;
-                                                                    logger.Error("errore nell'esecuzione del file daticert: " + err + " " + e.Message);
-                                                                    if (!string.IsNullOrEmpty(err))
-                                                                        mailProcessed.ErrorMessage = err;
-                                                                    else
-                                                                        mailProcessed.ErrorMessage = e.Message;
-                                                                    err = "";
-                                                                    //new
-                                                                    if (!msg_mail_elaborata)
-                                                                        if (!tipoPosta.Equals("POP") && !spostato)
-                                                                        {
-                                                                            bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                            if (!moveImap)
-                                                                            {
-                                                                                logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                spostato = true;
-                                                                            }
-                                                                        }
-                                                                }
+                                                                logger.DebugFormat("Invio Eccezione.xml, per il documento protocollato nr {0} a {1} ", num_reg_mit, mc.from);
+                                                                interoperabilita.InteroperabilitaEccezioni.sendNotificaEccezione(reg, not_ecc, num_reg_mit, mc.from);
+                                                            }
+                                                        }
+                                                        //21-12-2012
+
+                                                    }
+                                                    catch (Exception ex10)
+                                                    {
+                                                        if (!tipoPosta.Equals("POP") && !spostato)
+                                                        {
+                                                            bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                            if (!moveImap)
+                                                            {
+                                                                logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
                                                             }
                                                             else
-                                                                //tipo protocollazione
-                                                                if (conferma_ricezione == false)
+                                                            {
+                                                                spostato = true;
+                                                            }
+                                                        }
+                                                        if (!erroreNelMessaggio)
+                                                            erroreNelMessaggio = true;
+                                                        logger.Error("errore nella gestione degli allegati - errore: " + ex10.Message);
+                                                    }
+                                                    #endregion
+
+                                                    try
+                                                    {
+                                                        //modifica 
+                                                        string isPec = "0";
+                                                        //if (svr.getMessagePec(i))
+                                                        //    isPec = "1";
+                                                        if (!string.IsNullOrEmpty(uidl))
+                                                        {
+                                                            if (svr.getMessagePec(uidl))
+                                                                isPec = "1";
+                                                        }
+                                                        else
+                                                        {
+                                                            if (svr.getMessagePec(i))
+                                                                isPec = "1";
+                                                        }
+                                                        //fine modifca
+
+
+                                                        if (daticert)
+                                                        {
+                                                            try
+                                                            {
+                                                                logger.Debug("Elaboro i dati cert  per il messaggio:" + i.ToString());
+                                                                msg_mail_elaborata = InteroperabilitaSegnatura.leggiFileDatiCert(path, xmlFileName, out err, out docnumber, listaAllegati, infoUtente, messageId);
+                                                                if (msg_mail_elaborata && !string.IsNullOrEmpty(err))
+                                                                {
+                                                                    mailProcessed.ErrorMessage = "Ok. " + err;
+                                                                    err = "";
+                                                                    if (!erroreNelMessaggio)
+                                                                        erroreNelMessaggio = true;
+                                                                }
+                                                                else
+                                                                    if (!msg_mail_elaborata && !string.IsNullOrEmpty(err))
+                                                                    {
+                                                                        mailProcessed.ErrorMessage = err;
+                                                                        err = "";
+                                                                        if (!erroreNelMessaggio)
+                                                                            erroreNelMessaggio = true;
+                                                                    }
+                                                            }
+                                                            catch (Exception e)//erreo con nel daticert
+                                                            {
+                                                                if (!erroreNelMessaggio)
+                                                                    erroreNelMessaggio = true;
+                                                                logger.Error("errore nell'esecuzione del file daticert: " + err + " " + e.Message);
+                                                                if (!string.IsNullOrEmpty(err))
+                                                                    mailProcessed.ErrorMessage = err;
+                                                                else
+                                                                    mailProcessed.ErrorMessage = e.Message;
+                                                                err = "";
+                                                                //new
+                                                                if (!msg_mail_elaborata)
+                                                                    if (!tipoPosta.Equals("POP") && !spostato)
+                                                                    {
+                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                        if (!moveImap)
+                                                                        {
+                                                                            logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            spostato = true;
+                                                                        }
+                                                                    }
+                                                            }
+                                                        }
+                                                        else
+                                                            //tipo protocollazione
+                                                            if (conferma_ricezione == false)
                                                             {
                                                                 if (protocolla_con_segnatura)
                                                                 {
@@ -3254,125 +3268,125 @@ namespace BusinessLogic.Interoperabilità
 
                                                             }
 
-                                                        }
-                                                        catch (Exception ex18)
-                                                        {
-                                                            if (!erroreNelMessaggio)
-                                                                erroreNelMessaggio = true;
-                                                            logger.Error("errore nell'esecuzione della segnatura: " + ex18.Message);
-                                                            //new
-                                                            if (!msg_mail_elaborata)
-                                                                if (!tipoPosta.Equals("POP") && !spostato)
-                                                                {
-                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                    if (!moveImap)
-                                                                    {
-                                                                        logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        spostato = true;
-                                                                    }
-                                                                }
-                                                            //end new
-                                                        }
-
-
-                                                        try
-                                                        {
-                                                            if (msg_mail_elaborata)
+                                                    }
+                                                    catch (Exception ex18)
+                                                    {
+                                                        if (!erroreNelMessaggio)
+                                                            erroreNelMessaggio = true;
+                                                        logger.Error("errore nell'esecuzione della segnatura: " + ex18.Message);
+                                                        //new
+                                                        if (!msg_mail_elaborata)
+                                                            if (!tipoPosta.Equals("POP") && !spostato)
                                                             {
-                                                                if ((protocolla_con_segnatura) ||
-                                                                    (conferma_ricezione) ||
-                                                                    (notifica_annullamento) ||
-                                                                    (elabora_ogni_mail) ||
-                                                                    (eccezione) ||
-                                                                    (daticert))
+                                                                bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                if (!moveImap)
                                                                 {
-
-                                                                    bool elaboramail = false;
-                                                                    try
-                                                                    {
-                                                                        if (tipoPosta == "IMAP")
-                                                                        {
-                                                                            bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, true) : svr.moveImap(i, true);
-                                                                            if (moveImap)
-                                                                                elaboramail = InteroperabilitaUtils.MailElaborata(messageId, "E", regId, docnumber, mc.from);
-                                                                            else
-                                                                            {
-                                                                                mailProcessed.ErrorMessage = "Impossibile spostare la mail nella cartella elaborate";
-                                                                                logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                            }
-                                                                        }
-
-                                                                    }
-                                                                    catch (Exception ex24)
-                                                                    {
-                                                                        if (!erroreNelMessaggio)
-                                                                            erroreNelMessaggio = true;
-                                                                        if (!tipoPosta.Equals("POP") && !spostato)
-                                                                        {
-                                                                            bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                            if (!moveImap)
-                                                                            {
-                                                                                logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                spostato = true;
-                                                                            }
-                                                                        }
-                                                                        logger.Error("errore nell'elaborazione della mail di tipo IMAP: " + ex24.Message);
-                                                                    }
-
-
-                                                                    try
-                                                                    {
-                                                                        if (tipoPosta == "POP")
-                                                                            InteroperabilitaUtils.MailElaborata(messageId, "E", regId, docnumber, mc.from);
-                                                                    }
-                                                                    catch (Exception ex25)
-                                                                    {
-                                                                        if (!erroreNelMessaggio)
-                                                                            erroreNelMessaggio = true;
-                                                                        logger.Error("errore nell'elabarzione del messaggio di tipo POP: " + ex25.Message);
-                                                                    }
-
-                                                                    try
-                                                                    {
-                                                                        if (rimuovi_mail_elaborata &&
-                                                                            !erroreNelMessaggio)
-                                                                        {
-                                                                            //svr.deleteSingleMessage(i);
-                                                                            if (!string.IsNullOrEmpty(uidl))
-                                                                                svr.deleteSingleMessage(uidl);
-                                                                            else
-                                                                                svr.deleteSingleMessage(i);
-                                                                        }
-                                                                    }
-                                                                    catch (Exception e)
-                                                                    {
-                                                                        logger.Error(String.Format("Impossibile eliminare il messaggio [{0}] ({1})", mc.subject, e.Message));
-                                                                    }
+                                                                    logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
                                                                 }
-                                                                // causa errori nello scarico delle fatture, il metodo viene inserito in eseguiSegnatura ed eseguiSenzaSegnatura
-                                                                //if(fatturaElDaPEC)
-                                                                //{
-                                                                //    BusinessLogic.Amministrazione.SistemiEsterni.FattElDaPEC(docnumber, infoUtente);
-
-                                                                //}
+                                                                else
+                                                                {
+                                                                    spostato = true;
+                                                                }
                                                             }
-                                                            else
+                                                        //end new
+                                                    }
+
+
+                                                    try
+                                                    {
+                                                        if (msg_mail_elaborata)
+                                                        {
+                                                            if ((protocolla_con_segnatura) ||
+                                                                (conferma_ricezione) ||
+                                                                (notifica_annullamento) ||
+                                                                (elabora_ogni_mail) ||
+                                                                (eccezione) ||
+                                                                (daticert))
                                                             {
+
+                                                                bool elaboramail = false;
                                                                 try
                                                                 {
-                                                                    if (err.Contains("CODINTEROP1"))
+                                                                    if (tipoPosta == "IMAP")
                                                                     {
-                                                                        err = err.Replace("CODINTEROP1", "Mail Elaborata.");
-                                                                        mailProcessed.ErrorMessage = err;
+                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, true) : svr.moveImap(i, true);
+                                                                        if (moveImap)
+                                                                            elaboramail = InteroperabilitaUtils.MailElaborata(messageId, "E", regId, docnumber, mc.from);
+                                                                        else
+                                                                        {
+                                                                            mailProcessed.ErrorMessage = "Impossibile spostare la mail nella cartella elaborate";
+                                                                            logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                        }
                                                                     }
-                                                                    else
-                                                                        if (string.IsNullOrEmpty(mailProcessed.ErrorMessage))
+
+                                                                }
+                                                                catch (Exception ex24)
+                                                                {
+                                                                    if (!erroreNelMessaggio)
+                                                                        erroreNelMessaggio = true;
+                                                                    if (!tipoPosta.Equals("POP") && !spostato)
+                                                                    {
+                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                        if (!moveImap)
+                                                                        {
+                                                                            logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            spostato = true;
+                                                                        }
+                                                                    }
+                                                                    logger.Error("errore nell'elaborazione della mail di tipo IMAP: " + ex24.Message);
+                                                                }
+
+
+                                                                try
+                                                                {
+                                                                    if (tipoPosta == "POP")
+                                                                        InteroperabilitaUtils.MailElaborata(messageId, "E", regId, docnumber, mc.from);
+                                                                }
+                                                                catch (Exception ex25)
+                                                                {
+                                                                    if (!erroreNelMessaggio)
+                                                                        erroreNelMessaggio = true;
+                                                                    logger.Error("errore nell'elabarzione del messaggio di tipo POP: " + ex25.Message);
+                                                                }
+
+                                                                try
+                                                                {
+                                                                    if (rimuovi_mail_elaborata &&
+                                                                        !erroreNelMessaggio)
+                                                                    {
+                                                                        //svr.deleteSingleMessage(i);
+                                                                        if (!string.IsNullOrEmpty(uidl))
+                                                                            svr.deleteSingleMessage(uidl);
+                                                                        else
+                                                                            svr.deleteSingleMessage(i);
+                                                                    }
+                                                                }
+                                                                catch (Exception e)
+                                                                {
+                                                                    logger.Error(String.Format("Impossibile eliminare il messaggio [{0}] ({1})", mc.subject, e.Message));
+                                                                }
+                                                            }
+                                                            // causa errori nello scarico delle fatture, il metodo viene inserito in eseguiSegnatura ed eseguiSenzaSegnatura
+                                                            //if(fatturaElDaPEC)
+                                                            //{
+                                                            //    BusinessLogic.Amministrazione.SistemiEsterni.FattElDaPEC(docnumber, infoUtente);
+
+                                                            //}
+                                                        }
+                                                        else
+                                                        {
+                                                            try
+                                                            {
+                                                                if (err.Contains("CODINTEROP1"))
+                                                                {
+                                                                    err = err.Replace("CODINTEROP1", "Mail Elaborata.");
+                                                                    mailProcessed.ErrorMessage = err;
+                                                                }
+                                                                else
+                                                                    if (string.IsNullOrEmpty(mailProcessed.ErrorMessage))
                                                                     {
                                                                         if (string.IsNullOrEmpty(moreError))
                                                                         {
@@ -3386,73 +3400,56 @@ namespace BusinessLogic.Interoperabilità
                                                                     else
                                                                         mailProcessed.ErrorMessage = "Mail non elaborata. " + mailProcessed.ErrorMessage;
 
-                                                                    //mailProcessed.ErrorMessage = "Mail non elaborata." + err;
-                                                                    if (tipoPosta == "IMAP" && !spostato)
-                                                                    {
-                                                                        // svr.moveImap(i, false);
-                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                        if (!moveImap)
-                                                                        {
-                                                                            logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                        }
-                                                                    }
-                                                                }
-                                                                catch (Exception ex21)
+                                                                //mailProcessed.ErrorMessage = "Mail non elaborata." + err;
+                                                                if (tipoPosta == "IMAP" && !spostato)
                                                                 {
-                                                                    if (!tipoPosta.Equals("POP") && !spostato)
+                                                                    // svr.moveImap(i, false);
+                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                    if (!moveImap)
                                                                     {
-                                                                        bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                        if (!moveImap)
-                                                                        {
-                                                                            logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            spostato = true;
-                                                                        }
+                                                                        logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
                                                                     }
-                                                                    logger.Error("errore nella mail non elaborata con la gestione del protocollo IMAP: " + ex21.Message);
                                                                 }
-
                                                             }
-                                                        }
-                                                        catch (Exception ex20)
-                                                        {
-                                                            if (!tipoPosta.Equals("POP") && !spostato)
+                                                            catch (Exception ex21)
                                                             {
-                                                                bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
-                                                                if (!moveImap)
+                                                                if (!tipoPosta.Equals("POP") && !spostato)
                                                                 {
-                                                                    logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                    bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
+                                                                    if (!moveImap)
+                                                                    {
+                                                                        logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        spostato = true;
+                                                                    }
                                                                 }
-                                                                else
-                                                                {
-                                                                    spostato = true;
-                                                                }
+                                                                logger.Error("errore nella mail non elaborata con la gestione del protocollo IMAP: " + ex21.Message);
                                                             }
-                                                            logger.Error("errore nell'elaborazione della mail recuperata: " + ex20.Message + " con id: " + messageId);
+
                                                         }
-
-
-                                                        // si cancella la directory temporanea
-                                                        DocsPaUtils.Functions.Functions.CancellaDirectory(path);
                                                     }
-                                                    else //Se la firma della mail non è valida sposto tra le mail non elaborate
+                                                    catch (Exception ex20)
                                                     {
-                                                        if (tipoPosta == "IMAP" && !spostato)
+                                                        if (!tipoPosta.Equals("POP") && !spostato)
                                                         {
-                                                            // svr.moveImap(i, false);
                                                             bool moveImap = !string.IsNullOrEmpty(uidl) ? svr.moveImap(uidl, false) : svr.moveImap(i, false);
                                                             if (!moveImap)
                                                             {
-                                                                logger.Debug("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
+                                                                logger.Error("errore nello spostamento della mail nella cartella elaborata, la mail: " + mc.subject);
                                                             }
                                                             else
                                                             {
                                                                 spostato = true;
                                                             }
                                                         }
+                                                        logger.Error("errore nell'elaborazione della mail recuperata: " + ex20.Message + " con id: " + messageId);
                                                     }
+
+
+                                                    // si cancella la directory temporanea
+                                                    DocsPaUtils.Functions.Functions.CancellaDirectory(path);
                                                 }
                                             }
                                             catch (Exception ex7)
@@ -3558,6 +3555,8 @@ namespace BusinessLogic.Interoperabilità
                             retValue.MailProcessedList.Add(mailProcessed);
                         }
                     }
+
+                    logger.Info("CheckMailbox -> END -> id: " + uidl);
                 }
             }
             catch (Exception e)

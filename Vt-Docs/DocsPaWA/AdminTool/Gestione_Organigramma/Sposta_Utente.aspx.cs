@@ -36,25 +36,14 @@ namespace Amministrazione.Gestione_Organigramma
 		protected System.Web.UI.HtmlControls.HtmlInputHidden hd_returnValueModal;	
 		protected System.Web.UI.HtmlControls.HtmlInputHidden hd_idGruppoDest;
 		protected System.Web.UI.HtmlControls.HtmlInputHidden hd_idCorrGlobGruppoDest;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_returnValueModalLF;
-        //-------------------------------------------------------------------
-        private string _idAmm = string.Empty;				
+		//-------------------------------------------------------------------
+		private string _idAmm = string.Empty;				
 		private string _idCorrGlobUtente = string.Empty;		
 		private string _nomeUtenteDaSpostare = string.Empty;								
 		private string _cognomeUtenteDaSpostare = string.Empty;
 
-        private InvalidaPassiCorrelatiDelegate invalidaPassiCorrelati;
 
-        #region Costanti
-
-        private const string UTENTE_COINVOLTO = "UC";
-        private const string ULTIMO_UTENTE_COINVOLTO = "UURC"; //L'utente che si stà rimuovendo è l'ultimo ed è coinvolto
-        private const string ULTIMO_UTENTE_NON_COINVOLTO = "UURNC"; //L'utente che si stà rimuovendo non è coinvolto in processi/istanze
-        private const string ULTIMO_UTENTE_COINVOLTO_E_NON = "UURCNC"; //L'utente che si stà rimuovendo è l'ultimo e ci sono processi in cui è coinvolti e altri no
-
-        #endregion
-
-        private void Page_Load(object sender, System.EventArgs e)
+		private void Page_Load(object sender, System.EventArgs e)
 		{
 			Response.Expires = -1;
 
@@ -85,11 +74,7 @@ namespace Amministrazione.Gestione_Organigramma
 					this.hd_idCorrGlobGruppoDest.Value = appo[2];
 					this.hd_idGruppoDest.Value = appo[3];					
 				}
-                if (this.hd_returnValueModalLF.Value != null && this.hd_returnValueModalLF.Value != string.Empty && this.hd_returnValueModalLF.Value != "undefined")
-                {
-                    this.GestRitornoAvvisoLF(this.hd_returnValueModalLF.Value);
-                }
-            }
+			}
 		}
 
 		private void Inizialize()
@@ -163,74 +148,64 @@ namespace Amministrazione.Gestione_Organigramma
 						this.hd_idCorrGlobGruppoDest.Value!="")
 					{
 
-                        // verifica che l'utente non sia connesso a docspa
-                        if (this.VerificaUtenteLoggato(this.hd_userid.Value, this.hd_idAmm.Value))
-                        {
-                                // verifica che non sia l'unico del ruolo
-                                if (Convert.ToInt16(this.hd_countUtenti.Value) > 1)
-                                {
-                                    // NON è l'unico utente nel ruolo quindi lo elimina dal ruolo
-                                    if (this.EliminaUtenteInRuolo(this.hd_idPeople.Value, this.hd_idGruppo.Value))
-                                    {
-                                        // ripulisce l'AREA DI LAVORO
-                                        if (this.EliminaADLUtente(this.hd_idPeople.Value, this.hd_idCorrGlobGruppo.Value))
-                                        {
-                                            // inserisce l'utente nel nuovo ruolo
-                                            if (this.InserimentoUtente(this.hd_idPeople.Value, this.hd_idGruppoDest.Value))
-                                            {
-                                                // inserisce trasm utente
-                                                if (this.InsTrasmUtente(this.hd_idPeople.Value, this.hd_idCorrGlobGruppoDest.Value))
-                                                {
-                                                    DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                                                    AsyncCallback callback = new AsyncCallback(CallBack);
-                                                    invalidaPassiCorrelati = new InvalidaPassiCorrelatiDelegate(InvalidaPassiCorrelati);
-                                                    invalidaPassiCorrelati.BeginInvoke(this.hd_idPeople.Value, this.hd_idGruppo.Value, sessionManager.getUserAmmSession(), callback, null);
-
-                                                    string returnValue = this.hd_idCorrGlobUtente.Value + "_" + this.hd_idCorrGlobGruppoDest.Value;
-                                                    this.executeJS("<SCRIPT>alert('Operazione di spostamento utente eseguita correttamente.'); window.returnValue = '" + returnValue + "'; self.close();</SCRIPT>");
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // è l'unico utente del ruolo...
-                                    // verifica che il ruolo non abbia trasmissioni con work-flow
-                                    if (this.RuoloConTrasmissioni(this.hd_idCorrGlobGruppo.Value))
-                                    {
-                                        // ruolo con trasmissioni... avvisa l'amministratore di seguire un'altra procedura
-                                        string msg = "Attenzione,\\n\\ncon lo spostamento di " + this.lbl_utente.Text.Replace("<b>", "").Replace("</b>", "") + " il ruolo rimane senza utenti.\\n\\nTuttavia il ruolo presenta trasmissioni che necessitano ACCETTAZIONE,\\npertanto non è possibile lasciare il ruolo privo di utenti.\\n\\n\\nProcedere come segue:\\nselezionare il ruolo nel quale ora è inserito " + this.lbl_utente.Text.Replace("<b>", "").Replace("</b>", "") + ",\\neliminarlo da questo ruolo tramite il tasto \\'Gestione utenti\\',\\nquindi inserirlo nel nuovo ruolo di destinazione utilizzando sempre il tasto indicato.";
-                                        this.executeJS("<SCRIPT>alert('" + msg + "'); window.returnValue = 'N'; self.close();</SCRIPT>");
-                                    }
-                                    else
-                                    {
-                                        // elimina utente dal ruolo
-                                        if (this.EliminaUtenteInRuolo(this.hd_idPeople.Value, this.hd_idGruppo.Value))
-                                        {
-                                            // ripulisce l'AREA DI LAVORO
-                                            if (this.EliminaADLUtente(this.hd_idPeople.Value, this.hd_idCorrGlobGruppo.Value))
-                                            {
-                                                // inserisce l'utente nel nuovo ruolo
-                                                if (this.InserimentoUtente(this.hd_idPeople.Value, this.hd_idGruppoDest.Value))
-                                                {
-                                                    // inserisce trasm utente
-                                                    if (this.InsTrasmUtente(this.hd_idPeople.Value, this.hd_idCorrGlobGruppoDest.Value))
-                                                    {
-                                                        DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                                                        AsyncCallback callback = new AsyncCallback(CallBack);
-                                                        invalidaPassiCorrelati = new InvalidaPassiCorrelatiDelegate(InvalidaPassiCorrelati);
-                                                        invalidaPassiCorrelati.BeginInvoke(this.hd_idPeople.Value, this.hd_idGruppo.Value, sessionManager.getUserAmmSession(), callback, null);
-
-
-                                                        string returnValue = this.hd_idCorrGlobUtente.Value + "_" + this.hd_idCorrGlobGruppoDest.Value;
-                                                        this.executeJS("<SCRIPT>alert('Operazione di spostamento utente eseguita correttamente.'); window.returnValue = '" + returnValue + "'; self.close();</SCRIPT>");
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+						// verifica che l'utente non sia connesso a docspa
+						if(this.VerificaUtenteLoggato(this.hd_userid.Value,this.hd_idAmm.Value))
+						{
+							// verifica che non sia l'unico del ruolo
+							if(Convert.ToInt16(this.hd_countUtenti.Value)>1)
+							{
+								// NON è l'unico utente nel ruolo quindi lo elimina dal ruolo
+								if(this.EliminaUtenteInRuolo(this.hd_idPeople.Value,this.hd_idGruppo.Value))
+								{
+									// ripulisce l'AREA DI LAVORO
+									if(this.EliminaADLUtente(this.hd_idPeople.Value,this.hd_idCorrGlobGruppo.Value))
+									{
+										// inserisce l'utente nel nuovo ruolo
+										if(this.InserimentoUtente(this.hd_idPeople.Value,this.hd_idGruppoDest.Value))
+										{
+											// inserisce trasm utente
+											if(this.InsTrasmUtente(this.hd_idPeople.Value,this.hd_idCorrGlobGruppoDest.Value))
+											{
+                                                InvalidaPassiCorrelati();
+                                                string returnValue = this.hd_idCorrGlobUtente.Value + "_" + this.hd_idCorrGlobGruppoDest.Value;
+                                                this.executeJS("<SCRIPT>alert('Operazione di spostamento utente eseguita correttamente.'); window.returnValue = '" + returnValue + "'; self.close();</SCRIPT>");
+											}
+										}	
+									}
+								}
+							}
+							else
+							{
+								// è l'unico utente del ruolo...
+								// verifica che il ruolo non abbia trasmissioni con work-flow
+								if(this.RuoloConTrasmissioni(this.hd_idCorrGlobGruppo.Value))
+								{
+									// ruolo con trasmissioni... avvisa l'amministratore di seguire un'altra procedura
+									string msg = "Attenzione,\\n\\ncon lo spostamento di " + this.lbl_utente.Text.Replace("<b>","").Replace("</b>","") + " il ruolo rimane senza utenti.\\n\\nTuttavia il ruolo presenta trasmissioni che necessitano ACCETTAZIONE,\\npertanto non è possibile lasciare il ruolo privo di utenti.\\n\\n\\nProcedere come segue:\\nselezionare il ruolo nel quale ora è inserito " + this.lbl_utente.Text.Replace("<b>","").Replace("</b>","") + ",\\neliminarlo da questo ruolo tramite il tasto \\'Gestione utenti\\',\\nquindi inserirlo nel nuovo ruolo di destinazione utilizzando sempre il tasto indicato.";
+									this.executeJS("<SCRIPT>alert('"+msg+"'); window.returnValue = 'N'; self.close();</SCRIPT>");						
+								}
+								else
+								{
+									// elimina utente dal ruolo
+									if(this.EliminaUtenteInRuolo(this.hd_idPeople.Value,this.hd_idGruppo.Value))
+									{
+										// ripulisce l'AREA DI LAVORO
+										if(this.EliminaADLUtente(this.hd_idPeople.Value,this.hd_idCorrGlobGruppo.Value))
+										{								
+											// inserisce l'utente nel nuovo ruolo
+											if(this.InserimentoUtente(this.hd_idPeople.Value,this.hd_idGruppoDest.Value))
+											{
+												// inserisce trasm utente
+												if(this.InsTrasmUtente(this.hd_idPeople.Value,this.hd_idCorrGlobGruppoDest.Value))
+												{
+                                                    InvalidaPassiCorrelati();
+													this.executeJS("<SCRIPT>alert('Operazione di spostamento utente eseguita correttamente.'); window.returnValue = 'Y'; self.close();</SCRIPT>");
+												}
+											}	
+										}
+									}
+								}
+							}
 						}
 					}
 					else
@@ -245,27 +220,40 @@ namespace Amministrazione.Gestione_Organigramma
 			}
 		}
 
-        private void InvalidaPassiCorrelati(string idPeople, string idRuolo, DocsPAWA.DocsPaWR.InfoUtenteAmministratore infoAmm)
+        private void InvalidaPassiCorrelati()
         {
             DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
             wws.Timeout = System.Threading.Timeout.Infinite;
-            string tipoTick = "U";
-            if (Convert.ToInt16(this.hd_countUtenti.Value) == 1)
+            List<DocsPaWR.ProcessoFirma> processiCoinvolti_R = (Session["processiCoinvolti_R"] != null && ((int)Session["processiCoinvolti_R"]) > 0 ? wws.GetProcessiDiFirmaByRuoloTitolare(this.hd_idGruppo.Value).ToList() : new List<DocsPaWR.ProcessoFirma>());
+            List<DocsPaWR.IstanzaProcessoDiFirma> istazaProcessiCoinvolti_R = (Session["istazaProcessiCoinvolti_R"] != null && ((int)Session["processiCoinvolti_R"]) > 0 ? wws.GetIstanzeProcessiDiFirmaByRuoloCoinvolto(this.hd_idGruppo.Value).ToList() : new List<DocsPaWR.IstanzaProcessoDiFirma>());
+
+            if (processiCoinvolti_R.Count > 0)
             {
-                idPeople = string.Empty;
-                tipoTick = "R";
+                List<string> idPassi = new List<string>();
+                foreach (DocsPaWR.ProcessoFirma processo in processiCoinvolti_R)
+                {
+                    foreach (DocsPaWR.PassoFirma passo in processo.passi)
+                    {
+                        if (!idPassi.Contains(passo.idPasso))
+                        {
+                            idPassi.Add(passo.idPasso);
+                        }
+                    }
+                }
+
+                wws.TickPasso(idPassi.ToArray(), "R");
+                Session["processiCoinvolti_R"] = null;
             }
-            wws.InvalidaPassiCorrelatiTitolare(idRuolo, idPeople, tipoTick, infoAmm);
+
+            if (istazaProcessiCoinvolti_R.Count > 0)
+            {
+                DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
+                wws.TickIstanze(istazaProcessiCoinvolti_R.ToArray(), "R", sessionManager.getUserAmmSession());
+                Session["istazaProcessiCoinvolti_R"] = null;
+            }
         }
 
-        public delegate void InvalidaPassiCorrelatiDelegate(string idPeople, string idGruppo, DocsPAWA.DocsPaWR.InfoUtenteAmministratore infoAmm);
-
-
-        private void CallBack(IAsyncResult result)
-        {
-            invalidaPassiCorrelati.EndInvoke(result);
-        }
-        private DocsPAWA.DocsPaWR.OrgUtente DatiUtente(string idCorrGlob)
+		private DocsPAWA.DocsPaWR.OrgUtente DatiUtente(string idCorrGlob)
 		{			
 			Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
 			theManager.DatiUtente(idCorrGlob);
@@ -295,113 +283,7 @@ namespace Amministrazione.Gestione_Organigramma
 			return result;
 		}
 
-        private bool VerificaPresenzaProcessiFirma(string idPeople, string idGruppo)
-        {
-            bool result = false;
-            //Verifico che non ci siano processi attivi
-            string idUtente;
-            string idRuolo = Request.QueryString["idGruppo"].ToString();
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            int countProcessiCoinvolti = 0;
-            int countIstazaProcessiCoinvolti = 0;
-            string tipoTitolare = string.Empty;
-            // verifica che non sia l'unico del ruolo
-            idUtente = idPeople;
-            countProcessiCoinvolti = ws.GetCountProcessiDiFirmaByTitolare(idRuolo, idUtente);
-            countIstazaProcessiCoinvolti = ws.GetCountIstanzaProcessiDiFirmaByTitolare(idRuolo, idUtente);
-
-            if (countProcessiCoinvolti > 0 || countIstazaProcessiCoinvolti > 0)
-            {
-                string msg = "Attenzione, poichè l\\'utente in modifica è coinvolto in processi di firma o processi di firma avviati, per effettuare lo spostamento è consigliato procedere come segue:\\n\\nutilizzare il tasto \\'Gestione utenti\\' presente nel dettaglio del ruolo per procedere con l\\'interruzione o la sostituzione dell\\'utente nei processi coinvolti.";
-                this.executeJS("<SCRIPT>alert('" + msg + "'); window.returnValue = 'N'; self.close();</SCRIPT>");
-                return true;
-            }
-            return result;
-        }
-
-        private void GestRitornoAvvisoLF(string valore)
-        {
-            try
-            {
-                switch (valore)
-                {
-                    case "Y":
-                        // verifica che non sia l'unico del ruolo
-                        if (Convert.ToInt16(this.hd_countUtenti.Value) > 1)
-                        {
-                            // NON è l'unico utente nel ruolo quindi lo elimina dal ruolo
-                            if (this.EliminaUtenteInRuolo(this.hd_idPeople.Value, this.hd_idGruppo.Value))
-                            {
-                                // ripulisce l'AREA DI LAVORO
-                                if (this.EliminaADLUtente(this.hd_idPeople.Value, this.hd_idCorrGlobGruppo.Value))
-                                {
-                                    // inserisce l'utente nel nuovo ruolo
-                                    if (this.InserimentoUtente(this.hd_idPeople.Value, this.hd_idGruppoDest.Value))
-                                    {
-                                        // inserisce trasm utente
-                                        if (this.InsTrasmUtente(this.hd_idPeople.Value, this.hd_idCorrGlobGruppoDest.Value))
-                                        {
-                                            DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                                            AsyncCallback callback = new AsyncCallback(CallBack);
-                                            invalidaPassiCorrelati = new InvalidaPassiCorrelatiDelegate(InvalidaPassiCorrelati);
-                                            invalidaPassiCorrelati.BeginInvoke(this.hd_idPeople.Value, this.hd_idGruppo.Value, sessionManager.getUserAmmSession(), callback, null);
-
-                                            string returnValue = this.hd_idCorrGlobUtente.Value + "_" + this.hd_idCorrGlobGruppoDest.Value;
-                                            this.executeJS("<SCRIPT>alert('Operazione di spostamento utente eseguita correttamente.'); window.returnValue = '" + returnValue + "'; self.close();</SCRIPT>");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // è l'unico utente del ruolo...
-                            // verifica che il ruolo non abbia trasmissioni con work-flow
-                            if (this.RuoloConTrasmissioni(this.hd_idCorrGlobGruppo.Value))
-                            {
-                                // ruolo con trasmissioni... avvisa l'amministratore di seguire un'altra procedura
-                                string msg = "Attenzione,\\n\\ncon lo spostamento di " + this.lbl_utente.Text.Replace("<b>", "").Replace("</b>", "") + " il ruolo rimane senza utenti.\\n\\nTuttavia il ruolo presenta trasmissioni che necessitano ACCETTAZIONE,\\npertanto non è possibile lasciare il ruolo privo di utenti.\\n\\n\\nProcedere come segue:\\nselezionare il ruolo nel quale ora è inserito " + this.lbl_utente.Text.Replace("<b>", "").Replace("</b>", "") + ",\\neliminarlo da questo ruolo tramite il tasto \\'Gestione utenti\\',\\nquindi inserirlo nel nuovo ruolo di destinazione utilizzando sempre il tasto indicato.";
-                                this.executeJS("<SCRIPT>alert('" + msg + "'); window.returnValue = 'N'; self.close();</SCRIPT>");
-                            }
-                            else
-                            {
-                                // elimina utente dal ruolo
-                                if (this.EliminaUtenteInRuolo(this.hd_idPeople.Value, this.hd_idGruppo.Value))
-                                {
-                                    // ripulisce l'AREA DI LAVORO
-                                    if (this.EliminaADLUtente(this.hd_idPeople.Value, this.hd_idCorrGlobGruppo.Value))
-                                    {
-                                        // inserisce l'utente nel nuovo ruolo
-                                        if (this.InserimentoUtente(this.hd_idPeople.Value, this.hd_idGruppoDest.Value))
-                                        {
-                                            // inserisce trasm utente
-                                            if (this.InsTrasmUtente(this.hd_idPeople.Value, this.hd_idCorrGlobGruppoDest.Value))
-                                            {
-                                                DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                                                AsyncCallback callback = new AsyncCallback(CallBack);
-                                                invalidaPassiCorrelati = new InvalidaPassiCorrelatiDelegate(InvalidaPassiCorrelati);
-                                                invalidaPassiCorrelati.BeginInvoke(this.hd_idPeople.Value, this.hd_idGruppo.Value, sessionManager.getUserAmmSession(), callback, null);
-
-                                                this.executeJS("<SCRIPT>alert('Operazione di spostamento utente eseguita correttamente.'); window.returnValue = 'Y'; self.close();</SCRIPT>");
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        break;
-
-                    case "N":
-                        break;
-                }
-                this.hd_returnValueModalLF.Value = "";
-            }
-            catch
-            {
-            }
-        }
-
-        private bool EliminaUtenteInRuolo(string idPeople, string idGruppo)
+		private bool EliminaUtenteInRuolo(string idPeople, string idGruppo)
 		{
 			bool result = false;
             string idAmm = AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "3");
@@ -581,5 +463,5 @@ namespace Amministrazione.Gestione_Organigramma
 
 			}
 		}
-    }
+	}
 }

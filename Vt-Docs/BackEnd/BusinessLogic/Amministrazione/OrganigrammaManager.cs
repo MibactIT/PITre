@@ -1317,7 +1317,11 @@ namespace BusinessLogic.Amministrazione
         public static DocsPaVO.amministrazione.EsitoOperazione AmmInsTipoFunzioni(DocsPaVO.amministrazione.OrgTipoFunzione[] listaFunzioni)
         {
             DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
-
+            if (listaFunzioni == null || listaFunzioni.Count() == 0)
+            {
+                esito.Descrizione = "Lista funzioni vuota";
+                return esito;
+            }
             // Creazione del contesto transazionale
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
@@ -1655,97 +1659,6 @@ namespace BusinessLogic.Amministrazione
                 esito.Descrizione = "si è verificato un errore: rifiuto delle trasmissioni a ruolo che prevedono accettazione";
             }
             dbAmm = null;
-
-            return esito;
-        }
-
-
-        public static DocsPaVO.amministrazione.EsitoOperazione AmmAccettaTrasmConWFUtente(string idPeople, string idCorrGlobaliRuolo)
-        {
-            DocsPaDB.Query_DocsPAWS.Trasmissione trasmDB = new DocsPaDB.Query_DocsPAWS.Trasmissione();
-            DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
-            string mode;
-            string idObj;
-            string msg;
-
-            Ruolo role = BusinessLogic.Utenti.UserManager.getRuoloById(idCorrGlobaliRuolo);
-            Utente utente = BusinessLogic.Utenti.UserManager.getUtenteById(idPeople);
-            DocsPaVO.utente.InfoUtente infoUtente = BusinessLogic.Utenti.UserManager.GetInfoUtente(utente, role);
-            string noteAccettazione = "Trasmissione accettata automaticamente in seguito a rimozione utente dal ruolo";
-
-            List<DocsPaVO.trasmissione.Trasmissione> trasmissioni = trasmDB.GetListTrasmissioniPendentiUtente(idPeople, idCorrGlobaliRuolo);
-            DocsPaVO.trasmissione.TrasmissioneUtente trasmUtente;
-            foreach (DocsPaVO.trasmissione.Trasmissione trasm in trasmissioni)
-            {
-                if (!BusinessLogic.Trasmissioni.ExecTrasmManager.isTrasmDocInCestino(trasm.systemId))
-                {
-                    trasmUtente = (trasm.trasmissioniSingole[0] as DocsPaVO.trasmissione.TrasmissioneSingola).trasmissioneUtente[0] as DocsPaVO.trasmissione.TrasmissioneUtente;
-                    trasmUtente.noteAccettazione = noteAccettazione;
-                    if (!BusinessLogic.Trasmissioni.ExecTrasmManager.executeAccRifMethod(trasmUtente, trasm.systemId, role, infoUtente, out msg, out mode, out idObj))
-                    {
-                        esito.Codice = 1;
-                        esito.Descrizione = "si è verificato un errore durante l'accettazione delle trasmissioni a ruolo che prevedono accettazione";
-                    }
-                }
-            }
-
-            return esito;
-        }
-
-        public static DocsPaVO.amministrazione.EsitoOperazione AmmAccettaTrasmConWFRuolo(string idCorrGlobaliRuolo)
-        {
-            DocsPaDB.Query_DocsPAWS.Trasmissione trasmDB = new DocsPaDB.Query_DocsPAWS.Trasmissione();
-            DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
-            string mode;
-            string idObj;
-            string msg;
-
-            Ruolo role = BusinessLogic.Utenti.UserManager.getRuoloById(idCorrGlobaliRuolo);
-            string noteAccettazione = "Trasmissione accettata automaticamente per mancanza di utenti nel ruolo";
-
-            List<DocsPaVO.trasmissione.Trasmissione> trasmissioni = trasmDB.GetListTrasmissioniPendentiRuolo(idCorrGlobaliRuolo);
-            Utente utente;
-            DocsPaVO.utente.InfoUtente infoUtente;
-            foreach (DocsPaVO.trasmissione.Trasmissione trasm in trasmissioni)
-            {
-                foreach (DocsPaVO.trasmissione.TrasmissioneSingola singleTrasm in trasm.trasmissioniSingole)
-                {
-                    // Se la ragione di trasmissione prevede accettazione (Workflow), viene verificato di che tipo di trasmissione
-                    // si tratta (Singola o Tutti) e si procede con le accettazioni
-                    if (singleTrasm.ragione.tipo.ToUpper().Equals("W"))
-                    {
-                        switch (singleTrasm.tipoTrasm.ToUpper())
-                        {
-                            case "S":   // Singola
-                                // Se la trasmissione singola non è già stata accettata, si procede con l'accettazione
-                                DocsPaVO.trasmissione.TrasmissioneUtente trasmUtente = singleTrasm.trasmissioneUtente[0] as DocsPaVO.trasmissione.TrasmissioneUtente;
-                                trasmUtente.noteAccettazione = noteAccettazione;
-                                utente = BusinessLogic.Utenti.UserManager.getUtenteById(trasmUtente.utente.idPeople);
-                                infoUtente = BusinessLogic.Utenti.UserManager.GetInfoUtente(utente, role);
-                                if(!BusinessLogic.Trasmissioni.ExecTrasmManager.executeAccRifMethod(trasmUtente, trasm.systemId, role, infoUtente, out msg, out mode, out idObj))
-                                {
-                                    esito.Codice = 1;
-                                    esito.Descrizione = "si è verificato un errore durante l'accettazione delle trasmissioni a ruolo che prevedono accettazione";
-                                }
-                                break;
-                            case "T":   // Tutti
-                                // Se la trasmissione non è già stata accettata, si procede con l'accettazione
-                                foreach (DocsPaVO.trasmissione.TrasmissioneUtente tu in singleTrasm.trasmissioneUtente)
-                                {
-                                    utente = BusinessLogic.Utenti.UserManager.getUtenteById(tu.utente.idPeople);
-                                    infoUtente = BusinessLogic.Utenti.UserManager.GetInfoUtente(utente, role);
-                                    tu.noteAccettazione = noteAccettazione;
-                                    if(!BusinessLogic.Trasmissioni.ExecTrasmManager.executeAccRifMethod(tu, trasm.systemId, role, infoUtente, out msg, out mode, out idObj))
-                                    {
-                                        esito.Codice = 1;
-                                        esito.Descrizione = "si è verificato un errore durante l'accettazione delle trasmissioni a ruolo che prevedono accettazione";
-                                    }
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
 
             return esito;
         }
@@ -2682,7 +2595,8 @@ namespace BusinessLogic.Amministrazione
                         OrgRuolo newRuolo = new OrgRuolo();
 
                         //Valorizzo i campi
-                        UnitaOrganizzativa uoPadre = (UnitaOrganizzativa)Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 1).ToUpper(), infoUtente);
+                        var c = Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 1).ToUpper(), DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
+                        UnitaOrganizzativa uoPadre = (UnitaOrganizzativa)c;// Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 1).ToUpper(), infoUtente);
                         if (uoPadre != null)
                             newRuolo.IDUo = uoPadre.systemId;
 
@@ -2749,13 +2663,15 @@ namespace BusinessLogic.Amministrazione
                         infoUtente.idAmministrazione = idAmm;
 
                         //Recupero l'idCorrGlobale della UO padre
-                        UnitaOrganizzativa uoPadre = (UnitaOrganizzativa)Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 1).ToUpper(), infoUtente);
+                        var _tempFiltroUOPadre = Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 1).ToUpper(), DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
+                        UnitaOrganizzativa uoPadre = (UnitaOrganizzativa)_tempFiltroUOPadre;// Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 1).ToUpper(), infoUtente);
                         string idUo = string.Empty;
                         if (uoPadre != null)
                             idUo = uoPadre.systemId;
 
                         //Recupero l'idCorrGlobale del ruolo
-                        Ruolo ruolo = (Ruolo)Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), infoUtente);
+                        var _tempFiltroRuolo = Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
+                        Ruolo ruolo = (Ruolo)_tempFiltroRuolo;// Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), infoUtente);
                         string idCorrGlobRuolo = string.Empty;
                         if (ruolo != null)
                             idCorrGlobRuolo = ruolo.systemId;
@@ -2832,7 +2748,8 @@ namespace BusinessLogic.Amministrazione
                         infoUtente.idAmministrazione = idAmm;
 
                         //Recupero l'idCorrGlobale del ruolo
-                        Ruolo ruolo = (Ruolo)Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), infoUtente);
+                        var _tempFiltroRuolo = Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
+                        Ruolo ruolo = (Ruolo)_tempFiltroRuolo;// Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), infoUtente);
                         string idCorrGlobRuolo = string.Empty;
                         if (ruolo != null)
                             idCorrGlobRuolo = ruolo.systemId;
@@ -2975,7 +2892,8 @@ namespace BusinessLogic.Amministrazione
                         infoUtente.idAmministrazione = idAmm;
 
                         //Recupero il ruolo a cui associare gli utenti
-                        Ruolo ruolo = (Ruolo)Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), infoUtente);
+                        var _tempFiltroRuolo = Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
+                        Ruolo ruolo = (Ruolo)_tempFiltroRuolo;// Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderRuoli, 3).ToUpper(), infoUtente);
                         string idGruppo = string.Empty;
                         if (ruolo != null)
                             idGruppo = ruolo.idGruppo;
@@ -2989,7 +2907,8 @@ namespace BusinessLogic.Amministrazione
                             for (int i = 0; i < codiciUtente.Length; i++)
                             {
                                 //Recupero l'utente da associare
-                                Utente utente = (Utente)Utenti.UserManager.getCorrispondenteByCodRubrica(codiciUtente[i].ToUpper().TrimStart().TrimEnd(), infoUtente);
+                                var _tempFiltroUtente = Utenti.UserManager.getCorrispondenteByCodRubrica(codiciUtente[i].ToUpper().TrimStart().TrimEnd(), DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
+                                Utente utente = (Utente)_tempFiltroUtente;// Utenti.UserManager.getCorrispondenteByCodRubrica(codiciUtente[i].ToUpper().TrimStart().TrimEnd(), infoUtente);
                                 string idPeople = string.Empty;
                                 if (utente != null)
                                     idPeople = utente.idPeople;
@@ -3042,13 +2961,15 @@ namespace BusinessLogic.Amministrazione
                         infoUtente.idAmministrazione = idAmm;
 
                         //Recupero l'utente
-                        Utente utente = (Utente)Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderUtenti, 0).ToUpper(), infoUtente);
+                        var _tempFiltroUtente = Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderUtenti, 0).ToUpper(), DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
+                        Utente utente = (Utente)_tempFiltroUtente;// Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderUtenti, 0).ToUpper(), infoUtente);
                         string idPeople = string.Empty;
                         if (utente != null)
                             idPeople = utente.idPeople;
 
                         //Recupero il ruolo predefinito da associare all'utente
-                        Ruolo ruolo = (Ruolo)Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderUtenti, 12).ToUpper(), infoUtente);
+                        var _tempFiltroRuolo = Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderUtenti, 12).ToUpper(), DocsPaVO.addressbook.TipoUtente.INTERNO, infoUtente);
+                        Ruolo ruolo = (Ruolo)_tempFiltroRuolo;// Utenti.UserManager.getCorrispondenteByCodRubrica(get_string(xlsReaderUtenti, 12).ToUpper(), infoUtente);
                         string idGruppo = string.Empty;
                         if (ruolo != null)
                             idGruppo = ruolo.idGruppo;
@@ -3261,11 +3182,7 @@ namespace BusinessLogic.Amministrazione
                     // tutti verranno accettate da tutti gli utenti attivi
                     try
                     {
-                        string cleanToDoList_SP = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ENABLED_CLEAN_TODOLIST_SP");
-                        if(!string.IsNullOrEmpty(cleanToDoList_SP) && cleanToDoList_SP.Equals("1"))
-                            response = CleanToDoList_SP(request);
-                        else
-                            response = CleanToDoList(request);
+                        response = CleanToDoList(request);
                     }
                     catch (Exception e)
                     {
@@ -3461,7 +3378,7 @@ namespace BusinessLogic.Amministrazione
                 if (haveDeleghe)
                 {
                     response.Result.Codice = -1;
-                    response.Result.Descrizione = "Almeno un utente nel ruolo ha delle sostituzioni attive. E' necessario revocare le sostituzioni per poter proseguire.";
+                    response.Result.Descrizione = "Almeno un utente nel ruolo ha delle deleghe attive. E' necessario revocare le deleghe per poter proseguire.";
 
                 }
 
@@ -3474,32 +3391,6 @@ namespace BusinessLogic.Amministrazione
                 if (haveTransm)
                     response.MessageToShowToAdministrator = "Attenzione! Sono state rilevate delle trasmissioni pendenti indirizzate al ruolo da modificare. Cliccando su OK, queste trasmissioni verranno accettate massivamente. Cliccare su Annulla se si desidera pulire le liste delle cose da fare manualmente.";
             }
-
-            return response;
-        }
-
-        /// <summary>
-        /// Metodo per la pulizia della to do list mediante Stored Procedure
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        private static SaveChangesToRoleResponse CleanToDoList_SP(SaveChangesToRoleRequest request)
-        {
-            // Costruzione della response a partire dalla request
-            SaveChangesToRoleResponse response = new SaveChangesToRoleResponse(request);
-
-            // Esito dell'operazione
-            EsitoOperazione result = new EsitoOperazione();
-            string note = "Trasmissione accettata automaticamente in seguito a modifica del ruolo";
-
-            result = BusinessLogic.Trasmissioni.TrasmManager.AccettazioneMassivaInTdl_SP(request.ModifiedRole.IDGruppo, request.ModifiedRole.IDCorrGlobale, note);
-
-            // Impostazione del codice di ritorno e aggiornamento della descrizione
-            if (response.Result.Codice == 0)
-                response.Result.Codice = result.Codice;
-
-            if (!String.IsNullOrEmpty(result.Descrizione))
-                response.Result.Descrizione += "\n" + result.Descrizione;
 
             return response;
         }

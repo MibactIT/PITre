@@ -368,13 +368,11 @@ namespace DocsPAWA.popup
                                 {
                                     foreach (DocsPAWA.DocsPaWR.UtentiConNotificaTrasm utNot in mittDest.UTENTI_NOTIFICA)
                                     {
-                                        statoChk = this.utenteSelezionato(utNot.ID_PEOPLE, Convert.ToString(mittDest.ID_CORR_GLOBALI));
-                                        utNot.FLAG_NOTIFICA = statoChk;
-                                        //if (utNot.FLAG_NOTIFICA != "1")
-                                        //{
-                                        //    statoChk = this.utenteSelezionato(utNot.ID_PEOPLE, Convert.ToString(mittDest.ID_CORR_GLOBALI));
-                                        //    utNot.FLAG_NOTIFICA = statoChk;
-                                        //}
+                                        if (utNot.FLAG_NOTIFICA != "1")
+                                        {
+                                            statoChk = this.utenteSelezionato(utNot.ID_PEOPLE, Convert.ToString(mittDest.ID_CORR_GLOBALI));
+                                            utNot.FLAG_NOTIFICA = statoChk;
+                                        }
                                     }
                                 }
                             }

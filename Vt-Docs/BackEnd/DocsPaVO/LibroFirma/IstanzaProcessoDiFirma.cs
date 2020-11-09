@@ -10,9 +10,7 @@ namespace DocsPaVO.LibroFirma
         IN_EXEC,
         STOPPED,
         CLOSED,
-        CLOSED_WITH_CUT,
-        IN_ERROR,
-        REPLAY
+        CLOSED_WITH_CUT
     }
 
     public class IstanzaProcessoDiFirma
@@ -39,16 +37,13 @@ namespace DocsPaVO.LibroFirma
         private DocsPaVO.utente.Utente _utenteProponente; //ID_UTENTE_PROPONENTE
         private string _descUtenteDelegato; //DESCRIZIONE DELL'UTENTE DELEGATO
         private int _numeroVersione; //NUM_VERSIONE
-        private OpzioniNotifica _notifiche;
+        private string _notifica_interrotto; //NOTIFICA_INTERROTTO
+        private string _notifica_concluso; //NOTIFICA_CONCLUSO
         private string _descrizione; //DESCRIZIONE
         private List<IstanzaPassoDiFirma> _istanzePassoDiFirma;
         private string _noteDiAvvio; //NOTE_AVVIO
         private string _motivoResingimento;
         private char _chaInterrotoDa; //CHA_INTERROTTO_DA
-        private string _descUtenteInterruzione; //DESCRIZIONE UTENTE CHE HA INTERROTTO IL PROCESSO
-        private string _descUtenteDelegatoInterruzione; //DESCRIZIONE UTENTE DELEGATO CHE HA INTERROTTO IL PROCESSO
-        private bool _isTroncato;
-        private bool _attivatoPerPassaggioStato = false; //ATTIVATO PER PASSAGGIO DI STATO
         #endregion
 
         #region public property
@@ -297,6 +292,47 @@ namespace DocsPaVO.LibroFirma
             set { _descUtenteDelegato = value; }
         }
 
+        /// <summary>
+        /// Richiesta notifica per interruzione
+        /// </summary>
+        public bool Notifica_interrotto
+        {
+            get 
+            {
+                bool retVal = false;
+                if (!string.IsNullOrEmpty(_notifica_interrotto))
+                {
+                    bool.TryParse(_notifica_interrotto, out retVal);
+                }
+
+                return retVal; 
+            }
+            set 
+            {
+                _notifica_interrotto = value.ToString(); 
+            }
+        }
+
+        /// <summary>
+        /// Richiesta notifica per conclusione
+        /// </summary>
+        public bool Notifica_concluso
+        {
+            get 
+            {
+                bool retVal = false;
+                if (!string.IsNullOrEmpty(_notifica_concluso))
+                {
+                    bool.TryParse(_notifica_concluso, out retVal);
+                }
+
+                return retVal; 
+            }
+            set 
+            {
+                _notifica_concluso = value.ToString(); 
+            }
+        }
 
         public List<IstanzaPassoDiFirma> istanzePassoDiFirma
         {
@@ -342,50 +378,6 @@ namespace DocsPaVO.LibroFirma
         {
             get { return _chaInterrotoDa; }
             set { _chaInterrotoDa = value; }
-        }
-
-        /// <summary>
-        /// Utente che ha interrotto l'istanza di processo
-        /// </summary>
-        public string DescUtenteInterruzione
-        {
-            get { return _descUtenteInterruzione; }
-            set { _descUtenteInterruzione = value; }
-        }
-
-        /// <summary>
-        /// Utente delegato che ha interrotto l'istanza di processo
-        /// </summary>
-        public string DescUtenteDelegatoInterruzione
-        {
-            get { return _descUtenteDelegatoInterruzione; }
-            set { _descUtenteDelegatoInterruzione = value; }
-        }
-
-        /// </summary>
-        public bool IsTroncato
-        {
-            get { return _isTroncato; }
-            set { _isTroncato = value; }
-        }
-
-        public bool AttivatoPerPassaggioStato
-        {
-            get
-            {
-                return _attivatoPerPassaggioStato;
-            }
-
-            set
-            {
-                _attivatoPerPassaggioStato = value;
-            }
-        }
-
-        public OpzioniNotifica Notifiche
-        {
-            get { return _notifiche; }
-            set { _notifiche = value; }
         }
         #endregion
     }

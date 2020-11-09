@@ -32,8 +32,6 @@ namespace DocsPaDB
                 case "ORACLE":
                     databaseProvider = new DocsPaDbManagement.Database.Oracle.Database(connectionString);
                     break;
-
-                                
             }
         }
 
@@ -74,6 +72,11 @@ namespace DocsPaDB
         public bool ExecuteQuery(out DataSet dataSet, string tableName, string command)
         {
             return databaseProvider.ExecuteQuery(out dataSet, tableName, command);
+        }
+
+        public bool ExecuteQueryNewConn(out DataSet dataSet, string tableName, string command)
+        {
+            return databaseProvider.ExecuteQueryNewConn(out dataSet, tableName, command);
         }
 
         public bool ExecuteQuery(DataSet dataSet, string command)

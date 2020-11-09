@@ -229,73 +229,59 @@ namespace BusinessLogic.interoperabilita
             settings.ProhibitDtd = false;
             XmlReader xreader = XmlTextReader.Create(path, settings);
             XmlDocument doc = new XmlDocument();
-            try
+            doc.Load(xreader);
+
+            //Se è presente il namespase valido con Xsd, altrimenti con DTD
+            if (string.IsNullOrEmpty(doc.DocumentElement.NamespaceURI))
             {
-                doc.Load(xreader);
+                LocalDtdResolver resolver = new LocalDtdResolver();
+                // Set the validation settings.
+                settings = new XmlReaderSettings();
+                settings.ProhibitDtd = false;
+                settings.ValidationType = ValidationType.DTD;
+                settings.XmlResolver = resolver;
 
-                //Se è presente il namespase valido con Xsd, altrimenti con DTD
-                if (string.IsNullOrEmpty(doc.DocumentElement.NamespaceURI))
+                XmlReader reader = XmlReader.Create(path, settings);
+
+                // Parse the file. 
+                try
                 {
-                    LocalDtdResolver resolver = new LocalDtdResolver();
-                    // Set the validation settings.
-                    settings = new XmlReaderSettings();
-                    settings.ProhibitDtd = false;
-                    settings.ValidationType = ValidationType.DTD;
-                    settings.XmlResolver = resolver;
-
-                    XmlReader reader = XmlReader.Create(path, settings);
-                    try
-                    {
-                        while (reader.Read()) ;
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("Errore nella validazione della segnatura " + ex.Message);
-                        result = false;
-                    }
-                    finally
-                    {
-                        reader.Close();
-                    }
+                    while (reader.Read()) ;
                 }
-                else
+                catch (Exception ex)
                 {
-                    XmlSchemaCollection myschema = new XmlSchemaCollection();
-                    XmlTextReader reader = null;
-
-                    //Creo XML reader
-                    //Incapsulo XML reader dentro Validiting reader
-                    reader = new XmlTextReader(path);
-                    XmlValidatingReader vReader = new XmlValidatingReader(reader);
-                    String filenameXsd = AppDomain.CurrentDomain.BaseDirectory + @"xml\segnatura.xsd";
-                    myschema.Add(null, filenameXsd);
-                    vReader.ValidationType = ValidationType.Schema;
-                    vReader.Schemas.Add(myschema);
-
-                    //Leggo il file
-                    //Se ci fossero errori viene chiamato l'handler
-                    try
-                    {
-                        while (vReader.Read()) ;
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("Errore nella validazione della segnatura " + ex.Message);
-                        result = false;
-                    }
-                    finally
-                    {
-                        reader.Close();
-                        vReader.Close();
-                    }
+                    logger.Error("Errore nella validazione della segnatura " + ex.Message);
+                    result = false;
                 }
             }
-            catch (Exception ex)
+            else
             {
-                logger.Error("Errore nella validazione della segnatura " + ex.Message);
-                result = false;
+                XmlSchemaCollection myschema = new XmlSchemaCollection();
+                XmlTextReader reader = null;
+
+                //Creo XML reader
+                //Incapsulo XML reader dentro Validiting reader
+                reader = new XmlTextReader(path);
+                XmlValidatingReader vReader = new XmlValidatingReader(reader);
+                String filenameXsd = AppDomain.CurrentDomain.BaseDirectory + @"xml\segnatura.xsd";
+                myschema.Add(null, filenameXsd);
+                vReader.ValidationType = ValidationType.Schema;
+                vReader.Schemas.Add(myschema);
+
+                //Leggo il file
+                //Se ci fossero errori viene chiamato l'handler
+                try
+                {
+                    while (vReader.Read()) ;
+
+                    reader.Close();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Errore nella validazione della segnatura " + ex.Message);
+                    result = false;
+                }
             }
-            xreader.Close();
             return result;
         }
 
@@ -521,7 +507,7 @@ namespace BusinessLogic.interoperabilita
                 if (listHistorySendDoc != null && listHistorySendDoc.Count > 0)
                 {
                     Object lastSendPec = (from record in listHistorySendDoc.ToArray()
-                                         where ((ElStoricoSpedizioni)record).Mail.ToLower().Equals(notifica.destinatario.ToLower()) && ((ElStoricoSpedizioni)record).Esito.Equals("Spedito")
+                                         where ((ElStoricoSpedizioni)record).Mail.Equals(notifica.destinatario) && ((ElStoricoSpedizioni)record).Esito.Equals("Spedito")
                                          select record).ToList().FirstOrDefault();
                     if (lastSendPec != null)
                     {
@@ -711,7 +697,7 @@ namespace BusinessLogic.interoperabilita
             //string istruzioni_utente = "Il documento è stato registrato in ingresso dall’Amministrazione ricevente e pertanto non occorre effettuare rispedizioni.";
             string istruzioni_utente = "Il documento è stato ricevuto dall’Amministrazione destinataria e pertanto non occorre effettuare rispedizioni.";
 
-            if (isDtdValid(xml_segnatura, messaggio))
+            if (isDtdValid(xml_segnatura))
             {   //Segnatura Valida procedo con gli altri controlli
 
                 //dato che segnatura è stato validato, deserializzarlo non dovrebbe dare problemi.
@@ -892,22 +878,17 @@ namespace BusinessLogic.interoperabilita
         /// Caso C) il formato della segnatura informatica non è conforme alla DTD di cui alla presente circolare ovvero alla sua versione più recente;
         /// </summary>
         /// <returns></returns>
-        bool isDtdValid(string segnaturaXml, Interoperabilità.CMMsg messaggio)
+        bool isDtdValid(string segnaturaXml)
         {
             try
             {
-
                 validaSegnatura valid = new validaSegnatura(segnaturaXml);
                 if (valid.ValidationErrorList.Count() == 0)
-                {
-                    //Verifica che non ci sono errori nel caricamento dell'xml
-                    if (!CheckErrorInLoadXml(messaggio))
-                        return false;
                     return true;
-                }
+
                 //Aggiunto per il passaggio dalla vecchia segnatura alla nuova (che prevede il CodiceRegistro)
-                //if (valid.ValidationErrorList.Count() == 1 && valid.ValidationErrorList[0].Contains("CodiceRegistro"))
-                //    return true;
+                if (valid.ValidationErrorList.Count() == 1 && valid.ValidationErrorList[0].Contains("CodiceRegistro"))
+                    return true;
 
                 foreach (string ve in valid.ValidationErrorList)
                     logger.DebugFormat("Errori durante la validazione di segnatura XML {0}", ve);
@@ -920,57 +901,6 @@ namespace BusinessLogic.interoperabilita
             }
             
             return false;
-        }
-
-        bool CheckErrorInLoadXml(Interoperabilità.CMMsg messaggio)
-        {
-            bool result = true;
-
-            try
-            {
-                foreach (CMAttachment a in messaggio.attachments)
-                {
-                    if (a.name.ToLower().Equals("segnatura.xml"))
-                    {
-                        // Controllo encoding
-                        XmlDocument doc = new XmlDocument();
-                        InteropResolver my = new InteropResolver();
-                        System.IO.MemoryStream ms = new System.IO.MemoryStream(a._data);
-                        XmlTextReader xtr = new XmlTextReader(ms);
-                        xtr.WhitespaceHandling = WhitespaceHandling.None;
-                        XmlValidatingReader xvr = new XmlValidatingReader(xtr);
-                        xvr.ValidationType = System.Xml.ValidationType.Schema;
-                        xvr.EntityHandling = System.Xml.EntityHandling.ExpandCharEntities;
-                        xvr.XmlResolver = my;
-                        try
-                        {
-                            doc.Load(xvr);
-                        }
-                        catch (System.Xml.XmlException e)
-                        {
-                            logger.Error("Eccezione CheckErrorInLoadXml:" + e.Message);
-                            logger.Debug("Errore CheckErrorInLoadXml stackTrace : " + e.StackTrace);
-                            result = false;
-                        }
-                        catch (Exception e)
-                        {
-                            logger.Error("Eccezione:" + e.Message);
-                        }
-                        finally
-                        {
-                            xvr.Close();
-                            xtr.Close();
-                        }
-                    }
-                        
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in checkEncoding: " + e.Message);
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -1008,6 +938,11 @@ namespace BusinessLogic.interoperabilita
                 foreach (object obj in sexml.Descrizione.Allegati)
                 {
                     segnatura.Documento allegatoSegnatura = obj as segnatura.Documento;
+                    if(string.IsNullOrEmpty(allegatoSegnatura.nome))
+                    {
+                        logger.Debug("il nome dell'allegato nella segnatura.xml non è specificato");
+                        return false;
+                    }
                     if (allegatoSegnatura != null)
                         lstAllegatiSegnatura.Add(allegatoSegnatura.nome.ToLower());
                 }
@@ -1068,11 +1003,6 @@ namespace BusinessLogic.interoperabilita
                 string fileExtension = ff.FileType(att._data).ToLower();
                 string extension = System.IO.Path.GetExtension(att.name).Replace(".", string.Empty);
                 bool isValid = fileExtension.ToLower().Contains(extension.ToLower());
-
-                //Per i file Zip, il validatore non riesce a distinguere uno zip da file office.
-                if (!isValid && extension.ToLower().Equals("zip") && fileExtension.ToLower().Equals("ooxml"))
-                    isValid = true;
-
                 if (!isValid)
                 {
                     logger.DebugFormat("Il controllo di formato sul documento principale da trovato differenze Riscontrato {0}  Atteso {1}", fileExtension, extension);

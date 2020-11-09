@@ -1,7 +1,6 @@
 using System;
 using System.Configuration;
 using log4net;
-using BusinessLogic.LibroFirma;
  
 namespace BusinessLogic.Documenti
 {
@@ -124,7 +123,7 @@ namespace BusinessLogic.Documenti
                 else
                 {
 
-                    if (statoCongelato && allegato.TypeAttachment != 2 && allegato.TypeAttachment != 3)
+                    if (statoCongelato)
                     {
                         // Controllo su stato congelato, solo se non si sta creando l'allegato nel repository context
                         DocumentConsolidation.CanExecuteAction(infoUtente,
@@ -155,9 +154,6 @@ namespace BusinessLogic.Documenti
                             putfile = "Y";
 
                         DocsPaDocumentale.Documentale.DocumentManager documentManager = new DocsPaDocumentale.Documentale.DocumentManager(infoUtente);
-                        //Se l'allegato non è una ricevuta controllo se il doc principale è in libro firma; se il doc principale è in libro firma non è possibile allegare
-                        if(allegato.TypeAttachment != 2 && allegato.TypeAttachment != 3 && LibroFirmaManager.IsModificaBloccataPerDocumentoPrincipaleInLF(allegato.docNumber, infoUtente.idAmministrazione))
-                            throw new Exception("Non è possibile creare l'allegato poichè il documento principale è in libro firma");
 
                         if (!documentManager.AddAttachment(allegato, putfile))
                             throw new Exception("Errore nell'inserimento dell'allegato nel documentale");

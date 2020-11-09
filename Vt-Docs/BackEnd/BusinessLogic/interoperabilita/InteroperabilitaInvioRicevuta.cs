@@ -8,7 +8,6 @@ using System.Data;
 using DocsPaUtils.Security;
 using log4net;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BusinessLogic.Interoperabilità
 {
@@ -223,7 +222,7 @@ namespace BusinessLogic.Interoperabilità
                 }
 
                 //invio mail
-                mailMitt = getMailAddress(qco, schedaDoc.interop, idProfile);
+                mailMitt = getMailAddress(qco, schedaDoc.interop);
                 if (string.IsNullOrEmpty(mailMitt))
                 {
                     messaggioErrore = "Il Mittente non ha associata una mail.";
@@ -337,7 +336,6 @@ namespace BusinessLogic.Interoperabilità
                 //costruzione dell'oggetto per la richiesta mittente
                 qco.codiceRubrica = mittRow["VAR_COD_RUBRICA"].ToString();
                 qco.idAmministrazione = mittRow["ID_AMM"].ToString();
-                qco.systemId = mittRow["SYSTEM_ID"].ToString();
                 if (mittRow["CHA_TIPO_IE"].ToString().Equals("I"))
                 {
                     qco.tipoUtente = DocsPaVO.addressbook.TipoUtente.INTERNO;
@@ -417,10 +415,6 @@ namespace BusinessLogic.Interoperabilità
                 codiceAOO.InnerText = reg.codRegistro;
                 identificatore.AppendChild(codiceAOO);
 
-                XmlElement codiceRegistro = xdoc.CreateElement("CodiceRegistro");
-                codiceRegistro.InnerText = reg.codRegistro;
-                identificatore.AppendChild(codiceRegistro);
-
                 XmlElement numeroReg = xdoc.CreateElement("NumeroRegistrazione");
                 numeroReg.InnerText = numeroRegString;
                 identificatore.AppendChild(numeroReg);
@@ -441,10 +435,6 @@ namespace BusinessLogic.Interoperabilità
                 XmlElement codiceAOOMitt = xdoc.CreateElement("CodiceAOO");
                 codiceAOOMitt.InnerText = codiceAOOMittString;
                 identificatoreMitt.AppendChild(codiceAOOMitt);
-
-                XmlElement codiceRegistroMitt = xdoc.CreateElement("CodiceRegistro");
-                codiceRegistroMitt.InnerText = string.Empty;
-                identificatoreMitt.AppendChild(codiceRegistroMitt);
 
                 XmlElement numeroRegMitt = xdoc.CreateElement("NumeroRegistrazione");
                 numeroRegMitt.InnerText = numeroRegMittString;
@@ -565,11 +555,10 @@ namespace BusinessLogic.Interoperabilità
         /// <summary></summary>
         /// <param name="qco"></param>
         /// <returns></returns>
-        private static string getMailAddress(DocsPaVO.addressbook.QueryCorrispondente qco, string interop, string idProfile)
+        private static string getMailAddress(DocsPaVO.addressbook.QueryCorrispondente qco, string interop)
         {
             logger.Debug("getMailAddress");
             string mailMitt = "";
-            string mailMittProfile = "";
             System.Collections.ArrayList mittArr = new System.Collections.ArrayList();
             if (qco.tipoUtente == DocsPaVO.addressbook.TipoUtente.ESTERNO)
             {
@@ -591,20 +580,8 @@ namespace BusinessLogic.Interoperabilità
             }
             if (mittArr.Count > 0)
             {
-                DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
                 foreach (DocsPaVO.utente.Corrispondente c in mittArr)
                 {
-                    if (qco.tipoUtente == DocsPaVO.addressbook.TipoUtente.ESTERNO)
-                    {
-                        //Invio la ricevuta di protocollazione all'indirizzo Email da cui ho ricevuto il documento.
-                        mailMittProfile = doc.GetEmailAddressDocument(idProfile);
-                        if (!string.IsNullOrEmpty(mailMittProfile))
-                        {
-                            c.Emails = BusinessLogic.Utenti.addressBookManager.GetMailCorrispondente(c.systemId);
-                            if ((from e in c.Emails where e.Email.Equals(mailMittProfile) select e).FirstOrDefault() != null)
-                                c.email = mailMittProfile;
-                        }
-                    }
                     if (c.GetType() == typeof(DocsPaVO.utente.UnitaOrganizzativa))
                     {
                         logger.Debug("UO");

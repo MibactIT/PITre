@@ -548,14 +548,6 @@ namespace VtDocsWS.WebServices
                                 position = new labelPdf();
                             if (segnatura)
                             {
-                                if (schedaDoc.documentoPrincipale != null)
-                                {
-                                    position.orientamento = "orizzontale";
-                                    position.position = "15-30";
-                                    position.sel_color = "1";
-                                    position.sel_font = "1";
-                                    position.tipoLabel = true;
-                                }
                                 fileDocumento = BusinessLogic.Documenti.FileManager.getFileConSegnatura(fileRequest, schedaDoc, infoUtente, path, position, false);
                             }
                             else
@@ -570,9 +562,6 @@ namespace VtDocsWS.WebServices
                                     fileDocumento = BusinessLogic.Documenti.FileManager.getFileConSegnatura(fileRequest, schedaDoc, infoUtente, path, position, false);
                                 }
                             }
-                            // Forzatura per Integrazione.
-                            if (fileDocumento == null || string.IsNullOrEmpty(fileDocumento.nomeOriginale))
-                                fileDocumento = BusinessLogic.Documenti.FileManager.getFileFirmato(fileRequest, infoUtente, false);
 
                         }
                         result.Name = fileDocumento.nomeOriginale;
@@ -1603,8 +1592,8 @@ namespace VtDocsWS.WebServices
                 DocsPaVO.documento.FileRequest versioneCorrente = (DocsPaVO.documento.FileRequest)documento.documenti[0];
                 responseDocument.MainDocument = Utils.GetFile(versioneCorrente, getFile, infoUtente, false, false, string.Empty, null, false);
                 if (infoOnFile)
-                    responseDocument.MainDocument.Description += "§" + versioneCorrente.fileSize;
-
+                     responseDocument.MainDocument.Description += "§" + versioneCorrente.fileSize;
+                
             }
 
             //Prendi allegati
@@ -1619,8 +1608,8 @@ namespace VtDocsWS.WebServices
                         BusinessLogic.Documenti.AllegatiManager.getIsAllegatoPEC(tempAll.versionId) != "1")
                     {
                         tempAllPIS = Utils.GetFile(tempAll, getFile, infoUtente, false, false, string.Empty, null, false);
-                        if (infoOnFile)
-                            tempAllPIS.Description += "§" + tempAll.fileSize;
+                        if(infoOnFile)
+                        tempAllPIS.Description += "§" + tempAll.fileSize;
                         allegatiAlbo.Add(tempAllPIS);
 
                     }
@@ -2370,7 +2359,7 @@ namespace VtDocsWS.WebServices
                     Domain.Field campo = templatePis.Fields.FirstOrDefault(e => e.Name.ToUpperInvariant() == oggettoCustom.DESCRIZIONE.ToUpperInvariant());
 
                     // Impostazione del valore
-                    if (campo != null && (string.IsNullOrEmpty(campo.Value) || ((oggettoCustom.TIPO.DESCRIZIONE_TIPO).Equals("CasellaDiSelezione") && (campo.MultipleChoice == null || campo.MultipleChoice.Length == 0))))
+                    if (campo != null && string.IsNullOrEmpty(campo.Value) || ((oggettoCustom.TIPO.DESCRIZIONE_TIPO).Equals("CasellaDiSelezione") && (campo.MultipleChoice == null || campo.MultipleChoice.Length == 0)))
                     {
 
                         if (campo.Required && !search)
@@ -2474,9 +2463,8 @@ namespace VtDocsWS.WebServices
         public static DocsPaVO.ProfilazioneDinamica.Templates GetTemplateFromPisVisibility(Domain.Template templatePis, DocsPaVO.ProfilazioneDinamica.Templates template, bool search, string idRuolo, string DoP, string codeApplication, DocsPaVO.utente.InfoUtente infoUtente = null, Domain.File docPrincipale = null, string codeRegister = null, string codeRF = null, bool editDocument = false, string idSdi = null)
         {
             DocsPaVO.ProfilazioneDinamica.Templates result = new DocsPaVO.ProfilazioneDinamica.Templates();
-            byte[] fDocContent = null;
             // Modifica Elaborazione XML da PIS req.2
-            if (string.IsNullOrEmpty(template.PATH_XSD_ASSOCIATO) || editDocument)
+            if (string.IsNullOrEmpty(template.PATH_XSD_ASSOCIATO) || template.PATH_XSD_ASSOCIATO == "CIRC_MIBACT_BACHECA" || editDocument)
             {
                 if (templatePis == null || template == null)
                 {
@@ -2484,16 +2472,9 @@ namespace VtDocsWS.WebServices
                 }
                 else
                 {
-                    if (template != null)
-                    {
-                        result.DESCRIZIONE = template.DESCRIZIONE;
-                        result.SYSTEM_ID = template.SYSTEM_ID;
-                    }
-                    else
-                    {
-                        result.DESCRIZIONE = templatePis.Name;
-                        result.SYSTEM_ID = Int32.Parse(templatePis.Id);
-                    }
+                    result.DESCRIZIONE = templatePis.Name;
+                    result.SYSTEM_ID = Int32.Parse(templatePis.Id);
+
                     DocsPaVO.ProfilazioneDinamica.OggettoCustom[] oggettiCustom = (DocsPaVO.ProfilazioneDinamica.OggettoCustom[])
                                                            template.ELENCO_OGGETTI.ToArray(typeof(DocsPaVO.ProfilazioneDinamica.OggettoCustom));
                     DocsPaVO.ProfilazioneDinamica.AssDocFascRuoli[] dirittiOggetti = null;
@@ -2524,7 +2505,7 @@ namespace VtDocsWS.WebServices
 
                         }
                         // Impostazione del valore
-                        if (campo != null && string.IsNullOrEmpty(campo.Value) || (campo != null && (oggettoCustom.TIPO.DESCRIZIONE_TIPO).Equals("CasellaDiSelezione") && (campo.MultipleChoice == null || campo.MultipleChoice.Length == 0)))
+                        if (campo != null && string.IsNullOrEmpty(campo.Value) || ((oggettoCustom.TIPO.DESCRIZIONE_TIPO).Equals("CasellaDiSelezione") && (campo.MultipleChoice == null || campo.MultipleChoice.Length == 0)))
                         {
 
                             if (campo.Required && !search)
@@ -2679,7 +2660,6 @@ namespace VtDocsWS.WebServices
                         }
                         //docPrincipale.Content = fdoc.content;
                         //docPrincipale.Name = fdoc.name;
-                        fDocContent = fdoc.content;
 
                     }
                     result.DESCRIZIONE = template.DESCRIZIONE;
@@ -2688,18 +2668,7 @@ namespace VtDocsWS.WebServices
                         stringaXml = Encoding.UTF8.GetString(docPrincipale.Content);
 
                     stringaXml = RemoveUtf8ByteOrderMark(stringaXml);
-                    try
-                    {
-                        AssociazioneXMLperTemplate(ref template, templatePis, stringaXml, DoP, codeApplication, idRuolo, search, infoUtente, codeRegister, codeRF, idSdi);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("Eccezione in GetTemplateFromPisVisibility: " + ex.Message);
-                        //potrebbe capitare che la codifica dell'xml è utf-16
-                        stringaXml = System.Text.Encoding.Unicode.GetString(fDocContent);
-                        stringaXml = stringaXml.Trim();
-                        AssociazioneXMLperTemplate(ref template, templatePis, stringaXml, DoP, codeApplication, idRuolo, search, infoUtente, codeRegister, codeRF, idSdi);
-                    }
+                    AssociazioneXMLperTemplate(ref template, templatePis, stringaXml, DoP, codeApplication, idRuolo, search, infoUtente, codeRegister, codeRF, idSdi);
                     result = template;
                 }
 
@@ -2912,14 +2881,6 @@ namespace VtDocsWS.WebServices
                                 {
                                     valore = "";
                                 }
-                                else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_CLIENTE_1"))
-                                {
-                                    valore = "";
-                                }
-                                else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_PIVA_CLIENTE_1"))
-                                {
-                                    valore = "999";
-                                }
                                 else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_NOTE_VER_FIRMA_1"))
                                 {
                                     valore = "Verifica firma digitale effettuata da SDI, secondo le Specifiche tecniche operative delle Regole tecniche di cui all’allegato B del D.M. n. 55 del 3 aprile 2013 e ss.mm.ii.";
@@ -3083,82 +3044,6 @@ namespace VtDocsWS.WebServices
                                             {
                                                 throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
                                             }
-                                        }
-                                    }
-                                }
-                                #endregion
-                                #region Cliente Fattura elettronica attiva
-                                if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_CLIENTE_1"))
-                                {
-                                    if (string.IsNullOrEmpty(valore))
-                                    {
-                                        string mappingNome = "CessionarioCommittente>DatiAnagrafici>Anagrafica>Nome";
-                                        mappingXml = mappingNome.Split('>');
-                                        mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                        for (int i = 1; i < mappingXml.Length; i++)
-                                        {
-                                            mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                        }
-                                        valore = "";
-                                        try
-                                        {
-                                            XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                            valore = node.InnerXml; // valore dell'xml estratto
-                                        }
-                                        catch (Exception nodo)
-                                        {
-                                            notePerElaborazioneXML += "Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE + ". ";
-                                            if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                            {
-                                                throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
-                                            }
-                                        }
-
-                                        string mappingCognome = "CessionarioCommittente>DatiAnagrafici>Anagrafica>Cognome";
-                                        mappingXml = mappingCognome.Split('>');
-                                        mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                        for (int i = 1; i < mappingXml.Length; i++)
-                                        {
-                                            mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                        }
-                                        try
-                                        {
-                                            XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                            valore += (" " + node.InnerXml); // valore dell'xml estratto
-                                        }
-                                        catch (Exception nodo)
-                                        {
-                                            notePerElaborazioneXML += "Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE + ". ";
-                                            if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                            {
-                                                throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
-                                            }
-                                        }
-                                    }
-                                }
-                                #endregion
-                                #region Partita IVA CessionarioCommittente
-                                if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_PIVA_CLIENTE_1"))
-                                {
-                                    // CessionarioCommittente>DatiAnagrafici>CodiceFiscale
-                                    if( string.IsNullOrEmpty(valore) || valore =="999")
-                                    {
-                                        string mappingNome = "CessionarioCommittente>DatiAnagrafici>CodiceFiscale";
-                                        mappingXml = mappingNome.Split('>');
-                                        mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                        for (int i = 1; i < mappingXml.Length; i++)
-                                        {
-                                            mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                        }
-                                        try
-                                        {
-                                            XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                            valore = node.InnerXml; // valore dell'xml estratto
-                                        }
-                                        catch (Exception nodo)
-                                        {
-                                            notePerElaborazioneXML += "Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE + ". ";
-                                            
                                         }
                                     }
                                 }
@@ -3816,7 +3701,6 @@ namespace VtDocsWS.WebServices
                 throw new PisException("MISSING_PARAMETER");
             }
             bool isSysExt = false;
-            bool isUtenteAutomatico = false;
             //string idAmm = "";
             //if (!string.IsNullOrEmpty(request.CodeAdm))
             //{
@@ -3912,7 +3796,6 @@ namespace VtDocsWS.WebServices
 
                 // Procedura Nuova
                 utente = BusinessLogic.Utenti.UserManager.getUtente(request.UserName, Utils.GetIdAdmByCodeAdm(request.CodeAdm));
-                isUtenteAutomatico = IsUtenteAutomatico(utente);
             }
             else
             {
@@ -3981,19 +3864,16 @@ namespace VtDocsWS.WebServices
                         //    }
                         //    if (!ruoloOK) throw new PisException("ROLE_NO_EXIST");
                         //}
-                        //Se l'utente è automatico può operare con qualsiasi ruolo
-                        if (!isUtenteAutomatico)
+
+                        List<UserMinimalInfo> utentiinruolo = BusinessLogic.Utenti.UserManager.GetUsersInRoleMinimalInfo(ruolo.idGruppo);
+                        if (utentiinruolo != null && utentiinruolo.Count > 0)
                         {
-                            List<UserMinimalInfo> utentiinruolo = BusinessLogic.Utenti.UserManager.GetUsersInRoleMinimalInfo(ruolo.idGruppo);
-                            if (utentiinruolo != null && utentiinruolo.Count > 0)
+                            foreach (UserMinimalInfo umi in utentiinruolo)
                             {
-                                foreach (UserMinimalInfo umi in utentiinruolo)
-                                {
-                                    if (umi.SystemId == utente.idPeople) ruoloOK = true;
-                                }
+                                if (umi.SystemId == utente.idPeople) ruoloOK = true;
                             }
-                            if (!ruoloOK) throw new PisException("ROLE_NO_EXIST");
                         }
+                        if (!ruoloOK) throw new PisException("ROLE_NO_EXIST");
                     }
                 }
                 else
@@ -4039,17 +3919,6 @@ namespace VtDocsWS.WebServices
             result = infoUtente;
 
             return result;
-        }
-
-        private static bool IsUtenteAutomatico(Utente utente)
-        {
-            bool isAutomatico = false;
-
-            Utente utenteAutomatico = BusinessLogic.Utenti.UserManager.GetUtenteAutomatico(utente.idAmministrazione);
-            if (utenteAutomatico != null)
-                isAutomatico = utenteAutomatico.idPeople.Equals(utente.idPeople);
-
-            return isAutomatico;
         }
 
         public static DocsPaVO.rubrica.ParametriRicercaRubrica GetParametriRicercaRubricaFromPis(Domain.Filter[] filters, DocsPaVO.utente.InfoUtente infoUtente)
@@ -4366,7 +4235,6 @@ namespace VtDocsWS.WebServices
                         result.idRegistro = reg.systemId;
                     }
                 }
-
                 ArrayList mezziSpedizione = BusinessLogic.Amministrazione.MezziSpedizioneManager.ListaMezziSpedizione(infoUtente.idAmministrazione, true);
                 DocsPaVO.utente.Canale canaleLettera = null;
                 foreach (MezzoSpedizione m_spediz in mezziSpedizione)
@@ -4399,8 +4267,6 @@ namespace VtDocsWS.WebServices
                 {
                     result.canalePref = canaleLettera;
                 }
-
-
                 string indirizzo = "";
                 string citta = "";
                 string cap = "";
@@ -5439,14 +5305,6 @@ namespace VtDocsWS.WebServices
                             DocsPaVO.documento.labelPdf position = new labelPdf();
                             if (segnatura)
                             {
-                                if (schedaDoc.documentoPrincipale != null)
-                                {
-                                    position.orientamento = "orizzontale";
-                                    position.position = "15-30";
-                                    position.sel_color = "1";
-                                    position.sel_font = "1";
-                                    position.tipoLabel = true;
-                                }
                                 fileDocumento = BusinessLogic.Documenti.FileManager.getFileConSegnatura(fileRequest, schedaDoc, infoUtente, path, position, false);
                             }
                             else
@@ -6158,147 +6016,6 @@ namespace VtDocsWS.WebServices
 
 
             return docInProc;
-        }
-
-        public static Domain.FileFTPUploadInfo getDomFileFTPInfo(DocsPaVO.ExternalServices.FileFtpUpInfo input)
-        {
-            Domain.FileFTPUploadInfo retInfo = new Domain.FileFTPUploadInfo();
-            retInfo.IdQueue = input.IdQueue;
-            retInfo.IdDocument = input.IdDocument;
-            retInfo.CodeAdm = input.CodeAdm;
-            retInfo.Description = input.Description;
-            retInfo.ErrorMessage = input.ErrorMessage;
-            retInfo.Filename = input.FileName;
-            retInfo.FileSize = input.FileSize;
-            retInfo.FSPath = input.FSPath;
-            retInfo.FTPPath = input.FTPPath;
-            retInfo.HashFile = input.HashFile;
-            retInfo.Status = input.Status;
-            retInfo.Uploader = input.Uploader;
-            retInfo.UploaderRole = input.UploaderRole;
-            retInfo.Version = input.Version;
-            retInfo.VersionId = input.VersionId;
-            return retInfo;
-        }
-
-        public static Domain.User getUser(DocsPaVO.utente.Utente utente)
-        {
-            Domain.User retval = new Domain.User();
-            if (utente != null)
-            {
-                retval.Id = utente.idPeople;
-                retval.Description = utente.descrizione;
-                retval.Name = utente.nome;
-                retval.Surname = utente.cognome;
-                retval.UserId = utente.userId;
-                retval.NationalIdentificationNumber = utente.codfisc;
-            }
-            else retval = null;
-            return retval;
-        }
-
-        public static Domain.Role getRole(DocsPaVO.utente.Ruolo ruolo)
-        {
-            Domain.Role retval = new Domain.Role();
-            if (ruolo != null)
-            {
-                retval.Code = ruolo.codice;
-                retval.Description = ruolo.descrizione;
-                retval.Id = ruolo.idGruppo;
-                if (ruolo.registri != null && ruolo.registri.Count > 0)
-                {
-                    Domain.Register regD = null;
-                    retval.Registers = new Domain.Register[ruolo.registri.Count];
-                    int i = 0;
-                    foreach (DocsPaVO.utente.Registro reg in ruolo.registri)
-                    {
-                        regD = Utils.GetRegister(reg);
-                        retval.Registers[i] = regD;
-                        i++;
-                    }
-                }
-            }
-            return retval;
-        }
-
-        public static DocsPaVO.LibroFirma.PassoFirma getPassoDiFirmaFromDomain(Domain.SignBook.SignatureStep step)
-        {
-            DocsPaVO.LibroFirma.PassoFirma retVal = new DocsPaVO.LibroFirma.PassoFirma();
-            retVal.DaAggiornare = step.ToUpdate;
-            retVal.dataScadenza = step.ExpirationDate;
-            retVal.Evento = getEventoLibroFirmaFromDomain(step.Event);
-            retVal.idEventiDaNotificare = step.EventsToNotifyIds;
-            retVal.idPasso = step.IdStep;
-            retVal.idProcesso = step.IdProcess;
-            retVal.Invalidated = step.Invalidated;
-            retVal.IsModello = step.IsModel;
-            retVal.note = step.Note;
-            retVal.numeroSequenza = step.SequenceNumber;
-            if (step.InvolvedRole != null) { retVal.ruoloCoinvolto = BusinessLogic.Utenti.UserManager.getRuoloByIdGruppo(step.InvolvedRole.Id); }
-            if (step.InvolvedUser != null) { retVal.utenteCoinvolto = BusinessLogic.Utenti.UserManager.getUtenteById(step.InvolvedUser.Id); }
-            if (!string.IsNullOrEmpty(step.InvolvedRoleTypeCode) && !string.IsNullOrEmpty(step.InvolvedRoleTypeIdAmm)) { retVal.TpoRuoloCoinvolto = BusinessLogic.Amministrazione.SistemiEsterni.getTipoRuoloByCode(step.InvolvedRoleTypeIdAmm, step.InvolvedRoleTypeCode); }
-
-            return retVal;
-        }
-
-        public static DocsPaVO.LibroFirma.Evento getEventoLibroFirmaFromDomain(Domain.SignBook.Event ev)
-        {
-            DocsPaVO.LibroFirma.Evento retVal = new DocsPaVO.LibroFirma.Evento();
-            retVal.CodiceAzione = ev.CodeAction;
-            retVal.Descrizione = ev.Description;
-            retVal.Gruppo = ev.Group;
-            retVal.IdEvento = ev.IdEvent;
-            retVal.TipoEvento = ev.EventType;
-
-
-            return retVal;
-        }
-
-        public static DocsPaVO.LibroFirma.ProcessoFirma GetProcessoFirmaFromDomain(Domain.SignBook.SignatureProcess process)
-        {
-            DocsPaVO.LibroFirma.ProcessoFirma retVal = new DocsPaVO.LibroFirma.ProcessoFirma();
-            retVal.idPeopleAutore = process.AuthorUserId;
-            retVal.idProcesso = process.IdProcess;
-            retVal.idRuoloAutore = process.AuthorRoleId;
-            retVal.isInvalidated = process.isInvalidated;
-            retVal.IsProcessModel = process.IsProcessModel;
-            retVal.nome = process.Name;
-            retVal.passi = new List<DocsPaVO.LibroFirma.PassoFirma>();
-
-            foreach (Domain.SignBook.SignatureStep step in process.Steps)
-            {
-                retVal.passi.Add(getPassoDiFirmaFromDomain(step));
-            }
-
-            return retVal;
-        }
-
-        public static void ExecAutoTrasmByIdStatus(InfoUtente infoUt, DocsPaVO.documento.SchedaDocumento doc, DocsPaVO.DiagrammaStato.Stato stato, string idTemplate)
-        {
-            try
-            {
-                ArrayList idModelli = BusinessLogic.DiagrammiStato.DiagrammiStato.isStatoTrasmAuto(infoUt.idAmministrazione, stato.SYSTEM_ID.ToString(), idTemplate);
-                if (idModelli != null && idModelli.Count > 0)
-                {
-
-                    DocsPaVO.utente.Ruolo ruolo = BusinessLogic.Utenti.UserManager.getRuoloByIdGruppo(infoUt.idGruppo);
-                    foreach ( DocsPaVO.Modelli_Trasmissioni.ModelloTrasmissione model in idModelli)
-                    {
-                        string pathFE = "";
-                        if (System.Configuration.ConfigurationManager.AppSettings["URL_PATH_IS"] != null)
-                            pathFE = System.Configuration.ConfigurationManager.AppSettings["URL_PATH_IS"].ToString();
-                        //DocsPaVO.Modelli_Trasmissioni.ModelloTrasmissione model = BusinessLogic.Trasmissioni.ModelliTrasmissioni.getModelloByID(infoUt.idAmministrazione, idModello);
-                        DocsPaVO.Modelli_Trasmissioni.ModelloTrasmissione modelOut = null;
-                        BusinessLogic.Trasmissioni.TrasmManager.TransmissionExecuteDocTransmFromModelCodeSoloConNotifica(infoUt, pathFE, doc, model.CODICE, ruolo, out modelOut);
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex);
-            }
-
         }
 
     }

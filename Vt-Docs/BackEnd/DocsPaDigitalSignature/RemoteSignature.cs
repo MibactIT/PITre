@@ -93,8 +93,7 @@ namespace BusinessLogic.Documenti.DigitalSignature
 
             public string Put (DocsPaVO.documento.FileDocumento filedoc)
             {
-                string name = System.IO.Path.GetFileNameWithoutExtension(filedoc.name);
-                string fileHash =hsmSvc.Session_PutFileToSign(_SessionToken, filedoc.content, name);
+                string fileHash =hsmSvc.Session_PutFileToSign(_SessionToken, filedoc.content, filedoc.nomeOriginale);
                 if (!String.IsNullOrEmpty (fileHash))
                 {
                     fileListToSign.Add(fileHash);

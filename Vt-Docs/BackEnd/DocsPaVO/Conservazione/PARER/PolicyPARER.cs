@@ -59,15 +59,11 @@ namespace DocsPaVO.Conservazione.PARER
         public string numGiorniStampa;
 
         public string statoVersamento;
+
+        /* 11/02/19 Conservazione */
         public string escludiFatture;
-
+        
         public string numGiorniFirma;
-        public string bigFiles;
-
-        public string ente;
-        public string struttura;
-
-        public string notificaMail;
 
         [XmlArray()]
         [XmlArrayItem(typeof(SupportedFileType))]

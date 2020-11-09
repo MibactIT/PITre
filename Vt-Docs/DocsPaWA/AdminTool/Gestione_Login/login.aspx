@@ -4,7 +4,7 @@
 <HTML>
 	<HEAD runat = "server">
         <title></title>	
-		<SCRIPT language="javascript">
+		<%--<SCRIPT language="javascript">
 			function body_onLoad()
 			{
 				var maxWidth=570;
@@ -17,7 +17,7 @@
 				window.moveTo(newLeft,newTop);
 				
 			}
-		</SCRIPT>
+		</SCRIPT>--%>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
 		<meta content="C#" name="CODE_LANGUAGE">
 		<meta content="JavaScript" name="vs_defaultClientScript">

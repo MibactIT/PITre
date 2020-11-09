@@ -33,15 +33,7 @@
 			Form1.hd_returnValueModal.value = rtnValue;		
 			window.document.Form1.submit();	
 			//window.open(myUrl,'','width=600,height=600,scrollbars=YES,resizable=YES');
-		}
-		function AvvisoRuoloConLF(tipoTitolare, idRuolo, idUtente, numProcessi, numIstanze) {
-		    var myUrl = "AvvisoRuoloConLF.aspx?tipoTitolare=" + tipoTitolare + "&idRuolo=" + idRuolo + "&idUtente=" + idUtente + "&numProcessi=" + numProcessi + "&numIstanze=" + numIstanze;
-		    rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:450px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;");
-
-		    frm_gestioneUtenti.hd_returnValueModalLF.value = rtnValue;
-
-		    window.document.frm_gestioneUtenti.submit();
-		}
+		}						
 		</SCRIPT>
 	</HEAD>
 	<body bottomMargin="3" leftMargin="3" topMargin="3" rightMargin="3" MS_POSITIONING="GridLayout" onload="document.Form1.txt_ricCod.focus();">
@@ -54,7 +46,6 @@
 			<input id="hd_idAmm" type="hidden" name="hd_idAmm" runat="server"> <input id="hd_returnValueModal" type="hidden" name="hd_returnValueModal" runat="server">
 			<input id="hd_idGruppoDest" type="hidden" name="hd_idGruppoDest" runat="server">
 			<input id="hd_idCorrGlobGruppoDest" type="hidden" name="hd_idCorrGlobGruppoDest" runat="server">
-            <input id="hd_returnValueModalLF" type="hidden" name="hd_returnValueModalLF" runat="server">
 			<table width="500" align="center">
 				<tr>
 					<!-- OPZIONI DI TESTA -->

@@ -6,5 +6,5 @@
     cause the file to be unrecognizable by the program.
 -->
 <GenericObjectDataSource DisplayName="PR_Amministrazione" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
-   <TypeInfo>TestProject.DocsPaWS.PR_Amministrazione</TypeInfo>
+   <TypeInfo>TestProject.DocsPaWS.PR_Amministrazione, Web References.DocsPaWS.Reference.cs.dll, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
 </GenericObjectDataSource>

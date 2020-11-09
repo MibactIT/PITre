@@ -767,12 +767,9 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
 
 
                 this.chk_doc_digitali.Checked = policy.digitali.Equals("1");
-                this.chk_fatture.Checked = policy.escludiFatture.Equals("1");
-                this.txt_custom_ente.Text = policy.ente;
-                this.txt_custom_struttura.Text = policy.struttura;
 
-                if (!string.IsNullOrEmpty(policy.bigFiles))
-                    this.rbl_bigFiles.SelectedValue = policy.bigFiles;
+                /* 11/02/19 Conservazione */
+                this.chk_fatture.Checked = policy.escludiFatture.Equals("1");
 
                 if (!string.IsNullOrEmpty(policy.firmati))
                     this.chk_firma.SelectedValue = policy.firmati;
@@ -799,6 +796,7 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                     this.lbl_dataCreazioneAP.Text = policy.dataProtocollazioneA;
                 if (!string.IsNullOrEmpty(policy.numGiorniProtocollazione))
                     this.txt_days_pr.Text = policy.numGiorniProtocollazione;
+
                 if (!string.IsNullOrEmpty(policy.numGiorniFirma))
                     this.txt_days_sign.Text = policy.numGiorniFirma;
 
@@ -1328,7 +1326,7 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                 }
             }
 
-            // controllo su valore numerico campo n giorni prima
+            // controllo su valore numerico campo n giorni prima - txt_days_sign
             if (!string.IsNullOrEmpty(this.txt_days_sign.Text))
             {
                 int anno;
@@ -1338,7 +1336,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                     return false;
                 }
             }
-
 
 
             return true;
@@ -1482,10 +1479,10 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
             }
 
             policy.digitali = this.chk_doc_digitali.Checked ? "1" : "0";
+
+            /* 11/02/19 Conservazione - MEV Reportistica */
             policy.escludiFatture = this.chk_fatture.Checked ? "1" : "0";
-            policy.ente = this.txt_custom_ente.Text;
-            policy.struttura = this.txt_custom_struttura.Text;
-            policy.bigFiles = this.rbl_bigFiles.SelectedValue;
+
             if (this.chk_firma.Items[0].Selected && !this.chk_firma.Items[1].Selected)
                 policy.firmati = "1";
             else if (this.chk_firma.Items[1].Selected && !this.chk_firma.Items[0].Selected)

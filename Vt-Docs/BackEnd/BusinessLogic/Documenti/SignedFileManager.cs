@@ -51,9 +51,9 @@ namespace BusinessLogic.Documenti
                             byte[] signedContent,
                             bool cofirma,
                             ref DocsPaVO.documento.FileRequest fileRequest,
-                            DocsPaVO.utente.InfoUtente infoUtente, bool isConvertedToPdf = false)
+                            DocsPaVO.utente.InfoUtente infoUtente)
         {
-            return AppendDocumentoFirmato(signedContent, cofirma, ref fileRequest, infoUtente, true, isConvertedToPdf);
+            return AppendDocumentoFirmato(signedContent, cofirma, ref fileRequest, infoUtente, true);
         }
 
 
@@ -69,7 +69,7 @@ namespace BusinessLogic.Documenti
                                 byte[] signedContent,
                                 bool cofirma,
                                 ref DocsPaVO.documento.FileRequest fileRequest,
-                                DocsPaVO.utente.InfoUtente infoUtente,bool isPades, bool isConvertedToPdf = false)
+                                DocsPaVO.utente.InfoUtente infoUtente,bool isPades)
         {
             bool retValue = true;
 
@@ -86,10 +86,12 @@ namespace BusinessLogic.Documenti
                             true);
                 }
                 //luca
-                if (fileRequest != null && !String.IsNullOrEmpty(fileRequest.fileName) && (fileRequest.fileName.ToLower().EndsWith("pdf_convertito") || isConvertedToPdf))
+                bool WasConverted = false;
+
+                if (fileRequest != null && !String.IsNullOrEmpty(fileRequest.fileName) && fileRequest.fileName.ToLower().EndsWith("pdf_convertito"))
                 {
                     fileRequest.fileName = System.IO.Path.GetFileNameWithoutExtension(fileRequest.fileName) + ".pdf";
-                    isConvertedToPdf = true;
+                    WasConverted = true;
                 }
                 //end luca
                 // Verifica se il formato del file è accettato per la firma
@@ -105,19 +107,7 @@ namespace BusinessLogic.Documenti
 
                 if (isPades)
                 {
-                    // INC000001085991 PITRE - conversione in pdf su firma pades non aggiorna l'estensione
-                    // fileDoc.nomeOriginale = nomeOriginale ;
-                    if (!string.IsNullOrEmpty(nomeOriginale))
-                    {
-                        //se il filename finisce PDF probabilmente è stato convertito.
-                        //controllo inoltre se il nomeoriginale non finisce con PDF, in tal caso lo popolo.
-                        if ((System.IO.Path.GetExtension(fileRequest.fileName).ToUpper() == ".PDF") && 
-                            (System.IO.Path.GetExtension(nomeOriginale).ToUpper() != ".PDF") && isConvertedToPdf)
-                            nomeOriginale += ".PDF";
-
-                        fileDoc.nomeOriginale = nomeOriginale;
-                    }
-
+                    fileDoc.nomeOriginale = nomeOriginale ;
                     fileDoc.estensioneFile = GetAppSuffix(fileRequest.fileName);
                     fileDoc.name = fileRequest.fileName;
                     app.estensione = GetAppSuffix(fileRequest.fileName);
@@ -149,7 +139,7 @@ namespace BusinessLogic.Documenti
                         fileDoc.name = fileRequest.fileName + ".P7M";
 
                         //luca
-                        if (isConvertedToPdf)
+                        if (WasConverted)
                         {
                             //ATTENZIONE, Se un giorno attiveremo la firma pades lato client questo codice non andrà più bene
                             if (!string.IsNullOrEmpty(nomeOriginale))
@@ -206,7 +196,7 @@ namespace BusinessLogic.Documenti
                         throw new ApplicationException("Errore nella creazione della versione firmata per il documento");
 
                     bool setDataFirma = BusinessLogic.Documenti.DocManager.SetDataFirmaDocumento(fileRequest.docNumber, fileRequest.versionId);
-
+                    
                     if (!isAllegato)
                         ((DocsPaVO.documento.Documento)fileRequest).daInviare = "1";
                 }

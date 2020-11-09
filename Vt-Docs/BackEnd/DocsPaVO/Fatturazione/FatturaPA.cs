@@ -21,7 +21,6 @@ namespace DocsPaVO.Fatturazione
         public string trasmittenteTelefono;
         public string trasmittenteMail;
         public string formatoTrasmissione;
-        public string pecDestinatario;
 
         #endregion
 
@@ -40,28 +39,17 @@ namespace DocsPaVO.Fatturazione
         public string idOrdineAcquisto;
         public string CUPOrdineAcquisto;
         public string CIGOrdineAcquisto;
-        public string codiceSipaiProgetto; // new  duplicato idOrdineAcquisto (idDocumento)
-        public string codiceSottoprogetto; // new
-        public string codiceComponente; // new
 
         public string idContratto;
         public string CUPContratto;
         public string CIGContratto;
-        public string dipartimentoMef; // new
 
         public string codiceIPA;
-
-        // DatiOrdineAcquisto
-        [XmlArray()]
-        [XmlArrayItem(typeof(DocsPaVO.Fatturazione.DatiOrdineAcquisto))]
-        public ArrayList ordineAcquisto = new ArrayList();
 
         // DatiBeniServizi
         [XmlArray()]
         [XmlArrayItem(typeof(DocsPaVO.Fatturazione.DatiBeniServizi))]
         public ArrayList servizi = new ArrayList();
-
-
 
         // DatiRiepilogo
         public string aliquotaIVA;
@@ -78,7 +66,6 @@ namespace DocsPaVO.Fatturazione
         public string istitutoFinanziario;
         public string IBAN;
         public string BIC;
-        public DateTime dataScadenzaPagamento;
 
     }
 }

@@ -416,6 +416,18 @@ namespace DocsPAWA
             }
         }
 
+        public static void updateProcedimentaleTipoDoc(int systemId_template, string procedimentale, Page page)
+        {
+            try
+            {
+                docsPaWS.updateProcedimentoTipoDoc(systemId_template, procedimentale);
+            }
+            catch(Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+            }
+        }
+
         public static int countDocTipoDoc(string tipo_atto, string codiceAmm, Page page)
         {
             try
@@ -1493,6 +1505,38 @@ namespace DocsPAWA
             }
 
             return msg;
+        }
+
+        public static bool ReplicaTipoDocumento(List<string> idAmministrazioni, string idTipoDoc)
+        {
+            bool result = false;
+            try
+            {
+                result = docsPaWS.ReplicaTipoDocumento(idTipoDoc, idAmministrazioni.ToArray());
+            }
+            catch (Exception e)
+            {
+                result = false;
+            }
+            return result;
+        }
+
+        public static List<Templates> GetTipiDocProcedimentali(string idAmm, Page page)
+        {
+            List<Templates> list = new List<Templates>();
+            ArrayList listaTemplate = getTemplates(idAmm, page);
+            if(listaTemplate != null && listaTemplate.Count > 0)
+            {
+                foreach(Templates item in listaTemplate)
+                {
+                    if(item.PROCEDIMENTALE == "1")
+                    {
+                        list.Add(item);
+                    }
+                }
+            }
+
+            return list;
         }
     }
 }

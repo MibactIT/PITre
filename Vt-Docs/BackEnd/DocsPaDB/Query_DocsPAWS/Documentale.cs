@@ -163,7 +163,7 @@ namespace DocsPaDB.Query_DocsPAWS
 			try
 			{
 				logger.Debug("INIZIO transazione in CreateDocumentSP");
-				this.BeginTransaction();
+				//this.BeginTransaction();
 
 				// Creazione parametri per la Store Procedure
 				ArrayList parameters = new ArrayList();
@@ -185,33 +185,38 @@ namespace DocsPaDB.Query_DocsPAWS
                     else
                         parameters.Add(this.CreateParameter("isFirmato", "0"));
                     parameters.Add(outParam);
-                    
 
-					//this.ExecuteStoreProcedure("createDocSP",parameters);
-					this.ExecuteStoredProcedure("createDocSP",parameters,null);
+
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        dbProvider.ExecuteStoredProcedure("createDocSP",parameters,null);
+                    }
+
+                    //this.ExecuteStoreProcedure("createDocSP",parameters);
+                    
 				}
 				if(outParam.Valore!=null && outParam.Valore.ToString()!="" && outParam.Valore.ToString()!="0")
 				{
 					retProc=outParam.Valore.ToString();
-					this.CommitTransaction();
+					//this.CommitTransaction();
 					logger.Debug("COMMIT transazione in CreateDocumentSP");			
 				}
 				else
 				{
-					this.RollbackTransaction();
+					//this.RollbackTransaction();
 					logger.Debug("ROLLBACK transazione in CreateDocumentSP");
 				}	
 
 			}
 			catch(Exception e)
 			{
-				this.RollbackTransaction();
+				//this.RollbackTransaction();
 				logger.Debug("ROLLBACK transazione in CreateDocumentSP" + e.Message);
 				
 			}
 			finally
 			{
-				this.CloseConnection();
+				//this.CloseConnection();
 				logger.Debug("FINE transazione in CreateDocumentSP");
                 logger.Info("END");
 			}
@@ -327,7 +332,12 @@ namespace DocsPaDB.Query_DocsPAWS
 					q.setParam("param2", "VERSION_ID = " + fileRequest.versionId);
 					string sql = q.getSQL();
 					logger.Debug(sql);
-					if(!this.ExecuteNonQuery(sql)) throw new Exception();
+
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        if (!dbProvider.ExecuteNonQuery(sql)) throw new Exception();
+                    }
+                    
 				} 
 				else
                 {
@@ -412,7 +422,12 @@ namespace DocsPaDB.Query_DocsPAWS
 				q.setParam("param2", "TYPIST = " + idPeople + " ORDER BY VERSION_ID DESC");
 				string sql = q.getSQL();
 				logger.Debug(sql);
-				if(!this.ExecuteScalar(out versionsResult, sql)) throw new Exception();
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+
+                    if (!dbProvider.ExecuteScalar(out versionsResult, sql)) throw new Exception();
+                }
 
 				//INSERT su Components				   
 				if(!InsertIntoComponent(versionsResult, allegato.docNumber)) throw new Exception();
@@ -537,7 +552,10 @@ namespace DocsPaDB.Query_DocsPAWS
 				q.setParam("param2", "VERSION_ID = " + versionId);
 				string sql = q.getSQL();
 				logger.Debug(sql);
-				if(!this.ExecuteScalar(out result, sql)) throw new Exception();
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (!dbProvider.ExecuteScalar(out result, sql)) throw new Exception();
+                }
 			}
 			catch(Exception exception)
 			{
@@ -569,7 +587,13 @@ namespace DocsPaDB.Query_DocsPAWS
 				q.setParam("param2", "DOCNUMBER = " + docNumber);
 				string sql = q.getSQL();
 				logger.Debug(sql);
-				if(!this.ExecuteScalar(out systemId, sql)) throw new Exception();
+
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (!dbProvider.ExecuteScalar(out systemId, sql)) throw new Exception();
+                }
+                
 
 				//DELETE su Profile
 				//sql = "DELETE FROM Profile WHERE DOCNUMBER=" + docNumber;
@@ -577,7 +601,12 @@ namespace DocsPaDB.Query_DocsPAWS
 				q.setParam("param1", "DOCNUMBER = " + docNumber);
 				sql = q.getSQL();
 				logger.Debug(sql);
-				if(!this.ExecuteNonQuery(sql)) throw new Exception();
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (!dbProvider.ExecuteNonQuery(sql)) throw new Exception();
+                }
+                
 
 				//DELETE su Versions
 				//sql = "DELETE FROM Versions WHERE DOCNUMBER=" + docNumber;
@@ -585,7 +614,13 @@ namespace DocsPaDB.Query_DocsPAWS
 				q.setParam("param1", "DOCNUMBER = " + docNumber);
 				sql = q.getSQL();
 				logger.Debug(sql);
-				if(!this.ExecuteNonQuery(sql)) throw new Exception();
+
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (!dbProvider.ExecuteNonQuery(sql)) throw new Exception();
+                }
+                
 
 				//DELETE su Components				   
 				//sql = "DELETE FROM Components WHERE DOCNUMBER=" + docNumber;
@@ -593,15 +628,27 @@ namespace DocsPaDB.Query_DocsPAWS
 				q.setParam("param1", "DOCNUMBER = " + docNumber);
 				sql = q.getSQL();
 				logger.Debug(sql);
-				if(!this.ExecuteNonQuery(sql)) throw new Exception();
 
-				//DELETE su Security	
-				//sql = "DELETE FROM Security WHERE THING=" + systemId;
-				q = DocsPaUtils.InitQuery.getInstance().getQuery("D_SECURITY");								
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (!dbProvider.ExecuteNonQuery(sql)) throw new Exception();
+
+                }
+
+                //DELETE su Security	
+                //sql = "DELETE FROM Security WHERE THING=" + systemId;
+                q = DocsPaUtils.InitQuery.getInstance().getQuery("D_SECURITY");								
 				q.setParam("param1", "THING = " + systemId);
 				sql = q.getSQL();
 				logger.Debug(sql);
-				if(!this.ExecuteNonQuery(sql)) throw new Exception();
+
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (!dbProvider.ExecuteNonQuery(sql)) throw new Exception();
+                }
+                
 			}
 			catch(Exception exception)
 			{
@@ -842,7 +889,8 @@ namespace DocsPaDB.Query_DocsPAWS
                     || (idPeople != null && idPeople != ""))
                 {
                     parameters.Add(this.CreateParameter("idpeople", idPeople));
-                    parameters.Add(this.CreateParameter("description", descrizione));
+                    logger.Debug("CreateProjectSP " + descrizione);
+                    parameters.Add(this.CreateParameter("description", descrizione.Replace("\r\n", " ").Replace("\n", " ")));
 
                     parameters.Add(this.CreateParameter("idPeopleDelegato", idPeopleDelegato));
 
@@ -1015,7 +1063,10 @@ namespace DocsPaDB.Query_DocsPAWS
 			q.setParam("param1", idPeople);
 			string sql = q.getSQL();
 			logger.Debug(sql);
-			return this.ExecuteQuery(out corrispondente, sql);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                return dbProvider.ExecuteQuery(out corrispondente, sql);
+            }
 		}
 
 
@@ -1027,10 +1078,14 @@ namespace DocsPaDB.Query_DocsPAWS
 			q.setParam("param1", idUp);
 			string sql = q.getSQL();
 			logger.Debug(sql);
-			if(!this.ExecuteScalar(out result,sql))
-			{
-				result=null;
-			}
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                if (!dbProvider.ExecuteScalar(out result,sql))
+			    {
+				    result=null;
+			    }
+            }
 			return result;
 		}
 
@@ -1041,10 +1096,13 @@ namespace DocsPaDB.Query_DocsPAWS
 			q.setParam("param1", idRuolo);
 			string sql = q.getSQL();
 			logger.Debug(sql);
-			if(!this.ExecuteScalar(out result,sql))
-			{
-				result=null;
-			}
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                if (!dbProvider.ExecuteScalar(out result, sql))
+                {
+                    result = null;
+                }
+            }
 			return result;
 		}
 
@@ -1055,10 +1113,13 @@ namespace DocsPaDB.Query_DocsPAWS
 			q.setParam("param1", docNumber);
 			string sql = q.getSQL();
 			logger.Debug(sql);
-			if(!this.ExecuteQuery(out dataSet,"DOCUMENTO",sql))
-			{
-				result=false;
-			}
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                if (!dbProvider.ExecuteQuery(out dataSet, "DOCUMENTO", sql))
+                {
+                    result = false;
+                }
+            }
 			return result;
 		}
 
@@ -1069,10 +1130,13 @@ namespace DocsPaDB.Query_DocsPAWS
 			q.setParam("param1", idRegistro);
 			string sql = q.getSQL();
 			logger.Debug(sql);
-			if(!this.ExecuteScalar(out result,sql))
-			{
-				result=null;
-			}
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                if (!dbProvider.ExecuteScalar(out result, sql))
+                {
+                    result = null;
+                }
+            }
 			return result;
 		}
 

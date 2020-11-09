@@ -53,7 +53,6 @@ namespace ClrVerificationService
         {
 
         }
-        
 
         public static FirmaDigitale.FirmaDigitalePortTypeClient createClient(string endPoindAddress)
         {
@@ -69,14 +68,14 @@ namespace ClrVerificationService
                 {
                     MaxStringContentLength = 100000000,
                     MaxArrayLength = 100000000,
-                    MaxBytesPerRead = 524288 
+                    MaxBytesPerRead = 524288
                 };
                 MtomMessageEncodingBindingElement mtomEconding = new MtomMessageEncodingBindingElement
                 {
                     MaxReadPoolSize = 640,
                     MaxWritePoolSize = 160,
                     MessageVersion = MessageVersion.Soap12,
-                    MaxBufferSize = 2147483647, 
+                    MaxBufferSize = 2147483647,
                 };
 
                 mtomEconding.ReaderQuotas.MaxArrayLength = 100000000;
@@ -96,11 +95,12 @@ namespace ClrVerificationService
                     KeepAliveEnabled = true,
                     ProxyAuthenticationScheme = System.Net.AuthenticationSchemes.Anonymous,
                     Realm = "",
-                    TransferMode = System.ServiceModel.TransferMode.Buffered,
+                    TransferMode = System.ServiceModel.TransferMode.Streamed,
                     UnsafeConnectionNtlmAuthentication = false,
                     UseDefaultWebProxy = false,
-                    RequireClientCertificate = true 
+                    RequireClientCertificate = true
                 };
+
                 binding.Elements.Add(mtomEconding);
                 binding.Elements.Add(httpsTransposport);
 
@@ -111,7 +111,6 @@ namespace ClrVerificationService
                 string certFindData = ConfigurationManager.AppSettings["CERTNAME"];
                 channel.ClientCredentials.ClientCertificate.SetCertificate(System.Security.Cryptography.X509Certificates.StoreLocation.LocalMachine, System.Security.Cryptography.X509Certificates.StoreName.My, System.Security.Cryptography.X509Certificates.X509FindType.FindBySubjectName, certFindData);
                 channel.Endpoint.Behaviors.Add(new MaxFaultSizeBehavior(2147483647));
-
             }
             catch (Exception e)
             {
@@ -189,7 +188,7 @@ namespace ClrVerificationService
 
             controlloCRLCert = null;
             int statusInt=-1;
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             DateTime dataverifica;
             try
             {
@@ -275,7 +274,7 @@ namespace ClrVerificationService
 
                     dataVerificaString = null;
                 }
-                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
 
 
             }
@@ -299,14 +298,12 @@ namespace ClrVerificationService
                 sbyte? marcaSHA1WithRSA = 0;
                 sbyte? controlloFirmeAnnidate = 1;
                 logger.Debug("Data Verifica: " + dataVerificaString + " (" + dataverificaDT.ToString() + ")");
-
                 if (fileOriginale != null)
                     ret = client.VerificaFirmaConOriginale(fileContents, fileOriginale, firmaSHA1WithRSA, marcaSHA1WithRSA, dataVerificaString, controlloFirmeAnnidate);
                 else
                 {
                     FirmaDigitale.DocumentoType doc = new FirmaDigitale.DocumentoType();
                     ret = client.VerificaFirma(fileContents, firmaSHA1WithRSA, marcaSHA1WithRSA, dataVerificaString, controlloFirmeAnnidate, out doc);
-
                     if (doc != null)
                         ev.content = doc.fileOriginale;
                 }
@@ -378,147 +375,6 @@ namespace ClrVerificationService
                 //TEST!!!!
                 FirmaDigitale.DettaglioFirmaDigitaleType d = w.Detail.DettaglioFirmaDigitale;
                 if (w.Detail.Documento !=null)
-                    ev.content = w.Detail.Documento.fileOriginale;
-
-                ev.VerifySignatureResult = ConvertToVerifySignatureResult(ev.status, d); ;
-                ev.additionalData = lstW.ToArray();
-
-                logger.Debug("Firma verificata con warning");
-                if (logger.IsInfoEnabled)
-                    logger.Info(Utils.SerializeObject<EsitoVerifica>(ev));
-                return ev;
-
-            }
-
-            catch (Exception ex)
-            {
-                ev.status = EsitoVerificaStatus.ErroreGenerico;
-                ev.message = string.Format("{0},{1}", ex.Message, ex.StackTrace);
-                logger.Error(ev.message);
-                if (logger.IsInfoEnabled)
-                    logger.Info(Utils.SerializeObject<EsitoVerifica>(ev));
-                return ev;
-
-            }
-        }
-
-        public EsitoVerifica VerificaByteEVCompleta(byte[] fileContents, DateTime? dataverificaDT, FirmaDigitale.FirmaDigitalePortTypeClient client)
-        {
-            logger.Debug("INIZIO");
-            logger.Debug("VERIFICA FIRMA COMPLETA");
-            string verbosesgb = ConfigurationManager.AppSettings["VERBOSEDEBUG"];
-            bool verboseDebug = false;
-            Boolean.TryParse(verbosesgb, out verboseDebug);
-
-
-            EsitoVerifica ev = new EsitoVerifica();
-            FirmaDigitale.DettaglioFirmaDigitaleType ret = null;
-
-            string dataVerificaString = string.Empty;
-
-
-            try
-            {
-                if (dataverificaDT != null)
-                {
-                    dataVerificaString = zeniDateConverter(dataverificaDT);
-                }
-                else
-                {
-
-                    dataVerificaString = null;
-                }
-                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
-
-
-            }
-            catch (Exception ex)
-            {
-                string inner = string.Empty;
-                ev.status = EsitoVerificaStatus.ErroreGenerico;
-                if (ex.InnerException != null)
-                {
-                    inner = ex.InnerException.Message;
-                }
-                ev.message = string.Format("{0},{1}   INNER {2} ", ex.Message, ex.StackTrace, inner);
-                return ev;
-            }
-
-
-            try
-            {
-                sbyte? controlloFirmeAnnidate = 1;
-                logger.Debug("Data Verifica: " + dataVerificaString + " (" + dataverificaDT.ToString() + ")");
-
-                FirmaDigitale.DocumentoType doc = new FirmaDigitale.DocumentoType();
-                ret = client.VerificaFirmaCompleta(fileContents, dataVerificaString, controlloFirmeAnnidate, out doc);
-                
-                ev.status = EsitoVerificaStatus.Valid;
-
-                if (ret != null)
-                    ev.VerifySignatureResult = ConvertToVerifySignatureResult(ev.status, ret); ;
-
-                if (verboseDebug)
-                {
-                    logger.Info(Utils.SerializeObject<EsitoVerifica>(ev));
-                }
-                logger.Debug("Firma OK");
-
-                return ev;
-            }
-
-            catch (FaultException<FirmaDigitale.FaultType> f)
-            {
-                ev.status = EsitoVerificaStatus.ErroreGenerico;
-                ev.message = f.Detail.userMessage;
-                ev.errorCode = f.Detail.errorCode;
-                logger.Error("errore in verifica firma completa:" + ev.message);
-                if (logger.IsInfoEnabled)
-                    logger.Info(Utils.SerializeObject<EsitoVerifica>(ev));
-                return ev;
-
-            }
-
-            catch (FaultException<FirmaDigitale.WarningResponseType> w)
-            {
-                List<string> lstW = new List<string>();
-                foreach (FirmaDigitale.WarningType s in w.Detail.WarningFault)
-                {
-                    lstW.Add(Utils.SerializeObject<FirmaDigitale.WarningType>(s));
-
-                    ev.message = s.errorMsg;
-                    ev.errorCode = s.errorCode;
-                    ev.SubjectDN = s.SubjectDN;
-                    ev.SubjectCN = s.SubjectCN;
-
-                    ev.status = EsitoVerificaStatus.ErroreGenerico;
-
-                    if (s.errorCode == "1426")
-                    {
-                        ev.status = EsitoVerificaStatus.CtlNotTimeValid;
-                    }
-                    if (s.errorCode == "1468")
-                    {
-                        ev.status = EsitoVerificaStatus.SHA1NonSupportato;
-                    }
-                    if (s.errorCode == "1407")  // check
-                    {
-                        ev.status = EsitoVerificaStatus.NotTimeValid;
-                    }
-                    if (s.errorCode == "1408")  // check
-                    {
-                        ev.status = EsitoVerificaStatus.Revoked;
-                        foreach (FirmaDigitale.FirmatarioType ft in w.Detail.DettaglioFirmaDigitale.datiFirmatari)
-                        {
-                            if (ft.firmatario.dataRevocaCertificato != DateTime.MinValue)
-                                ev.dataRevocaCertificato = ft.firmatario.dataRevocaCertificato;
-                        }
-                    }
-                }
-
-                //TEST!!!!
-                FirmaDigitale.DettaglioFirmaDigitaleType d = w.Detail.DettaglioFirmaDigitale;
-                if (w.Detail.Documento != null)
                     ev.content = w.Detail.Documento.fileOriginale;
 
                 ev.VerifySignatureResult = ConvertToVerifySignatureResult(ev.status, d); ;

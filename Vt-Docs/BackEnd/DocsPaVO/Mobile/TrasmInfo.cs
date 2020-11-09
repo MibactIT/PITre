@@ -77,7 +77,7 @@ namespace DocsPaVO.Mobile
             trasmInfo.Mittente = input.utente.descrizione;
             if (delegato != null)
             {
-                trasmInfo.Mittente = delegato.descrizione + " sostituto di " + input.utente.descrizione;
+                trasmInfo.Mittente = delegato.descrizione + " delegato da " + input.utente.descrizione;
             }
             foreach (TrasmissioneSingola temp in input.trasmissioniSingole)
             {

@@ -94,6 +94,17 @@ namespace DocsPaDocumentale.Documentale
         }
 
         /// <summary>
+        /// Effettua il login di un utente amministratore
+        /// </summary>
+        /// <param name="utente"></param>
+        /// <param name="loginResult"></param>
+        /// <returns></returns>
+        public bool LoginAdminUserLDAP(DocsPaVO.utente.UserLogin userLogin, bool forceLogin, out DocsPaVO.amministrazione.InfoUtenteAmministratore utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult)
+        {
+            return this.Instance.LoginAdminUserLDAP(userLogin, forceLogin, out utente, out loginResult);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="utente"></param>
@@ -102,6 +113,17 @@ namespace DocsPaDocumentale.Documentale
         public bool LoginUser(DocsPaVO.utente.UserLogin userLogin, out DocsPaVO.utente.Utente utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult)
         {
             return this.Instance.LoginUser(userLogin, out utente, out loginResult);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="utente"></param>
+        /// <param name="loginResult"></param>
+        /// <returns></returns>
+        public bool LoginUserLDAP(DocsPaVO.utente.UserLogin userLogin, out DocsPaVO.utente.Utente utente, out DocsPaVO.utente.UserLogin.LoginResult loginResult)
+        {
+            return this.Instance.LoginUserLDAP(userLogin, out utente, out loginResult);
         }
 
         /// <summary>

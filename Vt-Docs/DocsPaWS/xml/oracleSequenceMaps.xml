@@ -95,10 +95,6 @@
 
   <Map tableName="DPA_FLUSSO_PROCEDURALE" sequenceName="SEQ_DPA_FLUSSO_PROCEDURALE" />
   
-  <Map tableName="DPA_ISTANZA_PROC_FIRMA_STO" sequenceName="SEQ_DPA_ISTANZA_PROC_FIRMA_STO" />
-  <Map tableName="DPA_REPORT_PROCESSI_TICK" sequenceName="SEQ_DPA_REPORT_PROCESSI_TICK" />
-  <Map tableName="DPA_DESCRIZIONI_FASC" sequenceName="SEQ_DPA_DESCRIZIONI_FASC" />
-  
 
 
 </SequenceMaps>

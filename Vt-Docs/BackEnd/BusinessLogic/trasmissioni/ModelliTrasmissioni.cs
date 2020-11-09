@@ -106,21 +106,6 @@ namespace BusinessLogic.Trasmissioni
 			}
 		}
 
-        public static System.Collections.ArrayList getModelliByAmmLite(string idAmm)
-        {
-            try
-            {
-                DocsPaDB.Query_DocsPAWS.ModTrasmissioni listModTrasm = new DocsPaDB.Query_DocsPAWS.ModTrasmissioni();
-                return listModTrasm.getModelliByAmmLite(idAmm);
-
-            }
-            catch (Exception ex)
-            {
-                logger.Debug("Errore in Trasmissioni - ModelliTrasmissioni - metodo: getModelliByAmm", ex);
-                return null;
-            }
-        }
-
         public static System.Collections.ArrayList getModelliByAmmPaging(string idAmm, int nPagina, string ricerca, string codice, out int numTotPag)
 		{
 			numTotPag = 0;

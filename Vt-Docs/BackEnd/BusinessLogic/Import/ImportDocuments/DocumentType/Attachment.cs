@@ -811,10 +811,7 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
                     ftpAddress,
                     attachment,
                     ftpUsername,
-                    ftpPassword, 
-                    rowData);
-
-
+                    ftpPassword);
 
             // Impostazione delle informazioni sull'allegato creato
             identificationData = String.Format(
@@ -857,7 +854,7 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
         /// <param name="userInfo">Le informazioni sull'utente che ha lanciato la procedura</param>
         /// <param name="ftpAddress">L'indirizzo a cui è possibile recuperare le informazioni sul file</param>
         /// <param name="attachment">L'allegato a cui associare il file</param>
-        protected void AcquireFile(string path, string administrationCode, InfoUtente userInfo, string ftpAddress, Allegato attachment, String ftpUsername, String ftpPassword, DocumentRowData rowData)
+        protected void AcquireFile(string path, string administrationCode, InfoUtente userInfo, string ftpAddress, Allegato attachment, String ftpUsername, String ftpPassword)
         {
             #region Dichiarazione Variabili
 
@@ -877,18 +874,14 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
             try
             {
                 // Apertura, lettura e chiusura del file
-                //fileContent = ImportUtils.DownloadFileFromFTP(
-                //     ftpAddress,
-                //     String.Format("{0}/{1}/{2}",
-                //         administrationCode,
-                //         userInfo.userId,
-                //         path),
-                //     ftpUsername,
-                //     ftpPassword);
-
-                // nuova versione, i file vengono presi in locale e caricati dagli utenti in locale nella procedura di import
-
-                fileContent = ImportUtils.DounloadFileFromUserTempFolder(rowData, userInfo, true);
+                fileContent = ImportUtils.DownloadFileFromFTP(
+                     ftpAddress,
+                     String.Format("{0}/{1}/{2}",
+                         administrationCode,
+                         userInfo.userId,
+                         path),
+                     ftpUsername,
+                     ftpPassword);
 
             }
             catch (Exception e)

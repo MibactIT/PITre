@@ -5,6 +5,7 @@ using System.Web.UI;
 using DocsPAWA.DocsPaWR;
 using System.Data;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace DocsPAWA
 {
@@ -289,6 +290,18 @@ namespace DocsPAWA
                 docsPaWS.updateMesiConsTipoFasc(systemId_template, mesi);
             }
             catch (Exception ex)
+            {
+                ErrorManager.redirect(page, ex);
+            }
+        }
+
+        public static void updateProcedimentaleTipoFasc(int systemId_template, string procedimentale, Page page)
+        {
+            try
+            {
+                docsPaWS.updateProcedimentoTipoFasc(systemId_template, procedimentale);
+            }
+            catch(Exception ex)
             {
                 ErrorManager.redirect(page, ex);
             }
@@ -790,6 +803,20 @@ namespace DocsPAWA
             {
                 ErrorManager.redirect(pagina, ex);
             }
+        }
+
+        public static bool ReplicaTipoFascicolo(List<string> idAmministrazioni, string idTipoFasc)
+        {
+            bool result = false;
+            try
+            {
+                result = docsPaWS.ReplicaTipoFascicolo(idTipoFasc, idAmministrazioni.ToArray());
+            }
+            catch (Exception e)
+            {
+                result = false;
+            }
+            return result;
         }
     }
 }

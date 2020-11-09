@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F39F2429-729A-4134-A31B-19E8A673B3AC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ArubaSignService</RootNamespace>
+    <AssemblyName>ArubaSignService</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JsonSubTypes, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\DocsPA3xSolution\packages\JsonSubTypes.1.2.0\lib\net47\JsonSubTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\DocsPA3xSolution\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\DocsPA3xSolution\packages\RestSharp.105.1.0\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArubaSignServiceApi.cs" />
+    <Compile Include="Client\ApiClient.cs" />
+    <Compile Include="Client\ApiException.cs" />
+    <Compile Include="Client\ApiResponse.cs" />
+    <Compile Include="Client\Configuration.cs" />
+    <Compile Include="Client\ExceptionFactory.cs" />
+    <Compile Include="Client\GlobalConfiguration.cs" />
+    <Compile Include="Client\IApiAccessor.cs" />
+    <Compile Include="Client\IReadableConfiguration.cs" />
+    <Compile Include="Client\SwaggerDateConverter.cs" />
+    <Compile Include="Model\JsonApplicationAuth.cs" />
+    <Compile Include="Model\JsonArssReturn.cs" />
+    <Compile Include="Model\JsonAuth.cs" />
+    <Compile Include="Model\JsonAuthMethodsReturn.cs" />
+    <Compile Include="Model\JsonBaseSignRequest.cs" />
+    <Compile Include="Model\JsonBodyRequestAddPkcs7Sign.cs" />
+    <Compile Include="Model\JsonBodyRequestAuthMethod.cs" />
+    <Compile Include="Model\JsonBodyRequestCloseSession.cs" />
+    <Compile Include="Model\JsonBodyRequestCredentialsQuery.cs" />
+    <Compile Include="Model\JsonBodyRequestEncryptedEnvelope.cs" />
+    <Compile Include="Model\JsonBodyRequestListCert.cs" />
+    <Compile Include="Model\JsonBodyRequestListCertAuth.cs" />
+    <Compile Include="Model\JsonBodyRequestListProcess.cs" />
+    <Compile Include="Model\JsonBodyRequestMarkReturn.cs" />
+    <Compile Include="Model\JsonBodyRequestOpenSession.cs" />
+    <Compile Include="Model\JsonBodyRequestPdfSignature.cs" />
+    <Compile Include="Model\JsonBodyRequestPdfSignatureV2.cs" />
+    <Compile Include="Model\JsonBodyRequestPdfSignatureV2Multiple.cs" />
+    <Compile Include="Model\JsonBodyRequestPkcs7Sign.cs" />
+    <Compile Include="Model\JsonBodyRequestPkcs7SignHash.cs" />
+    <Compile Include="Model\JsonBodyRequestPkcs7SignHashMultiple.cs" />
+    <Compile Include="Model\JsonBodyRequestPkcs7SignV2.cs" />
+    <Compile Include="Model\JsonBodyRequestPkcs7sSignV2Multiple.cs" />
+    <Compile Include="Model\JsonBodyRequestRetriveCredential.cs" />
+    <Compile Include="Model\JsonBodyRequestSendCredential.cs" />
+    <Compile Include="Model\JsonBodyRequestSignHash.cs" />
+    <Compile Include="Model\JsonBodyRequestTestOtp.cs" />
+    <Compile Include="Model\JsonBodyRequestVerify.cs" />
+    <Compile Include="Model\JsonBodyRequestVerifyOtp.cs" />
+    <Compile Include="Model\JsonBodyRequestXmlSignature.cs" />
+    <Compile Include="Model\JsonBodyRequestXmlSignatureMultiple.cs" />
+    <Compile Include="Model\JsonCanonicalizedType.cs" />
+    <Compile Include="Model\JsonCert.cs" />
+    <Compile Include="Model\JsonCertificato.cs" />
+    <Compile Include="Model\JsonCredentialInfo.cs" />
+    <Compile Include="Model\JsonCredentialListQuery.cs" />
+    <Compile Include="Model\JsonCredentialListReturn.cs" />
+    <Compile Include="Model\JsonCredentialsType.cs" />
+    <Compile Include="Model\JsonDictionarySignedAttributes.cs" />
+    <Compile Include="Model\JsonDocumentType.cs" />
+    <Compile Include="Model\JsonEncryptedEnvelopReq.cs" />
+    <Compile Include="Model\JsonEncryptedEnvelopReturn.cs" />
+    <Compile Include="Model\JsonEncryptionAlgorithm.cs" />
+    <Compile Include="Model\JsonEWSResult.cs" />
+    <Compile Include="Model\JsonGWReturn.cs" />
+    <Compile Include="Model\JsonMark.cs" />
+    <Compile Include="Model\JsonMarkRequest.cs" />
+    <Compile Include="Model\JsonMarkReturn.cs" />
+    <Compile Include="Model\JsonPDFProfile.cs" />
+    <Compile Include="Model\JsonPdfSignApparence.cs" />
+    <Compile Include="Model\JsonPdfSignOptions.cs" />
+    <Compile Include="Model\JsonPdfSignRequest.cs" />
+    <Compile Include="Model\JsonQueryConstraint.cs" />
+    <Compile Include="Model\JsonRetriveCredentialReturn.cs" />
+    <Compile Include="Model\JsonSigner.cs" />
+    <Compile Include="Model\JsonSignHashRequest.cs" />
+    <Compile Include="Model\JsonSignHashReturn.cs" />
+    <Compile Include="Model\JsonSignOptions.cs" />
+    <Compile Include="Model\JsonSignRequest.cs" />
+    <Compile Include="Model\JsonSignRequestV2.cs" />
+    <Compile Include="Model\JsonSignResponse.cs" />
+    <Compile Include="Model\JsonSignReturn.cs" />
+    <Compile Include="Model\JsonSignReturnV2.cs" />
+    <Compile Include="Model\JsonSignReturnV2Multiple.cs" />
+    <Compile Include="Model\JsonTestCredential.cs" />
+    <Compile Include="Model\JsonTransform.cs" />
+    <Compile Include="Model\JsonTransformType.cs" />
+    <Compile Include="Model\JsonTSAAuth.cs" />
+    <Compile Include="Model\JsonTypeTransport.cs" />
+    <Compile Include="Model\JsonUserCertList.cs" />
+    <Compile Include="Model\JsonUserCertListAuth.cs" />
+    <Compile Include="Model\JsonVerifyRequest.cs" />
+    <Compile Include="Model\JsonVerifyReturn.cs" />
+    <Compile Include="Model\JsonVerifySignatures.cs" />
+    <Compile Include="Model\JsonXmlSignatureParameter.cs" />
+    <Compile Include="Model\JsonXMLSignatureType.cs" />
+    <Compile Include="Model\XmlNs0ApplicationAuth.cs" />
+    <Compile Include="Model\XmlNs0ArssReturn.cs" />
+    <Compile Include="Model\XmlNs0Auth.cs" />
+    <Compile Include="Model\XmlNs0AuthMethodsReturn.cs" />
+    <Compile Include="Model\XmlNs0BaseSignRequest.cs" />
+    <Compile Include="Model\XmlNs0CanonicalizedType.cs" />
+    <Compile Include="Model\XmlNs0Cert.cs" />
+    <Compile Include="Model\XmlNs0Certificato.cs" />
+    <Compile Include="Model\XmlNs0CredentialInfo.cs" />
+    <Compile Include="Model\XmlNs0CredentialListQuery.cs" />
+    <Compile Include="Model\XmlNs0CredentialListReturn.cs" />
+    <Compile Include="Model\XmlNs0CredentialsType.cs" />
+    <Compile Include="Model\XmlNs0DictionarySignedAttributes.cs" />
+    <Compile Include="Model\XmlNs0DocumentType.cs" />
+    <Compile Include="Model\XmlNs0EncryptedEnvelopReq.cs" />
+    <Compile Include="Model\XmlNs0EncryptedEnvelopReturn.cs" />
+    <Compile Include="Model\XmlNs0EncryptionAlgorithm.cs" />
+    <Compile Include="Model\XmlNs0EWSResult.cs" />
+    <Compile Include="Model\XmlNs0GWReturn.cs" />
+    <Compile Include="Model\XmlNs0Mark.cs" />
+    <Compile Include="Model\XmlNs0MarkRequest.cs" />
+    <Compile Include="Model\XmlNs0MarkReturn.cs" />
+    <Compile Include="Model\XmlNs0PDFProfile.cs" />
+    <Compile Include="Model\XmlNs0PdfSignApparence.cs" />
+    <Compile Include="Model\XmlNs0PdfSignOptions.cs" />
+    <Compile Include="Model\XmlNs0PdfSignRequest.cs" />
+    <Compile Include="Model\XmlNs0QueryConstraint.cs" />
+    <Compile Include="Model\XmlNs0RetriveCredentialReturn.cs" />
+    <Compile Include="Model\XmlNs0Signer.cs" />
+    <Compile Include="Model\XmlNs0SignHashRequest.cs" />
+    <Compile Include="Model\XmlNs0SignHashReturn.cs" />
+    <Compile Include="Model\XmlNs0SignOptions.cs" />
+    <Compile Include="Model\XmlNs0SignRequest.cs" />
+    <Compile Include="Model\XmlNs0SignRequestV2.cs" />
+    <Compile Include="Model\XmlNs0SignResponse.cs" />
+    <Compile Include="Model\XmlNs0SignReturn.cs" />
+    <Compile Include="Model\XmlNs0SignReturnV2.cs" />
+    <Compile Include="Model\XmlNs0SignReturnV2Multiple.cs" />
+    <Compile Include="Model\XmlNs0TestCredential.cs" />
+    <Compile Include="Model\XmlNs0Transform.cs" />
+    <Compile Include="Model\XmlNs0TransformType.cs" />
+    <Compile Include="Model\XmlNs0TSAAuth.cs" />
+    <Compile Include="Model\XmlNs0TypeTransport.cs" />
+    <Compile Include="Model\XmlNs0UserCertList.cs" />
+    <Compile Include="Model\XmlNs0UserCertListAuth.cs" />
+    <Compile Include="Model\XmlNs0VerifyRequest.cs" />
+    <Compile Include="Model\XmlNs0VerifyReturn.cs" />
+    <Compile Include="Model\XmlNs0VerifySignatures.cs" />
+    <Compile Include="Model\XmlNs0XmlSignatureParameter.cs" />
+    <Compile Include="Model\XmlNs0XMLSignatureType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SignServiceApi.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

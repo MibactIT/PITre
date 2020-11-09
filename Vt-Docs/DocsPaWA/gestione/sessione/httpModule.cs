@@ -48,8 +48,9 @@ namespace DocsPAWA.gestione.sessione
 		public void OnPreRequestHandler(object obj, EventArgs args) 
 		{ 
 			HttpApplication app =(HttpApplication) obj; 
-			HttpContext ctx = app.Context; 
-     
+			HttpContext ctx = app.Context;
+
+            //logger.Debug(ctx.Request.Url.AbsolutePath.ToLower());
 			// Modifica per integrazione con portale ANAS
 			if (ctx.Request.Url.AbsolutePath.ToLower().IndexOf("portal_docspa.aspx") > 0)
 				return; 
@@ -75,6 +76,9 @@ namespace DocsPAWA.gestione.sessione
 
             //Evito ricorsione su session aborted
             if (ctx.Request.Url.AbsolutePath.ToLower().IndexOf("sessionaborted.aspx") > 0)
+                return;
+
+            if (ctx.Request.Url.AbsolutePath.ToLower().IndexOf("loginldap.aspx") > 0)
                 return;
 
 			if (ctx.Session !=null) 

@@ -41,7 +41,7 @@ namespace VtDocsWS.Services.Proceedings.AddDocToProceeding
         }
 
         /// <summary>
-        /// Tipologia documento
+        /// Tipologia documento - DEPRECATO
         /// </summary>
         [DataMember]
         public int IdDocumentTypology
@@ -54,10 +54,10 @@ namespace VtDocsWS.Services.Proceedings.AddDocToProceeding
         /// Contenuto del file
         /// </summary>
         [DataMember]
-        public byte[] Content 
-        { 
+        public byte[] Content
+        {
             get;
-            set; 
+            set;
         }
 
         /// <summary>
@@ -65,6 +65,16 @@ namespace VtDocsWS.Services.Proceedings.AddDocToProceeding
         /// </summary>
         [DataMember]
         public Domain.File[] Attachment
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Descrizione tipologia documento
+        /// </summary>
+        [DataMember]
+        public String DescDocumentTypology
         {
             get;
             set;

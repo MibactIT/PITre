@@ -84,7 +84,11 @@ namespace DocsPaDB.Query_Utils
 
 			string myString = q.getSQL();
             logger.Debug(myString);
-			this.ExecuteQuery (out dataSet,"RUOLI",myString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery (out dataSet,"RUOLI",myString);
+            }
 		}
 
 

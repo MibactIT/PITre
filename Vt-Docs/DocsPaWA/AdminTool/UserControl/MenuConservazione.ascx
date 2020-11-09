@@ -184,29 +184,29 @@
     <!-- Menu conservazione PARER -->
     <tr>
         <%
-            if (string.IsNullOrEmpty(Request.QueryString["menuConservazione"]))
-            { %>
-        <!--  TASTO : Riepilogo  -->
-        <td width="120" height="25" bgcolor="#ad736b" class="testo_bianco" align="left" style="padding-left: 5px;">
-            Riepilogo
-        </td>
-        <% }
-            else
-            { %>
-        <td width="120" height="25" bgcolor="#800000" align="left" class="testo_bianco" style="padding-left: 5px;">
-            <asp:HyperLink CssClass="menu" ID="HyperLink6" runat="server" Target="_parent"
-                NavigateUrl="../Gestione_Conservazione/Conservazione.aspx?from=CON"
-                ToolTip="Riepilogo">Riepilogo</asp:HyperLink>
-        </td>
-        <% } %>
-    </tr>
-    <tr>
-        <td width="120" height="20">
-            &nbsp;
-        </td>
-    </tr>
-    <tr>
-        <%
+        if (string.IsNullOrEmpty(Request.QueryString["menuConservazione"]))
+                    { %>
+                <!--  TASTO : Riepilogo  -->
+                <td width="120" height="25" bgcolor="#ad736b" class="testo_bianco" align="left" style="padding-left: 5px;">
+                    Riepilogo
+                </td>
+                <% }
+                    else
+                    { %>
+                <td width="120" height="25" bgcolor="#800000" align="left" class="testo_bianco" style="padding-left: 5px;">
+                    <asp:HyperLink CssClass="menu" ID="HyperLink6" runat="server" Target="_parent"
+                        NavigateUrl="../Gestione_Conservazione/Conservazione.aspx?from=CON"
+                        ToolTip="Riepilogo">Riepilogo</asp:HyperLink>
+                </td>
+                <% } %>
+            </tr>
+            <tr>
+                <td width="120" height="20">
+                    &nbsp;
+                </td>
+            </tr>
+            <tr>
+            <%
             if (Request.QueryString["menuConservazione"] == "policyDocumentiPARER")
             { %>
         <!--  TASTO : Policy Documenti  -->

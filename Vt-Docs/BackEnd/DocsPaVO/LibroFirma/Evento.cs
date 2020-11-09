@@ -12,7 +12,6 @@ namespace DocsPaVO.LibroFirma
         private string descrizione;
         private string tipo_evento;
         private string gruppo;
-        private bool automatico;
 
         public string IdEvento
         {
@@ -76,18 +75,6 @@ namespace DocsPaVO.LibroFirma
             set
             {
                 gruppo = value;
-            }
-        }
-
-        public bool Automatico
-        {
-            get
-            {
-                return automatico;
-            }
-            set
-            {
-                automatico = value;
             }
         }
     }

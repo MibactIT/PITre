@@ -95,7 +95,7 @@ namespace DocsPaDocumentale_WSPIA.WsPiaServices
                 WsPia.Service1 wspia = new WsPia.Service1();
                 wspia.Url = urlWsPia;
                 DimeAttachment dimeAttach = new DimeAttachment("image/gif", TypeFormat.MediaType, @pathDelFile);
-                wspia.RequestSoapContext.Attachments.Add(dimeAttach);
+                // wspia.RequestSoapContext.Attachments.Add(dimeAttach); RIPRISTINARE
                 wspia.Timeout = System.Threading.Timeout.Infinite;
                 
                 esitoXmlFormat = wspia.associaImmagine(formData.codApp, formData.codAMM, formData.codA00, formData.codiceUtente, formData.segnatura, formData.xml);
@@ -150,7 +150,7 @@ namespace DocsPaDocumentale_WSPIA.WsPiaServices
                 WsPia.Service1 wspia = new WsPia.Service1();
                 wspia.Url = urlWsPia;
                 DimeAttachment dimeAttach = new DimeAttachment("image/gif", TypeFormat.MediaType, @pathDelFile);
-                wspia.RequestSoapContext.Attachments.Add(dimeAttach);
+                // wspia.RequestSoapContext.Attachments.Add(dimeAttach); // RIPRISTINARE
                 wspia.Timeout = System.Threading.Timeout.Infinite;
 
                 segnaturaXmlFormat = wspia.associaAllegato(inputData.codApp, inputData.codAMM, inputData.codA00, inputData.codiceUtente, inputData.segnatura, inputData.xml);

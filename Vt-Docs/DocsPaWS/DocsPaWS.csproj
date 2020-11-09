@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -22,14 +22,16 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <SignAssembly>false</SignAssembly>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <UseIISExpress>false</UseIISExpress>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,6 +51,7 @@
     <FilesToIncludeForPublish>AllFilesInTheProject</FilesToIncludeForPublish>
     <ExcludeGeneratedDebugSymbol>true</ExcludeGeneratedDebugSymbol>
     <ExcludeApp_Data>true</ExcludeApp_Data>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,8 +61,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Aspose.Pdf, Version=17.10.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <HintPath>..\DocsPA3xSolution\packages\Aspose.Pdf.17.10\lib\net40-client\Aspose.Pdf.dll</HintPath>
+    </Reference>
     <Reference Include="BouncyCastle.Crypto, Version=1.7.4114.6375, Culture=neutral, PublicKeyToken=0e99375e54769942">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DLL_TERZE_PARTI\BouncyCastle.Crypto.dll</HintPath>
@@ -85,13 +92,8 @@
     </Reference>
     <Reference Include="Microsoft.Web.Services3, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
-    <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Services" />
     <Reference Include="System.Data.Services.Client" />
@@ -104,20 +106,17 @@
     </Reference>
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Web.Extensions.Design, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Extensions.Design" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Web.Mobile" />
-    <Reference Include="System.Xml.Linq, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WCFExtras, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DLL_TERZE_PARTI\WCFExtras.dll</HintPath>
@@ -134,8 +133,9 @@
     <Content Include="Cache\DocsPaCachingWS.asmx" />
     <Content Include="Behaviors.config" />
     <Content Include="Bindings.config" />
-    <!--<Compile Include="ChilkatDotNet2.dll" />-->
-    <Content Include="ChilkatDotNet\ChilkatDotNet2_32.dll" />
+    <!--<None Include="ChilkatDotNet2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>-->
     <Content Include="ChilkatDotNet\ChilkatDotNet2_64.dll" />
     <Content Include="Conservazione\Integrita\IntegritaServices.asmx" />
     <Content Include="Conservazione\PacchettiVersamento\PacchettiServices.asmx" />
@@ -165,9 +165,6 @@
     <Content Include="report\ricevuta\ricevuta.txt" />
     <Content Include="report\templateXML\XMLRepStampaRisRicTrasmFasc.xml" />
     <Content Include="report\templateXML\XMLStampaRisRicNotificationCenter.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="report\templateXML\XMLStampaRisRicVisibilitaProcessi.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="VtDocsWS\Compression\bin\Debug\Compression.dll" />
@@ -240,7 +237,9 @@
     <Content Include="webservice_test\webServiceTest.asmx" />
     <Content Include="xml\Dati.xml" />
     <Content Include="xml\descrittore CSV.txt" />
-    <Content Include="xml\ImportExportQueryList.xml" />
+    <Content Include="xml\ImportExportQueryList.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="xml\labelPDF.xml" />
     <Content Include="xml\logger.xsl" />
     <Content Include="xml\oracleSequenceMaps.xml">
@@ -272,9 +271,9 @@
     <Content Include="xml\xslfo_export_fasc.xsl" />
     <Content Include="xml\xslfo_export_notification_center.xsl" />
     <Content Include="xml\xslfo_export_trasm.xsl" />
-    <None Include="Properties\PublishProfiles\ny.pubxml" />
-    <None Include="Properties\PublishProfiles\SVILUPPO.pubxml" />
-    <None Include="Properties\PublishProfiles\SVILUPPO_BE.pubxml" />
+    <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\MIBAC-GIADAv1.1-BE.pubxml" />
     <None Include="VtDocsWS\Compression\obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
     <None Include="xml\impresainungiorno.gov_tipi_elementari-1.0.0.xsd">
       <SubType>Designer</SubType>
@@ -530,6 +529,7 @@
     <Compile Include="VtDocsWS\Compression\CompressionManager.cs" />
     <Compile Include="VtDocsWS\Compression\HttpCompressionModule.cs" />
     <Compile Include="VtDocsWS\Compression\Properties\AssemblyInfo.cs" />
+    <Compile Include="VtDocsWS\Domain\AooUserAssociation.cs" />
     <Compile Include="VtDocsWS\Domain\C3Document.cs" />
     <Compile Include="VtDocsWS\Domain\C3File.cs" />
     <Compile Include="VtDocsWS\Domain\ClassificationScheme.cs" />
@@ -549,16 +549,10 @@
     <Compile Include="VtDocsWS\Domain\FileDoc\SubjectInfo.cs" />
     <Compile Include="VtDocsWS\Domain\FileDoc\TSARFC2253.cs" />
     <Compile Include="VtDocsWS\Domain\FileDoc\VerifySignatureResult.cs" />
-    <Compile Include="VtDocsWS\Domain\FileFTPUploadInfo.cs" />
     <Compile Include="VtDocsWS\Domain\FileInUpload.cs" />
     <Compile Include="VtDocsWS\Domain\Filter.cs" />
     <Compile Include="VtDocsWS\Domain\Folder.cs" />
     <Compile Include="VtDocsWS\Domain\IstanzaPassoFirma.cs" />
-    <Compile Include="VtDocsWS\Domain\SignBook\Event.cs" />
-    <Compile Include="VtDocsWS\Domain\SignBook\SignStepInstance.cs" />
-    <Compile Include="VtDocsWS\Domain\SignBook\SignatureProcessInstance.cs" />
-    <Compile Include="VtDocsWS\Domain\SignBook\SignatureStep.cs" />
-    <Compile Include="VtDocsWS\Domain\SignBook\SignatureProcess.cs" />
     <Compile Include="VtDocsWS\Domain\Note.cs" />
     <Compile Include="VtDocsWS\Domain\OperationFollow.cs" />
     <Compile Include="VtDocsWS\Domain\OpportunityData.cs" />
@@ -625,6 +619,7 @@
     <Compile Include="VtDocsWS\Services\APSS_Services\SendPublicationResult\SendPublicationResultResponse.cs" />
     <Compile Include="VtDocsWS\Services\Authentication\Authenticate\AuthenticateRequest.cs" />
     <Compile Include="VtDocsWS\Services\Authentication\Authenticate\AuthenticateResponse.cs" />
+    <Compile Include="VtDocsWS\Services\Authentication\GetAooListForUser\AooUserAssociationResponse.cs" />
     <Compile Include="VtDocsWS\Services\Authentication\LogIn\LogInRequest.cs" />
     <Compile Include="VtDocsWS\Services\Authentication\LogIn\LogInResponse.cs" />
     <Compile Include="VtDocsWS\Services\Authentication\LogOut\LogOutRequest.cs" />
@@ -710,13 +705,8 @@
     <Compile Include="VtDocsWS\Services\Documents\UploadFileToDocument\UploadFileToDocumentResponse.cs" />
     <Compile Include="VtDocsWS\Services\Email\SendMail\SendMailRequest.cs" />
     <Compile Include="VtDocsWS\Services\Email\SendMail\SendMailResponse.cs" />
-    <Compile Include="VtDocsWS\Services\FilesUploader\FileFTPUpload\CheckFileFTPUploadRequest.cs" />
-    <Compile Include="VtDocsWS\Services\FilesUploader\FileFTPUpload\FileFTPUploadResponse.cs" />
-    <Compile Include="VtDocsWS\Services\FilesUploader\FileFTPUpload\NotifyFileFTPUploadRequest.cs" />
     <Compile Include="VtDocsWS\Services\FilesUploader\GetFileState\GetFileStateRequest.cs" />
     <Compile Include="VtDocsWS\Services\FilesUploader\GetFileState\GetFileStateResponse.cs" />
-    <Compile Include="VtDocsWS\Services\FilesUploader\UploaderVersion\UploaderVersionRequest.cs" />
-    <Compile Include="VtDocsWS\Services\FilesUploader\UploaderVersion\UploaderVersionResponse.cs" />
     <Compile Include="VtDocsWS\Services\FilesUploader\UploadFile\UploadFileRequest.cs" />
     <Compile Include="VtDocsWS\Services\FilesUploader\UploadFile\UploadFileResponse.cs" />
     <Compile Include="VtDocsWS\Services\FollowDomainObject\FollowResponse.cs" />
@@ -740,27 +730,18 @@
     <Compile Include="VtDocsWS\Services\LibroFirma\AddElementoInLF\AddElementoInLFResponse.cs" />
     <Compile Include="VtDocsWS\Services\LibroFirma\ClosePassoAndGetNext\ClosePassoAndGetNextRequest.cs" />
     <Compile Include="VtDocsWS\Services\LibroFirma\ClosePassoAndGetNext\ClosePassoAndGetNextResponse.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\GetInstanceSearchFilters\GetInstanceSearchFiltersResponse.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\GetSignatureProcesses\GetSignatureProcessesRequest.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\GetSignatureProcesses\GetSignatureProcessesResponse.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\GetSignatureProcess\GetSignatureProcessRequest.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\GetSignatureProcess\GetSignatureProcessResponse.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\GetSignProcessInstance\GetSignProcessInstanceRequest.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\GetSignProcessInstance\GetSignProcessInstanceResponse.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\InterruptSignatureProcess\InterruptSignatureProcessRequest.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\InterruptSignatureProcess\InterruptSignatureProcessResponse.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\SearchSignProcessInstances\SearchSignProcessInstancesRequest.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\SearchSignProcessInstances\SearchSignProcessInstancesResponse.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\StartSignatureProcess\StartSignatureProcessRequest.cs" />
-    <Compile Include="VtDocsWS\Services\LibroFirma\StartSignatureProcess\StartSignatureProcessResponse.cs" />
     <Compile Include="VtDocsWS\Services\PluginHash\GetHashMail\GetHashMailRequest.cs" />
     <Compile Include="VtDocsWS\Services\PluginHash\GetHashMail\GetHashMailResponse.cs" />
     <Compile Include="VtDocsWS\Services\PluginHash\NewHashMail\NewHashMailRequest.cs" />
     <Compile Include="VtDocsWS\Services\PluginHash\NewHashMail\NewHashMailResponse.cs" />
     <Compile Include="VtDocsWS\Services\Proceedings\AddDocToProceeding\AddDocToProceedingRequest.cs" />
     <Compile Include="VtDocsWS\Services\Proceedings\AddDocToProceeding\AddDocToProceedingResponse.cs" />
+    <Compile Include="VtDocsWS\Services\Proceedings\GetAOO\GetAOORequest.cs" />
+    <Compile Include="VtDocsWS\Services\Proceedings\GetAOO\GetAOOResponse.cs" />
     <Compile Include="VtDocsWS\Services\Proceedings\GetProceeding\GetProceedingRequest.cs" />
     <Compile Include="VtDocsWS\Services\Proceedings\GetProceeding\GetProceedingResponse.cs" />
+    <Compile Include="VtDocsWS\Services\Proceedings\GetTipologies\GetTipologiesRequest.cs" />
+    <Compile Include="VtDocsWS\Services\Proceedings\GetTipologies\GetTipologiesResponse.cs" />
     <Compile Include="VtDocsWS\Services\Proceedings\GetUnreadNotifications\GetUnreadNotificationsRequest.cs" />
     <Compile Include="VtDocsWS\Services\Proceedings\GetUnreadNotifications\GetUnreadNotificationsResponse.cs" />
     <Compile Include="VtDocsWS\Services\Proceedings\SetReadNotifications\SetReadNotificationsRequest.cs" />
@@ -1077,6 +1058,10 @@
       <Project>{00705496-C7C0-4792-94B4-CA618551319C}</Project>
       <Name>VtDocs.BusinessServices</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DocsPA3xSolution\PdfService\PdfService.csproj">
+      <Project>{f3e48e48-8095-4279-8d9a-4afb7d624fad}</Project>
+      <Name>PdfService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DocsPA3xSolution\VerifyAndSetTypeDocOrFasc\VerifyAndSetTypeDocOrFasc.csproj">
       <Project>{DEB63EFB-4F28-4C00-9EBF-13F23F428F81}</Project>
       <Name>VerifyAndSetTypeDocOrFasc</Name>
@@ -1124,6 +1109,28 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

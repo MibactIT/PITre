@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
@@ -32,7 +32,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <PublishUrl>http://localhost/BusinessLogic/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -74,6 +74,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -98,6 +99,31 @@
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <WarningLevel>0</WarningLevel>
+    <FileAlignment>4096</FileAlignment>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
@@ -122,8 +148,8 @@
     <Reference Include="AODL">
       <HintPath>..\..\DLL_TERZE_PARTI\AODL.dll</HintPath>
     </Reference>
-    <Reference Include="Aspose.Pdf">
-      <HintPath>..\..\DLL_TERZE_PARTI\Aspose.Pdf.dll</HintPath>
+    <Reference Include="Aspose.Pdf, Version=17.10.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <HintPath>..\..\DocsPA3xSolution\packages\Aspose.Pdf.17.10\lib\net40-client\Aspose.Pdf.dll</HintPath>
     </Reference>
     <Reference Include="Aspose.Slides">
       <HintPath>..\..\DLL_TERZE_PARTI\Aspose.Slides.dll</HintPath>
@@ -134,12 +160,14 @@
     <Reference Include="BouncyCastle.Crypto">
       <HintPath>..\..\DLL_TERZE_PARTI\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
-    <Reference Include="ChilkatDotNet2, Version=9.5.0.72, Culture=neutral, PublicKeyToken=eb5fc1fc52ef09bd, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ChilkatDotNet2">
       <HintPath>..\..\DLL_TERZE_PARTI\ChilKat\9.5.0\ChilkatDotNet2.dll</HintPath>
     </Reference>
     <Reference Include="DPA.Acrobat7.PdfConverter">
       <HintPath>..\..\DLL_TERZE_PARTI\DPA.Acrobat7.PdfConverter.dll</HintPath>
+    </Reference>
+    <Reference Include="DPA.BouncyCastle">
+      <HintPath>..\..\DLL_TERZE_PARTI\DPA.BouncyCastle.dll</HintPath>
     </Reference>
     <Reference Include="DPA.Common">
       <HintPath>..\..\DLL_TERZE_PARTI\DPA.Common.dll</HintPath>
@@ -155,6 +183,15 @@
     </Reference>
     <Reference Include="DPA.UI.Scanner.EZTwain">
       <HintPath>..\..\DLL_TERZE_PARTI\DPA.UI.Scanner.EZTwain.dll</HintPath>
+    </Reference>
+    <Reference Include="Emc.Documentum.FS.DataModel">
+      <HintPath>..\..\DLL_TERZE_PARTI\Emc.Documentum.FS.DataModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Emc.Documentum.FS.Runtime">
+      <HintPath>..\..\DLL_TERZE_PARTI\Emc.Documentum.FS.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Emc.Documentum.FS.Services">
+      <HintPath>..\..\DLL_TERZE_PARTI\Emc.Documentum.FS.Services.dll</HintPath>
     </Reference>
     <Reference Include="ExcelXmlWriter">
       <HintPath>..\..\DLL_TERZE_PARTI\ExcelXmlWriter.dll</HintPath>
@@ -186,11 +223,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DLL_TERZE_PARTI\Interoperabilita_Semplificata\Interoperability.Service.Library.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\..\DLL_TERZE_PARTI\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="itextsharp, Version=4.1.6.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DLL_TERZE_PARTI\itextsharp.dll</HintPath>
     </Reference>
-    <Reference Include="log4net">
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DLL_TERZE_PARTI\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Services3, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -233,9 +274,21 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
+    <ProjectReference Include="..\..\DocsPA3xSolution\AsposePdfService\AsposePdfService.csproj">
+      <Project>{fbcfb227-99e1-4309-b132-96e24f24744d}</Project>
+      <Name>AsposePdfService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DocsPA3xSolution\InfoCertSignerConnector\InfoCertSignerConnector.csproj">
       <Project>{531c9431-634e-4310-bf8f-33717ac50729}</Project>
       <Name>InfoCertSignerConnector</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DocsPA3xSolution\PdfService\PdfService.csproj">
+      <Project>{f3e48e48-8095-4279-8d9a-4afb7d624fad}</Project>
+      <Name>PdfService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ExternalServices\ArubaSignService\ArubaSignService.csproj">
+      <Project>{f39f2429-729a-4134-a31b-19e8a673b3ac}</Project>
+      <Name>ArubaSignService</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\InlineConverterEngine.Proxy\InlineConverterEngine.Proxy.csproj">
       <Project>{CC328C7A-7B13-4EE6-B577-AAEBDABF69AD}</Project>
@@ -414,6 +467,7 @@
     <Compile Include="AS400\AS400.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="AsposePDF\AsposeManager.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -430,7 +484,6 @@
     <Compile Include="Conservazione\AmmConservazioneManager.cs" />
     <Compile Include="Conservazione\ConservazioneManager.cs" />
     <Compile Include="Conservazione\EsibizioneManager.cs" />
-    <Compile Include="Conservazione\PARER\BigFilesManager.cs" />
     <Compile Include="Conservazione\PARER\PolicyPARERManager.cs" />
     <Compile Include="Conservazione\PARER\ReportManager.cs" />
     <Compile Include="Conservazione\Policy\PolicyManager.cs" />
@@ -448,6 +501,7 @@
     <Compile Include="Documenti\DocumentConsolidation.cs" />
     <Compile Include="Documenti\EtichetteManager.cs" />
     <Compile Include="Documenti\PDFParser.cs" />
+    <Compile Include="Documenti\SegnaturaManager.cs" />
     <Compile Include="Documenti\TimestampManager.cs" />
     <Compile Include="Documenti\VersioniRemoveHandler.cs" />
     <Compile Include="ExportDati\OpenDocumentServices.cs" />
@@ -668,25 +722,24 @@
     <Compile Include="Modelli\StampaRicevutaProtocolloPdf.cs" />
     <Compile Include="MText\MText.cs" />
     <Compile Include="Note\NoteManager.cs" />
+    <Compile Include="Pdf\PdfManager.cs" />
     <Compile Include="Plugin\PluginHashBL.cs" />
+    <Compile Include="Procedimenti\AmministrazioneManager.cs" />
     <Compile Include="Procedimenti\AnalisiManager.cs" />
     <Compile Include="Procedimenti\ProcedimentiManager.cs" />
-    <Compile Include="RegistroAccessi\RegistroAccessiManager.cs" />
+    <Compile Include="RDE\DownloadRDE.cs" />
+    <Compile Include="RDE\FileHelper.cs" />
+    <Compile Include="RDE\RDEManager.cs" />
     <Compile Include="Reporting\AmmExportMacroFunzioniReportGeneratorCommand.cs" />
     <Compile Include="Reporting\AmmExportMicroFunzioniReportGeneratorCommand.cs" />
     <Compile Include="Reporting\AmmExportPolicyPARERReportGeneratorCommand.cs" />
-    <Compile Include="Reporting\AmmMonitoraggioPolicyReportGeneratorCommand.cs" />
     <Compile Include="Reporting\CertificazioneIstanzaEsibizioneReportGeneratorCommand.cs" />
     <Compile Include="Reporting\EsecuzionePolicyPARERReportGeneratorCommand.cs" />
     <Compile Include="Reporting\ExportLogConservazioneReportGeneratorCommand.cs" />
-    <Compile Include="Reporting\ExportProcessiDiFirmaReportGeneratorCommand.cs" />
     <Compile Include="Reporting\ExportRubricaReportGeneratorCommand.cs" />
     <Compile Include="Reporting\ExportRubricaSearchReportGeneratorCommand.cs" />
-    <Compile Include="Reporting\ExportTrasmissioniPendentiUtenteReportGeneratorCommand.cs" />
     <Compile Include="Reporting\NotificheChiusuraReportGeneratorCommand.cs" />
     <Compile Include="Reporting\NotificheRifiutoReportGeneratorCommand.cs" />
-    <Compile Include="Reporting\RegistroAccessiExportReportGeneratorCommand.cs" />
-    <Compile Include="Reporting\RegistroAccessiPublishReportGeneratorCommand.cs" />
     <Compile Include="Reporting\ReportVersamentiPAREREmptyReportGeneratorCommand.cs" />
     <Compile Include="Reporting\ReportVersamentiReportGeneratorCommand.cs" />
     <Compile Include="Reporting\RigenerazioneIstanzaReportGeneratorCommand.cs" />
@@ -878,6 +931,7 @@
     <Content Include="Reporting\Excel\ExcelXmlWriter.dll" />
     <EmbeddedResource Include="interoperabilita\CalendarMail\iCalendar\Templates\SendAppointment.ics" />
     <EmbeddedResource Include="interoperabilita\CalendarMail\iCalendar\Templates\SendAppointmentDisplayAlert.ics" />
+    <None Include="packages.config" />
     <None Include="Service References\NotificationCenterOperationServices\BusinessLogic.NotificationCenterOperationServices.AssociateChannelToInstanceResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

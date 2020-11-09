@@ -160,18 +160,83 @@ namespace BusinessLogic.Utenti
 
 			return utente;
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="objLogin"></param>
-		/// <param name="loginResult"></param>
-		/// <param name="forcedLogin">
-		/// Imposta se la connessione deve essere forzata, ossia 
-		/// una eventuale connessione esistente viene annullata).
-		/// </param>
-		/// <returns></returns>
-		public static DocsPaVO.utente.UserLogin.ValidationResult ValidateLogin(string userName, string idAmministrazione, string webSessionId) 
+
+        public static DocsPaVO.utente.Utente loginMethodLDAP(string userId, string codAmm,
+                   out DocsPaVO.utente.UserLogin.LoginResult loginResult,
+                   string webSessionId, string ipaddress)
+        {
+            DocsPaVO.utente.Utente utente = null;
+            loginResult = DocsPaVO.utente.UserLogin.LoginResult.UNKNOWN_USER;
+            //ipaddress2 = string.Empty;
+
+            DocsPaVO.utente.UserLogin loggedUser = new DocsPaVO.utente.UserLogin();
+
+            bool multiAmm = false;
+
+            DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
+            string IdAmm = amm.GetIDAmm(codAmm);
+
+            try
+            {
+                if (!string.IsNullOrEmpty(IdAmm))
+                {
+                    loggedUser.IdAmministrazione = IdAmm;
+                    loggedUser.IPAddress = ipaddress;
+                    loggedUser.UserName = userId;
+
+                    DocsPaDocumentale.Documentale.UserManager userManager = new DocsPaDocumentale.Documentale.UserManager();
+                    DocsPaDB.Query_DocsPAWS.Utenti gestioneUtenti = new DocsPaDB.Query_DocsPAWS.Utenti();
+
+                    if (userManager.LoginUserLDAP(loggedUser, out utente, out loginResult))
+                    {
+                        // Impostazione id sessione utente
+                        utente.sessionID = webSessionId;
+
+                        // Cancella eventuali connessioni esistenti
+                        gestioneUtenti.UnlockUserLogin(utente.userId, utente.idAmministrazione);
+
+                        // Assegna connessione
+                        gestioneUtenti.LockUserLogin(utente.userId, utente.idAmministrazione,
+                            webSessionId, ipaddress, utente.dst);
+                        utente.ruoli = UserManager.getRuoliUtente(utente.idPeople);
+                        utente.dominio = getDominio(utente.idPeople);
+                        if (utente.ruoli.Count == 0)
+                        {
+                            loginResult = DocsPaVO.utente.UserLogin.LoginResult.NO_RUOLI;
+                            utente = null;
+                        }
+
+                        // Qualifiche Utente
+                        string value = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "GESTIONE_QUALIFICHE");
+                        if (!string.IsNullOrEmpty(value) && value.Equals("1"))
+                        {
+                            utente.qualifiche = new ArrayList(utenti.QualificheManager.GetPeopleGroupsQualificheByIdPeople(utente.idPeople));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Debug(e.Message);
+                loginResult = DocsPaVO.utente.UserLogin.LoginResult.APPLICATION_ERROR;
+                logger.Debug("Errore nella gestione degli utenti (loginMethodLDAP)");
+                utente = null;
+            }
+
+            return utente;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objLogin"></param>
+        /// <param name="loginResult"></param>
+        /// <param name="forcedLogin">
+        /// Imposta se la connessione deve essere forzata, ossia 
+        /// una eventuale connessione esistente viene annullata).
+        /// </param>
+        /// <returns></returns>
+        public static DocsPaVO.utente.UserLogin.ValidationResult ValidateLogin(string userName, string idAmministrazione, string webSessionId) 
 		{
 			DocsPaVO.utente.UserLogin.ValidationResult result = DocsPaVO.utente.UserLogin.ValidationResult.OK;
 

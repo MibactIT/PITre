@@ -183,10 +183,13 @@ namespace Amministrazione.Gestione_Homepage
 
 
         protected System.Web.UI.WebControls.DropDownList ddlLabelPrinterType;
-		#endregion		
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
+        protected System.Web.UI.WebControls.CheckBox cbx_segnatura_permanente;
+        #endregion
+
+        #region Web Form Designer generated code
+
+        override protected void OnInit(EventArgs e)
 		{
 			InitializeComponent();
 			base.OnInit(e);
@@ -199,10 +202,8 @@ namespace Amministrazione.Gestione_Homepage
 			this.btn_chiudi.Click += new System.Web.UI.ImageClickEventHandler(this.btn_chiudi_Click);
 			this.dgFascSegn.ItemCommand += new System.Web.UI.WebControls.DataGridCommandEventHandler(this.dgFascSegn_ItemCommand);
 			this.dg_Separ.ItemCommand += new System.Web.UI.WebControls.DataGridCommandEventHandler(this.dg_Separ_ItemCommand);
-			this.btn_segn.Click += new System.Web.UI.ImageClickEventHandler(this.btn_segn_Click);
-			this.btn_fasc.Click += new System.Web.UI.ImageClickEventHandler(this.btn_fasc_Click);
-            this.btn_aut_dominio.Click += new System.Web.UI.ImageClickEventHandler(this.btn_aut_dominio_Click);
-            this.btn_chiudi_aut.Click += new System.Web.UI.ImageClickEventHandler(this.btn_aut_chiudi_Click);
+            this.cbx_segnatura_permanente.CheckedChanged += Cbx_segnatura_permanente_CheckedChanged;
+            //this.cbx_segnaturaNP_permanente.CheckedChanged += Cbx_segnaturaNP_permanente_CheckedChanged;
             this.dg_aut.ItemCommand += new System.Web.UI.WebControls.DataGridCommandEventHandler(this.dg_aut_ItemCommand);
             this.dg_sep.ItemCommand += new System.Web.UI.WebControls.DataGridCommandEventHandler(this.dg_sep_ItemCommand);
             this.btn_annulla.Click += new System.EventHandler(this.btn_annulla_Click);
@@ -214,9 +215,22 @@ namespace Amministrazione.Gestione_Homepage
             this.btn_chiudi_etichette.Click += new System.Web.UI.ImageClickEventHandler(this.btn_chiudi_etichette_Click);
             this.btn_fascObbligatoria.Click += new System.Web.UI.ImageClickEventHandler(this.btn_fascObbligatoria_Click);
             this.btn_chiudiFascObbligatoria.Click += new System.Web.UI.ImageClickEventHandler(this.btn_chiudiFascObbligatoria_Click);
-            
+            this.btn_segn.Click += new System.Web.UI.ImageClickEventHandler(this.btn_segn_Click);
 
-		}
+
+        }
+
+        private void Cbx_segnaturaNP_permanente_CheckedChanged(object sender, EventArgs e)
+        {
+            // nessuna azione, il valore verrà letto del salvataggio per impostare il campo nella tabella del db
+        }
+
+        private void Cbx_segnatura_permanente_CheckedChanged(object sender, EventArgs e)
+        {
+            // nessuna azione, il valore verrà letto del salvataggio per impostare il campo nella tabella del db
+        }
+
+
 		#endregion
 
 		#region Page Load e inizializzazione dati
@@ -305,9 +319,9 @@ namespace Amministrazione.Gestione_Homepage
 
 				if(amm.getListaAmministrazioni()!=null && amm.getListaAmministrazioni().Count>0)
 				{
-					// gestione tipologie di utente amministratore
-					if (_datiAmministratore.tipoAmministratore.Equals("2") || _datiAmministratore.tipoAmministratore.Equals("3"))
-					{
+                    // gestione tipologie di utente amministratore
+                    if (_datiAmministratore.tipoAmministratore.Equals("2") || _datiAmministratore.tipoAmministratore.Equals("3"))
+                    {
 						//03-07-2017: visualizzo tutte le amministrazioni in cui il super admin corrente è inserito
                         //this.LoadDDLAmministrazioni(amm.getListaAmministrazioni(), _datiAmministratore.idAmministrazione);
                         LoadDDLAmministrazioniPerUtenteAmministratore(amm.getListaAmministrazioni(), _datiAmministratore.idAmministrazione, _datiAmministratore.userId);
@@ -365,6 +379,7 @@ namespace Amministrazione.Gestione_Homepage
             try
             {
                 ws.Clear(idAmm);
+
                 DocsPAWA.AdminTool.Manager.SessionManager session = new DocsPAWA.AdminTool.Manager.SessionManager();
                 this._datiAmministratore = session.getUserAmmSession();
 
@@ -391,19 +406,30 @@ namespace Amministrazione.Gestione_Homepage
                     string redirectUrl = string.Empty;
                     if (_datiAmministratore.tipoAmministratore.Equals("3"))
                     {
-                         redirectUrl = "../Gestione_Homepage/Home2.aspx?from=HP1";
+                        redirectUrl = "../Gestione_Homepage/Home2.aspx?from=HP1";
                     }
                     if (oldTipoAmministratore.Equals("3") && _datiAmministratore.tipoAmministratore.Equals("2"))
                     {
-                         redirectUrl = "../Gestione_Homepage/Home.aspx";
+                        redirectUrl = "../Gestione_Homepage/Home.aspx";
                     }
 
                     // apre la homepage dell'amministrazione
-                    string script = "<script>; var popup = window.open('" + redirectUrl + "','Home'," +
-                            "'fullscreen=no,toolbar=no,directories=no,statusbar=no,menubar=no,resizable=yes,scrollbars=yes');" +
-                            "popup.moveTo(0,0); popup.resizeTo(screen.availWidth,screen.availHeight);" +
-                            " if(popup!=self) {window.opener=null;self.close();}" +
-                            "</script>";
+                    string script = "";
+                    //*--- redirect senza popup per login da LDAP -------------
+                    if (Session["LdapOK"] != null && (bool)Session["LdapOK"] == true)
+                    {
+                        redirectUrl = "../Gestione_Homepage/Home.aspx";
+                        script = "<script>window.location.href = '" + redirectUrl + "'</script>";
+                    }
+                    //*--- redirect con popup per login normale
+                    else
+                    {
+                        script = "<script>; var popup = window.open('" + redirectUrl + "','Home'," +
+                                "'fullscreen=no,toolbar=no,directories=no,statusbar=no,menubar=no,resizable=yes,scrollbars=yes');" +
+                                "popup.moveTo(0,0); popup.resizeTo(screen.availWidth,screen.availHeight);" +
+                                " if(popup!=self) {window.opener=null;self.close();}" +
+                                "</script>";
+                    }
 
                     this.ClientScript.RegisterStartupScript(this.GetType(), "scriptJavaScript", script);
                 }
@@ -482,14 +508,22 @@ namespace Amministrazione.Gestione_Homepage
 
 		private void LoadInfoAmm(DocsPAWA.DocsPaWR.InfoAmministrazione currAmm)
 		{
-           
-			this.hd_idAmm.Value=currAmm.IDAmm;
+            Session["SELECTED_AMM"] = currAmm;
+
+            this.hd_idAmm.Value=currAmm.IDAmm;
 			this.txt_codice.Text=currAmm.Codice;
 			this.txt_descrizione.Text=currAmm.Descrizione;			
 			this.txt_segnatura.Text=currAmm.Segnatura;
             this.txt_timbro_su_pdf.Text=currAmm.Timbro_pdf;
 			this.txt_fascicolatura.Text=currAmm.Fascicolatura;
             this.txt_banner.Text = currAmm.Banner;
+
+            // Alessandro Aiello
+
+            //this.txt_segnaturaNP.Text = currAmm.SegnaturaNP.Trim();
+            this.cbx_segnatura_permanente.Checked = currAmm.Segnatura_IsPermanente.Equals("1");
+            //this.cbx_segnaturaNP_permanente.Checked = currAmm.SegnaturaNP_IsPermanente.Equals("1");
+            //
 
             if(!string.IsNullOrEmpty(ws.isEnableProtocolloTitolario()) || ws.isEnableRiferimentiMittente())
                 this.txt_protocolloTit_Riscontro.Text = currAmm.formatoProtTitolario;
@@ -652,12 +686,16 @@ namespace Amministrazione.Gestione_Homepage
 
 		private DocsPAWA.DocsPaWR.InfoAmministrazione getVideoData()
 		{
-			DocsPAWA.DocsPaWR.InfoAmministrazione amm = new DocsPAWA.DocsPaWR.InfoAmministrazione();
+            DocsPAWA.DocsPaWR.InfoAmministrazione amm = new DocsPAWA.DocsPaWR.InfoAmministrazione();
+            if (Session["SELECTED_AMM"] != null) amm = (DocsPAWA.DocsPaWR.InfoAmministrazione)Session["SELECTED_AMM"];
 
-			amm.IDAmm=this.ddl_amministrazioni.SelectedValue.ToString();
+            amm.IDAmm=this.ddl_amministrazioni.SelectedValue.ToString();
 			amm.Codice=this.txt_codice.Text;
 			amm.Descrizione=this.txt_descrizione.Text;
 			amm.Segnatura=this.txt_segnatura.Text;
+            //amm.SegnaturaNP = this.txt_segnaturaNP.Text.Trim(); // Alessandro
+            amm.Segnatura_IsPermanente = this.cbx_segnatura_permanente.Checked ? "1" : "0"; // Alessandro
+            //amm.SegnaturaNP_IsPermanente = this.cbx_segnaturaNP_permanente.Checked ? "1" : "0"; // Alessandro
             amm.Timbro_pdf=this.txt_timbro_su_pdf.Text;
 			amm.Fascicolatura=this.txt_fascicolatura.Text;
             if (!string.IsNullOrEmpty(ws.isEnableProtocolloTitolario()) || ws.isEnableRiferimentiMittente())
@@ -821,7 +859,7 @@ namespace Amministrazione.Gestione_Homepage
 					this.btn_elimina.Visible=true;
 					this.btn_elimina.Attributes.Add("onclick","if (!window.confirm('Sei sicuro di voler eliminare questa amministrazione?')) {return false};");
 					this.btn_salva.Text="Modifica";
-
+                    
                     // gestione tipologie di utente amministratore -------------------------------------------
                     if (_datiAmministratore.tipoAmministratore.Equals("2"))
                     {   // SUPER ADMIN
@@ -848,7 +886,7 @@ namespace Amministrazione.Gestione_Homepage
                             //this.lbl_ragTrasmCC.Text = this.lbl_ragTrasmCC.Text.Remove(72);
                         }
                     }
-					// ---------------------------------------------------------------------------------------
+                    // ---------------------------------------------------------------------------------------
 
                     // Impostazione visibilità controlli relativi alla gestione del wordprocessor
                     this.SetClientModelControlsVisibility();
@@ -1110,6 +1148,13 @@ namespace Amministrazione.Gestione_Homepage
                     return;
                 }
 
+                //if (String.IsNullOrEmpty(this.txt_segnaturaNP.Text.Trim()))
+                //{
+                //    this.AlertJS("Attenzione, il campo Segnatura NP è obbligatorio");
+                //    this.SetFocus(this.txt_timbro_su_pdf);
+                //    return;
+                //}
+
                 if (this.txt_fascicolatura.Text.Trim().Equals(string.Empty))
                 {
                     this.AlertJS("Attenzione, il campo Fascicolatura è obbligatorio");
@@ -1128,6 +1173,23 @@ namespace Amministrazione.Gestione_Homepage
                 this.SetFocus(this.txt_protocolloTit_Riscontro);
                 return;
             }
+
+
+            if (this.cbx_segnatura_permanente.Checked && String.IsNullOrEmpty(this.txt_segnatura.Text.Trim()))
+            {
+                this.AlertJS("Attenzione, specificare il formato Segnatura");
+                this.SetFocus(this.txt_segnatura);
+                return;
+            }
+
+
+            //if (this.cbx_segnaturaNP_permanente.Checked && String.IsNullOrEmpty(this.txt_segnaturaNP.Text.Trim()))
+            //{
+            //    this.AlertJS("Attenzione, specificare il formato Segnatura NP");
+            //    this.SetFocus(this.txt_segnaturaNP);
+            //    return;
+            //}
+
 
             if (this.txt_pwd_smtp.Text.Trim() != string.Empty || this.txt_conferma_pwd_smtp.Text.Trim() != string.Empty)
             {
@@ -1440,6 +1502,22 @@ namespace Amministrazione.Gestione_Homepage
             row["codice"] = "DESC_TIT";
             row["descrizione"] = "Descrizione titolario";
             dt.Rows.Add(row);
+
+            // Segnatura Np
+            // nel be vengono usati per la segnatura, in ?	[DocsPaDB.Query_DocsPAWS.Documenti -> CalcolaSegnaturaNP] 
+            //21
+            row = dt.NewRow();
+            row["codice"] = "DATA_ORA_CREAZ";
+            row["descrizione"] = "Data e ora della creazione";
+            dt.Rows.Add(row);
+            //22
+            row = dt.NewRow();
+            row["codice"] = "ID";
+            row["descrizione"] = "Identificativo del documento";
+            dt.Rows.Add(row);
+
+
+
             // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             
             dgFascSegn.DataSource = dt;
@@ -1508,6 +1586,7 @@ namespace Amministrazione.Gestione_Homepage
 			this.dgFascSegn.Items[6].Visible	=	true;
 			this.dgFascSegn.Items[7].Visible	=	true;
             this.dgFascSegn.Items[9].Visible    =   true;
+            this.dgFascSegn.Items[12].Visible = true;
             if (ConfigurationManager.AppSettings["ENABLE_CODBIS_SEGNATURA"] != null)
             {
                 if (ConfigurationManager.AppSettings["ENABLE_CODBIS_SEGNATURA"] == "1")
@@ -1522,6 +1601,29 @@ namespace Amministrazione.Gestione_Homepage
             else
                 this.dgFascSegn.Items[15].Visible = false;
 		}
+
+
+        protected void btn_segNP_Click(object sender, ImageClickEventArgs e)
+        {
+            this.pnl_autenticazione.Visible = false;
+            this.pnl_fasc_segn.Visible = true;
+            this.pnl_timbro.Visible = false;
+            this.pnl_etichette.Visible = false;
+            this.pnlFascObbligatoriaTipiDoc.Visible = false;
+            this.lbl_fascSegn.Text = "Opzioni per la stringa di Segnatura NP";
+            this.clearDgFascSegn();
+
+            this.dgFascSegn.Items[0].Visible = true;
+            this.dgFascSegn.Items[3].Visible = true;
+            this.dgFascSegn.Items[12].Visible = true;
+            // this.dgFascSegn.Items[18].Visible = true;
+            // data per il formato della segnatura
+            this.dgFascSegn.Items[21].Visible = true;
+            this.dgFascSegn.Items[22].Visible = true;
+            
+        }
+
+
 
 		/// <summary>
 		/// 
@@ -1812,6 +1914,11 @@ namespace Amministrazione.Gestione_Homepage
                     SetFocus(txt_segnatura);
                     break;
 
+                //case "Opzioni per la stringa di Segnatura NP":
+                //    txt_segnaturaNP.Text += e.Item.Cells[1].Text;
+                //    SetFocus(txt_segnaturaNP);
+                //    break;
+
                 case "Opzioni per la stringa di Fascicolatura":
                     txt_fascicolatura.Text += e.Item.Cells[1].Text;
                     SetFocus(txt_fascicolatura);
@@ -1842,6 +1949,11 @@ namespace Amministrazione.Gestione_Homepage
                     txt_segnatura.Text += e.Item.Cells[1].Text;
                     SetFocus(txt_segnatura);
                     break;
+
+                //case "Opzioni per la stringa di Segnatura NP":
+                //    txt_segnaturaNP.Text += e.Item.Cells[1].Text;
+                //    SetFocus(txt_segnaturaNP);
+                //    break;
 
                 case "Opzioni per la stringa di Fascicolatura":
                     txt_fascicolatura.Text += e.Item.Cells[1].Text;

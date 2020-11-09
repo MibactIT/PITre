@@ -90,6 +90,11 @@
 
             event.returnValue = returnCode;
         }
+
+        function apriPopupReplicaInAoo() {
+            window.showModalDialog('ModalAnteprimaProfDinamicaFasc.aspx?Chiamante=ReplicaInAoo.aspx', '', 'dialogWidth:600px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;close:no;top:' + new_h + ';left:' + new_w);
+            window.Form1.submit();
+        }
     </script>
 </head>
 <body bottommargin="0" leftmargin="0" topmargin="0">
@@ -138,9 +143,9 @@
                                             <asp:Label ID="lbl_titolo" runat="server" CssClass="titolo">Lista Tipi Fascicolo</asp:Label>
                                         </td>
                                         <td align="right">&nbsp;
-                                            <asp:Button ID="btn_Storico" Text="Gestione storico" runat="server"  CssClass="testo_btn_p" Visible="false" />
                                             <asp:Button ID="btn_CampiComuni" runat="server" CssClass="testo_btn_p" Visible="False" Text="Campi Comuni" OnClick="btn_CampiComuni_Click"></asp:Button>&nbsp;
                                             <asp:Button ID="btn_inEsercizio" runat="server" CssClass="testo_btn_p" Visible="False" Text="In Esercizio"></asp:Button>&nbsp;
+                                            <asp:Button ID="btn_replica" runat="server" CssClass="testo_btn_p" Visible="False" Text="Replica"></asp:Button>&nbsp;
                                             <asp:Button ID="btn_salvaTemplate" runat="server" CssClass="testo_btn_p" Visible="False" Text="Salva"></asp:Button>&nbsp;
                                             <asp:Button ID="btn_anteprima" runat="server" CssClass="testo_btn_p" Visible="False" Text="Anteprima"></asp:Button>&nbsp;
                                             <asp:Button ID="btn_modelli" runat="server" CssClass="testo_btn_p" Visible="False" Text="Tipi Fascicolo"></asp:Button>&nbsp;
@@ -224,6 +229,15 @@
                                                         <asp:ImageButton ID="ImageButtonMesiCons" runat="server" ImageUrl="../../images/proto/matita.gif"
                                                             CommandName="MesiCons"></asp:ImageButton>
                                                         <asp:Label ID="lbl_mesiCons" runat="server" Height="17px">Label</asp:Label>&nbsp;
+                                                    </ItemTemplate>
+                                                </asp:TemplateColumn>
+                                                <asp:TemplateColumn HeaderText="Procedimentale">
+                                                    <HeaderStyle HorizontalAlign="Center" Width="8%"></HeaderStyle>
+                                                    <ItemStyle HorizontalAlign="Center" Font-Bold="False"></ItemStyle>
+                                                    <ItemTemplate>
+                                                        <asp:ImageButton ID="ImageButtonProcedimentale" runat="server" ImageUrl="../../images/proto/matita.gif"
+                                                            CommandName="Procedimentale"></asp:ImageButton>
+                                                        <asp:Label ID="lbl_procedimentale" runat="server" Height="17px">Label</asp:Label>&nbsp;
                                                     </ItemTemplate>
                                                 </asp:TemplateColumn>
                                                 <asp:TemplateColumn HeaderText="Selezione">
@@ -332,6 +346,10 @@
                                                     Width="100%">
                                                 </asp:TextBox>
                                             </td>
+                                            <td align="center" width="20%">
+                                            <asp:CheckBox ID="cb_Procedimentale" runat="server" CssClass="testo_grigio_scuro" Text="Procedimentale"
+                                                TextAlign="Left" Checked="false"></asp:CheckBox>
+                                        </td>
                                             <td align="right">
                                                 <!--td align=center-->
                                                 <asp:CheckBox ID="cb_Privato" runat="server" CssClass="testo_grigio_scuro" Text="Privato"
@@ -504,6 +522,21 @@
                                                                 </asp:TextBox>
                                                             </td>
                                                         </tr>
+                                                         <tr>
+                                                        <td class="testo_grigio_scuro" style="width: 108px" align="left" width="108">
+                                                            Valore di default
+                                                        </td>
+                                                        <td style="padding-left: 5px" cssclass="testo">
+                                                            <asp:TextBox ID="txt_default_campotesto" runat="server" CssClass="testo" Width="200"></asp:TextBox>
+                                                        </td>
+                                                        <td class="testo_grigio_scuro" style="width: 80px" align="right" width="80">
+                                                          
+                                                        </td>
+                                                        <td>
+                                                            
+                                                        </td>
+                                                        
+                                                    </tr>
                                                         <tr>
                                                             <td align="left" colspan="4">
                                                                 <asp:Button ID="btn_ConfermaPersCampoDiTesto" runat="server" CssClass="testo_btn_p"
@@ -1266,6 +1299,50 @@
                                 </asp:Panel>
                             </td>
                         </tr>
+                        <!-- Panel per fasc procedimentale -->
+                        <tr>
+                            <td height="3">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:Panel ID="Panel_Procedimentale" runat="server" Visible="False" BorderWidth="1px" BorderColor="#810D06"
+                                BorderStyle="Solid">
+                                    <table width="99.5%">
+                                        <tr>
+                                            <td class="titolo_pnl" colspan="3">
+                                            <table cellspacing="0" cellpadding="0" width="100%">
+                                                <tr>
+                                                    <td class="titolo_pnl">
+                                                        Personalizzazione Tipo Fascicolo&nbsp;-&nbsp;
+                                                        <asp:Label ID="LblTipoFascProcedimentale" runat="server">Label</asp:Label>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                    <td align="right">
+                                                        <asp:ImageButton ID="pulsante_chiudi_Procedimentale" runat="server" ImageUrl="../Images/cancella.gif">
+                                                        </asp:ImageButton>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <asp:CheckBox ID="cb_ModProcedimentale" runat="server" CssClass="testo_grigio_scuro" Text="Procedimentale"
+                                                TextAlign="Left" Checked="False"></asp:CheckBox>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <asp:Button ID="btn_confermaProcedimentale" runat="server" CssClass="testo_btn_p" Text="Conferma">
+                                                </asp:Button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </asp:Panel>
+                            </td>
+                        </tr>                      
                         <!-- FINE: PANNELLI -->
                     </table>
                 </td>

@@ -356,6 +356,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 queryMng.setParam("CHA_PRIVATO", template.PRIVATO);
                 queryMng.setParam("NUM_MESI_CONSERVAZIONE", template.NUM_MESI_CONSERVAZIONE);
                 queryMng.setParam("CHA_CONSERVAZIONE", template.INVIO_CONSERVAZIONE);
+                queryMng.setParam("CHA_PROCEDIMENTALE", template.PROCEDIMENTALE);
                 string commandText = queryMng.getSQL();
                 System.Diagnostics.Debug.WriteLine("SQL - salvaTemplate - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                 logger.Debug("SQL - salvaTemplate - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
@@ -419,6 +420,8 @@ namespace DocsPaDB.Query_DocsPAWS
                     queryMng.setParam("RICERCA_CORR", oggettoCustom.TIPO_RICERCA_CORR);
                     queryMng.setParam("tipoContatore", oggettoCustom.TIPO_CONTATORE);
                     queryMng.setParam("formatoOra", oggettoCustom.FORMATO_ORA);
+                    queryMng.setParam("is_segnatura_permanente", oggettoCustom.IS_SEGNATURA_PERMANENTE);
+                    queryMng.setParam("is_segnatura_permanente_onnicomprensiva", oggettoCustom.IS_SEGNATURA_PERMANENTE_ONNICOMPRENSIVA);
 
 
                     if (oggettoCustom.CAMPO_COMUNE != null && oggettoCustom.CAMPO_COMUNE == "1")
@@ -732,7 +735,7 @@ namespace DocsPaDB.Query_DocsPAWS
         public bool aggiornaTemplate(DocsPaVO.ProfilazioneDinamica.Templates template)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
-
+            logger.Info("START");
             try
             {
                 DocsPaUtils.Query queryMng;
@@ -776,6 +779,9 @@ namespace DocsPaDB.Query_DocsPAWS
                         queryMng.setParam("Formato_Contatore", oggettoCustom.FORMATO_CONTATORE);
                         queryMng.setParam("ID_R_DEFAULT", oggettoCustom.ID_RUOLO_DEFAULT);
                         queryMng.setParam("RICERCA_CORR", oggettoCustom.TIPO_RICERCA_CORR);
+                        queryMng.setParam("is_segnatura_permanente", oggettoCustom.IS_SEGNATURA_PERMANENTE);
+                        queryMng.setParam("is_segnatura_permanente_onnicomprensiva", oggettoCustom.IS_SEGNATURA_PERMANENTE_ONNICOMPRENSIVA);
+
                         if (!string.IsNullOrEmpty(oggettoCustom.TIPO_LINK))
                         {
                             queryMng.setParam("TIPO_LINK", oggettoCustom.TIPO_LINK);
@@ -928,7 +934,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         queryMng.setParam("ID_OGGETTO", system_id_oggettoCustom);
                         queryMng.setParam("ID_TEMPLATE", template.SYSTEM_ID.ToString());
                         queryMng.setParam("Doc_Number", "");
-                        if(!string.IsNullOrEmpty(oggettoCustom.VALORE_DATABASE))
+                        if (!string.IsNullOrEmpty(oggettoCustom.VALORE_DATABASE))
                             queryMng.setParam("Valore_Oggetto_Db", oggettoCustom.VALORE_DATABASE);
                         else
                             queryMng.setParam("Valore_Oggetto_Db", "");
@@ -1059,6 +1065,8 @@ namespace DocsPaDB.Query_DocsPAWS
                         queryMng.setParam("consolidamento", oggettoCustom.CONSOLIDAMENTO);
                         queryMng.setParam("conservazione", oggettoCustom.CONSERVAZIONE);
                         queryMng.setParam("formatoOra", oggettoCustom.FORMATO_ORA);
+                        queryMng.setParam("is_segnatura_permanente", oggettoCustom.IS_SEGNATURA_PERMANENTE);
+                        queryMng.setParam("is_segnatura_permanente_onnicomprensiva", oggettoCustom.IS_SEGNATURA_PERMANENTE_ONNICOMPRENSIVA);
 
                         if (!string.IsNullOrEmpty(oggettoCustom.TIPO_LINK))
                             queryMng.setParam("TIPO_LINK", oggettoCustom.TIPO_LINK);
@@ -1215,6 +1223,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 dbProvider.Dispose();
             }
 
+            logger.Info("END");
             return true;
         }
 
@@ -1332,6 +1341,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             try
             {
+                logger.Info("START");
                 //Selezione dalla DPA_TEMPLATES in relazione con la DPA_TEMPLATES_COMPONENT
                 //per la selezione dei template associati ad una specifica amministrazione
                 DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_GET_DPA_TEMPLATE");
@@ -1350,8 +1360,9 @@ namespace DocsPaDB.Query_DocsPAWS
                     templates.Add(template);
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                logger.Error(ex.Message, ex);
                 return null;
             }
             finally
@@ -1371,6 +1382,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 }
             }
 
+            logger.Info("END");
             return templates;
         }
 
@@ -1411,7 +1423,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                     calcolaContatore(template, ref oggettoCustom, true);
                                 else
                                     calcolaContatoreComune(template, ref oggettoCustom, true);
-                              
+
                                 queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_SALVA_ASSOCIAZIONE_TEMPLATES");
                                 queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
                                 queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_ASSOCIAZIONE_TEMPLATES"));
@@ -1445,9 +1457,9 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.ToDate(oggettoCustom.DATA_INSERIMENTO));
 
                                 queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.GetDate());
-                                    
+
                                 queryMng.setParam("anno_acc", oggettoCustom.ANNO_ACC);
-                                
+
 
                                 commandText = queryMng.getSQL();
                                 System.Diagnostics.Debug.WriteLine("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
@@ -1558,143 +1570,23 @@ namespace DocsPaDB.Query_DocsPAWS
                     {
                         DocsPaVO.ProfilazioneDinamica.OggettoCustom oggettoCustom = (DocsPaVO.ProfilazioneDinamica.OggettoCustom)template.ELENCO_OGGETTI[i];
 
-                        bool modifica = true;
-                        if (!string.IsNullOrEmpty(oggettoCustom.CAMPO_XML_ASSOC) && oggettoCustom.CAMPO_XML_ASSOC.Equals("DI_SISTEMA"))
-                            modifica = false;
-
-                        if (modifica)
+                        switch (oggettoCustom.TIPO.DESCRIZIONE_TIPO)
                         {
-                            switch (oggettoCustom.TIPO.DESCRIZIONE_TIPO)
-                            {
-                                case "CasellaDiSelezione":
-                                    int modif_cas_selez = 0; //booleano che mi informa se è cambiato lo stato della casella di selezione 
-                                    oggettoCustom.gestisciCaratteriSpeciali();
-                                    for (int j = 0; j < oggettoCustom.ELENCO_VALORI.Count; j++)
-                                    {
-                                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_UPDATE_DPA_ASSOCIAZIONE_TEMPLATES");
-                                        if (oggettoCustom.VALORI_SELEZIONATI[j] != null && (string)oggettoCustom.VALORI_SELEZIONATI[j] != "")
-                                            queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORI_SELEZIONATI[j].ToString().Replace("'", "''"));
-                                        else
-                                            queryMng.setParam("valoreDbOggettoCustom", "");
-                                        queryMng.setParam("idAooRf", "0");
-                                        queryMng.setParam("docNumber", docNumber);
-                                        queryMng.setParam("CODICE_DB", oggettoCustom.CODICE_DB);
-                                        string manual = (oggettoCustom.MANUAL_INSERT) ? "1" : "0";
-                                        queryMng.setParam("MANUAL_INSERT", manual);
-                                        queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString());
-                                        queryMng.setParam("idOggettoCustom", oggettoCustom.SYSTEM_ID.ToString());
-                                        queryMng.setParam("system_id", ds_docNumber.Tables[0].Rows[indiceSystem_id_DpaAssTemplates]["SYSTEM_ID"].ToString());
-                                        queryMng.setParam("valoreSc", "0");
-                                        queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.GetDate());
-                                        queryMng.setParam("anno", oggettoCustom.ANNO);
-                                        commandText = queryMng.getSQL();
-                                        System.Diagnostics.Debug.WriteLine("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
-                                        logger.Debug("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
-                                        dbProvider.ExecuteNonQuery(commandText, out rowsAffected);
-                                        indiceSystem_id_DpaAssTemplates++;
-                                        if (rowsAffected > 0)
-                                            modif_cas_selez = 1;
-                                    }
-                                    oggettoCustom.ritornaCaratteriSpeciali();
-                                    insertInStorico(oggettoCustom, oldOggCustom, modif_cas_selez, ref indexOldObj);
-                                    break;
-
-                                case "Contatore":
-                                case "ContatoreSottocontatore":
-                                    //Iacozzilli 17/12/2013
-                                    //Modifica per l'update del contatore da SP via PIS.
-                                    //OLD CODE:
-                                    //if (oggettoCustom.VALORE_DATABASE == null || oggettoCustom.VALORE_DATABASE == "")
-                                    //NEW CODE
-                                    if (oggettoCustom.VALORE_DATABASE == null || oggettoCustom.VALORE_DATABASE == "" || oggettoCustom.VALORE_DATABASE == "0")
-                                    {
-                                        //verifico se nel contatore ci sia già impostato un valore numerico: in questo caso non faccio update
-                                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_IS_VALUE_IN_USE");
-                                        queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString() + " AND system_id = " + ds_docNumber.Tables[0].Rows[indiceSystem_id_DpaAssTemplates]["SYSTEM_ID"].ToString());
-                                        queryMng.setParam("idOggetto", oggettoCustom.SYSTEM_ID.ToString() + " AND doc_number = " + docNumber);
-                                        string field = string.Empty;
-                                        dbProvider.ExecuteScalar(out field, queryMng.getSQL());
-                                        bool continua = false;
-                                        try
-                                        {
-                                            //Iacozzilli 17/12/2013
-                                            //Modifica per l'update del contatore da SP via PIS.
-                                            //OLD CODE:
-                                            //Convert.ToInt32(field);
-                                            //continua = false;
-                                            //NEW CODE:
-                                            int code = 0;
-                                            continua = !Int32.TryParse(field, out code);
-                                        }
-                                        catch (Exception excp)
-                                        {
-                                            logger.Debug("Il contatore non presenta un valore numerico e quindi si può effettuare l'aggiornamento");
-                                            continua = true;
-                                        }
-
-                                        //if (continua)
-                                        //{
-                                        //Il parametro booleano è :
-                                        //true = se l'oggetto è da inserire 
-                                        //false= se l'oggetto è da aggiornare - come in questo caso
-                                        if (oggettoCustom.CAMPO_COMUNE != "1")
-                                            calcolaContatore(template, ref oggettoCustom, continua);
-                                        else
-                                            calcolaContatoreComune(template, ref oggettoCustom, continua);
-
-                                        if (!continua)
-                                            oggettoCustom.VALORE_DATABASE = field;
-
-                                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_UPDATE_DPA_ASSOCIAZIONE_TEMPLATES");
-                                        if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
-                                            queryMng.setParam("idAooRf", oggettoCustom.ID_AOO_RF);
-                                        else
-                                            queryMng.setParam("idAooRf", "0");
-                                        queryMng.setParam("docNumber", docNumber);
-                                        queryMng.setParam("CODICE_DB", oggettoCustom.CODICE_DB);
-                                        string manual1 = (oggettoCustom.MANUAL_INSERT) ? "1" : "0";
-                                        queryMng.setParam("MANUAL_INSERT", manual1);
-                                        queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString());
-                                        queryMng.setParam("idOggettoCustom", oggettoCustom.SYSTEM_ID.ToString());
-                                        queryMng.setParam("system_id", ds_docNumber.Tables[0].Rows[indiceSystem_id_DpaAssTemplates]["SYSTEM_ID"].ToString());
-                                        if (!string.IsNullOrEmpty(oggettoCustom.VALORE_SOTTOCONTATORE))
-                                            queryMng.setParam("valoreSc", oggettoCustom.VALORE_SOTTOCONTATORE);
-                                        else
-                                            queryMng.setParam("valoreSc", "0");
-
-                                        //In alcuni casi impostava la data di inserimento vuota
-                                        if (!string.IsNullOrEmpty(DocsPaDbManagement.Functions.Functions.ToDate(oggettoCustom.DATA_INSERIMENTO)))
-                                            queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.ToDate(oggettoCustom.DATA_INSERIMENTO));
-                                        else
-                                            queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.GetDate());
-
-                                        queryMng.setParam("anno", oggettoCustom.ANNO);
-                                        queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE);
-                                        commandText = queryMng.getSQL();
-                                        System.Diagnostics.Debug.WriteLine("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
-                                        logger.Debug("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
-                                        int rowsAff = 0;
-                                        dbProvider.ExecuteNonQuery(commandText, out rowsAff);
-                                        //}
-                                    }
-                                    indiceSystem_id_DpaAssTemplates++;
-                                    break;
-
-                                default:
-                                    oggettoCustom.gestisciCaratteriSpeciali();
+                            case "CasellaDiSelezione":
+                                int modif_cas_selez = 0; //booleano che mi informa se è cambiato lo stato della casella di selezione 
+                                oggettoCustom.gestisciCaratteriSpeciali();
+                                for (int j = 0; j < oggettoCustom.ELENCO_VALORI.Count; j++)
+                                {
                                     queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_UPDATE_DPA_ASSOCIAZIONE_TEMPLATES");
-                                    //if(oggettoCustom.VALORE_DATABASE.Length > 254)
-                                    //    queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE.Substring(0,254));
-                                    //else
-                                    queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE);
-                                    if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
-                                        queryMng.setParam("idAooRf", oggettoCustom.ID_AOO_RF);
+                                    if (oggettoCustom.VALORI_SELEZIONATI[j] != null && (string)oggettoCustom.VALORI_SELEZIONATI[j] != "")
+                                        queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORI_SELEZIONATI[j].ToString().Replace("'", "''"));
                                     else
-                                        queryMng.setParam("idAooRf", "0");
+                                        queryMng.setParam("valoreDbOggettoCustom", "");
+                                    queryMng.setParam("idAooRf", "0");
                                     queryMng.setParam("docNumber", docNumber);
                                     queryMng.setParam("CODICE_DB", oggettoCustom.CODICE_DB);
-                                    string manual2 = (oggettoCustom.MANUAL_INSERT) ? "1" : "0";
-                                    queryMng.setParam("MANUAL_INSERT", manual2);
+                                    string manual = (oggettoCustom.MANUAL_INSERT) ? "1" : "0";
+                                    queryMng.setParam("MANUAL_INSERT", manual);
                                     queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString());
                                     queryMng.setParam("idOggettoCustom", oggettoCustom.SYSTEM_ID.ToString());
                                     queryMng.setParam("system_id", ds_docNumber.Tables[0].Rows[indiceSystem_id_DpaAssTemplates]["SYSTEM_ID"].ToString());
@@ -1706,24 +1598,124 @@ namespace DocsPaDB.Query_DocsPAWS
                                     logger.Debug("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                                     dbProvider.ExecuteNonQuery(commandText, out rowsAffected);
                                     indiceSystem_id_DpaAssTemplates++;
-                                    oggettoCustom.ritornaCaratteriSpeciali();
-                                    //storicizzo il campo profilato
-                                    insertInStorico(oggettoCustom, oldOggCustom, rowsAffected, ref indexOldObj);
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            switch (oggettoCustom.TIPO.DESCRIZIONE_TIPO)
-                            {
-                                case "CasellaDiSelezione":
-                                    for (int j = 0; j < oggettoCustom.ELENCO_VALORI.Count; j++)
-                                        indiceSystem_id_DpaAssTemplates++;
-                                    break;
-                                default:
-                                    indiceSystem_id_DpaAssTemplates++;
-                                    break;
-                            }
+                                    if (rowsAffected > 0)
+                                        modif_cas_selez = 1;
+                                }
+                                oggettoCustom.ritornaCaratteriSpeciali();
+                                insertInStorico(oggettoCustom, oldOggCustom, modif_cas_selez, ref indexOldObj);
+                                break;
+
+                            case "Contatore":
+                            case "ContatoreSottocontatore":
+                                //Iacozzilli 17/12/2013
+                                //Modifica per l'update del contatore da SP via PIS.
+                                //OLD CODE:
+                                //if (oggettoCustom.VALORE_DATABASE == null || oggettoCustom.VALORE_DATABASE == "")
+                                //NEW CODE
+                                if (oggettoCustom.VALORE_DATABASE == null || oggettoCustom.VALORE_DATABASE == "" || oggettoCustom.VALORE_DATABASE == "0")
+                                {
+                                    //verifico se nel contatore ci sia già impostato un valore numerico: in questo caso non faccio update
+                                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_IS_VALUE_IN_USE");
+                                    queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString() + " AND system_id = " + ds_docNumber.Tables[0].Rows[indiceSystem_id_DpaAssTemplates]["SYSTEM_ID"].ToString());
+                                    queryMng.setParam("idOggetto", oggettoCustom.SYSTEM_ID.ToString() + " AND doc_number = " + docNumber);
+                                    string field = string.Empty;
+                                    dbProvider.ExecuteScalar(out field, queryMng.getSQL());
+                                    bool continua = false;
+                                    try
+                                    {
+                                        //Iacozzilli 17/12/2013
+                                        //Modifica per l'update del contatore da SP via PIS.
+                                        //OLD CODE:
+                                        //Convert.ToInt32(field);
+                                        //continua = false;
+                                        //NEW CODE:
+                                        int code = 0;
+                                        continua = !Int32.TryParse(field, out  code);
+                                    }
+                                    catch (Exception excp)
+                                    {
+                                        logger.Debug("Il contatore non presenta un valore numerico e quindi si può effettuare l'aggiornamento");
+                                        continua = true;
+                                    }
+
+                                    //if (continua)
+                                    //{
+                                    //Il parametro booleano è :
+                                    //true = se l'oggetto è da inserire 
+                                    //false= se l'oggetto è da aggiornare - come in questo caso
+                                    if (oggettoCustom.CAMPO_COMUNE != "1")
+                                        calcolaContatore(template, ref oggettoCustom, continua);
+                                    else
+                                        calcolaContatoreComune(template, ref oggettoCustom, continua);
+
+                                    if (!continua)
+                                        oggettoCustom.VALORE_DATABASE = field;
+
+                                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_UPDATE_DPA_ASSOCIAZIONE_TEMPLATES");
+                                    if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
+                                        queryMng.setParam("idAooRf", oggettoCustom.ID_AOO_RF);
+                                    else
+                                        queryMng.setParam("idAooRf", "0");
+                                    queryMng.setParam("docNumber", docNumber);
+                                    queryMng.setParam("CODICE_DB", oggettoCustom.CODICE_DB);
+                                    string manual1 = (oggettoCustom.MANUAL_INSERT) ? "1" : "0";
+                                    queryMng.setParam("MANUAL_INSERT", manual1);
+                                    queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString());
+                                    queryMng.setParam("idOggettoCustom", oggettoCustom.SYSTEM_ID.ToString());
+                                    queryMng.setParam("system_id", ds_docNumber.Tables[0].Rows[indiceSystem_id_DpaAssTemplates]["SYSTEM_ID"].ToString());
+                                    if (!string.IsNullOrEmpty(oggettoCustom.VALORE_SOTTOCONTATORE))
+                                        queryMng.setParam("valoreSc", oggettoCustom.VALORE_SOTTOCONTATORE);
+                                    else
+                                        queryMng.setParam("valoreSc", "0");
+
+                                    //In alcuni casi impostava la data di inserimento vuota
+                                    if (!string.IsNullOrEmpty(DocsPaDbManagement.Functions.Functions.ToDate(oggettoCustom.DATA_INSERIMENTO)))
+                                        queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.ToDate(oggettoCustom.DATA_INSERIMENTO));
+                                    else
+                                        queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.GetDate());
+
+                                    queryMng.setParam("anno", oggettoCustom.ANNO);
+                                    queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE);
+                                    commandText = queryMng.getSQL();
+                                    System.Diagnostics.Debug.WriteLine("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                                    logger.Debug("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                                    int rowsAff = 0;
+                                    dbProvider.ExecuteNonQuery(commandText, out rowsAff);
+                                    //}
+                                }
+                                indiceSystem_id_DpaAssTemplates++;
+                                break;
+
+                            default:
+                                oggettoCustom.gestisciCaratteriSpeciali();
+                                queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_UPDATE_DPA_ASSOCIAZIONE_TEMPLATES");
+                                //if(oggettoCustom.VALORE_DATABASE.Length > 254)
+                                //    queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE.Substring(0,254));
+                                //else
+                                queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE);
+                                if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
+                                    queryMng.setParam("idAooRf", oggettoCustom.ID_AOO_RF);
+                                else
+                                    queryMng.setParam("idAooRf", "0");
+                                queryMng.setParam("docNumber", docNumber);
+                                queryMng.setParam("CODICE_DB", oggettoCustom.CODICE_DB);
+                                string manual2 = (oggettoCustom.MANUAL_INSERT) ? "1" : "0";
+                                queryMng.setParam("MANUAL_INSERT", manual2);
+                                queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString());
+                                queryMng.setParam("idOggettoCustom", oggettoCustom.SYSTEM_ID.ToString());
+                                queryMng.setParam("system_id", ds_docNumber.Tables[0].Rows[indiceSystem_id_DpaAssTemplates]["SYSTEM_ID"].ToString());
+                                queryMng.setParam("valoreSc", "0");
+                                queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.GetDate());
+                                queryMng.setParam("anno", oggettoCustom.ANNO);
+                                commandText = queryMng.getSQL();
+                                System.Diagnostics.Debug.WriteLine("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                                logger.Debug("SQL - salvaInserimentoUtenteProfDim - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                                dbProvider.ExecuteNonQuery(commandText, out rowsAffected);
+                                indiceSystem_id_DpaAssTemplates++;
+                                oggettoCustom.ritornaCaratteriSpeciali();
+                                //storicizzo il campo profilato
+                                insertInStorico(oggettoCustom, oldOggCustom, rowsAffected, ref indexOldObj);
+                                break;
                         }
                     }
                     template.OLD_OGG_CUSTOM.Clear();
@@ -1898,10 +1890,10 @@ namespace DocsPaDB.Query_DocsPAWS
                             DocsPaVO.utente.Repertori.RegistroRepertorioSingleSettings.RepertorioState.O);
                 }
                 //codice aggiunto da C.Fuccia per la gestione manuale della sospensione dei contatori custom
-                OggettoCustom cc =((OggettoCustom[])template.ELENCO_OGGETTI.ToArray(typeof(OggettoCustom))).Where(c => c.TIPO.DESCRIZIONE_TIPO.ToLower() == "contatore" && !string.IsNullOrEmpty(c.DATA_INIZIO) && !string.IsNullOrEmpty(c.DATA_FINE) ).FirstOrDefault();
+                OggettoCustom cc = ((OggettoCustom[])template.ELENCO_OGGETTI.ToArray(typeof(OggettoCustom))).Where(c => c.TIPO.DESCRIZIONE_TIPO.ToLower() == "contatore" && !string.IsNullOrEmpty(c.DATA_INIZIO) && !string.IsNullOrEmpty(c.DATA_FINE)).FirstOrDefault();
                 if (cc != null)
                 {
-                    DocsPaUtils.Query queryMngcc  = DocsPaUtils.InitQuery.getInstance().getQuery("PD_GESTIONE_SOSPENSIONE");
+                    DocsPaUtils.Query queryMngcc = DocsPaUtils.InitQuery.getInstance().getQuery("PD_GESTIONE_SOSPENSIONE");
                     queryMngcc.setParam("id_ogg", cc.SYSTEM_ID.ToString());
                     if (template.IN_ESERCIZIO.ToUpper().Equals("SI"))
                         queryMngcc.setParam("sospensione", "SI");
@@ -2504,7 +2496,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     consolida = "0";
                 }
                 // se si disattiva il flag consolidamento è necessario rimuovere anche i flag conservazione e conservazione repertorio
-                if(consolida.Equals("0"))
+                if (consolida.Equals("0"))
                     queryMng.setParam("CONSERVAZIONE", ", CHA_CONSERVAZIONE=0, CHA_CONS_REPERTORIO=0");
                 else
                     queryMng.setParam("CONSERVAZIONE", string.Empty);
@@ -2521,7 +2513,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     this.UpdateInvioConsTipoDoc(Convert.ToInt32(systemId_template), "1");
                 }
                 */
-                
+
             }
             catch (Exception ex)
             {
@@ -2575,6 +2567,37 @@ namespace DocsPaDB.Query_DocsPAWS
             finally
             {
 
+                dbProvider.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region PROCEDIMENTI
+
+        public void UpdateProcedimentoTipoDoc(int systemId_template, string procedimentale)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_UPDATE_PROCEDIMENTALE_DOC");
+                queryMng.setParam("idTemplate", systemId_template.ToString());
+                if (!string.IsNullOrEmpty(procedimentale))
+                    queryMng.setParam("PROCEDIMENTALE", procedimentale);
+                else
+                    queryMng.setParam("PROCEDIMENTALE", "0");
+
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - UpdateInvioConsTipoDoc - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                logger.Debug("SQL - UpdateInvioConsTipoDoc - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                dbProvider.ExecuteNonQuery(commandText);
+            }
+            catch (Exception ex)
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
                 dbProvider.Dispose();
             }
         }
@@ -3905,13 +3928,13 @@ namespace DocsPaDB.Query_DocsPAWS
             return retValue;
         }
 
-        
+
         public string GetIdCorrespondentForTemplate(DocsPaVO.ProfilazioneDinamica.Templates template)
         {
             string corrId = string.Empty;
             foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom oggetto in template.ELENCO_OGGETTI)
             {
-                if(oggetto.TIPO.DESCRIZIONE_TIPO.Equals("Corrispondente"))
+                if (oggetto.TIPO.DESCRIZIONE_TIPO.Equals("Corrispondente"))
                 {
                     corrId = oggetto.VALORE_DATABASE.ToString();
                     break;
@@ -3919,7 +3942,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             return corrId;
         }
-         
+
 
         public string getSeriePerRicercaProfilazione(DocsPaVO.ProfilazioneDinamica.Templates template, string anno_prof)
         {
@@ -3994,14 +4017,14 @@ namespace DocsPaDB.Query_DocsPAWS
 
                             case "Contatore":
                                 string filterDataRepertorio = string.Empty;
-                                if(!string.IsNullOrEmpty(oggetto.DATA_INSERIMENTO))
+                                if (!string.IsNullOrEmpty(oggetto.DATA_INSERIMENTO))
                                 {
                                     if (oggetto.DATA_INSERIMENTO.IndexOf('@') != -1)
                                     {
                                         string[] dataInserimento = oggetto.DATA_INSERIMENTO.Split('@');
                                         filterDataRepertorio += " AND dpa0.DTA_INS >=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(dataInserimento[0], true) + " AND dpa0.DTA_INS <=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(dataInserimento[1], false);
                                     }
-                                    else 
+                                    else
                                     {
                                         filterDataRepertorio += " AND dpa0.DTA_INS >=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(oggetto.DATA_INSERIMENTO, true) + " AND dpa0.DTA_INS <=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(oggetto.DATA_INSERIMENTO, false);
                                     }
@@ -4031,7 +4054,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                                 filterString += " AND " + DocsPaDbManagement.Functions.Functions.ToInt("dpa0.valore_oggetto_db", true) + " >= " + DocsPaDbManagement.Functions.Functions.ToInt(oggetto.VALORE_DATABASE, false) + " ) )";
                                             }
                                         }
-                                        else if(!string.IsNullOrEmpty(filterDataRepertorio))
+                                        else if (!string.IsNullOrEmpty(filterDataRepertorio))
                                         {
                                             filterString += operatoreRicerca + " A.system_id in  (SELECT doc_number FROM dpa_associazione_templates dpa0 where (dpa0.id_oggetto = " + oggetto.SYSTEM_ID.ToString() + filterDataRepertorio + " ) )";
                                         }
@@ -4160,7 +4183,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                                 filterString += " AND upper(dpa0.valore_oggetto_db) in( select upper(SYSTEM_ID) from DPA_CORR_GLOBALI where SYSTEM_ID IN (SELECT system_id FROM N))))";
                                             }
                                             else
-                                            { 
+                                            {
                                                 filterString += " AND upper(dpa0.valore_oggetto_db) in( select upper(SYSTEM_ID) from DPA_CORR_GLOBALI where SYSTEM_ID IN (SELECT system_id FROM dpa_corr_globali START WITH system_id = " + codiceCorrispondente + " CONNECT BY PRIOR id_old = system_id))))";
                                             }
                                         }
@@ -5028,7 +5051,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 // Modifica Elaborazione XML da PIS req.1
                 if (dataSet.Tables[0].Columns.Contains("PATH_XSD_ASSOCIATO"))
                     template.PATH_XSD_ASSOCIATO = dataSet.Tables[0].Rows[rowNumber]["PATH_XSD_ASSOCIATO"].ToString();
-                
+
                 if (dataSet.Tables[0].Columns.Contains("PATH_ALL_1"))
                     template.PATH_ALLEGATO_1 = dataSet.Tables[0].Rows[rowNumber]["PATH_ALL_1"].ToString();
                 if (dataSet.Tables[0].Columns.Contains("GG_SCADENZA"))
@@ -5076,6 +5099,14 @@ namespace DocsPaDB.Query_DocsPAWS
                         template.INVIO_CONSERVAZIONE = dataSet.Tables[0].Rows[rowNumber]["CHA_INVIO_CONSERVAZIONE"].ToString();
                     else
                         template.INVIO_CONSERVAZIONE = "0";
+                }
+                // PROCEDIMENTI
+                if (dataSet.Tables[0].Columns.Contains("CHA_PROCEDIMENTALE"))
+                {
+                    if (!string.IsNullOrEmpty(dataSet.Tables[0].Rows[rowNumber]["CHA_PROCEDIMENTALE"].ToString()))
+                        template.PROCEDIMENTALE = dataSet.Tables[0].Rows[rowNumber]["CHA_PROCEDIMENTALE"].ToString();
+                    else
+                        template.PROCEDIMENTALE = "0";
                 }
 
                 if (dataSet.Tables[0].Columns.Contains("CHA_ASSOC_MANUALE"))
@@ -5133,6 +5164,10 @@ namespace DocsPaDB.Query_DocsPAWS
                     oggettoCustom.RESETTA_CONTATORE_INIZIO_ANNO = dataSet.Tables[0].Rows[rowNumber]["RESET_ANNO"].ToString();
                 if (dataSet.Tables[0].Columns.Contains("FORMATO_CONTATORE"))
                     oggettoCustom.FORMATO_CONTATORE = dataSet.Tables[0].Rows[rowNumber]["FORMATO_CONTATORE"].ToString();
+                if (dataSet.Tables[0].Columns.Contains("CHA_PERMANENTE"))
+                    oggettoCustom.IS_SEGNATURA_PERMANENTE = dataSet.Tables[0].Rows[rowNumber]["CHA_PERMANENTE"].ToString();
+                if (dataSet.Tables[0].Columns.Contains("CHA_PERMANENTE_ONNICOMPRENSIVA"))
+                    oggettoCustom.IS_SEGNATURA_PERMANENTE_ONNICOMPRENSIVA = dataSet.Tables[0].Rows[rowNumber]["CHA_PERMANENTE_ONNICOMPRENSIVA"].ToString();
                 if (dataSet.Tables[0].Columns.Contains("RICERCA_CORR"))
                     oggettoCustom.TIPO_RICERCA_CORR = dataSet.Tables[0].Rows[rowNumber]["RICERCA_CORR"].ToString();
                 if (dataSet.Tables[0].Columns.Contains("ID_R_DEFAULT"))
@@ -5149,7 +5184,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     if (!string.IsNullOrEmpty(dataSet.Tables[0].Rows[rowNumber]["CHA_TIPO_TAR"].ToString()))
                         oggettoCustom.TIPO_CONTATORE = dataSet.Tables[0].Rows[rowNumber]["CHA_TIPO_TAR"].ToString();
                 }
-                
+
                 if (dataSet.Tables[0].Columns.Contains("CONTA_DOPO"))
                 {
                     if (!string.IsNullOrEmpty(dataSet.Tables[0].Rows[rowNumber]["CONTA_DOPO"].ToString()) && dataSet.Tables[0].Rows[rowNumber]["CONTA_DOPO"].ToString() == "1")
@@ -5239,7 +5274,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 if (!string.IsNullOrEmpty(oggettoCustom.FORMATO_CONTATORE))
                     this.ControllaCustom(ref oggettoCustom);
 
-                
+
             }
             catch (Exception ex)
             {
@@ -5279,6 +5314,10 @@ namespace DocsPaDB.Query_DocsPAWS
                     oggettoCustom.RESETTA_CONTATORE_INIZIO_ANNO = dataRow["RESET_ANNO"].ToString();
                 if (dataRow.Table.Columns.Contains("FORMATO_CONTATORE"))
                     oggettoCustom.FORMATO_CONTATORE = dataRow["FORMATO_CONTATORE"].ToString();
+                if (dataRow.Table.Columns.Contains("CHA_PERMANENTE"))
+                    oggettoCustom.IS_SEGNATURA_PERMANENTE = dataRow["CHA_PERMANENTE"].ToString();
+                if (dataRow.Table.Columns.Contains("CHA_PERMANENTE_ONNICOMPRENSIVA"))
+                    oggettoCustom.IS_SEGNATURA_PERMANENTE_ONNICOMPRENSIVA = dataRow["CHA_PERMANENTE_ONNICOMPRENSIVA"].ToString();
                 if (dataRow.Table.Columns.Contains("RICERCA_CORR"))
                     oggettoCustom.TIPO_RICERCA_CORR = dataRow["RICERCA_CORR"].ToString();
                 if (dataRow.Table.Columns.Contains("ID_R_DEFAULT"))
@@ -5295,7 +5334,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     if (!string.IsNullOrEmpty(dataRow["CHA_TIPO_TAR"].ToString()))
                         oggettoCustom.TIPO_CONTATORE = dataRow["CHA_TIPO_TAR"].ToString();
                 }
-                
+
                 if (dataRow.Table.Columns.Contains("CONTA_DOPO"))
                 {
                     if (!string.IsNullOrEmpty(dataRow["CONTA_DOPO"].ToString()) && dataRow["CONTA_DOPO"].ToString() == "1")
@@ -6617,8 +6656,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
         }
 
-
-
         /// <summary>
         /// Metodo per l'attivazione dello storico per tutti i campi profilati di una tipologia
         /// </summary>
@@ -6638,50 +6675,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
         }
 
-        public bool ActiveSelectiveHistoryFasc(String templateId)
-        {
-            using (DBProvider dbProvider = new DBProvider())
-            {
-                Query query = InitQuery.getInstance().getQuery("U_DISABLE_ENABLE_ALL_PROF_HISTORY_FASC");
-                query.setParam("value", "1");
-                query.setParam("idTemplate", templateId);
-
-                return dbProvider.ExecuteNonQuery(query.getSQL());
-            }
-
-        }
-
-        public bool ActiveSelectiveHistoryFasc(String templateId, List<CustomObjHistoryState> selectedFiels)
-        {
-            bool retVal = false;
-
-            using (DBProvider dbProvider = new DBProvider())
-            {
-                // Disattivazione di tutti gli storici relativi alla tipologia
-                if (this.DeactivateAllHistoryFasc(templateId))
-                {
-                    // Attivazione dello storico per specifici campi
-                    Query query = InitQuery.getInstance().getQuery("U_ENABLE_DISABLE_PROF_HISTORY_SELECTIVE_FASC");
-                    query.setParam("fasc", String.Empty);
-                    query.setParam("value", "1");
-
-                    //Emanuela 13-02-2015: aggiunto la condizione seguente per eccezione nel caso in cui selectedFiels = 0
-                    if (selectedFiels.Count > 0)
-                    {
-                        String[] idList = selectedFiels.Select(f => f.FieldId.ToString()).ToArray<String>();
-                        query.setParam("idList", idList.Aggregate((a, b) => a + ", " + b).ToString());
-
-                        retVal = dbProvider.ExecuteNonQuery(query.getSQL());
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-                return retVal;
-            }
-
-        }
         /// <summary>
         /// Metodo per la disabilitazione dello storico relativo a tutti i campi di una tipologia
         /// </summary>
@@ -6692,19 +6685,6 @@ namespace DocsPaDB.Query_DocsPAWS
             using (DBProvider dbProvider = new DBProvider())
             {
                 Query query = InitQuery.getInstance().getQuery("U_DISABLE_ENABLE_ALL_PROF_HISTORY");
-                query.setParam("fasc", String.Empty);
-                query.setParam("value", "0");
-                query.setParam("idTemplate", templateId);
-
-                return dbProvider.ExecuteNonQuery(query.getSQL());
-            }
-        }
-
-        public bool DeactivateAllHistoryFasc(String templateId)
-        {
-            using (DBProvider dbProvider = new DBProvider())
-            {
-                Query query = InitQuery.getInstance().getQuery("U_DISABLE_ENABLE_ALL_PROF_HISTORY_FASC");
                 query.setParam("fasc", String.Empty);
                 query.setParam("value", "0");
                 query.setParam("idTemplate", templateId);
@@ -6727,37 +6707,6 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 Query query = InitQuery.getInstance().getQuery("S_HISTORY_PROF_STATE");
                 query.setParam("fasc", String.Empty);
-                query.setParam("idTemplate", templateId);
-                string dbType = System.Configuration.ConfigurationManager.AppSettings["DBType"];
-                if (dbType.ToUpper() == "SQL")
-                    query.setParam("dbUser", DocsPaDbManagement.Functions.Functions.GetDbUserSession());
-                IDataReader dataReader = dbProvider.ExecuteReader(query.getSQL());
-
-                while (dataReader.Read())
-                {
-                    string descrizione = dataReader["descrizione"].ToString();
-                    if (dataReader["attivo"].ToString().Equals("0"))
-                        descrizione += " (disabilitato)";
-                    result.Add(new CustomObjHistoryState()
-                    {
-                        FieldId = Convert.ToInt32(dataReader["system_id"]),
-                        Description = descrizione,
-                        Enabled = dataReader["EnabledHistory"] != DBNull.Value && Convert.ToInt32(dataReader["EnabledHistory"]) == 1
-                    });
-                }
-            }
-
-            return result;
-
-        }
-
-        public List<CustomObjHistoryState> GetCustomHistoryListFasc(String templateId)
-        {
-            List<CustomObjHistoryState> result = new List<CustomObjHistoryState>();
-
-            using (DBProvider dbProvider = new DBProvider())
-            {
-                Query query = InitQuery.getInstance().getQuery("S_HISTORY_PROF_STATE_FASC");
                 query.setParam("idTemplate", templateId);
                 string dbType = System.Configuration.ConfigurationManager.AppSettings["DBType"];
                 if (dbType.ToUpper() == "SQL")
@@ -6906,7 +6855,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_GET_TEMPLATE_DOC_BY_DESC");
                 queryMng.setParam("descrizioneTemplate", descrizioneTemplate);
                 //queryMng.setParam("docNumber", "''");
-                queryMng.setParam("docNumber", " AND (DPA_ASSOCIAZIONE_TEMPLATES.DOC_NUMBER  = '' OR DPA_ASSOCIAZIONE_TEMPLATES.DOC_NUMBER IS NULL) AND DPA_TIPO_ATTO.ID_AMM = "+idAmm+" ");
+                queryMng.setParam("docNumber", " AND (DPA_ASSOCIAZIONE_TEMPLATES.DOC_NUMBER  = '' OR DPA_ASSOCIAZIONE_TEMPLATES.DOC_NUMBER IS NULL) AND DPA_TIPO_ATTO.ID_AMM = " + idAmm + " ");
                 string commandText = queryMng.getSQL();
                 System.Diagnostics.Debug.WriteLine("SQL - getTemplateById - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                 logger.Debug("SQL - getTemplateById - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
@@ -7050,44 +6999,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
         }
 
-        public ArrayList getIdDocByAssTemplates(string idOggetto, string valoreDB, string ordine, string idTemplate)
-        {
-            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
-            ArrayList retVal = new ArrayList();
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("GET_IDDOC_BY_ASS_TEMPLATES_2");
-                q.setParam("id_ogg_custom", idOggetto);
-                q.setParam("id_template", idTemplate);
-                q.setParam("valore_oggetto_db", valoreDB);
-                if (string.IsNullOrEmpty(ordine) || ordine.ToUpper() != "DESC")
-                    q.setParam("ordine", "ASC");
-                else q.setParam("ordine", "DESC");
-
-                string queryString = q.getSQL();
-                logger.Debug(queryString);
-                DataSet dataset = new DataSet();
-                dbProvider.ExecuteQuery(out dataset, "IDDOCS", queryString);
-                if (dataset.Tables["IDDOCS"] != null && dataset.Tables["IDDOCS"].Rows.Count > 0)
-                {
-                    foreach (DataRow r in dataset.Tables["IDDOCS"].Rows)
-                    {
-                        retVal.Add(r["DOC_NUMBER"].ToString());
-                    }
-                }
-                if (retVal.Count < 1) retVal = null;
-
-            }
-            catch (Exception ex)
-            {
-                retVal = null;
-                logger.Error(ex);
-            }
-
-            return retVal;
-
-        }
-
         public DocsPaVO.FlussoAutomatico.ContestoProcedurale GetContestoProceduraleById(string idContesto)
         {
             DocsPaVO.FlussoAutomatico.ContestoProcedurale contestoProcedurale = new DocsPaVO.FlussoAutomatico.ContestoProcedurale();
@@ -7117,6 +7028,63 @@ namespace DocsPaDB.Query_DocsPAWS
             }
 
             return contestoProcedurale;
+        }
+
+        public bool ReplicaTipoDocumento(string idTipoDoc, string idAmm, out string idNuovaTipologia)
+        {
+            logger.Debug("INIZIO ReplicaTipoDocumento");
+            bool result = false;
+            ArrayList parameters = new ArrayList();
+            idNuovaTipologia = string.Empty;
+
+            parameters.Add(new DocsPaUtils.Data.ParameterSP("idTipoDocumento", idTipoDoc));
+            parameters.Add(new DocsPaUtils.Data.ParameterSP("idAmministrazione", idAmm));
+
+            DocsPaUtils.Data.ParameterSP outParam = new DocsPaUtils.Data.ParameterSP("idTipoDocumentoNew", 0, DocsPaUtils.Data.DirectionParameter.ParamOutput);
+            outParam.Tipo = DbType.Int32;
+            parameters.Add(outParam);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                try
+                {
+                    dbProvider.BeginTransaction();
+                    int resultSP = dbProvider.ExecuteStoreProcedure("SP_REPLICA_TIPO_DOCUMENTO", parameters);
+
+                    switch (resultSP)
+                    {
+                        case 0:
+                            dbProvider.CommitTransaction();
+                            logger.Debug("Replica tipo documento " + idTipoDoc + " per l'amministrazione " + idAmm + " avveunta correttamente");
+                            result = true;
+                            idNuovaTipologia = outParam.Valore.ToString();
+                            break;
+                        case 1:
+                            dbProvider.RollbackTransaction();
+                            logger.Debug("Tipo documento " + idTipoDoc + " per l'amministrazione " + idAmm + " già presente");
+                            result = true;
+                            break;
+                        case 2:
+                            dbProvider.RollbackTransaction();
+                            logger.Debug("Tipo documento " + idTipoDoc + " per l'amministrazione " + idAmm + " errore nella creazione della tipologia automatica del diagramma di stato associato");
+                            result = false;
+                            break;
+                        default:
+                            dbProvider.RollbackTransaction();
+                            logger.Error("Errore in replica tipo documento " + idTipoDoc + " per l'amministrazione " + idAmm + "; Errore: " + resultSP.ToString());
+                            result = false;
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    dbProvider.RollbackTransaction();
+                    logger.Error("Errore in ReplicaTipoDocumento per la copia della tipologia documento " + idTipoDoc + " per l'amministrazione " + idAmm + " : " + e.Message);
+                }
+            }
+
+            logger.Debug("FINE ReplicaTipoDocumento");
+            return result;
         }
     }
 }

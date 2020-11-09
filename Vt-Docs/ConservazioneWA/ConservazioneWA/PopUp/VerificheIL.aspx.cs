@@ -33,8 +33,7 @@ namespace ConservazioneWA.PopUp
                 idConservazione = this.Request.QueryString["idConservazione"];
                 this.hd_idIstanza.Value = idConservazione;
                 WSConservazioneLocale.InfoUtente infoUtente = ((WSConservazioneLocale.InfoUtente)Session["infoutCons"]);
-                //WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(idConservazione, infoUtente);
-                WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazioneLite(idConservazione, infoUtente);
+                WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(idConservazione, infoUtente);
                 int i = 0;
 
                 DataTable tabella1 = new DataTable();
@@ -157,8 +156,7 @@ namespace ConservazioneWA.PopUp
                 {
                     string files = "";
                     WSConservazioneLocale.InfoUtente infoUtente = ((WSConservazioneLocale.InfoUtente)Session["infoutCons"]);
-                    //WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(this.hd_idIstanza.Value, infoUtente);
-                    WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazioneLite(IdIstanza, infoUtente);
+                    WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(this.hd_idIstanza.Value, infoUtente);
                     number = Int32.Parse(tb_num_file.Text);
                     Random rdm = new Random();
                     string[] presi = new string[number];
@@ -183,8 +181,7 @@ namespace ConservazioneWA.PopUp
                 {
                     string files = "";
                     WSConservazioneLocale.InfoUtente infoUtente = ((WSConservazioneLocale.InfoUtente)Session["infoutCons"]);
-                    //WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(this.hd_idIstanza.Value, infoUtente);
-                    WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazioneLite(IdIstanza, infoUtente);
+                    WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(this.hd_idIstanza.Value, infoUtente);
 
                     int percent = Int32.Parse(tb_percent_file.Text);
                     double op = (totDocs * 100 / percent);
@@ -444,8 +441,7 @@ namespace ConservazioneWA.PopUp
                 WSConservazioneLocale.InfoUtente infoUtente = ((WSConservazioneLocale.InfoUtente)Session["infoutCons"]);
 
                 Dictionary<String, String> documentiMemorizzati = ConservazioneWA.Utils.ConservazioneManager.getFilesFromUniSincro(infoUtente, IdIstanza,false);
-                //WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(IdIstanza, infoUtente);
-                WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazioneLite(IdIstanza, infoUtente);
+                WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(IdIstanza, infoUtente);
                 int totDocs2 = items.Length;
                 
                 string[] presi = null;
@@ -671,8 +667,7 @@ namespace ConservazioneWA.PopUp
                 WSConservazioneLocale.InfoUtente infoUtente = ((WSConservazioneLocale.InfoUtente)Session["infoutCons"]);
 
                 Dictionary<String, String> documentiMemorizzati = ConservazioneWA.Utils.ConservazioneManager.getFilesFromUniSincro(infoUtente, IdIstanza,false);
-                //WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(IdIstanza, infoUtente);
-                WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazioneLite(IdIstanza, infoUtente);
+                WSConservazioneLocale.ItemsConservazione[] items = ConservazioneWA.Utils.ConservazioneManager.getItemsConservazione(IdIstanza, infoUtente);
                 int totDocs2 = items.Length;
                 string files = "";
                 string[] presi = null;

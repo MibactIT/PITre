@@ -14,6 +14,5 @@ namespace DocsPaVO.DiagrammaStato
         public bool NON_RICERCABILE = false;
         public bool STATO_SISTEMA = false;
         public DocsPaVO.documento.DocumentConsolidationStateEnum STATO_CONSOLIDAMENTO = documento.DocumentConsolidationStateEnum.None;
-        public string ID_PROCESSO_FIRMA = string.Empty;
 	}
 }

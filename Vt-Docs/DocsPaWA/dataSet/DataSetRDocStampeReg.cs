@@ -1,6 +1,8 @@
-﻿namespace DocsPAWA.dataSet {
-    
-    
-    public partial class DataSetRDocStampeReg {
+﻿namespace DocsPAWA.dataSet
+{
+
+
+    public partial class DataSetRDocStampeReg
+    {
     }
 }

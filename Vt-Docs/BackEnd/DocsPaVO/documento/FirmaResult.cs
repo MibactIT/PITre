@@ -10,15 +10,6 @@ namespace DocsPaVO.documento
 	public class FirmaResult
 	{
 		public FileRequest fileRequest;
-        public EsitoFirma esito;
-        public string errore;
+		public string errore;
 	}
-
-    [Serializable()]
-    public class EsitoFirma
-    {
-        public string Id;
-        public string Codice;
-        public string Messaggio;
-    }
 }

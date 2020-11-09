@@ -30,6 +30,15 @@
                 //window.showModalDialog('ModalDiagrammiStato.aspx?Chiamante=VisibilitaStati.aspx', '', 'dialogWidth:800px;dialogHeight:650px;status:no;resizable:no;scroll:no;center:yes;help:no;close:no;top:' + new_h + ';left:' + new_w);
                 window.showModalDialog('VisibilitaStati.aspx', '', 'dialogWidth:800px;dialogHeight:650px;status:no;resizable:no;scroll:no;center:yes;help:no;close:no;top:' + new_h + ';left:' + new_w);
             }
+            function ApriPopupAssFasi() {
+                window.showModalDialog('AssociazioneFasiStati.aspx', '', 'dialogWidth:800px;dialogHeight:450px;status:no;resizable:no;scroll:no;center:yes;help:no;close:no;top:' + new_h + ';left:' + new_w);
+            }
+            function ApriPopupStatiScadenze() {
+                window.showModalDialog('AssociazioneStatiScadenze.aspx', '', 'dialogWidth:800px;dialogHeight:450px;status:no;resizable:no;scroll:no;center:yes;help:no;close:no;top:' + new_h + ';left:' + new_w);
+            }
+            function ApriPopupGestioneAutomatismi() {
+                window.showModalDialog('GestioneAutomatismi.aspx', '', 'dialogWidth:600px;dialogHeight:300px;status:no;resizable:no;scroll:no;center:yes;help:no;close:no;top:' + new_h + ';left:' + new_w);
+            }
 		</script> 
 	</HEAD>
 	<body bottomMargin="0" leftMargin="0" topMargin="0">
@@ -95,6 +104,14 @@
 														<HeaderStyle Width="5%"></HeaderStyle>
 														<ItemStyle HorizontalAlign="Center"></ItemStyle>
 													</asp:ButtonColumn>
+                                                    <asp:ButtonColumn Text="&lt;img src=../images/lentePreview.gif border=0 alt='Fasi'&gt;" HeaderText="Ass. Fasi" CommandName="Fasi">
+                                                        <HeaderStyle Width="15%"></HeaderStyle>
+                                                        <ItemStyle HorizontalAlign="Center"></ItemStyle>
+                                                    </asp:ButtonColumn>
+                                                    <asp:ButtonColumn Text="&lt;img src=../images/lentePreview.gif border=0 alt='Scadenze'&gt;" HeaderText="Gestione scadenze" CommandName="Scadenze">
+                                                        <HeaderStyle Width="15%"></HeaderStyle>
+                                                        <ItemStyle HorizontalAlign="Center"></ItemStyle>
+                                                    </asp:ButtonColumn>
 													<asp:ButtonColumn Text="&lt;img src=../Images/cestino.gif border=0 alt='Elimina'&gt;" HeaderText="Elimina"
 														CommandName="Delete">
 														<HeaderStyle Width="5%"></HeaderStyle>
@@ -153,19 +170,13 @@
 												<TD></TD>
 												<TD></TD>
 												<TD></TD>
-												<TD>
-													<asp:Label id="lbl_statoAuto" runat="server" CssClass="testo_grigio_scuro" Width="110px">Stato Automatico</asp:Label>
-													<asp:DropDownList id="ddl_statiAutomatici" runat="server" CssClass="testo" Width="205px"></asp:DropDownList>
-												</TD>
-											</TR>
-                                            <TR>
-												<TD></TD>
-												<TD></TD>
-												<TD></TD>
-												<TD>
-                                                    <asp:Panel ID="PnlStatoAutoProcesso" runat="server" Visible="false">
-													    <asp:Label id="lbl_statoAutoProcesso" runat="server" CssClass="testo_grigio_scuro" Width="110px">Stato Automatico Processo firma</asp:Label>
-													    <asp:DropDownList id="ddl_statiAutomaticiProcessoFirma" runat="server" CssClass="testo" Width="205px"></asp:DropDownList>
+												<TD align="center">
+                                                    <asp:Panel runat="server" ID="pnlStatoAutomatico">
+													    <asp:Label id="lbl_statoAuto" runat="server" CssClass="testo_grigio_scuro" Width="110px">Stato Automatico</asp:Label>
+													    <asp:DropDownList id="ddl_statiAutomatici" runat="server" CssClass="testo" Width="205px"></asp:DropDownList>
+                                                    </asp:Panel>
+                                                    <asp:Panel runat="server" ID="pnlAutomatismi" Visible="false">
+                                                        <asp:Button ID="btn_cambioStatoAutomatico" runat="server" CssClass="testo_btn_p" Width="200px" Text="Passaggi stato automatici" />
                                                     </asp:Panel>
 												</TD>
 											</TR>

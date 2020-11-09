@@ -170,7 +170,7 @@ namespace BusinessLogic.Utenti
                         if (dirittoOggetto.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_DELEGATO))
                         {
                             dirittoOggetto.soggetto = utente;
-                            dirittoOggetto.soggetto.descrizione = utente.descrizione + " sostituto di " + soggettoPropr.descrizione;
+                            dirittoOggetto.soggetto.descrizione = utente.descrizione + " delegato da " + soggettoPropr.descrizione;
                         }
                         else
                             dirittoOggetto.soggetto = utente;
@@ -595,7 +595,7 @@ namespace BusinessLogic.Utenti
                     if (dirittoOggetto.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_DELEGATO))
                     {
                         dirittoOggetto.soggetto = utenteTemp;
-                        dirittoOggetto.soggetto.descrizione = utenteTemp.descrizione + " sostituto di " + utenteTemp.descrizione;
+                        dirittoOggetto.soggetto.descrizione = utenteTemp.descrizione + " delegato da " + utenteTemp.descrizione;
                     }
                     else
                         dirittoOggetto.soggetto = utenteTemp;
@@ -1151,7 +1151,7 @@ namespace BusinessLogic.Utenti
                 foreach (DocsPaVO.documento.DirittoOggetto d in listaDiritti)
                 {
                     if (d.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_DELEGATO) && (!string.IsNullOrEmpty(personorgroupsDelegato) && d.personorgroup.Equals(personorgroupsDelegato)))
-                        d.soggetto.descrizione = d.soggetto.descrizione + " sostituto di " + descDelegante;
+                        d.soggetto.descrizione = d.soggetto.descrizione + " delegato da " + descDelegante;
                 }
             }
 
@@ -1317,7 +1317,7 @@ namespace BusinessLogic.Utenti
                 foreach (DocsPaVO.documento.DirittoOggetto d in listaDiritti)
                 {
                     if (d.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_DELEGATO) && (!string.IsNullOrEmpty(personorgroupsDelegato) && d.personorgroup.Equals(personorgroupsDelegato)))
-                        d.soggetto.descrizione = d.soggetto.descrizione + " sostituto di " + descDelegante;
+                        d.soggetto.descrizione = d.soggetto.descrizione + " delegato da " + descDelegante;
                 }
             }
 

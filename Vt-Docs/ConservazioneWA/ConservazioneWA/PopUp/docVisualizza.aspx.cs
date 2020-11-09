@@ -74,12 +74,11 @@ namespace ConservazioneWA.PopUp
                 {
                     Response.AddHeader("content-disposition", "inline");
                     WSConservazioneLocale.FileDocumento fd = ConservazioneWA.Utils.ConservazioneManager.sbustaFileFirmato(idConservazione, path, localStore);
-                    if (((IList<string>)formatsToDownload).Contains(fd.contentType) || string.IsNullOrEmpty(fd.contentType))
+                    if (((IList<string>)formatsToDownload).Contains(fd.contentType))
                     {
                         Response.ContentType = "text/html";
-                        Response.Write(string.Format("<a href=\"documentDL.aspx?file={0}&idC={1}&ext={2}&locale={3}\">Per visualizzare il file clicca qui.</a>", file, idConservazione, filetype, localStore.ToString().ToLower()));
-                        //Response.Write(string.Format("File non apribile nella finestra di visualizzazione. <br /><br /><a href=\"documentDL.aspx?file={0}&idC={1}&ext={2}&locale={3}\">Cliccare qui per scaricare il file.</a>", file, idConservazione, filetype,localStore.ToString().ToLower()));
-
+                        Response.Write(string.Format("File non apribile nella finestra di visualizzazione. <br /><br /><a href=\"documentDL.aspx?file={0}&idC={1}&ext={2}&locale={3}\">Cliccare qui per scaricare il file.</a>", file, idConservazione, filetype,localStore.ToString().ToLower()));
+                    
                     }
                     else
                     {
@@ -98,8 +97,7 @@ namespace ConservazioneWA.PopUp
                     //Response.BinaryWrite(bincontent);
 
                     Response.ContentType = "text/html";
-                    Response.Write(string.Format("<a href=\"documentDL.aspx?file={0}&idC={1}&ext={2}&locale={3}\">Per visualizzare il file clicca qui.</a>", file, idConservazione, filetype, localStore.ToString().ToLower()));
-                    //Response.Write(string.Format("File non apribile nella finestra di visualizzazione. <br /><br /><a href=\"documentDL.aspx?file={0}&idC={1}&ext={2}&locale={3}\">Cliccare qui per scaricare il file.</a>", file, idConservazione, filetype, localStore.ToString().ToLower()));
+                    Response.Write(string.Format("File non apribile nella finestra di visualizzazione. <br /><br /><a href=\"documentDL.aspx?file={0}&idC={1}&ext={2}&locale={3}\">Cliccare qui per scaricare il file.</a>", file, idConservazione, filetype, localStore.ToString().ToLower()));
                     
                     
                 }

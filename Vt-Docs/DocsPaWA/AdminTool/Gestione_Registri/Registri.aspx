@@ -66,19 +66,6 @@
             var res = r.Apri();
         }
 
-        function AvvisoPresenzaProcessiFirmaEmail() {
-            if (window.confirm('Attenzione! Sono presenti processi di firma in cui la casella di posta è coinvolta. Se si decide di proseguire verranno invalidati i processi coinvolti. Procedere?')) {
-                Form1.hd_ReturnValueProcessiFirmaRegistroRF.value = 'true';
-                Form1.submit();
-            }
-        }
-        function AvvisoPresenzaProcessiFirmaRegistro() {
-            if (window.confirm('Attenzione! Sono presenti processi di firma in cui il registro è coinvolto. Se si decide di proseguire verranno invalidati i processi coinvolti. Procedere?')) {
-                Form1.hd_ReturnValueProcessiFirmaRegistro.value = 'true';
-                Form1.submit();
-            }
-        }
-
     </script>
     <script language="javascript" id="btn_test_Click" event="onclick()" for="btn_test">
 			window.document.body.style.cursor='wait';
@@ -163,8 +150,6 @@
     </asp:ScriptManager>
     <uct:AppTitleProvider ID="appTitleProvider" runat="server" PageName="AMMINISTRAZIONE > Registri" />
     <input id="txtCommandPending" type="hidden" runat="server">
-    <input id="hd_ReturnValueProcessiFirmaRegistroRF" type="hidden" name="hd_ReturnValueProcessiFirmaRegistroRF" runat="server">
-    <input id="hd_ReturnValueProcessiFirmaRegistro" type="hidden" name="hd_ReturnValueProcessiFirmaRegistro" runat="server">
     <!-- Gestione del menu a tendina -->
     <uc2:MenuTendina ID="MenuTendina" runat="server"></uc2:MenuTendina>
     <table height="100%" cellspacing="1" cellpadding="0" width="100%" border="0">
@@ -538,24 +523,6 @@
                                                                                     </asp:DropDownList>
                                                                                 </td>
                                                                             </tr>
-                                                                            <tr>
-                                                                                <td class="testo_grigio_scuro" align="left" colspan="2">
-                                                                                    <div id="contMess">
-                                                                                        <div id="message" style="margin-bottom:-10px; margin-right:2px; float:left">
-                                                                                        <asp:Label ID="lblMessUscita" Text="Messaggio posta in uscita" runat="server"></asp:Label>
-                                                                                            </div>
-                                                                                        <div id="txtBox">
-                                                                                        <asp:TextBox ID="txt_msg_posta_in_uscita" runat="server" CssClass="testo" Width="200px"
-                                                                                            MaxLength="2000" TextMode="MultiLine"></asp:TextBox>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </td>
-                                                                                <td class="testo_grigio_scuro" align="left" width="34%" colspan="2">
-                                                                                    <div id="contCbxMess" style="margin-bottom:15px;"">
-                                                                                        <asp:CheckBox ID="cbx_sovrascrivi_messaggio" runat="server" CssClass="testo" Width="3"></asp:CheckBox>&nbsp;Sovrascrivi messaggio di amministrazione&nbsp;&nbsp;&nbsp;
-                                                                                    </div>
-                                                                                </td>
-                                                                            </tr>
                                                                         </table>
                                                                     </ContentTemplate>
                                                                     <Triggers>
@@ -739,7 +706,7 @@
                                                             <td align="left" class="style3">
                                                                 <asp:Label ID="lbl_msg" runat="server" CssClass="testo_rosso"></asp:Label>
                                                             </td>
-                                                            <td align="right"  width="60%">
+                                                            <td align="right" width="60%">
                                                                 <asp:Button ID="btn_UOsmista" runat="server" CssClass="testo_btn" Text="Primo smistamento">
                                                                 </asp:Button>&#160;&#160
                                                                 <asp:Button ID="btn_test" runat="server" CssClass="testo_btn" Text="Test Connessione"

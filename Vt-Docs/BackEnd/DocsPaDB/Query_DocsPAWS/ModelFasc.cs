@@ -41,7 +41,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     oggetto = new DocsPaVO.ProfilazioneDinamica.OggettoCustom();
                     this.setOggettoCustom(ref oggetto, ds, 0);
                     DocsPaVO.ProfilazioneDinamica.TipoOggetto tipo = new DocsPaVO.ProfilazioneDinamica.TipoOggetto();
-                    setTipoOggetto(ref tipo, ds,0);
+                    setTipoOggetto(ref tipo, ds, 0);
                     oggetto.TIPO = tipo;
 
                     //campo CLOB di configurazione
@@ -49,7 +49,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     {
                         string config = dbProvider.GetLargeText("DPA_OGGETTI_CUSTOM_FASC", oggetto.SYSTEM_ID.ToString(), "CONFIG_OBJ_EST");
                         oggetto.CONFIG_OBJ_EST = config;
-                    }                    
+                    }
                 }
             }
             catch (Exception ex)
@@ -94,7 +94,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
                     if (!string.IsNullOrEmpty(key) && key.Equals("1"))
                         SetTemplateStructure(ref template);
-                        
+
                     templates.Add(template);
                 }
             }
@@ -118,7 +118,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     templates.Insert(0, tempApp);
                 }
             }
-            
+
             return templates;
         }
 
@@ -160,7 +160,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 System.Diagnostics.Debug.WriteLine("SQL - eliminaOggettoCustomDaDBFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                 logger.Debug("SQL - eliminaOggettoCustomDaDBFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                 dbProvider.ExecuteNonQuery(commandText);
-                
+
                 if (template.IN_ESERCIZIO == "NO" || template.IPER_FASC_DOC == "1")
                 {
                     //Cancellazione valori
@@ -170,7 +170,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     System.Diagnostics.Debug.WriteLine("SQL - eliminaOggettoCustomDaDBFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     logger.Debug("SQL - eliminaOggettoCustomDaDBFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     dbProvider.ExecuteNonQuery(commandText);
-                    
+
                     //Cancellazione posizione
                     queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_DELETE_DPA_OGG_CUSTOM_COMP_FASC");
                     queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString());
@@ -179,7 +179,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     System.Diagnostics.Debug.WriteLine("SQL - eliminaOggettoCustomDaDBFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     logger.Debug("SQL - eliminaOggettoCustomDaDBFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     dbProvider.ExecuteNonQuery(commandText);
-                    
+
                     //Cancellazione oggetto
                     queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_DELETE_DPA_OGGETTI_CUSTOM_FASC");
                     queryMng.setParam("idOggettoCustom", oggettoCustom.SYSTEM_ID.ToString());
@@ -266,14 +266,14 @@ namespace DocsPaDB.Query_DocsPAWS
                 dbProvider.Dispose();
             }
         }
-        
+
         public bool salvaTemplateFasc(DocsPaVO.ProfilazioneDinamica.Templates template, string idAmministrazione)
         {
             template.gestisciCaratteriSpeciali();
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
             bool retValue = false;
             int rowsAffected;
-                
+
             try
             {
                 //Inserimento DPA_TIPO_FASC
@@ -287,6 +287,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 queryMng.setParam("In_Esercizio", "NO");
                 queryMng.setParam("Privato", template.PRIVATO);
                 queryMng.setParam("NUM_MESI_CONSERVAZIONE", template.NUM_MESI_CONSERVAZIONE);
+                queryMng.setParam("CHA_PROCEDIMENTALE", template.PROCEDIMENTALE);
                 string commandText = queryMng.getSQL();
                 System.Diagnostics.Debug.WriteLine("SQL - salvaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                 logger.Debug("SQL - salvaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
@@ -305,6 +306,77 @@ namespace DocsPaDB.Query_DocsPAWS
                         dbProvider.RollbackTransaction();
                         return false;
                     }
+                }
+
+                // Se il fascicolo è di tipo PROCEDIMENTALE devo inserire un dato set di metadati
+                if(!string.IsNullOrEmpty(template.PROCEDIMENTALE) && template.PROCEDIMENTALE == "1")
+                {
+                    try
+                    {
+                        DocsPaUtils.Query queryProc = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_CAMPI_PROCEDIMENTALI_FASC");
+                        string commandQueryProc = queryProc.getSQL();
+                        DataSet dsProc;
+
+                        if (!dbProvider.ExecuteQuery(out dsProc, commandQueryProc))
+                            logger.Debug("Errore nell'estrazione dei campi procedimentali - " + dbProvider.LastExceptionMessage);
+                        else
+                        {
+                            if (dsProc != null && dsProc.Tables[0] != null && dsProc.Tables[0].Rows.Count > 0)
+                            {
+                                int contatorePosizione;
+                                bool checkCampiEsistenti = (template.ELENCO_OGGETTI != null && template.ELENCO_OGGETTI.Count > 0);
+                                if(template.ELENCO_OGGETTI == null)
+                                {
+                                    template.ELENCO_OGGETTI = new ArrayList();
+                                    contatorePosizione = 1;
+                                }
+                                else
+                                {
+                                    contatorePosizione = template.ELENCO_OGGETTI.Count + 1;
+                                }
+
+                                foreach (DataRow row in dsProc.Tables[0].Rows)
+                                {
+                                    bool inserisciCampo = true;
+                                    if(checkCampiEsistenti)
+                                    {
+                                        foreach(OggettoCustom ogg in template.ELENCO_OGGETTI)
+                                        {
+                                            if(ogg.DESCRIZIONE.ToUpper() == row["NOME_CAMPO"].ToString().ToUpper())
+                                            {
+                                                logger.DebugFormat("Campo {0} già inserito", row["NOME_CAMPO"].ToString());
+                                                inserisciCampo = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if(inserisciCampo)
+                                    {
+                                        OggettoCustom item = new OggettoCustom();
+                                        item.DESCRIZIONE = row["NOME_CAMPO"].ToString();
+                                        item.CAMPO_OBBLIGATORIO = row["OBBLIGATORIO"].ToString();
+                                        item.CAMPO_DI_RICERCA = row["RICERCA"].ToString();
+                                        item.TIPO = new TipoOggetto() { DESCRIZIONE_TIPO = row["TIPO_OGGETTO"].ToString() };
+                                        if (row["CAMPO_COMUNE"].ToString() == "1")
+                                            item.CAMPO_COMUNE = "1";
+                                        item.ID_RUOLO_DEFAULT = "0";
+                                        item.POSIZIONE = contatorePosizione.ToString();
+                                        if (!string.IsNullOrEmpty(row["RICERCA_CORR"].ToString()))
+                                            item.TIPO_RICERCA_CORR = row["RICERCA_CORR"].ToString();
+
+                                        template.ELENCO_OGGETTI.Add(item);
+                                        contatorePosizione++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch(Exception exc)
+                    {
+                        logger.Debug("Si è verificato un errore nell'inserimento dei campi procedimentali del fascicolo - ", exc);
+                    }
+
                 }
 
                 //Inserimento DPA_OGGETTI_CUSTOM_FASC
@@ -349,7 +421,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     queryMng.setParam("Formato_Contatore", oggettoCustom.FORMATO_CONTATORE);
                     queryMng.setParam("ID_R_DEFAULT", oggettoCustom.ID_RUOLO_DEFAULT);
                     queryMng.setParam("RICERCA_CORR", oggettoCustom.TIPO_RICERCA_CORR);
-                    if(oggettoCustom.CAMPO_COMUNE != null && oggettoCustom.CAMPO_COMUNE == "1")
+                    if (oggettoCustom.CAMPO_COMUNE != null && oggettoCustom.CAMPO_COMUNE == "1")
                         queryMng.setParam("CAMPO_COMUNE", oggettoCustom.CAMPO_COMUNE);
                     else
                         queryMng.setParam("CAMPO_COMUNE", "null");
@@ -460,14 +532,14 @@ namespace DocsPaDB.Query_DocsPAWS
                     queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_INSERT_DPA_OGG_CUSTOM_COMP_FASC");
                     queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
                     queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_OGG_CUSTOM_COMP_FASC"));
-                    queryMng.setParam("idTemplate",system_id_templates);
-                    queryMng.setParam("idOggettoCustom",system_id_oggettoCustom);
+                    queryMng.setParam("idTemplate", system_id_templates);
+                    queryMng.setParam("idOggettoCustom", system_id_oggettoCustom);
                     queryMng.setParam("posizione", oggettoCustom.POSIZIONE);
                     commandText = queryMng.getSQL();
                     System.Diagnostics.Debug.WriteLine("SQL - salvaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     logger.Debug("SQL - salvaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     dbProvider.ExecuteNonQuery(commandText);
-                    
+
                     //Inserimento DPA_ASS_TEMPLATES_FASC
                     queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_SALVA_ASS_TEMPLATES_FASC");
                     queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
@@ -475,13 +547,13 @@ namespace DocsPaDB.Query_DocsPAWS
                     queryMng.setParam("ID_OGGETTO", system_id_oggettoCustom);
                     queryMng.setParam("ID_TEMPLATE", system_id_templates);
                     queryMng.setParam("Id_Project", "");
-                    if(!string.IsNullOrEmpty(oggettoCustom.VALORE_DATABASE))
+                    if (!string.IsNullOrEmpty(oggettoCustom.VALORE_DATABASE))
                         queryMng.setParam("Valore_Oggetto_Db", oggettoCustom.VALORE_DATABASE);
                     else
                         queryMng.setParam("Valore_Oggetto_Db", "");
                     queryMng.setParam("Anno", System.DateTime.Now.Year.ToString());
                     queryMng.setParam("CODICE_DB", "");
-                    queryMng.setParam("MANUAL_INSERT","0");
+                    queryMng.setParam("MANUAL_INSERT", "0");
                     if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
                         queryMng.setParam("idAooRf", oggettoCustom.ID_AOO_RF);
                     else
@@ -492,7 +564,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     System.Diagnostics.Debug.WriteLine("SQL - salvaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     logger.Debug("SQL - salvaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     dbProvider.ExecuteNonQuery(commandText);
-                    
+
                     //Inserimento DPA_ASS_VALORI_FASC
                     for (int j = 0; j < oggettoCustom.ELENCO_VALORI.Count; j++)
                     {
@@ -555,7 +627,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         DataSet ds = new DataSet();
                         dbProvider.ExecuteQuery(ds, commandText);
                         system_id_tipo_oggetto = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
-                        
+
                         //Inserimento oggettoCustom
                         string system_id_oggettoCustom = string.Empty;
                         queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_SALVA_OGGETTO_CUSTOM_FASC");
@@ -595,7 +667,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         //MODIFICA
 
                         queryMng.setParam("formatoOra", oggettoCustom.FORMATO_ORA);
-                        
+
                         //GESTIONE LINK
                         if (!string.IsNullOrEmpty(oggettoCustom.TIPO_LINK))
                         {
@@ -687,7 +759,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         System.Diagnostics.Debug.WriteLine("SQL - salvaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
-                        
+
                         //Inserimento DPA_ASSOCIAZIONE_TEMPLATES
                         queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_SALVA_ASS_TEMPLATES_FASC");
                         queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
@@ -700,7 +772,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         else
                             queryMng.setParam("Valore_Oggetto_Db", "");
                         queryMng.setParam("Anno", oggettoCustom.ANNO);
-                        queryMng.setParam("CODICE_DB","");
+                        queryMng.setParam("CODICE_DB", "");
                         queryMng.setParam("MANUAL_INSERT", "0");
                         if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
                             queryMng.setParam("idAooRf", oggettoCustom.ID_AOO_RF);
@@ -744,7 +816,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         {
                             dbProvider.SetLargeText("DPA_OGGETTI_CUSTOM", oggettoCustom.SYSTEM_ID.ToString(), "CONFIG_OBJ_EST", oggettoCustom.CONFIG_OBJ_EST);
                         }
-                        
+
                         //Inserimento DPA_ASS_VALORI_FASC
                         for (int j = 0; j < oggettoCustom.ELENCO_VALORI.Count; j++)
                         {
@@ -828,7 +900,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         //modifica
                         queryMng.setParam("da_visualizzare_ricerca", oggettoCustom.DA_VISUALIZZARE_RICERCA);
                         //modifica
-                        
+
                         commandText = queryMng.getSQL();
                         System.Diagnostics.Debug.WriteLine("SQL - aggiornaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         logger.Debug("SQL - aggiornaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
@@ -851,7 +923,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         System.Diagnostics.Debug.WriteLine("SQL - aggiornaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         logger.Debug("SQL - aggiornaTemplateFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
-                        
+
                         //Cerco il valoreOggetto per valore e id_oggettCustom
                         //Se esiste non faccio niente altrimenti effettuo un inserimento
                         for (int j = 0; j < oggettoCustom.ELENCO_VALORI.Count; j++)
@@ -946,7 +1018,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             }
                         }
                     }
-                }               
+                }
             }
             catch
             {
@@ -1216,7 +1288,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         string config = dbProvider.GetLargeText("DPA_OGGETTI_CUSTOM_FASC", oggettoCustom.SYSTEM_ID.ToString(), "CONFIG_OBJ_EST");
                         oggettoCustom.CONFIG_OBJ_EST = config;
                     }
-                    
+
                     /*
                     oggettoCustom = new DocsPaVO.ProfilazioneDinamica.OggettoCustom();
                     queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_GET_OGGETTI_CUSTOM_FASC");
@@ -1386,7 +1458,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 System.Diagnostics.Debug.WriteLine("SQL - aggiornaPosizioniFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                 logger.Debug("SQL - aggiornaPosizioniFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                 dbProvider.ExecuteNonQuery(commandText);
-                
+
                 queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_AGGIORNA_POSIZIONE_FASC");
                 queryMng.setParam("idTemplate", template.SYSTEM_ID.ToString());
                 queryMng.setParam("idOggettoCustom", oggettoCustom_2.SYSTEM_ID.ToString());
@@ -1477,7 +1549,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         listaTipiFasc.Add(template);
                     }
 
-                }   
+                }
             }
             catch
             {
@@ -1485,7 +1557,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             finally
             {
-                dbProvider.Dispose();                
+                dbProvider.Dispose();
             }
 
             return listaTipiFasc;
@@ -1501,7 +1573,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_TIPO_FASC_FROM_RUOLO");
                 queryMng.setParam("idAmm", idAmministrazione);
                 queryMng.setParam("idRuolo", idRuolo);
-                
+
                 //Ricerca
                 if (diritti == "1")
                 {
@@ -1571,7 +1643,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     {
                         DocsPaVO.ProfilazioneDinamica.OggettoCustom oggettoCustom = (DocsPaVO.ProfilazioneDinamica.OggettoCustom)template.ELENCO_OGGETTI[i];
                         oggettoCustom.ANNO = anno;
-                        
+
                         switch (oggettoCustom.TIPO.DESCRIZIONE_TIPO)
                         {
                             case "Contatore":
@@ -1587,7 +1659,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 queryMng.setParam("Id_Project", idProject);
                                 queryMng.setParam("Valore_Oggetto_Db", oggettoCustom.VALORE_DATABASE);
                                 queryMng.setParam("CODICE_DB", oggettoCustom.CODICE_DB);
-                                string manual=(oggettoCustom.MANUAL_INSERT)? "1":"0";
+                                string manual = (oggettoCustom.MANUAL_INSERT) ? "1" : "0";
                                 queryMng.setParam("MANUAL_INSERT", manual);
                                 queryMng.setParam("Anno", oggettoCustom.ANNO);
                                 if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
@@ -1651,14 +1723,14 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //if (oggettoCustom.VALORE_DATABASE.Length > 254)
                                 //    queryMng.setParam("Valore_Oggetto_Db", oggettoCustom.VALORE_DATABASE.Substring(0,254));
                                 //else
-                                    queryMng.setParam("Valore_Oggetto_Db", oggettoCustom.VALORE_DATABASE);
+                                queryMng.setParam("Valore_Oggetto_Db", oggettoCustom.VALORE_DATABASE);
                                 queryMng.setParam("Anno", oggettoCustom.ANNO);
                                 if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
                                     queryMng.setParam("idAooRf", oggettoCustom.ID_AOO_RF);
                                 else
                                     queryMng.setParam("idAooRf", "0");
                                 queryMng.setParam("CODICE_DB", oggettoCustom.CODICE_DB);
-                                string manual3=(oggettoCustom.MANUAL_INSERT)? "1":"0";
+                                string manual3 = (oggettoCustom.MANUAL_INSERT) ? "1" : "0";
                                 queryMng.setParam("MANUAL_INSERT", manual3);
                                 queryMng.setParam("dtaIns", DocsPaDbManagement.Functions.Functions.GetDate());
                                 queryMng.setParam("anno_acc", "");
@@ -1686,12 +1758,12 @@ namespace DocsPaDB.Query_DocsPAWS
                         {
                             case "CasellaDiSelezione":
                                 oggettoCustom.gestisciCaratteriSpeciali();
-                                 int modif_cas_selez = 0; //booleano che mi informa se è cambiato lo stato della casella di selezione 
+                                int modif_cas_selez = 0; //booleano che mi informa se è cambiato lo stato della casella di selezione 
                                 for (int j = 0; j < oggettoCustom.ELENCO_VALORI.Count; j++)
                                 {
                                     queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_UPDATE_DPA_ASS_TEMPLATES_FASC");
                                     if (oggettoCustom.VALORI_SELEZIONATI[j] != null && (string)oggettoCustom.VALORI_SELEZIONATI[j] != "")
-                                        queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORI_SELEZIONATI[j].ToString().Replace("'","''"));
+                                        queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORI_SELEZIONATI[j].ToString().Replace("'", "''"));
                                     else
                                         queryMng.setParam("valoreDbOggettoCustom", "");
                                     queryMng.setParam("idAooRf", "0");
@@ -1735,7 +1807,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                         logger.Debug("Il contatore non presenta un valore numerico e quindi si può effettuare l'aggiornamento");
                                         continua = true;
                                     }
-                                    
+
                                     //Il parametro booleano è :
                                     //true = se l'oggetto è da inserire 
                                     //false= se l'oggetto è da aggiornare - come in questo caso
@@ -1772,7 +1844,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //if (oggettoCustom.VALORE_DATABASE.Length > 254)
                                 //    queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE.Substring(0, 254));
                                 //else
-                                    queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE);
+                                queryMng.setParam("valoreDbOggettoCustom", oggettoCustom.VALORE_DATABASE);
                                 if (oggettoCustom.ID_AOO_RF != null && oggettoCustom.ID_AOO_RF != "")
                                     queryMng.setParam("idAooRf", oggettoCustom.ID_AOO_RF);
                                 else
@@ -1794,12 +1866,12 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //storicizzo il campo profilato
                                 insertInStorico(oggettoCustom, oldOggCustom, rowsAffected, ref indexOldObj);
                                 break;
-                        }                        
+                        }
                     }
                     template.OLD_OGG_CUSTOM.Clear();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 dbProvider.RollbackTransaction();
                 logger.Debug("Errore nel salvataggio dei campi profilati - FASCICOLO IdProject = " + idProject + " TIPOLOGIA = " + template.DESCRIZIONE + " ERRORE = " + ex.Message);
@@ -1848,7 +1920,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     dbProvider.ExecuteQuery(ds_template_descrizione, commandText);
 
                     setTemplate(ref template, ds_template_descrizione, 0);
-                    template.ID_PROJECT = idProject;                    
+                    template.ID_PROJECT = idProject;
                 }
             }
             catch
@@ -1857,7 +1929,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             finally
             {
-                dbProvider.Dispose();                
+                dbProvider.Dispose();
             }
 
             return template;
@@ -2080,7 +2152,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 logger.Info("END");
                 dbProvider.Dispose();
-            }            
+            }
             return template;
         }
 
@@ -2168,7 +2240,7 @@ namespace DocsPaDB.Query_DocsPAWS
         public bool existTemplatesFasc()
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
-            
+
             try
             {
                 DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("EXIST_TEMPLATES_FASC");
@@ -2181,7 +2253,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
                 if (ds_numberTemplates.Tables[0].Rows.Count > 0)
                 {
-                    if(ds_numberTemplates.Tables[0].Rows[0]["NUMBER_TEMPLATES"].ToString().Equals("0"))
+                    if (ds_numberTemplates.Tables[0].Rows[0]["NUMBER_TEMPLATES"].ToString().Equals("0"))
                         return false;
                     else
                         return true;
@@ -2221,7 +2293,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         aggiornaTemplateFasc(modello);
                         break;
                     }
-                        
+
                 }
 
                 //Seleziono i system_id degli oggetti_custom comuni per questo specifico template
@@ -2246,7 +2318,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         System.Diagnostics.Debug.WriteLine("SQL - impostaCampiComuniFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         logger.Debug("SQL - impostaCampiComuniFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
-                
+
                         //Rimozione dalla DPA_OGG_CUSTOM_COMP_FASC
                         queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_DELETE_DPA_OGG_CUSTOM_COMP_FASC");
                         queryMng.setParam("idTemplate", modello.SYSTEM_ID.ToString());
@@ -2257,7 +2329,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         dbProvider.ExecuteNonQuery(commandText);
                     }
                 }
-                
+
                 //Recupero il modello aggiornato per impostare correttamente le posizioni dei campi comuni
                 DocsPaVO.ProfilazioneDinamica.Templates modelloAggiornato = this.getTemplateFascById(modello.SYSTEM_ID.ToString());
                 int numeroElementiModello = modelloAggiornato.ELENCO_OGGETTI.Count;
@@ -2280,7 +2352,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 //Inserisco gli oggetti_custom comuni selezionati per questo template
                 for (int i = 0; i < campiComuni.Count; i++)
                 {
-                    DocsPaVO.ProfilazioneDinamica.OggettoCustom oggCustom = (DocsPaVO.ProfilazioneDinamica.OggettoCustom) campiComuni[i];
+                    DocsPaVO.ProfilazioneDinamica.OggettoCustom oggCustom = (DocsPaVO.ProfilazioneDinamica.OggettoCustom)campiComuni[i];
                     numeroElementiModello++;
 
                     //Inserimento nella DPA_ASS_TEMPLATES_FASC
@@ -2304,7 +2376,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     System.Diagnostics.Debug.WriteLine("SQL - impostaCampiComuniFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     logger.Debug("SQL - impostaCampiComuniFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     dbProvider.ExecuteNonQuery(commandText);
-                    
+
                     //Verifico se il campo comune è già presente nella DPA_OGG_CUSTOM_COMP_FASC per il template interessato,
                     //in caso affermativo non devo inserirlo
                     queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_GET_OGGETTI_CUSTOM_FASC");
@@ -2334,7 +2406,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
                 //Recupero il modello completamente aggiornato da restituire
                 DocsPaVO.ProfilazioneDinamica.Templates template = this.getTemplateFascById(modello.SYSTEM_ID.ToString());
-                
+
                 return template;
             }
             catch
@@ -2345,13 +2417,13 @@ namespace DocsPaDB.Query_DocsPAWS
             finally
             {
                 dbProvider.Dispose();
-            }            
+            }
         }
 
         public bool isInUseCampoComuneFasc(string idTemplate, string idCampoComune)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
-            
+
             try
             {
                 DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_IS_IN_USE_CAMPO_COMUNE_FASC");
@@ -2374,7 +2446,7 @@ namespace DocsPaDB.Query_DocsPAWS
             finally
             {
                 dbProvider.Dispose();
-            }           
+            }
         }
 
         //questa funzione controlla se è associato un record nella DPA_CONT_CUSTOM_FASC
@@ -2869,7 +2941,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     queryMng.setParam("privato", privato);
                 else
                     queryMng.setParam("privato", "0");
-                
+
                 string commandText = queryMng.getSQL();
                 System.Diagnostics.Debug.WriteLine("SQL - updatePrivatoTipoFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                 logger.Debug("SQL - updatePrivatoTipoFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
@@ -2911,6 +2983,37 @@ namespace DocsPaDB.Query_DocsPAWS
                 dbProvider.Dispose();
             }
         }
+
+        #region PROCEDIMENTI
+
+        public void UpdateProcedimentoTipoFasc(int systemId_template, string procedimentale)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_UPDATE_PROCEDIMENTALE_FASC");
+                queryMng.setParam("idTemplate", systemId_template.ToString());
+                if (!string.IsNullOrEmpty(procedimentale))
+                    queryMng.setParam("PROCEDIMENTALE", procedimentale);
+                else
+                    queryMng.setParam("PROCEDIMENTALE", "0");
+
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - UpdateInvioConsTipoDoc - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                logger.Debug("SQL - UpdateInvioConsTipoDoc - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                dbProvider.ExecuteNonQuery(commandText);
+            }
+            catch (Exception ex)
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
+
+        #endregion
 
         public int countFascTipoFasc(string tipo_fasc, string codiceAmm)
         {
@@ -3007,9 +3110,9 @@ namespace DocsPaDB.Query_DocsPAWS
         }
 
         public string getSeriePerRicercaProfilazione(DocsPaVO.ProfilazioneDinamica.Templates template, string anno_prof)
-        {   
+        {
             string queryStr = string.Empty;
-            
+
             if (template != null && template.ELENCO_OGGETTI != null)
             {
                 //Imposto il filtro per la ricercare solo sui campi profilati che sono campi di ricerca
@@ -3203,7 +3306,7 @@ namespace DocsPaDB.Query_DocsPAWS
         {
             ArrayList idModelliTrasmSelezionati = new ArrayList();
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
-            
+
             try
             {
                 if (idStato != "")
@@ -3253,7 +3356,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         obj.TRASM_AUT = ds.Tables[0].Rows[i]["Trasm_aut"].ToString();
                         idModelliTrasmSelezionati.Add(obj);
                     }
-                }                
+                }
             }
             catch
             {
@@ -3272,7 +3375,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             try
             {
-                
+
                 if (idStato == "")
                 {
                     if (idDiagramma == "0")
@@ -3282,7 +3385,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         string commandText = queryMng.getSQL();
                         System.Diagnostics.Debug.WriteLine("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
-                        dbProvider.ExecuteNonQuery(commandText);                        
+                        dbProvider.ExecuteNonQuery(commandText);
                     }
                     else
                     {
@@ -3299,7 +3402,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         commandText = queryMng.getSQL();
                         System.Diagnostics.Debug.WriteLine("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
-                        dbProvider.ExecuteNonQuery(commandText);                                                
+                        dbProvider.ExecuteNonQuery(commandText);
                     }
 
                     for (int i = 0; i < modelliSelezionati.Count; i++)
@@ -3318,7 +3421,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             string commandText = queryMng.getSQL();
                             System.Diagnostics.Debug.WriteLine("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                             logger.Debug("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
-                            dbProvider.ExecuteNonQuery(commandText);                            
+                            dbProvider.ExecuteNonQuery(commandText);
                         }
                         else
                         {
@@ -3333,7 +3436,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             System.Diagnostics.Debug.WriteLine("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                             logger.Debug("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                             dbProvider.ExecuteNonQuery(commandText);
-                        }                       
+                        }
                     }
                 }
                 else
@@ -3346,7 +3449,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     System.Diagnostics.Debug.WriteLine("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     logger.Debug("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     dbProvider.ExecuteNonQuery(commandText);
-                    
+
                     for (int i = 0; i < modelliSelezionati.Count; i++)
                     {
                         DocsPaVO.Modelli_Trasmissioni.AssDocDiagTrasm obj = (DocsPaVO.Modelli_Trasmissioni.AssDocDiagTrasm)modelliSelezionati[i];
@@ -3365,7 +3468,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         logger.Debug("SQL - salvaAssociazioneModelliFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
                     }
-                }                
+                }
             }
             catch
             {
@@ -3472,18 +3575,18 @@ namespace DocsPaDB.Query_DocsPAWS
                 dbProvider.ExecuteQuery(ds_template, commandText);
 
                 setTemplate(ref template, ds_template, 0);
-                
+
                 //Seleziono i SYSTEM_ID per gli oggettiCustom associati al template dalla DPA_ASSOCIAZIONE_TEMPLATES
                 queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("PD_SYSTEM_ID_OGGETTI_CUSTOM_FASC_CAMPI_COMUNI");
                 queryMng.setParam("idTemplate", idTemplate);
-                queryMng.setParam("idAmm",infoUtente.idAmministrazione);
-                queryMng.setParam("idRuolo",infoUtente.idGruppo);
+                queryMng.setParam("idAmm", infoUtente.idAmministrazione);
+                queryMng.setParam("idRuolo", infoUtente.idGruppo);
                 commandText = queryMng.getSQL();
                 System.Diagnostics.Debug.WriteLine("SQL - getTemplateFascCampiComuniById - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                 logger.Debug("SQL - getTemplateFascCampiComuniById - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                 DataSet ds_systemId_oggettiCustom = new DataSet();
                 dbProvider.ExecuteQuery(ds_systemId_oggettiCustom, commandText);
-                
+
                 //Cerco gli oggetti custom associati al template
                 DocsPaVO.ProfilazioneDinamica.OggettoCustom oggettoCustom = null;
                 for (int j = 0; j < ds_systemId_oggettiCustom.Tables[0].Rows.Count; j++)
@@ -3524,7 +3627,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     DataSet ds_tipoOggetto = new DataSet();
                     dbProvider.ExecuteQuery(ds_tipoOggetto, commandText);
                     setTipoOggetto(ref tipoOggetto, ds_tipoOggetto, 0);
-                    
+
                     //Aggiungo il tipo oggetto all'oggettoCustom
                     oggettoCustom.TIPO = tipoOggetto;
 
@@ -3638,7 +3741,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     System.Diagnostics.Debug.WriteLine("SQL - salvaDirittiCampiTipologiaFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     logger.Debug("SQL - salvaDirittiCampiTipologiaFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                     int rowsAffected;
-                    dbProvider.ExecuteNonQuery(commandText,out rowsAffected);
+                    dbProvider.ExecuteNonQuery(commandText, out rowsAffected);
 
                     if (rowsAffected == 0)
                     {
@@ -3655,7 +3758,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         logger.Debug("SQL - salvaDirittiCampiTipologiaFasc - ProfilazioneDinamica/Database/modelFasc.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
                     }
-                }                
+                }
             }
             catch
             {
@@ -3735,7 +3838,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 if (ds_dirittiCampo.Tables[0].Rows.Count != 0)
                 {
                     assDocFascRuoliResult = new DocsPaVO.ProfilazioneDinamica.AssDocFascRuoli();
-                    setAssDocFascRuoli(ref assDocFascRuoliResult, ds_dirittiCampo, 0);                    
+                    setAssDocFascRuoli(ref assDocFascRuoliResult, ds_dirittiCampo, 0);
                 }
                 else
                 {
@@ -3745,7 +3848,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     assDocFascRuoli.ID_OGGETTO_CUSTOM = idOggettoCustom;
                     assDocFascRuoli.INS_MOD_OGG_CUSTOM = "0";
                     assDocFascRuoli.VIS_OGG_CUSTOM = "0";
-                    assDocFascRuoliResult = assDocFascRuoli;                    
+                    assDocFascRuoliResult = assDocFascRuoli;
                 }
             }
             catch
@@ -3817,7 +3920,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             this.salvaDirittiCampiTipologiaFasc(listaDirittiCampiSelezionati);
                         }
                     }
-                }   
+                }
             }
             catch
             {
@@ -3890,7 +3993,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Debug("SQL - setTipoOggetto - ProfilazioneDinamica/Database/modelFasc.cs - Exception : " + ex.Message);
             }
         }
-        
+
         private void setValoreOggetto(ref DocsPaVO.ProfilazioneDinamica.ValoreOggetto valoreOggetto, DataSet dataSet, int rowNumber)
         {
             try
@@ -3999,6 +4102,14 @@ namespace DocsPaDB.Query_DocsPAWS
                     else
                         template.NUM_MESI_CONSERVAZIONE = "0";
                 }
+                // PROCEDIMENTI
+                if (dataSet.Tables[0].Columns.Contains("CHA_PROCEDIMENTALE"))
+                {
+                    if (!string.IsNullOrEmpty(dataSet.Tables[0].Rows[rowNumber]["CHA_PROCEDIMENTALE"].ToString()))
+                        template.PROCEDIMENTALE = dataSet.Tables[0].Rows[rowNumber]["CHA_PROCEDIMENTALE"].ToString();
+                    else
+                        template.PROCEDIMENTALE = "0";
+                }
 
                 if (dataSet.Tables[0].Columns.Contains("ID_TEMPLATE_STRUTTURA"))
                 {
@@ -4090,13 +4201,13 @@ namespace DocsPaDB.Query_DocsPAWS
                     else
                         oggettoCustom.ID_AOO_RF = "0";
                 }
-                if(dataSet.Tables[0].Columns.Contains("FORMATO_ORA"))
+                if (dataSet.Tables[0].Columns.Contains("FORMATO_ORA"))
                     oggettoCustom.FORMATO_ORA = dataSet.Tables[0].Rows[rowNumber]["FORMATO_ORA"].ToString();
                 if (dataSet.Tables[0].Columns.Contains("TIPO_LINK"))
                     oggettoCustom.TIPO_LINK = dataSet.Tables[0].Rows[rowNumber]["TIPO_LINK"].ToString();
                 if (dataSet.Tables[0].Columns.Contains("TIPO_OBJ_LINK"))
                     oggettoCustom.TIPO_OBJ_LINK = dataSet.Tables[0].Rows[rowNumber]["TIPO_OBJ_LINK"].ToString();
-                if(dataSet.Tables[0].Columns.Contains("CODICE_DB"))
+                if (dataSet.Tables[0].Columns.Contains("CODICE_DB"))
                     oggettoCustom.CODICE_DB = dataSet.Tables[0].Rows[rowNumber]["CODICE_DB"].ToString();
                 if (dataSet.Tables[0].Columns.Contains("MANUAL_INSERT"))
                 {
@@ -4285,29 +4396,17 @@ namespace DocsPaDB.Query_DocsPAWS
                             //System.Diagnostics.Debug.WriteLine("SQL - insertInStorico - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                             //logger.Debug("SQL - insertInStorico - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                             //dbProvider.ExecuteNonQuery(commandText);
-                            bool canInsert = false;
 
-                            if (oggettoCustom.TIPO.DESCRIZIONE_TIPO == "CasellaDiSelezione")
-                            {
-                                var flattenValue = ((String[])oggettoCustom.VALORI_SELEZIONATI.ToArray(typeof(String))).Aggregate((a, b) => String.Format("{0}*#?{1}", a, b)).ToString();
-                                canInsert = !ogg.Valore.Equals(flattenValue);
-                            }
-                            else
-                                canInsert = !ogg.Valore.Equals(oggettoCustom.VALORE_DATABASE);
+                            ArrayList parameters = new ArrayList();
+                            parameters.Add(new ParameterSP("objType", "F", DirectionParameter.ParamInput));
+                            parameters.Add(new ParameterSP("Idtemplate", ogg.IDTemplate, DirectionParameter.ParamInput));
+                            parameters.Add(new ParameterSP("idDocOrFasc", ogg.ID_Doc_Fasc, DirectionParameter.ParamInput));
+                            parameters.Add(new ParameterSP("Idoggcustom", ogg.ID_Oggetto, DirectionParameter.ParamInput));
+                            parameters.Add(new ParameterSP("Idpeople", ogg.ID_People, DirectionParameter.ParamInput));
+                            parameters.Add(new ParameterSP("Idruoloinuo", ogg.ID_Ruolo_In_UO, DirectionParameter.ParamInput));
+                            parameters.Add(new ParameterSP("Descmodifica", ogg.Valore, DirectionParameter.ParamInput));
 
-                            if (canInsert)
-                            {
-                                ArrayList parameters = new ArrayList();
-                                parameters.Add(new ParameterSP("objType", "F", DirectionParameter.ParamInput));
-                                parameters.Add(new ParameterSP("Idtemplate", ogg.IDTemplate, DirectionParameter.ParamInput));
-                                parameters.Add(new ParameterSP("idDocOrFasc", ogg.ID_Doc_Fasc, DirectionParameter.ParamInput));
-                                parameters.Add(new ParameterSP("Idoggcustom", ogg.ID_Oggetto, DirectionParameter.ParamInput));
-                                parameters.Add(new ParameterSP("Idpeople", ogg.ID_People, DirectionParameter.ParamInput));
-                                parameters.Add(new ParameterSP("Idruoloinuo", ogg.ID_Ruolo_In_UO, DirectionParameter.ParamInput));
-                                parameters.Add(new ParameterSP("Descmodifica", ogg.Valore, DirectionParameter.ParamInput));
-
-                                dbProvider.ExecuteStoreProcedure("InsertDataInHistoryProf", parameters);
-                            }
+                            dbProvider.ExecuteStoreProcedure("InsertDataInHistoryProf", parameters);
                         }
                         break;
                 }
@@ -4647,6 +4746,55 @@ namespace DocsPaDB.Query_DocsPAWS
 
             return retVal;
 
+        }
+
+        public bool ReplicaTipoFascicolo(string idTipoFasc, string idAmm)
+        {
+            logger.Debug("INIZIO ReplicaTipoFascicolo");
+            bool result = false;
+            ArrayList parameters = new ArrayList();
+            parameters.Add(new DocsPaUtils.Data.ParameterSP("idTipoFascicolo", idTipoFasc));
+            parameters.Add(new DocsPaUtils.Data.ParameterSP("idAmministrazione", idAmm));
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                try
+                {
+                    dbProvider.BeginTransaction();
+                    int resultSP = dbProvider.ExecuteStoreProcedure("SP_REPLICA_TIPO_FASCICOLO", parameters);
+
+                    switch (resultSP)
+                    {
+                        case 0:
+                            dbProvider.CommitTransaction();
+                            logger.Debug("Replica tipo fascicolo " + idTipoFasc + " per l'amministrazione " + idAmm + " avveunta correttamente");
+                            result = true;
+                            break;
+                        case 1:
+                            dbProvider.RollbackTransaction();
+                            logger.Debug("Tipo fascicolo " + idTipoFasc + " per l'amministrazione " + idAmm + " già presente");
+                            result = true;
+                            break;
+                        case 2:
+                            dbProvider.RollbackTransaction();
+                            logger.Debug("Tipo fascicolo " + idTipoFasc + " per l'amministrazione " + idAmm + " errore nella creazione della tipologia automatica del diagramma di stato associato");
+                            result = false;
+                            break;
+                        default:
+                            dbProvider.RollbackTransaction();
+                            logger.Error("Errore in replica tipo fascicolo " + idTipoFasc + " per l'amministrazione " + idAmm + "; Errore: " + resultSP.ToString());
+                            result = false;
+                            break;
+                    }
+                }
+                catch(Exception e)
+                {
+                    dbProvider.RollbackTransaction();
+                    logger.Error("Errore in ReplicaTipoFascicolo per la copia della tipologia fascicolo " + idTipoFasc + " per l'amministrazione " + idAmm + " : " + e.Message);
+                }
+            }        
+            logger.Debug("FINE ReplicaTipoFascicolo");
+            return result;
         }
     }
 }

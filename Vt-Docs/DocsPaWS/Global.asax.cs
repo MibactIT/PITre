@@ -152,6 +152,7 @@ namespace DocsPaWS
         /// </summary>
         public void ChilkatDot()
         {
+/*
             var currentPath = HttpContext.Current.Server.MapPath("~/");
             var fileName = @"ChilkatDotNet2.dll";
             var destFile = currentPath + "bin\\" + fileName;
@@ -187,6 +188,7 @@ namespace DocsPaWS
                     // Ignored
                 }
             }
+*/
         }
 
         #region Web Form Designer generated code

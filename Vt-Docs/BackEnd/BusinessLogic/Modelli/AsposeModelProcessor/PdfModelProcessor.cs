@@ -18,6 +18,7 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
 
         Aspose.Pdf.License license;
         Aspose.Pdf.Facades.Form form;
+        Aspose.Pdf.Facades.Form flatForm;
 
         public PdfModelProcessor()
         {
@@ -49,6 +50,10 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
             MemoryStream ms = new MemoryStream(pdfContent);
             form = new Form();
             form.BindPdf(ms);
+
+            flatForm = new Form();
+            flatForm.BindPdf(ms);
+            flatForm.FlattenAllFields();
         }
 
         public override DocsPaVO.Modelli.ModelResponse ProcessModel(DocsPaVO.Modelli.ModelRequest request)
@@ -66,30 +71,58 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
             logger.Debug("BEGIN");
             logger.Debug("Ricerca tipologia fascicolo");
             DocsPaVO.ProfilazioneDinamica.Templates template = BusinessLogic.ProfilazioneDinamica.ProfilazioneFascicoli.getTemplateFascById(idTemplate);
-            if (template != null && !string.IsNullOrEmpty(template.ID_TIPO_FASC))
+            if (template != null && !string.IsNullOrEmpty(template.ID_TIPO_FASC) && template.ELENCO_OGGETTI != null && template.ELENCO_OGGETTI.Count > 0)
             {
-                // Caricamento licenza
-                //DocsPaDB.Query_DocsPAWS.ClientSideModelProcessor csmp = new DocsPaDB.Query_DocsPAWS.ClientSideModelProcessor();
+                #region PREDISPOSIZIONE PER GESTIONE OBBLIGATORIETA' CAMPI
+                // Ricerca e popolamento dei campi profilati
+                /*
+                foreach(string formFieldName in form.FieldNames)
+                {
+                    string name = formFieldName;
+                    if(formFieldName.StartsWith("O_"))
+                    {
+                        name = formFieldName.Substring(2, formFieldName.Length);
+                    }
 
-                //Aspose.Pdf.License lic = new License();
-                //byte[] licenseContent = csmp.GetLicense("ASPOSE");
-                //if (licenseContent != null)
-                //{
-                //    System.IO.MemoryStream licenseStream = new System.IO.MemoryStream(licenseContent, 0, licenseContent.Length);
-                //    lic.SetLicense(licenseStream);
-                //    licenseStream.Close();
-                //}
-
-                // Caricamento file pdf da byte array
-                //MemoryStream ms = new MemoryStream(pdfContent);
-                //Form form = new Form();
-                //form.BindPdf(ms);
+                    foreach(DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg in template.ELENCO_OGGETTI)
+                    {
+                        if(ogg.DESCRIZIONE.ToUpper() == name.ToUpper())
+                        {
+                            string value = string.Empty;
+                            switch(form.GetFieldType(formFieldName))
+                            {
+                                case FieldType.Text:
+                                case FieldType.ComboBox:
+                                    value = form.GetField(formFieldName);
+                                    if(!string.IsNullOrEmpty(value))
+                                    {
+                                        ogg.VALORE_DATABASE = value;
+                                    }
+                                    break;
+                                case FieldType.CheckBox:
+                                    value = form.GetField(ogg.DESCRIZIONE);
+                                    break;
+                                case FieldType.Radio:
+                                    value = form.GetButtonOptionCurrentValue(ogg.DESCRIZIONE);
+                                    var options = form.GetButtonOptionValues(ogg.DESCRIZIONE);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    }
+                }
+                */
+                #endregion
 
                 // Ricerca e popolamento dei campi profilati
                 foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg in template.ELENCO_OGGETTI)
                 {
+                    logger.Debug("Campo: " + ogg.DESCRIZIONE);
                     if (form.FieldNames.Contains(ogg.DESCRIZIONE))
                     {
+                        logger.Debug("Individuato campo form");
                         string value = string.Empty;
                         switch (form.GetFieldType(ogg.DESCRIZIONE))
                         {
@@ -108,7 +141,7 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
                                 }
                                 break;
                             case FieldType.CheckBox:
-                                value = form.GetField(ogg.DESCRIZIONE);                               
+                                value = form.GetField(ogg.DESCRIZIONE);
                                 break;
                             case FieldType.Radio:
                                 value = form.GetButtonOptionCurrentValue(ogg.DESCRIZIONE);
@@ -117,8 +150,9 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
                             default:
                                 break;
                         }
-                    }                    
-                }                                
+                        logger.Debug("Valore campo: " + value);
+                    }
+                }
             }
             else
             {
@@ -135,16 +169,67 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
             logger.Debug("BEGIN");
             logger.Debug("Ricerca tipologia documento");
             DocsPaVO.ProfilazioneDinamica.Templates template = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getTemplateById(idTemplate);
-            if (template != null && !string.IsNullOrEmpty(template.ID_TIPO_ATTO))
+            if (template != null && !string.IsNullOrEmpty(template.ID_TIPO_ATTO) && template.ELENCO_OGGETTI != null && template.ELENCO_OGGETTI.Count > 0)
             {
+                #region PREDISPOSIZIONE PER OBBLIGATORIETA' CAMPI
+                // Ricerca e popolamento dei campi profilati
+                /*
+                foreach(string formFieldName in form.FieldNames)
+                {
+                    string name = formFieldName;
+                    if (formFieldName.StartsWith("O_"))
+                    {
+                        name = formFieldName.Substring(2, formFieldName.Length);
+                    }
+
+                    foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg in template.ELENCO_OGGETTI)
+                    {
+                        if (ogg.DESCRIZIONE.ToUpper() == name.ToUpper())
+                        {
+                            string value = string.Empty;
+                            switch (form.GetFieldType(formFieldName))
+                            {
+                                case FieldType.Text:
+                                    value = form.GetField(ogg.DESCRIZIONE);
+                                    if (!string.IsNullOrEmpty(value))
+                                    {
+                                        ogg.VALORE_DATABASE = value;
+                                    }
+                                    break;
+                                case FieldType.ComboBox:
+                                    value = form.GetField(ogg.DESCRIZIONE);
+                                    if (!string.IsNullOrEmpty(value))
+                                    {
+                                        ogg.VALORE_DATABASE = value;
+                                    }
+                                    break;
+                                case FieldType.CheckBox:
+                                    value = form.GetField(ogg.DESCRIZIONE);
+                                    break;
+                                case FieldType.Radio:
+                                    value = form.GetButtonOptionCurrentValue(ogg.DESCRIZIONE);
+                                    var options = form.GetButtonOptionValues(ogg.DESCRIZIONE);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                }
+                */
+                #endregion
+
                 foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg in template.ELENCO_OGGETTI)
                 {
+                    logger.Debug("Campo: " + ogg.DESCRIZIONE);
                     if (form.FieldNames.Contains(ogg.DESCRIZIONE))
                     {
+                        logger.Debug("Individuato campo form");
                         string value = string.Empty;
                         switch (form.GetFieldType(ogg.DESCRIZIONE))
                         {
                             case FieldType.Text:
+                            case FieldType.MultiLineText:
                                 value = form.GetField(ogg.DESCRIZIONE);
                                 if (!string.IsNullOrEmpty(value))
                                 {
@@ -168,7 +253,8 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
                             default:
                                 break;
                         }
-                    }        
+                        logger.Debug("Valore campo: " + value);
+                    }
                 }
             }
             else
@@ -181,7 +267,22 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
             return template;
         }
 
-        public DocsPaVO.documento.FileDocumento CreaRicevuta(DocsPaVO.utente.InfoUtente userInfo, string idDocument, string text)
+        public byte[] GetFlatContent()
+        {
+            try
+            {
+                MemoryStream ms = new MemoryStream();
+                this.flatForm.Save(ms);
+                return ms.ToArray();
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetFlatContent -- ", ex);
+                return null;
+            }
+        }
+
+        public DocsPaVO.documento.FileDocumento CreaRicevuta(string text)
         {
             byte[] content = null;
             DocsPaVO.documento.FileDocumento doc = new DocsPaVO.documento.FileDocumento();
@@ -256,7 +357,7 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
 
             page.Paragraphs.Add(t1);
             page.Paragraphs.Add(t2);
-            
+
             using (MemoryStream stream = new MemoryStream())
             {
                 pdf.Save(stream);
@@ -306,7 +407,7 @@ namespace BusinessLogic.Modelli.AsposeModelProcessor
             table.Border = new BorderInfo(BorderSide.All, .5f, Color.Black);
             table.DefaultCellBorder = new BorderInfo(BorderSide.All, .1f, Color.Black);
             table.ColumnAdjustment = ColumnAdjustment.AutoFitToWindow;
-            
+
             return table;
         }
 

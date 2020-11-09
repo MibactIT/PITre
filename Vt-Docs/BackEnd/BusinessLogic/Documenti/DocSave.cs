@@ -456,25 +456,6 @@ namespace BusinessLogic.Documenti
                 && incestino == "1")
                 throw new Exception("Il documento è stato rimosso, non è più possibile modificarlo");
 
-            //Verifico se il documento è in libro firma e se è prevista la repertoriazione del documento
-            #region CHECK_LIBRO_FIRMA
-            if (LibroFirma.LibroFirmaManager.IsDocInLibroFirma(schedaDoc.docNumber))
-            {
-                bool daRepertoriare = false;
-                if (schedaDoc.template != null && !string.IsNullOrEmpty(schedaDoc.template.ID_TIPO_ATTO) && schedaDoc.template.ELENCO_OGGETTI != null && schedaDoc.template.ELENCO_OGGETTI.Count > 0)
-                {
-                    DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg = (from o in schedaDoc.template.ELENCO_OGGETTI.Cast<DocsPaVO.ProfilazioneDinamica.OggettoCustom>()
-                                                                       where o.TIPO.DESCRIZIONE_TIPO.Equals("Contatore") && o.REPERTORIO.Equals("1")
-                                                                       && o.CONTATORE_DA_FAR_SCATTARE && string.IsNullOrEmpty(o.VALORE_DATABASE)
-                                                                       select o).FirstOrDefault();
-                    if (ogg != null && !LibroFirma.LibroFirmaManager.IsTitolarePassoInAttesa(schedaDoc.docNumber, infoUtente, DocsPaVO.LibroFirma.Azione.DOCUMENTO_REPERTORIATO))
-                    {
-                        throw new Exception("Non è possibile procedere con la repertoriazione poichè il documento è in Libro Firma");
-                    }
-                }
-            }
-            #endregion
-
             // Contesto transazionale
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {

@@ -20,16 +20,14 @@ namespace Amministrazione.Gestione_Organigramma
 		protected System.Web.UI.WebControls.Image img_alert;
 		protected System.Web.UI.WebControls.Label lbl_utente;
 		protected System.Web.UI.WebControls.Button btn_no;
-        protected System.Web.UI.WebControls.Button btn_noAccetta;
-
-        private void Page_Load(object sender, System.EventArgs e)
+	
+		private void Page_Load(object sender, System.EventArgs e)
 		{
 			this.lbl_utente.Text = Request.QueryString["utente"];
 
 			this.btn_si.Attributes.Add("onclick", "window.returnValue = 'Y'; window.close();");
 			this.btn_no.Attributes.Add("onclick", "window.returnValue = 'N'; window.close();");
-            this.btn_noAccetta.Attributes.Add("onclick", "window.returnValue = 'NA'; window.close();");
-        }
+		}
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
@@ -49,15 +47,7 @@ namespace Amministrazione.Gestione_Organigramma
 		{    			
 			this.Load += new System.EventHandler(this.Page_Load);
 		}
-
-        protected void btnExport_Click(object sender, EventArgs e)
-        {
-            string idPeople = this.Request.QueryString["idPeople"].ToString();
-            string idCorrGlobali = this.Request.QueryString["idCorrGlobali"].ToString();
-
-            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "OpenExport", "OpenExport('" + idPeople + "','" + idCorrGlobali + "');", true);
-        }
-        #endregion
-
-    }
+		#endregion
+		
+	}
 }

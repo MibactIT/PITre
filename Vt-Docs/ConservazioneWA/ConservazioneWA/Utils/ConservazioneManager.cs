@@ -189,21 +189,6 @@ namespace ConservazioneWA.Utils
             return itemsCons;
         }
 
-        public static WSConservazioneLocale.ItemsConservazione[] getItemsConservazioneLite(string idIstanza, WSConservazioneLocale.InfoUtente infoUt)
-        {
-            WSConservazioneLocale.ItemsConservazione[] itemsCons = null;
-            try
-            {
-                itemsCons = wss.getItemsConservazioneLite(idIstanza, infoUt);
-            }
-            catch (Exception ex)
-            {
-                itemsCons = null;
-                Debugger.Write("Errore nel get degli items in conservazione: " + ex.Message);
-            }
-            return itemsCons;
-        }
-
         public static WSConservazioneLocale.InfoConservazione[] getAreaConservazioneFiltro(string filtro, WSConservazioneLocale.InfoUtente infoUt)
         {
             WSConservazioneLocale.InfoConservazione[] infoCons = null;

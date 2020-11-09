@@ -22,24 +22,6 @@ namespace Amministrazione.Gestione_RF {
         protected global::System.Web.UI.HtmlControls.HtmlHead HEAD1;
         
         /// <summary>
-        /// hd_ReturnValueProcessiFirmaRegistroRF control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputHidden hd_ReturnValueProcessiFirmaRegistroRF;
-        
-        /// <summary>
-        /// hd_ReturnValueProcessiFirmaRegistro control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputHidden hd_ReturnValueProcessiFirmaRegistro;
-        
-        /// <summary>
         /// scrManager control.
         /// </summary>
         /// <remarks>
@@ -173,33 +155,6 @@ namespace Amministrazione.Gestione_RF {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddl_ricevutaPec;
-        
-        /// <summary>
-        /// lblMessUscita control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblMessUscita;
-        
-        /// <summary>
-        /// txt_msg_posta_in_uscita control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txt_msg_posta_in_uscita;
-        
-        /// <summary>
-        /// cbx_sovrascrivi_messaggio control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox cbx_sovrascrivi_messaggio;
         
         /// <summary>
         /// UpdatePanel1PostaIngresso control.

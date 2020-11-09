@@ -106,7 +106,11 @@
         function apriPopupGestioneContatore(idOggetto, idTemplate) {
             //window.open('ModalAnteprimaProfDinamica.aspx?Chiamante=Visibilita.aspx','','top = '+ new_h +' left = '+new_w+' width=500,height=400,scrollbars=YES');				
             window.showModalDialog('ModalAnteprimaProfDinamica.aspx?Chiamante=GestioneContatore.aspx&IdOggCustom=' + idOggetto + '&IdTemplate=' + idTemplate, '', 'dialogWidth:850px;dialogHeight:500px;status:no;resizable:no;scroll:no;center:yes;help:no;close:no;top:' + new_h + ';left:' + new_w);
-        }                         
+        }
+
+        function apriPopupReplicaInAoo() {
+            window.showModalDialog('ModalAnteprimaProfDinamica.aspx?Chiamante=ReplicaInAoo.aspx', '', 'dialogWidth:600px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;close:no;top:' + new_h + ';left:' + new_w);
+        }
     </script>
     <style type="text/css">
         .style1
@@ -177,6 +181,7 @@
                                             Text="Contesto Procedurale" Width="110px" OnClick="btn_ContestoProcedurale_Click"></asp:Button>&nbsp;
                                         <asp:Button ID="btn_inEsercizio" runat="server" CssClass="testo_btn_p" Visible="False"
                                             Text="In Esercizio"></asp:Button>&nbsp;
+                                        <asp:Button ID="btn_replica" runat="server" CssClass="testo_btn_p" Visible="False" Text="Replica"></asp:Button>&nbsp;
                                         <asp:Button ID="btn_isInstance" runat="server" Visible="false"
                                             OnClick="btn_isInstance_OnClick" CssClass="testo_btn_p"></asp:Button>&nbsp;
                                         <asp:Button ID="btn_salvaTemplate" runat="server" CssClass="testo_btn_p" Visible="False"
@@ -265,6 +270,15 @@
                                                     <asp:ImageButton ID="ImageButtonInvioCons" runat="server" ImageUrl="../../images/proto/matita.gif"
                                                         CommandName="InvioCons"></asp:ImageButton>
                                                         <asp:Label ID="lbl_invioCons" runat="server" Height="17px">Label</asp:Label>&nbsp;
+                                                </ItemTemplate>
+                                            </asp:TemplateColumn>
+                                            <asp:TemplateColumn HeaderText="Procedimentale">
+                                                <HeaderStyle HorizontalAlign="Center" Width="8%"></HeaderStyle>
+                                                <ItemStyle HorizontalAlign="Center" Font-Bold="False"></ItemStyle>
+                                                <ItemTemplate>
+                                                    <asp:ImageButton ID="ImageButtonProcedimentale" runat="server" ImageUrl="../../images/proto/matita.gif"
+                                                        CommandName="Procedimentale"></asp:ImageButton>
+                                                        <asp:Label ID="lbl_procedimentale" runat="server" Height="17px">Label</asp:Label>&nbsp;
                                                 </ItemTemplate>
                                             </asp:TemplateColumn>
                                             <asp:TemplateColumn HeaderText="Selezione">
@@ -584,6 +598,21 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
+                                                        <td class="testo_grigio_scuro" style="width: 108px" align="left" width="108">
+                                                            Valore di default
+                                                        </td>
+                                                        <td style="padding-left: 5px" cssclass="testo">
+                                                            <asp:TextBox ID="txt_default_campotesto" runat="server" CssClass="testo" Width="200"></asp:TextBox>
+                                                        </td>
+                                                        <td class="testo_grigio_scuro" style="width: 80px" align="right" width="80">
+                                                          
+                                                        </td>
+                                                        <td>
+                                                            
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                    <tr>
                                                         <td align="left" colspan="4">
                                                             <asp:Button ID="btn_ConfermaPersCampoDiTesto" runat="server" CssClass="testo_btn_p"
                                                                 Text="Conferma"></asp:Button>
@@ -840,6 +869,8 @@
                                                                 <asp:ListItem>COD_UO</asp:ListItem>
                                                                 <asp:ListItem>gg/mm/aaaa hh:mm</asp:ListItem>
                                                                 <asp:ListItem>gg/mm/aaaa</asp:ListItem>
+                                                                    <asp:ListItem>CLASSIFICA</asp:ListItem>
+                                                                    <asp:ListItem>TIPOLOGIA</asp:ListItem>
                                                             </asp:DropDownList>
                                                             <asp:ImageButton ID="img_btnAddCampoContatore" runat="server" ImageUrl="~/AdminTool/Images/aggiungi.gif"
                                                                 ToolTip="Aggiunge il  campo selezionato" OnClick="img_btnAddCampoContatore_Click" />
@@ -871,6 +902,29 @@
                                                             <asp:CheckBox ID="cb_Contatore_visibile" runat="server" CssClass="testo_grigio_scuro"
                                                                 Text="Visualizza colonna contatore da ricercare" />
                                                         </td>
+                                                            <td class="testo_grigio_scuro" style="width: 80px; height: 25px" align="right" width="80">Permanente
+                                                            </td>
+                                                            <td style="text-align: left; font-size: 11px; font-family: Arial">
+
+                                                                <!-- SEGNATURA PERMANENTE  -->
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <asp:CheckBox ID="cbx_segnatura_permanente" runat="server" Text="" />
+                                                                        </td>
+                                                                        <td style="width:20px;"></td>
+                                                                        <td class="testo_grigio_scuro">
+                                                                            Segnatura onnicomprensiva
+                                                                        </td>
+                                                                        <td>
+                                                                            <asp:CheckBox ID="cbx_segnatura_opzione_omnicomprensiva" runat="server" Text="" />
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+
+
+
+                                                            </td>
                                                     </tr>
                                                     <tr>
                                                         <td class="testo_grigio_scuro" style="height: 100px;">
@@ -879,8 +933,8 @@
                                                         <td colspan="1" valign="top">
                                                             <asp:RadioButtonList ID="rbl_tipoContatore" runat="server" class="testo_grigio_scuro"
                                                                 RepeatDirection="Horizontal">
-                                                                <asp:ListItem>Tipologia</asp:ListItem>
-                                                                <asp:ListItem  Selected="True">AOO</asp:ListItem>
+                                                                <asp:ListItem Selected="True">Tipologia</asp:ListItem>
+                                                                <asp:ListItem>AOO</asp:ListItem>
                                                                 <asp:ListItem>RF</asp:ListItem>
                                                             </asp:RadioButtonList>
                                                             <asp:RadioButtonList ID="RadioButtonContatore" runat="server" class="testo_grigio_scuro"
@@ -1559,6 +1613,51 @@
                             </asp:Panel>
                         </td>
                     </tr>
+                    <!-- Panel per doc procedimentale -->
+                    <tr>
+                        <td height="3">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Panel ID="Panel_Procedimentale" runat="server" Visible="False" BorderWidth="1px" BorderColor="#810D06"
+                                BorderStyle="Solid">
+                                <table width="99.5%">
+                                    <tr>
+                                        <td class="titolo_pnl" colspan="3">
+                                            <table cellspacing="0" cellpadding="0" width="100%">
+                                                <tr>
+                                                    <td class="titolo_pnl">
+                                                        Personalizzazione Tipo Documento&nbsp;-&nbsp;
+                                                        <asp:Label ID="LblTipoDocProcedimentale" runat="server">Label</asp:Label>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                    <td align="right">
+                                                        <asp:ImageButton ID="pulsante_chiudi_Procedimentale" runat="server" ImageUrl="../Images/cancella.gif">
+                                                        </asp:ImageButton>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <asp:CheckBox ID="cb_ModProcedimentale" runat="server" CssClass="testo_grigio_scuro" Text="Procedimentale"
+                                                TextAlign="Left" Checked="False"></asp:CheckBox>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <asp:Button ID="btn_confermaProcedimentale" runat="server" CssClass="testo_btn_p" Text="Conferma">
+                                            </asp:Button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </asp:Panel>
+                        </td>
+                    </tr>
+
                     <!-- Panel per consolidamento campo oggetto -->
                     <tr>
                         <td height="3">

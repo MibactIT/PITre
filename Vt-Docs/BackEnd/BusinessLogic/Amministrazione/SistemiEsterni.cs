@@ -71,16 +71,16 @@ namespace BusinessLogic.Amministrazione
 
         public static DocsPaVO.amministrazione.SistemaEsterno getSistemaEsternoByUserid(string idAmm, string userId)
         {
-            DocsPaDB.Query_DocsPAWS.Amministrazione DBamm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
+           DocsPaDB.Query_DocsPAWS.Amministrazione DBamm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
             return DBamm.getSistemaEsternoByUserID(idAmm, userId);
         }
 
-        public static DocsPaVO.utente.UnitaOrganizzativa getHubSistemaEsterno(string codice, string idAmm)
+        public static DocsPaVO.utente.UnitaOrganizzativa getHubSistemaEsterno(string codice,string idAmm)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione DBamm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            DocsPaVO.utente.UnitaOrganizzativa retval = DBamm.getUOByCodAndIdAmm(codice, idAmm);
-            if (retval != null && string.IsNullOrEmpty(retval.systemId))
-                retval = null;
+            DocsPaVO.utente.UnitaOrganizzativa retval = DBamm.getUOByCodAndIdAmm(codice,idAmm);
+            if(retval!=null && string.IsNullOrEmpty(retval.systemId))
+                retval=null;
             return retval;
         }
 
@@ -98,9 +98,9 @@ namespace BusinessLogic.Amministrazione
 
         public static bool cessioneProprieta(string idOggetto, string idRuoloDest, string idUtenteDest, string idSysExt, string idUtSysExt)
         {
-
+            
             DocsPaDB.Query_DocsPAWS.Trasmissione DBtrasm = new DocsPaDB.Query_DocsPAWS.Trasmissione();
-            DocsPaDB.Query_DocsPAWS.Utenti DBUt = new DocsPaDB.Query_DocsPAWS.Utenti();
+            DocsPaDB.Query_DocsPAWS.Utenti DBUt= new DocsPaDB.Query_DocsPAWS.Utenti();
             DocsPaVO.utente.Ruolo ruolo = DBUt.getRuoloByCodice(idSysExt);
             return DBtrasm.cessioneProprietaSistemaEsterno(idOggetto, idRuoloDest, idUtenteDest, ruolo.idGruppo, idUtSysExt);
         }
@@ -207,7 +207,7 @@ namespace BusinessLogic.Amministrazione
 
         public static bool APSSUpdateResultPubbInTable(DocsPaVO.ExternalServices.PubblicazioneAPSS pubb)
         {
-
+           
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
             try
             {
@@ -231,7 +231,7 @@ namespace BusinessLogic.Amministrazione
                     //}
                     //BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.salvaInserimentoUtenteProfDim(infoUt, documento.template, pubb.IdProfile);
                     dbAmm.APSSUpdateEsitoPubb(pubb.IdProfile, "01/01/1900");
-
+                    
                     if (!string.IsNullOrEmpty(pubb.IdSingleTrasm))
                     {
                         DocsPaVO.trasmissione.TrasmissioneUtente[] ArrayTrasmUtente = BusinessLogic.Trasmissioni.TrasmManager.getTrasmissioneUtenteInRuolo(infoUt, pubb.IdSingleTrasm, utente);
@@ -283,7 +283,7 @@ namespace BusinessLogic.Amministrazione
         public static ArrayList APSSgetDelDetDaRiPubbl(string ogg_custom, string statiDiagramma, string templates, string dataUltimaEsecuzione, string tipoevento)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            ArrayList retval = dbAmm.APSSgetDelDetDaRiPubbl(ogg_custom, statiDiagramma, templates, dataUltimaEsecuzione, tipoevento);
+            ArrayList retval = dbAmm.APSSgetDelDetDaRiPubbl(ogg_custom, statiDiagramma, templates, dataUltimaEsecuzione,tipoevento);
 
             return retval;
         }
@@ -310,20 +310,20 @@ namespace BusinessLogic.Amministrazione
         public static string FattElCtrlDupl(string idTibco, string idsdi, out string passo, out string esito)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            string idFattura = dbAmm.FattElCtrlDupl(idTibco, idsdi, out passo, out esito);
+            string idFattura = dbAmm.FattElCtrlDupl(idTibco,idsdi, out passo, out esito);
             return idFattura;
         }
 
         public static bool FattElInsTabellaLog(string idDoc, string idTibco, string idsdi)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            return dbAmm.FattElInsTabellaLog(idDoc, idTibco, idsdi);
+            return dbAmm.FattElInsTabellaLog(idDoc, idTibco,idsdi);
         }
 
         public static bool FattElUpdTabellaLog(string idTibco, string idsdi, string passo, string esito)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            return dbAmm.FattElUpdTabellaLog(idTibco, idsdi, passo, esito);
+            return dbAmm.FattElUpdTabellaLog(idTibco,idsdi, passo, esito);
         }
 
         public static bool FattElEstrAllegatiFE(DocsPaVO.documento.SchedaDocumento doc, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUt)
@@ -348,7 +348,7 @@ namespace BusinessLogic.Amministrazione
                         stringaXml = stringaXml.Replace("xml version=\"1.1\"", "xml version=\"1.0\"");
                     }
                     xmlDoc.LoadXml(stringaXml);
-                    if (xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://www.fatturapa.gov.it/sdi/fatturapa/v1") ||
+                    if (xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://www.fatturapa.gov.it/sdi/fatturapa/v1")||
                         xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/"))
                     {
                         System.Xml.XmlNodeList listanodi = xmlDoc.DocumentElement.SelectNodes("//*[name()='Allegati']");
@@ -358,57 +358,54 @@ namespace BusinessLogic.Amministrazione
                         DocsPaVO.documento.FileDocumento fileAllegato = null;
                         string erroreMessage = "";
                         bool caricaAllegato = true;
-                        if (listanodi != null && listanodi.Count > 0)
+                        foreach (System.Xml.XmlNode nodo in listanodi)
                         {
-                            foreach (System.Xml.XmlNode nodo in listanodi)
+                            nodoNome = null;
+                            nodoContent = null;
+                            caricaAllegato = true;
+
+                            foreach (System.Xml.XmlNode nodo1 in nodo.ChildNodes)
                             {
-                                nodoNome = null;
-                                nodoContent = null;
-                                caricaAllegato = true;
-
-                                foreach (System.Xml.XmlNode nodo1 in nodo.ChildNodes)
-                                {
-                                    //Console.WriteLine(nodo1.Name);
-                                    if (nodo1.Name.ToUpper() == "NOMEATTACHMENT") nodoNome = nodo1;
-                                    if (nodo1.Name.ToUpper() == "ATTACHMENT") nodoContent = nodo1;
-                                }
-
-
-                                //byte[] contentNormal = Convert.FromBase64String(nodoContent.InnerXml);
-                                foreach (DocsPaVO.documento.Allegato alltempx1 in doc.allegati)
-                                {
-                                    if (alltempx1.descrizione.ToUpper() == nodoNome.InnerXml.ToUpper()) caricaAllegato = false;
-                                }
-                                if (caricaAllegato)
-                                {
-                                    allegato = new DocsPaVO.documento.Allegato
-                                    {
-                                        docNumber = doc.systemId,
-                                        descrizione = nodoNome.InnerXml
-                                    };
-                                    allegato = BusinessLogic.Documenti.AllegatiManager.aggiungiAllegato(infoUt, ((DocsPaVO.documento.Allegato)allegato));
-
-                                    fileAllegato = new DocsPaVO.documento.FileDocumento
-                                    {
-                                        name = nodoNome.InnerXml,
-                                        fullName = nodoNome.InnerXml,
-                                        content = Convert.FromBase64String(nodoContent.InnerXml),
-                                        length = Convert.FromBase64String(nodoContent.InnerXml).Length,
-                                        bypassFileContentValidation = true
-                                    };
-
-
-                                    if (!BusinessLogic.Documenti.FileManager.putFile(ref allegato, fileAllegato, infoUt, out erroreMessage))
-                                    {
-                                        throw new Exception("Errore nella creazione del file");
-                                    }
-                                }
-                                else
-                                {
-                                    logger.Debug("Allegato già presente");
-                                }
-
+                                //Console.WriteLine(nodo1.Name);
+                                if (nodo1.Name.ToUpper() == "NOMEATTACHMENT") nodoNome = nodo1;
+                                if (nodo1.Name.ToUpper() == "ATTACHMENT") nodoContent = nodo1;
                             }
+
+
+                            //byte[] contentNormal = Convert.FromBase64String(nodoContent.InnerXml);
+                            foreach (DocsPaVO.documento.Allegato alltempx1 in doc.allegati)
+                            {
+                                if (alltempx1.descrizione.ToUpper() == nodoNome.InnerXml.ToUpper()) caricaAllegato = false;
+                            }
+                            if (caricaAllegato)
+                            {
+                                allegato = new DocsPaVO.documento.Allegato
+                                {
+                                    docNumber = doc.systemId,
+                                    descrizione = nodoNome.InnerXml
+                                };
+                                allegato = BusinessLogic.Documenti.AllegatiManager.aggiungiAllegato(infoUt, ((DocsPaVO.documento.Allegato)allegato));
+
+                                fileAllegato = new DocsPaVO.documento.FileDocumento
+                                {
+                                    name = nodoNome.InnerXml,
+                                    fullName = nodoNome.InnerXml,
+                                    content = Convert.FromBase64String(nodoContent.InnerXml),
+                                    length = Convert.FromBase64String(nodoContent.InnerXml).Length,
+                                    bypassFileContentValidation = true
+                                };
+
+
+                                if (!BusinessLogic.Documenti.FileManager.putFile(ref allegato, fileAllegato, infoUt, out erroreMessage))
+                                {
+                                    throw new Exception("Errore nella creazione del file");
+                                }
+                            }
+                            else
+                            {
+                                logger.Debug("Allegato già presente");
+                            }
+
                         }
                     }
                     else
@@ -457,9 +454,9 @@ namespace BusinessLogic.Amministrazione
                         {
                             stringaXml = "";
                             stringaXml = Encoding.UTF8.GetString(fileAllFatt.content);
-
+                            
                             stringaXml = stringaXml.Trim();
-                            xmlDoc = new System.Xml.XmlDocument();
+                             xmlDoc = new System.Xml.XmlDocument();
                             if (stringaXml.Contains("xml version=\"1.1\""))
                             {
                                 logger.Debug("Versione XML 1.1. Provo conversione");
@@ -552,7 +549,7 @@ namespace BusinessLogic.Amministrazione
                 retVal = false;
                 logger.Error(ex);
             }
-
+            
 
             return retVal;
         }
@@ -582,7 +579,7 @@ namespace BusinessLogic.Amministrazione
             DocsPaVO.documento.FileDocumento fileAllFatt = null;
             string stringaXml = null;
             System.Xml.XmlDocument xmlDoc = null;
-
+            
             try
             {
                 DocsPaVO.documento.SchedaDocumento doc = BusinessLogic.Documenti.DocManager.getDettaglioNoSecurity(infoUtente, idDoc);
@@ -596,7 +593,7 @@ namespace BusinessLogic.Amministrazione
                         {
                             stringaXml = "";
                             stringaXml = Encoding.UTF8.GetString(fileAllFatt.content);
-
+                            
                             stringaXml = stringaXml.Trim();
                             xmlDoc = new System.Xml.XmlDocument();
                             if (stringaXml.Contains("xml version=\"1.1\""))
@@ -971,7 +968,7 @@ namespace BusinessLogic.Amministrazione
                                             // QUA DEVE FINIRE
                                         }
 
-
+                                        
                                         foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom notePerXML in template.ELENCO_OGGETTI)
                                         {
                                             if (notePerXML.DESCRIZIONE.ToUpper() == "NOTE RELATIVE ALL'ELABORAZIONE XML")
@@ -995,8 +992,8 @@ namespace BusinessLogic.Amministrazione
                                         doc.tipologiaAtto.systemId = template.SYSTEM_ID.ToString();
                                         doc.tipologiaAtto.descrizione = template.DESCRIZIONE;
                                         doc.daAggiornareTipoAtto = true;
-
-                                        bool daaggiornTemp = false;
+                                        
+                                        bool daaggiornTemp= false;
                                         doc = BusinessLogic.Documenti.DocSave.save(infoUtente, doc, false, out daaggiornTemp, null);
 
                                     }
@@ -1014,61 +1011,58 @@ namespace BusinessLogic.Amministrazione
                                     DocsPaVO.documento.FileDocumento fileAllegato = null;
                                     string erroreMessage = "";
                                     bool caricaAllegato = true;
-                                    if (listanodi != null && listanodi.Count > 0)
+                                    foreach (System.Xml.XmlNode nodo in listanodi)
                                     {
-                                        foreach (System.Xml.XmlNode nodo in listanodi)
+                                        nodoNome = null;
+                                        nodoContent = null;
+                                        caricaAllegato = true;
+
+                                        foreach (System.Xml.XmlNode nodo1 in nodo.ChildNodes)
                                         {
-                                            nodoNome = null;
-                                            nodoContent = null;
-                                            caricaAllegato = true;
+                                            //Console.WriteLine(nodo1.Name);
+                                            if (nodo1.Name.ToUpper() == "NOMEATTACHMENT") nodoNome = nodo1;
+                                            if (nodo1.Name.ToUpper() == "ATTACHMENT") nodoContent = nodo1;
+                                        }
 
-                                            foreach (System.Xml.XmlNode nodo1 in nodo.ChildNodes)
+
+                                        //byte[] contentNormal = Convert.FromBase64String(nodoContent.InnerXml);
+                                        foreach (DocsPaVO.documento.Allegato alltempx1 in doc.allegati)
+                                        {
+                                            if (alltempx1.descrizione.ToUpper() == nodoNome.InnerXml.ToUpper()) caricaAllegato = false;
+                                        }
+                                        if (caricaAllegato)
+                                        {
+                                            allegato = new DocsPaVO.documento.Allegato
                                             {
-                                                //Console.WriteLine(nodo1.Name);
-                                                if (nodo1.Name.ToUpper() == "NOMEATTACHMENT") nodoNome = nodo1;
-                                                if (nodo1.Name.ToUpper() == "ATTACHMENT") nodoContent = nodo1;
-                                            }
+                                                docNumber = doc.systemId,
+                                                descrizione = nodoNome.InnerXml
+                                            };
+                                            allegato = BusinessLogic.Documenti.AllegatiManager.aggiungiAllegato(infoUtente, ((DocsPaVO.documento.Allegato)allegato));
 
-
-                                            //byte[] contentNormal = Convert.FromBase64String(nodoContent.InnerXml);
-                                            foreach (DocsPaVO.documento.Allegato alltempx1 in doc.allegati)
+                                            fileAllegato = new DocsPaVO.documento.FileDocumento
                                             {
-                                                if (alltempx1.descrizione.ToUpper() == nodoNome.InnerXml.ToUpper()) caricaAllegato = false;
-                                            }
-                                            if (caricaAllegato)
+                                                name = nodoNome.InnerXml,
+                                                fullName = nodoNome.InnerXml,
+                                                content = Convert.FromBase64String(nodoContent.InnerXml),
+                                                length = Convert.FromBase64String(nodoContent.InnerXml).Length,
+                                                bypassFileContentValidation = true
+                                            };
+
+
+                                            if (!BusinessLogic.Documenti.FileManager.putFile(ref allegato, fileAllegato, infoUtente, out erroreMessage))
                                             {
-                                                allegato = new DocsPaVO.documento.Allegato
-                                                {
-                                                    docNumber = doc.systemId,
-                                                    descrizione = nodoNome.InnerXml
-                                                };
-                                                allegato = BusinessLogic.Documenti.AllegatiManager.aggiungiAllegato(infoUtente, ((DocsPaVO.documento.Allegato)allegato));
-
-                                                fileAllegato = new DocsPaVO.documento.FileDocumento
-                                                {
-                                                    name = nodoNome.InnerXml,
-                                                    fullName = nodoNome.InnerXml,
-                                                    content = Convert.FromBase64String(nodoContent.InnerXml),
-                                                    length = Convert.FromBase64String(nodoContent.InnerXml).Length,
-                                                    bypassFileContentValidation = true
-                                                };
-
-
-                                                if (!BusinessLogic.Documenti.FileManager.putFile(ref allegato, fileAllegato, infoUtente, out erroreMessage))
-                                                {
-                                                    throw new Exception("Errore nella creazione del file");
-                                                }
-                                                else
-                                                {
-                                                    retVal = true;
-                                                }
+                                                throw new Exception("Errore nella creazione del file");
                                             }
                                             else
                                             {
-                                                logger.Debug("Allegato già presente");
+                                                retVal = true;
                                             }
-
                                         }
+                                        else
+                                        {
+                                            logger.Debug("Allegato già presente");
+                                        }
+
                                     }
                                     #endregion
                                 }
@@ -1085,659 +1079,13 @@ namespace BusinessLogic.Amministrazione
 
             return retVal;
         }
-
-        public static string FattElAttiveDaImport(string idDoc, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            string retVal = "";
-            DocsPaVO.documento.FileDocumento fileAllFatt = null;
-            string stringaXml = null;
-            System.Xml.XmlDocument xmlDoc = null;
-            bool tempBool = false;
-            bool isLottoAttivo = false;
-            DocsPaVO.ExternalServices.FornitoreFattAttiva fornitoreFA = null;
-            string firmaCX = "";
-
-            try
-            {
-                DocsPaVO.documento.SchedaDocumento doc = BusinessLogic.Documenti.DocManager.getDettaglioNoSecurity(infoUtente, idDoc);
-                //foreach (DocsPaVO.documento.Allegato allFatt in doc.allegati)
-                foreach (DocsPaVO.documento.Documento allFatt in doc.documenti)
-                {
-                    if (!string.IsNullOrEmpty(allFatt.fileName) && allFatt.fileName.ToUpper().Contains(".XML"))
-                    {
-                        fileAllFatt = BusinessLogic.Documenti.FileManager.getFile((DocsPaVO.documento.FileRequest)allFatt, infoUtente);
-
-                        if (fileAllFatt != null && !string.IsNullOrEmpty(fileAllFatt.fullName) && fileAllFatt.fullName.ToUpper().Contains("XML"))
-                        {
-                            if (allFatt.fileName.ToUpper().Contains(".P7M"))
-                                firmaCX = "C";
-                            stringaXml = "";
-                            stringaXml = Encoding.UTF8.GetString(fileAllFatt.content);
-
-                            stringaXml = stringaXml.Trim();
-                            xmlDoc = new System.Xml.XmlDocument();
-                            if (stringaXml.Contains("xml version=\"1.1\""))
-                            {
-                                logger.Debug("Versione XML 1.1. Provo conversione");
-                                stringaXml = stringaXml.Replace("xml version=\"1.1\"", "xml version=\"1.0\"");
-                            }
-                            try
-                            {
-                                xmlDoc.LoadXml(stringaXml);
-                            }
-                            catch (Exception bomUTF8)
-                            {
-                                string byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
-                                if (stringaXml.StartsWith(byteOrderMarkUtf8))
-                                {
-                                    stringaXml = stringaXml.Remove(0, byteOrderMarkUtf8.Length);
-                                }
-                                xmlDoc.LoadXml(stringaXml);
-                            }
-                            if (xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://www.fatturapa.gov.it/sdi/fatturapa/v1") ||
-                        xmlDoc.DocumentElement.NamespaceURI.ToLower().Contains("http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/"))
-                            {
-                                // controllo se la fattura è di uno dei fornitori in DB
-                                bool isFattLottoAttivo = false;
-
-                                
-
-                                string mappFornitore = string.Format("//*[name()='{0}']/*[name()='{1}']/*[name()='{2}']/*[name()='{3}']", "CedentePrestatore", "DatiAnagrafici", "IdFiscaleIVA", "IdCodice");
-                                string codFornitore = (xmlDoc.DocumentElement.SelectSingleNode(mappFornitore)).InnerXml;
-
-                                if (!string.IsNullOrEmpty(codFornitore))
-                                {
-                                    DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-                                    ArrayList fornitori = dbAmm.FattElAttive_getCodFornitore(infoUtente.idAmministrazione);
-                                    //if (fornitori.Contains(codFornitore))
-                                    //    isFattLottoAttivo = true;                                       
-                                    foreach (DocsPaVO.ExternalServices.FornitoreFattAttiva forn in fornitori)
-                                    {
-                                        if (!string.IsNullOrEmpty(forn.CodFornitore) && forn.CodFornitore.ToUpper() == codFornitore.ToUpper())
-                                        {
-                                            isFattLottoAttivo = true;
-                                            fornitoreFA = forn;
-                                        }
-                                    }
-                                }
-
-                                if (!isFattLottoAttivo)
-                                {
-                                    logger.Error("Fornitore della fattura o lotto attivo non corrispondente: " + codFornitore);
-                                    throw new Exception("Codice fornitore non corrispondente");
-                                }
-                                if (string.IsNullOrEmpty(firmaCX) && stringaXml.ToUpper().Contains("X509CERTIFICATE"))
-                                {
-                                    firmaCX = "X";
-                                }
-
-                                if (string.IsNullOrEmpty(firmaCX))
-                                {
-                                    string tempOutX5 = "";
-                                    System.Xml.XmlElement root = xmlDoc.DocumentElement;
-                                    string valore = root.Attributes["versione"].Value;
-                                    if (valore.ToUpper() != "FPR" && valore.ToUpper() != "FPR12")
-                                    {
-                                        logger.Info("FATTURA NON PRIVATA - Errore controllo firma");
-                                        BusinessLogic.Documenti.DocManager.CestinaDocumento(infoUtente, doc, null, "Fattura non firmata", out tempOutX5);
-                                        throw new Exception("Fattura non firmata");
-                                    }
-                                    else
-                                        logger.Info("FATTURA PRIVATA - Bypass controllo firma");
-                                   
-                                }
-
-                                System.Xml.XmlNodeList fatture = xmlDoc.DocumentElement.SelectNodes("//*[name()='FatturaElettronicaBody']");
-                                if (fatture.Count > 1)
-                                {
-                                    //throw new Exception("Lotto di fatture. Associazione a fattura elettronica interrotta.");
-                                    isLottoAttivo = true;
-                                }
-
-                                #region Associazione dei campi
-                                DocsPaVO.ProfilazioneDinamica.Templates template = null;
-                                if (!isLottoAttivo)
-                                {
-                                    template = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getTemplateByDescrizione("fattura elettronica attiva", infoUtente.idAmministrazione);
-                                }
-                                else { template = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getTemplateByDescrizione("lotto di fatture attive", infoUtente.idAmministrazione); }
-
-                                string controlFilter = string.Format("{0} and id_ruolo={1} and (diritti='2')", template.SYSTEM_ID.ToString(), infoUtente.idGruppo);
-                                ArrayList controlloVisibilita = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getRuoliTipoDoc(controlFilter);
-                                if (controlloVisibilita == null || controlloVisibilita.Count == 0)
-                                {
-                                    throw new Exception("Ruolo non ha diritti su template");
-                                }
-
-
-                                if (template != null)
-                                {
-                                    string notePerElaborazioneXML = "";
-                                    foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom oggettoCustom in template.ELENCO_OGGETTI)
-                                    {
-                                        try
-                                        {
-
-                                            if (!string.IsNullOrEmpty(oggettoCustom.CAMPO_XML_ASSOC))
-                                            {
-                                                bool associaSecondo = false;
-                                                string[] mappings = oggettoCustom.CAMPO_XML_ASSOC.Split('<');
-                                                string[] mappingXml = mappings[0].Split('>');
-                                                string mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                                for (int i = 1; i < mappingXml.Length; i++)
-                                                {
-                                                    mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                                }
-                                                string valore = "";
-                                                try
-                                                {
-                                                    System.Xml.XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                                    valore = node.InnerXml; // valore dell'xml estratto
-                                                }
-                                                catch (Exception nodo)
-                                                {
-                                                    if (mappings.Length > 1 && !string.IsNullOrEmpty(mappings[1]))
-                                                        associaSecondo = true;
-                                                    else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_FORNITORE_1"))
-                                                    {
-                                                        valore = "";
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_CLIENTE_1"))
-                                                    {
-                                                        valore = "";
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_NOTE_VER_FIRMA_1"))
-                                                    {
-                                                        //valore = "Verifica firma digitale effettuata da SDI, secondo le Specifiche tecniche operative delle Regole tecniche di cui all’allegato B del D.M. n. 55 del 3 aprile 2013 e ss.mm.ii.";
-                                                        valore = "";
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_PIVA_CLIENTE_1"))
-                                                    {
-                                                        valore = "999";
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_IDSDI"))
-                                                    {
-                                                        valore = "";
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_VERSIONE_1"))
-                                                    {
-                                                        System.Xml.XmlElement root = xmlDoc.DocumentElement;
-                                                        valore = root.Attributes["versione"].Value;
-                                                    }
-                                                    else
-                                                    {
-                                                        notePerElaborazioneXML += "XML " + oggettoCustom.DESCRIZIONE + ". ";
-                                                        //if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                        //{
-                                                        //    throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
-                                                        //}
-                                                    }
-                                                }
-
-                                                if (!string.IsNullOrEmpty(valore) && !string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_CODFISC_1"))
-                                                {
-                                                    if (!Char.IsLetter(valore[0]) || !Char.IsLetter(valore[1]) || !Char.IsLetter(valore[2]))
-                                                        valore = "";
-                                                }
-
-                                                if (associaSecondo)
-                                                {
-                                                    int associaSecondoI = 1;
-                                                    while (string.IsNullOrEmpty(valore) && mappings.Length > associaSecondoI && !string.IsNullOrEmpty(mappings[associaSecondoI]))
-                                                    {
-                                                        mappingXml = mappings[associaSecondoI].Split('>');
-                                                        mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                                        for (int i = 1; i < mappingXml.Length; i++)
-                                                        {
-                                                            mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                                        }
-                                                        valore = "";
-                                                        try
-                                                        {
-                                                            System.Xml.XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                                            valore = node.InnerXml; // valore dell'xml estratto
-                                                        }
-                                                        catch (Exception nodo)
-                                                        {
-
-                                                        }
-                                                        associaSecondoI++;
-                                                    }
-                                                    if (string.IsNullOrEmpty(valore))
-                                                    {
-                                                        notePerElaborazioneXML += "XML " + oggettoCustom.DESCRIZIONE + ". ";
-                                                        //if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                        //{
-                                                        //    throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
-                                                        //}
-
-                                                    }
-                                                }
-
-                                                // Estrazione dei campi CDATA
-                                                if (valore.Contains("<![CDATA["))
-                                                {
-                                                    valore = valore.Replace("<![CDATA[", "");
-                                                    valore = valore.Replace("]]>", "");
-                                                }
-
-                                                oggettoCustom.VALORE_DATABASE = valore;
-
-                                                if (oggettoCustom.TIPO.DESCRIZIONE_TIPO == "CampoDiTesto")
-                                                {
-                                                    if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("MULTINODE"))
-                                                    {
-                                                        string separatore = oggettoCustom.OPZIONI_XML_ASSOC.Split('>')[1];
-
-                                                        System.Xml.XmlNodeList multinode = xmlDoc.SelectNodes(mappingElemento);
-                                                        if (multinode.Count > 1)
-                                                        {
-                                                            valore = "";
-                                                            foreach (System.Xml.XmlNode nodoX in multinode)
-                                                            {
-                                                                if (!valore.Contains(nodoX.InnerXml))
-                                                                {
-                                                                    valore += nodoX.InnerXml + separatore;
-                                                                }
-                                                            }
-                                                        }
-                                                        if (valore.Length > 180) valore = valore.Substring(0, 180);
-
-                                                    }
-                                                    #region Cliente fattura elettronica
-                                                    if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_CLIENTE_1"))
-                                                    {
-                                                        if (string.IsNullOrEmpty(valore))
-                                                        {
-                                                            string mappingNome = "CessionarioCommittente>DatiAnagrafici>Anagrafica>Nome";
-                                                            mappingXml = mappingNome.Split('>');
-                                                            mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                                            for (int i = 1; i < mappingXml.Length; i++)
-                                                            {
-                                                                mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                                            }
-                                                            valore = "";
-                                                            try
-                                                            {
-                                                                System.Xml.XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                                                valore = node.InnerXml; // valore dell'xml estratto
-                                                            }
-                                                            catch (Exception nodo)
-                                                            {
-                                                                notePerElaborazioneXML += "XML " + oggettoCustom.DESCRIZIONE + ". ";
-                                                                //if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                                //{
-                                                                //    throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
-                                                                //}
-                                                            }
-
-                                                            string mappingCognome = "CessionarioCommittente>DatiAnagrafici>Anagrafica>Cognome";
-                                                            mappingXml = mappingCognome.Split('>');
-                                                            mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                                            for (int i = 1; i < mappingXml.Length; i++)
-                                                            {
-                                                                mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                                            }
-                                                            try
-                                                            {
-                                                                System.Xml.XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                                                valore += (" " + node.InnerXml); // valore dell'xml estratto
-                                                            }
-                                                            catch (Exception nodo)
-                                                            {
-                                                                notePerElaborazioneXML += "XML " + oggettoCustom.DESCRIZIONE + ". ";
-                                                                //if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                                //{
-                                                                //    throw new Exception("Elaborazione XML: Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE);
-                                                                //}
-                                                            }
-                                                        }
-                                                    }
-                                                    #endregion
-                                                    #region Partita IVA CessionarioCommittente
-                                                    if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC) && oggettoCustom.OPZIONI_XML_ASSOC.ToUpper().Contains("FATT_EL_PIVA_CLIENTE_1"))
-                                                    {
-                                                        // CessionarioCommittente>DatiAnagrafici>CodiceFiscale
-                                                        if (string.IsNullOrEmpty(valore) || valore == "999")
-                                                        {
-                                                            string mappingNome = "CessionarioCommittente>DatiAnagrafici>CodiceFiscale";
-                                                            mappingXml = mappingNome.Split('>');
-                                                            mappingElemento = String.Format("//*[name()='{0}']", mappingXml[0]);
-                                                            for (int i = 1; i < mappingXml.Length; i++)
-                                                            {
-                                                                mappingElemento += String.Format("/*[name()='{0}']", mappingXml[i]);
-                                                            }
-                                                            try
-                                                            {
-                                                                System.Xml.XmlNode node = xmlDoc.DocumentElement.SelectSingleNode(mappingElemento);
-                                                                valore = node.InnerXml; // valore dell'xml estratto
-                                                            }
-                                                            catch (Exception nodo)
-                                                            {
-                                                                notePerElaborazioneXML += "Nodo XML mancante per il campo " + oggettoCustom.DESCRIZIONE + ". ";
-
-                                                            }
-                                                        }
-                                                    }
-                                                    #endregion
-                                                    oggettoCustom.VALORE_DATABASE = valore;
-                                                }
-                                                if (!string.IsNullOrEmpty(valore))
-                                                {
-                                                    if (oggettoCustom.TIPO.DESCRIZIONE_TIPO == "MenuATendina" || oggettoCustom.TIPO.DESCRIZIONE_TIPO == "SelezioneEsclusiva")
-                                                    {
-                                                        string[] valoriAssociati1 = oggettoCustom.OPZIONI_XML_ASSOC.Split('>');
-                                                        bool trovato = false;
-                                                        for (int i = 0; i < valoriAssociati1.Length; i++)
-                                                        {
-                                                            string[] valoriAssociati2 = valoriAssociati1[i].Split('<');
-                                                            if (valoriAssociati2[1] == valore)
-                                                            {
-                                                                oggettoCustom.VALORE_DATABASE = valoriAssociati2[0];
-                                                                trovato = true;
-                                                            }
-                                                        }
-                                                        if (!trovato)
-                                                        {
-                                                            notePerElaborazioneXML += "Errore " + oggettoCustom.DESCRIZIONE + ". " + valore + " non valido. ";
-                                                            //if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                            //{
-                                                            //    throw new Exception("Elaborazione XML: Errore di associazione del campo " + oggettoCustom.DESCRIZIONE + ". Il valore " + valore + " non ha un campo associato configurato");
-                                                            //}
-                                                        }
-
-                                                    }
-                                                    else if (oggettoCustom.TIPO.DESCRIZIONE_TIPO == "Data")
-                                                    {
-                                                        string conversione = oggettoCustom.OPZIONI_XML_ASSOC;
-                                                        try
-                                                        {
-
-                                                            //DateTime dtp = DateTime.ParseExact(valore, conversione, System.Globalization.CultureInfo.InvariantCulture);
-                                                            DateTime dtp = DateTime.ParseExact(valore.Substring(0, conversione.Length), conversione, System.Globalization.CultureInfo.InvariantCulture);
-
-                                                            oggettoCustom.VALORE_DATABASE = dtp.ToString("dd/MM/yyyy");
-                                                            if (!string.IsNullOrEmpty(oggettoCustom.FORMATO_ORA))
-                                                            {
-                                                                oggettoCustom.VALORE_DATABASE = dtp.ToString("dd/MM/yyyy " + oggettoCustom.FORMATO_ORA);
-                                                            }
-                                                        }
-                                                        catch (Exception exData)
-                                                        {
-                                                            oggettoCustom.VALORE_DATABASE = "";
-                                                            notePerElaborazioneXML += "Errore " + oggettoCustom.DESCRIZIONE + ". " + valore + " non valido. ";
-                                                            //if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                            //{
-                                                            //    throw new Exception("Elaborazione XML: Errore di associazione del campo " + oggettoCustom.DESCRIZIONE + ". Il valore " + valore + " non è compatibile con la stringa di conversione " + conversione);
-                                                            //}
-                                                        }
-
-                                                    }
-                                                    else if (oggettoCustom.TIPO.DESCRIZIONE_TIPO == "Corrispondente")
-                                                    {
-                                                        #region Da rifare con metodi da Frontend
-                                                        DocsPaVO.rubrica.ParametriRicercaRubrica filtriRic = new DocsPaVO.rubrica.ParametriRicercaRubrica();
-                                                        //filtriRic.doUo = true;
-                                                        //filtriRic.doRuoli = true;
-                                                        filtriRic.doRubricaComune = true;
-                                                        //filtriRic.doUtenti = true;
-                                                        //filtriRic.doRF = true;
-                                                        filtriRic.tipoIE = DocsPaVO.addressbook.TipoUtente.ESTERNO;
-                                                        filtriRic.caller = new DocsPaVO.rubrica.ParametriRicercaRubrica.CallerIdentity();
-                                                        filtriRic.caller.IdRuolo = infoUtente.idGruppo;
-                                                        filtriRic.caller.IdUtente = infoUtente.idPeople;
-                                                        filtriRic.caller.filtroRegistroPerRicerca = string.Empty;
-                                                        string tipoRicerca = oggettoCustom.OPZIONI_XML_ASSOC.Split('§')[0];
-                                                        //if (tipoRicerca == "CODE")
-                                                        //    filtriRic.codice = valore;
-                                                        switch (tipoRicerca)
-                                                        {
-                                                            case "CODE":
-                                                                filtriRic.codice = valore;
-                                                                break;
-                                                            case "DESCRIZIONE":
-                                                                filtriRic.descrizione = valore;
-                                                                break;
-                                                            case "PIVA":
-                                                                filtriRic.partitaIva = valore;
-                                                                break;
-                                                            case "CF":
-                                                                filtriRic.codiceFiscale = valore;
-                                                                break;
-                                                            case "MAIL":
-                                                                filtriRic.email = valore;
-                                                                break;
-                                                        }
-                                                        BusinessLogic.Rubrica.DPA3_RubricaSearchAgent corrSearcher = new BusinessLogic.Rubrica.DPA3_RubricaSearchAgent(infoUtente);
-
-                                                        // DocsPaDB.Query_DocsPAWS.Rubrica query = new DocsPaDB.Query_DocsPAWS.Rubrica(infoUtente);
-                                                        DocsPaVO.rubrica.SmistamentoRubrica smistamentoRubrica = new DocsPaVO.rubrica.SmistamentoRubrica();
-                                                        ArrayList objElementiRubrica = corrSearcher.Search(filtriRic, smistamentoRubrica);
-                                                        if (objElementiRubrica != null && objElementiRubrica.Count > 0)
-                                                        {
-                                                            string sysId = "";
-
-                                                            if (!string.IsNullOrEmpty(((DocsPaVO.rubrica.ElementoRubrica)objElementiRubrica[0]).systemId))
-                                                            {
-                                                                sysId = ((DocsPaVO.rubrica.ElementoRubrica)objElementiRubrica[0]).systemId;
-                                                            }
-                                                            else
-                                                            {
-                                                                DocsPaVO.utente.Corrispondente corr = BusinessLogic.Utenti.UserManager.getCorrispondenteBySystemID(((DocsPaVO.rubrica.ElementoRubrica)objElementiRubrica[0]).codice);
-
-                                                                if ((corr == null) || (corr != null && string.IsNullOrEmpty(corr.systemId) && string.IsNullOrEmpty(corr.codiceRubrica)))
-                                                                {
-                                                                    bool rubricaComuneAbilitata = BusinessLogic.RubricaComune.Configurazioni.GetConfigurazioni(infoUtente).GestioneAbilitata;
-                                                                    if (rubricaComuneAbilitata)
-                                                                    {
-                                                                        corr = BusinessLogic.Utenti.UserManager.getCorrispondenteByCodRubricaRubricaComune(((DocsPaVO.rubrica.ElementoRubrica)objElementiRubrica[0]).codice, infoUtente);
-                                                                    }
-
-                                                                    if (corr != null)
-                                                                        sysId = corr.systemId;
-                                                                }
-                                                            }
-                                                            oggettoCustom.VALORE_DATABASE = sysId;
-                                                        }
-                                                        else
-                                                        {
-                                                            oggettoCustom.VALORE_DATABASE = string.Empty;
-                                                            //if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI")
-                                                            //    throw new Exception("Elaborazione XML: Errore nell'associazione del campo " + oggettoCustom.DESCRIZIONE + ", Corrispondente non trovato con i dati presenti nello XML.");
-                                                            //else
-                                                            notePerElaborazioneXML += "Errore di associazione del campo " + oggettoCustom.DESCRIZIONE + ". Il valore è presente nel file XML ma non è stato possibile associarlo automaticamente ad un corrispondente.  L’eventuale integrazione avviene manualmente. ";
-                                                        }
-                                                        #endregion
-                                                    }
-                                                    else if ((oggettoCustom.TIPO.DESCRIZIONE_TIPO).Equals("CasellaDiSelezione"))
-                                                    {
-
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    notePerElaborazioneXML += oggettoCustom.DESCRIZIONE + ". ";
-                                                }
-
-                                            }
-                                            else if (!string.IsNullOrEmpty(oggettoCustom.OPZIONI_XML_ASSOC))
-                                            {
-                                                if (oggettoCustom.OPZIONI_XML_ASSOC.ToUpper() == "FATT_EL_ATT_AUTOREPERTORIAZIONE" && fornitoreFA != null && !string.IsNullOrEmpty(fornitoreFA.IdRegistro))
-                                                {
-                                                    if (((oggettoCustom.TIPO.DESCRIZIONE_TIPO).Equals("Contatore") || (oggettoCustom.TIPO.DESCRIZIONE_TIPO).Equals("ContatoreSottocontatore")))
-                                                    {
-                                                        DocsPaVO.utente.Registro reg = BusinessLogic.Utenti.RegistriManager.getRegistro(fornitoreFA.IdRegistro);
-
-                                                        if (reg != null)
-                                                        {
-                                                            oggettoCustom.ID_AOO_RF = reg.systemId;
-                                                            oggettoCustom.CONTATORE_DA_FAR_SCATTARE = true;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        catch (Exception ex1end)
-                                        {
-                                            //if (e.Message.Equals("Corrispondente non trovato con i dati presenti nello XML."))
-                                            //{
-                                            //    throw new Exception("Corrispondente non trovato con i dati presenti nello XML.");
-                                            //}
-                                            //if (e.Message.Contains("Elaborazione XML:"))
-                                            //{
-                                            //    throw new Exception(e.Message);
-                                            //}
-                                            //else
-                                            //{
-                                            oggettoCustom.VALORE_DATABASE = string.Empty;
-                                            oggettoCustom.VALORI_SELEZIONATI = null;
-                                            //}
-                                        }
-
-                                        //if (oggettoCustom.CAMPO_OBBLIGATORIO == "SI" && (string.IsNullOrEmpty(oggettoCustom.VALORE_DATABASE) || ((oggettoCustom.VALORI_SELEZIONATI == null || oggettoCustom.VALORI_SELEZIONATI.Count < 1) && oggettoCustom.TIPO.DESCRIZIONE_TIPO == "CasellaDiSelezione")))
-                                        //{
-                                        //    //throw new PisException("FIELD_REQUIRED");
-                                        //    throw new Exception("Elaborazione XML: Valore assente per il campo obbligatorio " + oggettoCustom.DESCRIZIONE);
-                                        //}
-                                        // QUA DEVE FINIRE
-                                    }
-
-
-                                    foreach (DocsPaVO.ProfilazioneDinamica.OggettoCustom notePerXML in template.ELENCO_OGGETTI)
-                                    {
-                                        if (notePerXML.DESCRIZIONE.ToUpper() == "NOTE RELATIVE ALL'ELABORAZIONE XML")
-                                        {
-                                            if (!string.IsNullOrEmpty(notePerElaborazioneXML))
-                                            {
-                                                notePerElaborazioneXML = "Mancanti: " + notePerElaborazioneXML;
-                                                if (notePerElaborazioneXML.Length > 220)
-                                                {
-                                                    notePerElaborazioneXML = notePerElaborazioneXML.Substring(0, 220) + "...";
-                                                }
-                                                notePerXML.VALORE_DATABASE = notePerElaborazioneXML;
-                                            }
-                                            else
-                                                notePerXML.VALORE_DATABASE = "Elaborazione avvenuta con successo";
-                                        }
-                                    }
-
-                                    doc.template = template;
-                                    doc.tipologiaAtto = new DocsPaVO.documento.TipologiaAtto();
-                                    doc.tipologiaAtto.systemId = template.SYSTEM_ID.ToString();
-                                    doc.tipologiaAtto.descrizione = template.DESCRIZIONE;
-                                    doc.daAggiornareTipoAtto = true;
-
-                                    bool daaggiornTemp = false;
-                                    doc = BusinessLogic.Documenti.DocSave.save(infoUtente, doc, false, out daaggiornTemp, null);
-
-                                }
-                                else
-                                {
-                                    throw new Exception("Template Fattura non trovato");
-                                }
-                                #endregion
-
-                                #region Caricamento allegati fattura se presenti
-                                System.Xml.XmlNodeList listanodi = xmlDoc.DocumentElement.SelectNodes("//*[name()='Allegati']");
-                                System.Xml.XmlNode nodoNome = null;
-                                System.Xml.XmlNode nodoContent = null;
-                                DocsPaVO.documento.FileRequest allegato = null;
-                                DocsPaVO.documento.FileDocumento fileAllegato = null;
-                                string erroreMessage = "";
-                                bool caricaAllegato = true;
-                                foreach (System.Xml.XmlNode nodo in listanodi)
-                                {
-                                    nodoNome = null;
-                                    nodoContent = null;
-                                    caricaAllegato = true;
-
-                                    foreach (System.Xml.XmlNode nodo1 in nodo.ChildNodes)
-                                    {
-                                        //Console.WriteLine(nodo1.Name);
-                                        if (nodo1.Name.ToUpper() == "NOMEATTACHMENT") nodoNome = nodo1;
-                                        if (nodo1.Name.ToUpper() == "ATTACHMENT") nodoContent = nodo1;
-                                    }
-
-
-                                    //byte[] contentNormal = Convert.FromBase64String(nodoContent.InnerXml);
-                                    foreach (DocsPaVO.documento.Allegato alltempx1 in doc.allegati)
-                                    {
-                                        if (alltempx1.descrizione.ToUpper() == nodoNome.InnerXml.ToUpper()) caricaAllegato = false;
-                                    }
-                                    if (caricaAllegato)
-                                    {
-                                        allegato = new DocsPaVO.documento.Allegato
-                                        {
-                                            docNumber = doc.systemId,
-                                            descrizione = nodoNome.InnerXml
-                                        };
-                                        allegato = BusinessLogic.Documenti.AllegatiManager.aggiungiAllegato(infoUtente, ((DocsPaVO.documento.Allegato)allegato));
-
-                                        fileAllegato = new DocsPaVO.documento.FileDocumento
-                                        {
-                                            name = nodoNome.InnerXml,
-                                            fullName = nodoNome.InnerXml,
-                                            content = Convert.FromBase64String(nodoContent.InnerXml),
-                                            length = Convert.FromBase64String(nodoContent.InnerXml).Length,
-                                            bypassFileContentValidation = true
-                                        };
-
-
-                                        if (!BusinessLogic.Documenti.FileManager.putFile(ref allegato, fileAllegato, infoUtente, out erroreMessage))
-                                        {
-                                            throw new Exception("Errore nella creazione del file");
-                                        }
-                                        else
-                                        {
-                                            retVal = "OK";
-                                        }
-                                    }
-                                    else
-                                    {
-                                        logger.Debug("Allegato già presente");
-                                    }
-
-                                }
-                                #endregion
-
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex);
-                retVal = ex.Message;
-            }
-
-            return retVal;
-        }
-
-        public static ArrayList FattElAttiveGetFornitori(string idAmm)
-        {
-            DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            return dbAmm.FattElAttive_getCodFornitore(idAmm);
-        }
-
-        public static bool FattElAttive_InsertInLogPIS(string idProfile, string iduo, string coduo)
-        {
-            DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            return dbAmm.FattElAttive_InsertIntoLogPIS(idProfile, iduo, coduo);
-        }
-
-        public static bool FattElAttive_UpSecProprietario(string idProfile)
-        {
-            DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            return dbAmm.FattElAttive_UpSecProprietario(idProfile);
-        }
         #endregion
 
         #region Integrazione CDS
         public static ArrayList CDS_getLogEvents(string lastLog, string idTipoCDS, string idOggAppliant, string idOggLocat)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            ArrayList retval = dbAmm.CDS_getLogEvents(lastLog, idTipoCDS, idOggAppliant, idOggLocat);
+            ArrayList retval = dbAmm.CDS_getLogEvents( lastLog,  idTipoCDS,  idOggAppliant,  idOggLocat);
 
             return retval;
         }
@@ -1772,7 +1120,7 @@ namespace BusinessLogic.Amministrazione
                 if (pubbAlbo.statoDoc.ToUpper() == "DA PUBBLICARE")
                 {
                     int durata = 0;
-                    if (!Int32.TryParse(pubbAlbo.durata, out durata))
+                    if (!Int32.TryParse(pubbAlbo.durata, out durata)) 
                     {
                         pubbAlbo.errore = "Durata in formato non corretto";
                         errorepubb = true;
@@ -1811,7 +1159,7 @@ namespace BusinessLogic.Amministrazione
                                 {
                                     if (stato.DESCRIZIONE.ToUpper().Equals("DA PUBBLICARE ERRORE"))
                                     {
-                                        BusinessLogic.DiagrammiStato.DiagrammiStato.salvaModificaStato(pubbAlbo.idDocumento, stato.SYSTEM_ID.ToString(), diagramma, infoUtente.idPeople, infoUtente, string.Empty);
+                                        BusinessLogic.DiagrammiStato.DiagrammiStato.salvaModificaStato(pubbAlbo.idDocumento, stato.SYSTEM_ID.ToString(), diagramma, infoUtente.idPeople, infoUtente, string.Empty);                                                
                                     }
                                 }
                             }
@@ -1822,15 +1170,15 @@ namespace BusinessLogic.Amministrazione
                 else if (pubbAlbo.statoDoc.ToUpper() == "DA ANNULLARE")
                 {
                     int durata = 0;
-                    string descStato = string.Empty;
+                    string descStato= string.Empty;
 
-
-
+                    
+                    
                     if (!Int32.TryParse(pubbAlbo.durata, out durata))
                     {
                         pubbAlbo.errore = "Durata in formato non corretto";
                         errorepubb = true;
-                        descStato = "DA ANNULLARE ERRORE";
+                        descStato="DA ANNULLARE ERRORE";
                         logger.Error("Durata in formato non corretto");
                     }
                     else if (durata > 20)
@@ -1952,7 +1300,7 @@ namespace BusinessLogic.Amministrazione
                     //    logger.Error("Durata in formato non corretto");
                     //}
                     //else 
-                    if (!string.IsNullOrEmpty(pubbAlbo.extDocPrincipale) && !pubbAlbo.extDocPrincipale.ToUpper().Equals("PDF"))
+                        if (!string.IsNullOrEmpty(pubbAlbo.extDocPrincipale) && !pubbAlbo.extDocPrincipale.ToUpper().Equals("PDF"))
                     {
                         pubbAlbo.errore = "File Principale in formato non corretto";
                         errorepubb = true;
@@ -2058,7 +1406,7 @@ namespace BusinessLogic.Amministrazione
                     }
 
                 }
-
+                
                 retval2.Add(pubbAlbo);
             }
             return retval2;
@@ -2161,13 +1509,13 @@ namespace BusinessLogic.Amministrazione
         public static ArrayList CAPGetDocInFolder(string idFolder)
         {
             DocsPaDB.Query_DocsPAWS.Fascicoli dbFa = new DocsPaDB.Query_DocsPAWS.Fascicoli();
-            return dbFa.getIdDocSottoFasc(idFolder);
+            return dbFa.getIdDocSottoFasc(idFolder);                       
         }
 
         public static ArrayList CAPGetOpportunitiesPending(string typePrefix, string idPeople, string pendAppr, string idOpp)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            return dbAmm.CAPgetOpportunitiesPending(typePrefix, idPeople, pendAppr, idOpp);
+            return dbAmm.CAPgetOpportunitiesPending(typePrefix,idPeople,pendAppr, idOpp);
         }
 
         public static ArrayList CAPGetOppApprovals(string idOpp)
@@ -2188,7 +1536,7 @@ namespace BusinessLogic.Amministrazione
         public static System.Data.DataTable C3GetDocs(string fromTime, string toTime, string optionTime)
         {
             DocsPaDB.Query_DocsPAWS.Amministrazione dbAmm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-            return dbAmm.C3GetDocs(fromTime, toTime, optionTime);
+            return dbAmm.C3GetDocs(fromTime, toTime,optionTime);
         }
 
         public static System.Data.DataTable C3GetAllByIdDoc(string idDoc)
@@ -2224,7 +1572,7 @@ namespace BusinessLogic.Amministrazione
             System.Data.DataTable tabMod2 = dbAmm.C3GetDocsModAll(fromTime, toTime, optionTime);
             if (tabMod2 != null && tabMod2.Rows != null && tabMod2.Rows.Count > 0)
             {
-                if (retval == null)
+                if(retval == null)
                 {
                     retval = tabMod2.Clone();
                     retval.Rows.Clear();
@@ -2282,36 +1630,6 @@ namespace BusinessLogic.Amministrazione
             DocsPaDB.Query_DocsPAWS.Integrazioni intDB = new DocsPaDB.Query_DocsPAWS.Integrazioni();
             return intDB.MIBACT_BACHECA_GetFileInfoDoc(idDoc);
         }
-        #endregion
-
-        #region Big File FTP
-        public static bool BigFilesFTP_InsertIntoTable(DocsPaVO.ExternalServices.FileFtpUpInfo infoFile)
-        {
-            DocsPaDB.Query_DocsPAWS.Integrazioni intDb = new DocsPaDB.Query_DocsPAWS.Integrazioni();
-            return intDb.BigFilesFTP_InsertIntoTable(infoFile);
-        }
-
-        public static ArrayList BigFilesFTP_GetFilesToTransfer()
-        {
-            DocsPaDB.Query_DocsPAWS.Integrazioni intDb = new DocsPaDB.Query_DocsPAWS.Integrazioni();
-            return intDb.BigFilesFTP_GetFilesToTransfer();
-        }
-
-        public static bool BigFilesFTP_updateTable(DocsPaVO.ExternalServices.FileFtpUpInfo infoFile)
-        {
-            DocsPaDB.Query_DocsPAWS.Integrazioni intDb = new DocsPaDB.Query_DocsPAWS.Integrazioni();
-            return intDb.BigFilesFTP_updateTable(infoFile);
-        }
-
-        public static DocsPaVO.ExternalServices.FileFtpUpInfo BigFileFTP_GetInfoFileFTP(string idQueue, string idDocument)
-        {
-            DocsPaDB.Query_DocsPAWS.Integrazioni intDb = new DocsPaDB.Query_DocsPAWS.Integrazioni();
-            return intDb.BigFilesFTP_GetInfoFile(idQueue, idDocument);
-
-        }
-
-
-
         #endregion
 
     }

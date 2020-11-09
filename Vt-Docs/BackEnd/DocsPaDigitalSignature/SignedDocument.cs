@@ -1058,35 +1058,5 @@ namespace BusinessLogic.Documenti.DigitalSignature
             this._algHT.Add("2.16.840.1.101.3.4.2.3", "SHA512");
 
         }
-
-        public DocsPaVO.documento.SignerInfo ExtractSignerInfo(X509Certificate2 cert)
-        {
-            DocsPaVO.documento.SignerInfo signerInfo = new DocsPaVO.documento.SignerInfo();
-
-            signerInfo.CertificateInfo.RevocationStatus = CheckCertificate(cert);
-            //signerInfo.CertificateInfo.X509Certificate = cert1.GetEncoded();
-
-            signerInfo.CertificateInfo.RevocationStatusDescription = DecodeStatus(signerInfo.CertificateInfo.RevocationStatus);
-            ParseCNIPASubjectInfo(ref signerInfo.SubjectInfo, cert.SubjectName.Name);
-
-            signerInfo.CertificateInfo.IssuerName = cert.IssuerName.Name;
-            signerInfo.CertificateInfo.SerialNumber = cert.SerialNumber;
-            signerInfo.CertificateInfo.SignatureAlgorithm = cert.SignatureAlgorithm.FriendlyName;
-            signerInfo.CertificateInfo.SubjectName = cert.SubjectName.Name;
-            signerInfo.CertificateInfo.ValidFromDate = cert.NotBefore;
-            signerInfo.CertificateInfo.ValidToDate = cert.NotAfter;
-            signerInfo.CertificateInfo.ThumbPrint = cert.Thumbprint;
-
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("CertificateInfo.IssuerName: '{0}'", signerInfo.CertificateInfo.IssuerName);
-            sb.AppendFormat("CertificateInfo.SerialNumber: '{0}'", signerInfo.CertificateInfo.SerialNumber);
-            sb.AppendFormat("CertificateInfo.SignatureAlgorithm: '{0}'", signerInfo.CertificateInfo.SignatureAlgorithm);
-            sb.AppendFormat("CertificateInfo.SubjectName: '{0}'", signerInfo.CertificateInfo.SubjectName);
-            sb.AppendFormat("CertificateInfo.ValidFromDate: '{0}'", signerInfo.CertificateInfo.ValidFromDate);
-            sb.AppendFormat("CertificateInfo.ValidToDate: '{0}'", signerInfo.CertificateInfo.ValidToDate);
-            sb.AppendFormat("CertificateInfo.ThumbPrint: '{0}'", signerInfo.CertificateInfo.ThumbPrint);
-
-            return signerInfo;
-        }
     }
 }

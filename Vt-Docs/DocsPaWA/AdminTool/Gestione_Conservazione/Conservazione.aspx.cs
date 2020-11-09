@@ -19,7 +19,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                 if (this.DisplayMenuPARER())
                 {
                     this.pnlAttivaCons.Visible = true;
-                    this.btn_monitoring.OnClientClick = "ReportMonitoraggioPolicy();";
                     this.FetchData();
                 }
             }
@@ -64,9 +63,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                 this.lbl_resp_cons.ForeColor = System.Drawing.Color.Red;
                 this.lbl_resp_cons.Font.Bold = true;
             }
-
-            this.SetPolicyCounter(idAmministrazione);
-
         }
 
         protected void FetchStatoConservazione(string idAmministrazione)
@@ -92,23 +88,10 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
 
         }
 
-        protected void SetPolicyCounter(string idAmm)
-        {
-            try
-            {
-                this.lbl_policyDoc.Text = this._wsInstance.GetListaPolicyPARER(idAmm, "D") != null ? this._wsInstance.GetListaPolicyPARER(idAmm, "D").Where(p => p.isAttiva == "1").Count().ToString() : string.Empty;
-                this.lbl_policyStampe.Text = this._wsInstance.GetListaPolicyPARER(idAmm, "S") != null ? this._wsInstance.GetListaPolicyPARER(idAmm, "S").Where(p => p.isAttiva == "1").Count().ToString() : string.Empty;
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
         protected void btn_attiva_Click(object sender, EventArgs e)
         {
             string stato;
-            if(this.btn_attiva.Text == "Attiva")
+            if (this.btn_attiva.Text == "Attiva")
             {
                 stato = "1";
             }
@@ -120,10 +103,10 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
             string idAmministrazione = AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "3");
             bool result = this._wsInstance.SetStatoAttivazione(idAmministrazione, stato);
 
-            if(result)
+            if (result)
             {
                 this.FetchStatoConservazione(idAmministrazione);
-                if(stato == "1" && this.lbl_resp_cons.Text == "non definito")
+                if (stato == "1" && this.lbl_resp_cons.Text == "non definito")
                 {
                     ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "save_warning", "alert('Per il funzionamento del processo è necessario definire un responsabile della conservazione');", true);
                 }

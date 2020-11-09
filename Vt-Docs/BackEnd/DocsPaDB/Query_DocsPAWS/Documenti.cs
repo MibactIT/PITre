@@ -36,7 +36,7 @@ namespace DocsPaDB.Query_DocsPAWS
         private ILog logger = LogManager.GetLogger(typeof(Documenti));
         private static Hashtable registri = new Hashtable();
         private static Mutex semProtPronto;
-        //  private static Mutex semProtNuovo;
+      //  private static Mutex semProtNuovo;
         private bool Grigi = false;
         private bool Arrivo = false;
         private bool Partenza = false;
@@ -63,7 +63,7 @@ namespace DocsPaDB.Query_DocsPAWS
         static Documenti()
         {
             semProtPronto = new Mutex();
-            //  semProtNuovo = new Mutex();
+          //  semProtNuovo = new Mutex();
         }
 
         public Documenti()
@@ -390,7 +390,7 @@ namespace DocsPaDB.Query_DocsPAWS
             allegato.idPeopleDelegato = DocsPaUtils.Data.DataReaderHelper.GetValue<object>(reader, "ID_PEOPLE_DELEGATO", true, string.Empty).ToString();
             if (!string.IsNullOrEmpty(allegato.idPeopleDelegato) && allegato.idPeopleDelegato != "0")
             {
-                allegato.autore = utente.GetUtenteNoFiltroDisabled(allegato.idPeopleDelegato).descrizione + " SOSTITUTO DI " + allegato.autore;
+                allegato.autore = utente.GetUtenteNoFiltroDisabled(allegato.idPeopleDelegato).descrizione + "DELEGATO DA " + allegato.autore;
             }
             allegato.versionId = DocsPaUtils.Data.DataReaderHelper.GetValue<object>(reader, "VERSION_ID", false, string.Empty).ToString();
             allegato.docNumber = DocsPaUtils.Data.DataReaderHelper.GetValue<object>(reader, "DOCNUMBER", false, string.Empty).ToString();
@@ -423,7 +423,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 allegato.autoreFile = utente.GetUtenteNoFiltroDisabled(idAuthorFile).descrizione;
             string idAuthorDelagateFile = DocsPaUtils.Data.DataReaderHelper.GetValue<object>(reader, "ID_PEOPLE_DELEGATO_PUTFILE", true, string.Empty).ToString();
             if (!string.IsNullOrEmpty(idAuthorDelagateFile))
-                allegato.autoreFile = utente.GetUtenteNoFiltroDisabled(idAuthorDelagateFile).descrizione + " SOSTITUTO DI " + allegato.autoreFile;
+                allegato.autoreFile = utente.GetUtenteNoFiltroDisabled(idAuthorDelagateFile).descrizione + " DELEGATO DA " + allegato.autoreFile;
 
             allegato.dataAcquisizione = (DocsPaUtils.Data.DataReaderHelper.GetValue<DateTime>(reader, "DTA_FILE_ACQUIRED", true)).ToShortDateString();
 
@@ -485,7 +485,11 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", "DOCNUMBER=" + docNumber);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteScalar(out oldApp, queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteScalar(out oldApp, queryString);
+            }
             logger.Debug("oldApp=" + oldApp);
 
             q = DocsPaUtils.InitQuery.getInstance().getQuery("U_Profile");
@@ -493,7 +497,10 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", param);
             queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
         }
 
         public void UpdateVersion(string versionId)
@@ -533,7 +540,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param1", versionId);
             q.setParam("param2", docNumber);
             string queryString = q.getSQL();
-            ExecuteQuery(out ds, "PATH", queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQueryNewConn(out ds, "PATH", queryString);
+            }
+            
         }
 
         public void UpdateAppProfile(string oldApp, string docNumber)
@@ -563,7 +575,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param1", "NUM_PAG_ALLEGATI=" + numeroPagine + ",COMMENTS='" + descrizione.Replace("'", "''") + "'");
             q.setParam("param2", "VERSION_ID=" + versionId);
             string queryString = q.getSQL();
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
         }
 
         /// <summary>
@@ -743,7 +760,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
 
         #region areaLavoroManager
-        public bool ExeAddLavoro(string idProfile, string tipoProto, string idRegistro, DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.fascicolazione.Fascicolo fasc, string motivo = "")
+        public bool ExeAddLavoro(string idProfile, string tipoProto, string idRegistro, DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.fascicolazione.Fascicolo fasc)
         {
             DataSet dataSet = new DataSet();
             DocsPaUtils.Query q;
@@ -771,14 +788,14 @@ namespace DocsPaDB.Query_DocsPAWS
                     {
                         //si esegue l'inserimento
                         q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPAAreaLavoro");
-                        q.setParam("param1", Functions.GetSystemIdColName() + " ID_PEOPLE,ID_RUOLO_IN_UO,ID_PROFILE,CHA_TIPO_DOC,DTA_INS, ID_REGISTRO, VAR_MOTIVO ");
+                        q.setParam("param1", Functions.GetSystemIdColName() + " ID_PEOPLE,ID_RUOLO_IN_UO,ID_PROFILE,CHA_TIPO_DOC,DTA_INS, ID_REGISTRO ");
                         if (idRegistro != null && idRegistro != String.Empty)
                         {
-                            q.setParam("param2", Functions.GetSystemIdNextVal(null) + " '" + idPeople + "','" + idRuoloInUo + "','" + idProfile + "','" + tipoProto + "'," + dateString + "," + "'" + idRegistro + "','" + motivo.Replace("'", "''") + "'");
+                            q.setParam("param2", Functions.GetSystemIdNextVal(null) + " '" + idPeople + "','" + idRuoloInUo + "','" + idProfile + "','" + tipoProto + "'," + dateString + "," + "'" + idRegistro + "'");
                         }
                         else
                         {
-                            q.setParam("param2", Functions.GetSystemIdNextVal(null) + " '" + idPeople + "','" + idRuoloInUo + "','" + idProfile + "','" + tipoProto + "'," + dateString + "," + "NULL, '" + motivo.Replace("'", "''") + "'");
+                            q.setParam("param2", Functions.GetSystemIdNextVal(null) + " '" + idPeople + "','" + idRuoloInUo + "','" + idProfile + "','" + tipoProto + "'," + dateString + "," + "NULL");
                         }
                         queryString = q.getSQL();
                         logger.Debug(queryString);
@@ -1260,15 +1277,19 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Debug(commandText);
 
                 DataSet dataSet;
-                if (ExecuteQuery(out dataSet, "PROFILE", commandText))
+
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    schedaDoc = new DocsPaVO.documento.SchedaDocumento();
+                    if (dbProvider.ExecuteQuery(out dataSet, "PROFILE", commandText))
+                    {
+                        schedaDoc = new DocsPaVO.documento.SchedaDocumento();
 
-                    DataRow dataRow = dataSet.Tables["PROFILE"].Rows[0];
-                    schedaDoc = GetSchedaDocumento(infoUtente, dataRow, securityVersion);
+                        DataRow dataRow = dataSet.Tables["PROFILE"].Rows[0];
+                        schedaDoc = GetSchedaDocumento(infoUtente, dataRow, securityVersion);
 
-                    //if (Cfg_SET_DATA_VISTA_GRD)
-                    //    SetDataVistaSP(infoUtente, schedaDoc.systemId, "D");
+                        //if (Cfg_SET_DATA_VISTA_GRD)
+                        //    SetDataVistaSP(infoUtente, schedaDoc.systemId, "D");
+                    }
                 }
 
                 if (schedaDoc == null)
@@ -1493,19 +1514,24 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Debug(commandText);
 
                 DataSet dataSet;
-                if (ExecuteQuery(out dataSet, "PROFILE", commandText))
+
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    if (dataSet.Tables["PROFILE"].Rows.Count > 0)
+
+                    if (dbProvider.ExecuteQuery(out dataSet, "PROFILE", commandText))
                     {
-                        DataRow dataRow = dataSet.Tables["PROFILE"].Rows[0];
+                        if (dataSet.Tables["PROFILE"].Rows.Count > 0)
+                        {
+                            DataRow dataRow = dataSet.Tables["PROFILE"].Rows[0];
 
-                        schedaDocumento = GetSchedaDocumento(infoUtente, dataRow);
+                            schedaDocumento = GetSchedaDocumento(infoUtente, dataRow);
 
-                        dataSet.Dispose();
-                        dataSet = null;
+                            dataSet.Dispose();
+                            dataSet = null;
 
-                        if (impostaDataVista)
-                            SetDataVistaSP(infoUtente, schedaDocumento.systemId, "D");
+                            if (impostaDataVista)
+                                SetDataVistaSP(infoUtente, schedaDocumento.systemId, "D");
+                        }
                     }
                 }
 
@@ -2060,11 +2086,11 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Info("BEGIN");
             logger.Debug("getDocumenti");
             ArrayList listaDocumenti = new ArrayList();
-
+            
             //Verifico se il documento principale è in libroFirma
             string strInLibroFirma = (dataRow.Table.Columns.Contains("IN_LIBROFIRMA") && dataRow["IN_LIBROFIRMA"] != null ? dataRow["IN_LIBROFIRMA"].ToString().Trim() : "0");
             bool inLibroFirma = ((!string.IsNullOrEmpty(strInLibroFirma) ? strInLibroFirma.Trim() : "0") == "0" ? false : true);
-
+            
             string queryString = GetFileVersionsQuery(infoUtente, "D", dataRow["DOCNUMBER"].ToString(), securityVersion);
             DataSet dataSet;
             ExecuteQuery(out dataSet, "VERSIONI", queryString);
@@ -2153,9 +2179,9 @@ namespace DocsPaDB.Query_DocsPAWS
                     }
                     //Libro firma
                     string strInLibroFirma = (dataRow.Table.Columns.Contains("IN_LIBROFIRMA") && dataRow["IN_LIBROFIRMA"] != null ? dataRow["IN_LIBROFIRMA"].ToString().Trim() : "0");
-                    documento.inLibroFirma = ((!string.IsNullOrEmpty(strInLibroFirma) ? strInLibroFirma.Trim() : "0") == "0" ? false : true);
+                    documento.inLibroFirma = ((!string.IsNullOrEmpty(strInLibroFirma)?strInLibroFirma.Trim():"0") == "0" ? false : true);
                     //Fine
-
+                
                     listVersionsMainDoc.Add(documento);
                 }
             }
@@ -2202,7 +2228,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 if (infoUtente.idGruppo != null)
                 {
                     if (securityVersion)
-                        secondParam += string.Format(" AND {0}ISVERSIONVISIBLE(B.VERSION_ID, {1}, {2}) > 0", dbUser, infoUtente.idPeople, infoUtente.idGruppo);
+                    secondParam += string.Format(" AND {0}ISVERSIONVISIBLE(B.VERSION_ID, {1}, {2}) > 0", dbUser, infoUtente.idPeople, infoUtente.idGruppo);
                     else
                         secondParam += string.Format(" AND {0}ISVERSIONVISIBLENOSECURITY(B.VERSION_ID) > 0", dbUser);
                 }
@@ -2395,7 +2421,9 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 q.setParam("paramInEsercizio", "");
                 q.setParam("param4", " IN (1,2) ");
-                q.setParam("iperdocumento", " OR ( IPERDOCUMENTO = 1 AND (ID_AMM = " + idAmministrazione + " OR ID_AMM IS NULL)) ");
+                q.setParam("iperdocumento_and", "");
+                q.setParam("iperdocumento_or", "UNION SELECT DISTINCT DPA_TIPO_ATTO.SYSTEM_ID, VAR_DESC_ATTO FROM DPA_TIPO_ATTO, DPA_VIS_TIPO_DOC WHERE IPERDOCUMENTO = 1 AND (ID_AMM = " + idAmministrazione + " OR ID_AMM IS NULL) ");
+                //q.setParam("iperdocumento", " OR ( IPERDOCUMENTO = 1 AND (ID_AMM = " + idAmministrazione + " OR ID_AMM IS NULL)) ");
             }
 
             //Inserimento
@@ -2403,7 +2431,19 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 q.setParam("paramInEsercizio", " (In_Esercizio <> 'NO' OR In_Esercizio IS NULL) AND (Abilitato_SI_NO <> 0 OR Abilitato_SI_NO IS NULL) AND ");
                 q.setParam("param4", " IN (2) ");
-                q.setParam("iperdocumento", "");
+                q.setParam("iperdocumento_and", "");
+                q.setParam("iperdocumento_or", "");
+                //q.setParam("iperdocumento", "");
+            }
+
+            //Procedimenti
+            if(diritti == "P")
+            {
+                q.setParam("paramInEsercizio", " (In_Esercizio <> 'NO' OR In_Esercizio IS NULL) AND (Abilitato_SI_NO <> 0 OR Abilitato_SI_NO IS NULL) AND ");
+                q.setParam("param4", " IN (2) ");
+                q.setParam("iperdocumento_and", " AND CHA_PROCEDIMENTALE='1' ");
+                q.setParam("iperdocumento_or", "");
+                //q.setParam("iperdocumento", " AND CHA_PROCEDIMENTALE='1' ");
             }
 
             string queryString = q.getSQL();
@@ -2502,7 +2542,7 @@ namespace DocsPaDB.Query_DocsPAWS
         //		}
         #endregion
 
-        public string GetEmailAddressDocument(string idProfile)
+        private string GetEmailAddressDocument(string idProfile)
         {
             logger.Debug("GetEmailAddressDocument");
             string retValue = string.Empty;
@@ -2632,7 +2672,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     //26-09-2014: Sostituito GetUtente con GetUtenteNoFiltroDisabled nel caso di delegato disabilitato, andava in eccezione
                     //fileRequest.idPeopleDelegato = utente.GetUtente(dataRow["ID_PEOPLE_DELEGATO"].ToString()).descrizione;
                     fileRequest.idPeopleDelegato = dataRow["ID_PEOPLE_DELEGATO"].ToString();
-                    fileRequest.autore = utente.GetUtenteNoFiltroDisabled(dataRow["ID_PEOPLE_DELEGATO"].ToString()).descrizione + " SOSTITUTO DI " + fileRequest.autore;
+                    fileRequest.autore = utente.GetUtenteNoFiltroDisabled(dataRow["ID_PEOPLE_DELEGATO"].ToString()).descrizione + " DELEGATO DA " + fileRequest.autore;
                 }
 
             }
@@ -2644,7 +2684,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             if (dataRow.Table.Columns.Contains("ID_PEOPLE_DELEGATO_PUTFILE") && dataRow["ID_PEOPLE_DELEGATO_PUTFILE"] != DBNull.Value)
             {
-                fileRequest.autoreFile = utente.GetUtenteNoFiltroDisabled(dataRow["ID_PEOPLE_DELEGATO_PUTFILE"].ToString()).descrizione + " SOSTITUTO DI " + fileRequest.autoreFile;
+                fileRequest.autoreFile = utente.GetUtenteNoFiltroDisabled(dataRow["ID_PEOPLE_DELEGATO_PUTFILE"].ToString()).descrizione + " DELEGATO DA " + fileRequest.autoreFile;
             }
 
             if (dataRow.Table.Columns.Contains("DTA_FILE_ACQUIRED") && dataRow["DTA_FILE_ACQUIRED"] != DBNull.Value)
@@ -3324,7 +3364,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 string idDocumentType = string.Empty;
                 //DocsPaVO.utente.Corrispondente cor = GetCorrispondente_NEW(dr, dataSet);
-                DocsPaDB.Query_DocsPAWS.Utenti dbut = new Utenti();
+                DocsPaDB.Query_DocsPAWS.Utenti dbut= new Utenti();
 
                 DocsPaVO.addressbook.QueryCorrispondente qco = new DocsPaVO.addressbook.QueryCorrispondente();
                 qco.systemId = dr["SYSTEM_ID"].ToString();
@@ -3365,7 +3405,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 cor.tipoCorrispondente = "O";
                 // modifica per l'email dell corrispondente occasionale
                 if (!string.IsNullOrEmpty(dr["VAR_EMAIL"].ToString())) cor.email = dr["VAR_EMAIL"].ToString();
-
+            
             }
             return cor;
         }
@@ -3413,7 +3453,7 @@ namespace DocsPaDB.Query_DocsPAWS
             int delegato = 0;
             try
             {
-                BeginTransaction();
+                //BeginTransaction();
 
                 logger.Debug("INIZIO SetDataVistaSP");
 
@@ -3431,11 +3471,16 @@ namespace DocsPaDB.Query_DocsPAWS
                 parameters.Add(CreateParameter("idDelegato", delegato));
                 parameters.Add(outParam);
 
-                if (Cfg_SET_DATA_VISTA_GRD == "2")
-                    ExecuteStoredProcedure("SPsetDataVista_V2", parameters, null);
-                else
-                    ExecuteStoredProcedure("SPsetDataVista", parameters, null);
 
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (Cfg_SET_DATA_VISTA_GRD == "2")
+                        dbProvider.ExecuteStoredProcedure("SPsetDataVista_V2", parameters, null);
+                    else
+                        dbProvider.ExecuteStoredProcedure("SPsetDataVista", parameters, null);
+
+
+                }
 
                 if (outParam.Valore != null && outParam.Valore.ToString() != "" && outParam.Valore.ToString() != "1")
                 {
@@ -3464,20 +3509,20 @@ namespace DocsPaDB.Query_DocsPAWS
                 //}
 
 
-                if (retValue)
-                    CommitTransaction();
-                else
-                    RollbackTransaction();
+                //if (retValue)
+                //    CommitTransaction();
+                //else
+                //    RollbackTransaction();
             }
             catch (Exception e)
             {
                 logger.Error("STORE PROCEDURE SetDataVistaSP: esito negativo" + e.Message);
-                RollbackTransaction();
+                //RollbackTransaction();
                 retValue = false;
             }
             finally
             {
-                CloseConnection();
+                //CloseConnection();
                 logger.Debug("FINE SetDataVistaSP");
             }
 
@@ -3626,8 +3671,16 @@ namespace DocsPaDB.Query_DocsPAWS
             try
             {
                 //Aggiorno tutti i recod percui non esiste un dublicato avente già l'accessrights in input
-                query = "UPDATE SECURITY s SET s.ACCESSRIGHTS = " + accessRight + " WHERE s.THING = " + idDocumento + " AND s.ACCESSRIGHTS NOT IN (0) " +
+                if (dbType.ToUpper() == "SQL")
+                {
+                    query = "UPDATE s SET s.ACCESSRIGHTS = " + accessRight + " FROM SECURITY s WHERE s.THING = " + idDocumento + " AND s.ACCESSRIGHTS NOT IN (0) " +
                         "AND NOT EXISTS(SELECT 'X' FROM SECURITY WHERE THING = s.THING AND PERSONORGROUP = s.PERSONORGROUP AND ACCESSRIGHTS = " + accessRight + ")";
+                }
+                else
+                {
+                    query = "UPDATE SECURITY s SET s.ACCESSRIGHTS = " + accessRight + " WHERE s.THING = " + idDocumento + " AND s.ACCESSRIGHTS NOT IN (0) " +
+                        "AND NOT EXISTS(SELECT 'X' FROM SECURITY WHERE THING = s.THING AND PERSONORGROUP = s.PERSONORGROUP AND ACCESSRIGHTS = " + accessRight + ")";
+                }
                 System.Diagnostics.Debug.WriteLine("cambiaDirittiDocumenti - Query_DocsPAWS/Documenti - QUERY : " + query);
                 if (ExecuteNonQuery(query))
                 {
@@ -3754,29 +3807,9 @@ namespace DocsPaDB.Query_DocsPAWS
                                 }
 
                                 if (reg != null)
-
                                 {
-                                    if (!string.IsNullOrEmpty(reg.chaRF) && reg.chaRF == "1")
-                                    {
-                                        formato_contatore = formato_contatore.Replace("RF", reg.codRegistro);
-
-                                        if (!string.IsNullOrEmpty(reg.idAOOCollegata))
-                                        {
-                                            DocsPaVO.utente.Registro registro = new DocsPaVO.utente.Registro();
-                                            DocsPaDB.Query_DocsPAWS.Utenti rub = new DocsPaDB.Query_DocsPAWS.Utenti();
-                                            rub.GetRegistro(reg.idAOOCollegata, ref registro);
-                                            if (registro != null)
-                                                formato_contatore = formato_contatore.Replace("AOO", registro.codRegistro);
-                                        }
-
-
-                                    }
-                                    else //se contatore di AOO non ho i dati per ricavare RF perchè non mi viene passato in input. 
-                                    {
-                                        formato_contatore = formato_contatore.Replace("AOO", reg.codRegistro);
-                                        formato_contatore = formato_contatore.Replace("RF", reg.codRegistro);
-
-                                    }
+                                    formato_contatore = formato_contatore.Replace("RF", reg.codRegistro);
+                                    formato_contatore = formato_contatore.Replace("AOO", reg.codRegistro);
                                 }
                             }
 
@@ -4058,8 +4091,8 @@ namespace DocsPaDB.Query_DocsPAWS
                                         "','" +
                                         note +
                                         "'," +
-                                        //DocsPaDbManagement.Functions.Functions.ToDate(DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")) +
-                                        // Inserisce il valore della data del DB
+                                    //DocsPaDbManagement.Functions.Functions.ToDate(DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")) +
+                                    // Inserisce il valore della data del DB
                                         DocsPaDbManagement.Functions.Functions.GetDate() +
                                         ",'" +
                                         infoUtente.idPeople + "','" +
@@ -4074,8 +4107,8 @@ namespace DocsPaDB.Query_DocsPAWS
                                         idGruppoTrasm + ",'" +
                                         tipoDiritto + "','" +
                                         note + "'," +
-                                        //DocsPaDbManagement.Functions.Functions.ToDate(DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")) +
-                                        // Inserisce il valore della data del DB
+                                    //DocsPaDbManagement.Functions.Functions.ToDate(DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")) +
+                                    // Inserisce il valore della data del DB
                                         DocsPaDbManagement.Functions.Functions.GetDate() +
                                         ",'" +
                                         infoUtente.idPeople +
@@ -4220,18 +4253,18 @@ namespace DocsPaDB.Query_DocsPAWS
                                     }
                                     else
                                         if (numProprietari.Equals("2"))
-                                    {
-                                        q = DocsPaUtils.InitQuery.getInstance().getQuery("D_SECURITY");
-                                        q.setParam("param1", "THING=" + dirittoOggetto.idObj + " AND PERSONORGROUP=" + personOrGroupP + " AND CHA_TIPO_DIRITTO= 'P'");
-                                        queryString = q.getSQL();
-                                        logger.Debug(queryString);
-                                        if (!dbProvider.ExecuteNonQuery(queryString))
                                         {
-                                            result = false;
-                                            dbProvider.RollbackTransaction();
-                                            throw new Exception();
+                                            q = DocsPaUtils.InitQuery.getInstance().getQuery("D_SECURITY");
+                                            q.setParam("param1", "THING=" + dirittoOggetto.idObj + " AND PERSONORGROUP=" + personOrGroupP + " AND CHA_TIPO_DIRITTO= 'P'");
+                                            queryString = q.getSQL();
+                                            logger.Debug(queryString);
+                                            if (!dbProvider.ExecuteNonQuery(queryString))
+                                            {
+                                                result = false;
+                                                dbProvider.RollbackTransaction();
+                                                throw new Exception();
+                                            }
                                         }
-                                    }
                                 }
                             }
                         }
@@ -4502,19 +4535,19 @@ namespace DocsPaDB.Query_DocsPAWS
                 return (string.IsNullOrEmpty(docDir.CopiaVisibilita) || docDir.CopiaVisibilita.Equals("0") ? "ACQUISITO" : "ACQUISITO PER COPIA VISIBILITA");
             else
                 if (docDir.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_PROPRIETARIO))
-                return "PROPRIETARIO";
-            else
+                    return "PROPRIETARIO";
+                else
                     if (docDir.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_TRASMISSIONE))
-                return "TRASMISSIONE";
-            else
+                        return "TRASMISSIONE";
+                    else
                         if (docDir.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_TRASMISSIONE_IN_FASCICOLO))
-                return "INSERIMENTO IN FASC.";
-            else
+                            return "INSERIMENTO IN FASC.";
+                        else
                             if (docDir.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_SOSPESO))
-                return "SOSPESO";
-            else
+                                return "SOSPESO";
+                            else
                                 if (docDir.tipoDiritto.Equals(DocsPaVO.documento.TipoDiritto.TIPO_DELEGATO))
-                return "SOSTITUTO";
+                                    return "DELEGATO";
             return "";
         }
 
@@ -4720,15 +4753,15 @@ namespace DocsPaDB.Query_DocsPAWS
                     }
                     else
                         if (result > 0 && tipoObj == "F") result = 2;  //fascicolo normale non rimosse ACL.
-                    else
-                            if (result == 0) //rimosse ACL
-                    {
-                        result = 0;
-                        if (tipoObj == "D")
-                            errorMessage = "Non si possiedono i diritti per visualizzare il documento.";
                         else
-                            errorMessage = "Non si possiedono i diritti per visualizzare il fascicolo.";
-                    }
+                            if (result == 0) //rimosse ACL
+                            {
+                                result = 0;
+                                if (tipoObj == "D")
+                                    errorMessage = "Non si possiedono i diritti per visualizzare il documento.";
+                                else
+                                    errorMessage = "Non si possiedono i diritti per visualizzare il fascicolo.";
+                            }
                 }
             }
             catch
@@ -4754,7 +4787,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("param2", "SYSTEM_ID=" + schedaDoc.systemId);
                 string queryString = q.getSQL();
                 logger.Debug(queryString);
-                ExecuteNonQuery(queryString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteNonQuery(queryString);
+                }
+                
                 //AggiornaVisibilita(schedaDoc, objRuolo);
                 schedaDoc.daAggiornarePrivato = false;
             }
@@ -4772,7 +4810,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("param3", schedaDoc.docNumber);
                 string queryString = q.getSQL();
                 logger.Debug(queryString);
-                ExecuteNonQuery(queryString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteNonQuery(queryString);
+                } 
+               
                 schedaDoc.dtaArrivoDaStoricizzare = "0";
             }
 
@@ -4793,11 +4836,21 @@ namespace DocsPaDB.Query_DocsPAWS
                     ", " + idPeople + "," + idCorrGlobali);
                 q.setParam("param3", "SYSTEM_ID=" + schedaDoc.systemId);
                 string queryString = q.getSQL();
-                ExecuteNonQuery(queryString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteNonQuery(queryString);
+                }
+                
                 logger.Debug(queryString);
                 InsertOgg(idAmministrazione, ref schedaDoc);
                 queryString = SalvaOggetto2(schedaDoc.oggetto.systemId, schedaDoc.oggetto.descrizione, schedaDoc.systemId);
-                ExecuteNonQuery(queryString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteNonQuery(queryString);
+                }
+                
                 logger.Debug(queryString);
                 schedaDoc.oggetto.daAggiornare = false;
             }
@@ -4819,7 +4872,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", "SYSTEM_ID=" + idProfile);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
         }
 
         public void DeleteDocArrivoPar(string idPeople, string idCorrGlobali, string idProfile, string tipoCorr)
@@ -4845,7 +4903,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param1", "CHA_TIPO_MITT_DEST='" + tipoCorr + "' AND ID_PROFILE =" + idProfile);
             queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
         }
 
         public void DeleteParoleChiave(string idProfile)
@@ -4854,7 +4917,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param1", "ID_PROFILE =" + idProfile);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
         }
 
         public void SalvaParoleChiave(ref DocsPaVO.documento.SchedaDocumento schedaDoc)
@@ -4893,7 +4961,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", "SYSTEM_ID=" + schedaDoc.systemId);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
             schedaDoc.daAggiornareTipoAtto = false;
 
         }
@@ -4905,7 +4978,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             try
             {
-                BeginTransaction();
+                //BeginTransaction();
 
                 // oggetto
                 SalvaOggetto(infoUtente.idAmministrazione, infoUtente.idPeople, infoUtente.idCorrGlobali, ref schedaDoc);
@@ -4952,33 +5025,33 @@ namespace DocsPaDB.Query_DocsPAWS
                             updateTodolist = updateDpaTodolist(schedaDoc);
                         if (updateTodolist)
                         {
-                            CommitTransaction();
+                            //CommitTransaction();
                         }
                         else
                         {
-                            RollbackTransaction();
+                            //RollbackTransaction();
                             result = false;
                         }
                     }
                     else
                     {
-                        RollbackTransaction();
+                        //RollbackTransaction();
                         result = false;
                     }
                 }
                 else
                 {
-                    RollbackTransaction();
+                    //RollbackTransaction();
                     result = false;
                 }
 
-                CloseConnection();
+                //CloseConnection();
                 schedaDoc.predisponiProtocollazione = false;
             }
             catch (Exception e)
             {
-                RollbackTransaction();
-                CloseConnection();
+                //RollbackTransaction();
+                //CloseConnection();
                 logger.Error("Errore nella gestione dei documenti (Query - PredisponiAllaProtocollazione)", e);
                 throw new Exception();
             }
@@ -4993,7 +5066,12 @@ namespace DocsPaDB.Query_DocsPAWS
         {
             string upd = "UPDATE DPA_TODOLIST SET ID_REGISTRO=" + sch.registro.systemId + " WHERE ID_PROFILE=" + sch.systemId + " AND ID_REGISTRO=0";
             logger.Debug(upd);
-            return ExecuteNonQuery(upd);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                return dbProvider.ExecuteNonQuery(upd);
+            }
+            
 
         }
 
@@ -5014,8 +5092,15 @@ namespace DocsPaDB.Query_DocsPAWS
             sp_params.Add(new DocsPaUtils.Data.ParameterSP("idcorrGlobRuolo", Int32.Parse(idcorrGlobruolo)));
 
             sp_params.Add(res);
-            BeginTransaction();
-            int retValue = ExecuteStoredProcedure("DPA_setDirittoRuoloProp", sp_params, null);
+            //BeginTransaction();
+
+            int retValue = 0;
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                retValue = dbProvider.ExecuteStoredProcedure("DPA_setDirittoRuoloProp", sp_params, null);
+            }
+
             if (retValue > 0)
             {
                 result = true;
@@ -5042,7 +5127,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 daAggiornareUffRef = false;
                 //OpenConnection();
                 // Inizio transazione sul db
-                BeginTransaction();
+                //BeginTransaction();
                 // oggetto
 
                 SalvaOggetto(infoUtente.idAmministrazione, infoUtente.idPeople, infoUtente.idCorrGlobali, ref schedaDoc);
@@ -5128,14 +5213,14 @@ namespace DocsPaDB.Query_DocsPAWS
                     }
                 }
 
-                CommitTransaction();
-                CloseConnection();
+                //CommitTransaction();
+                //CloseConnection();
 
             }
             catch (Exception e)
             {
                 logger.Debug(e.Message);
-                RollbackTransaction();
+               //RollbackTransaction();
                 //CloseConnection();		
                 logger.Error("Errore nella gestione dei documenti (Query - SalvaModifiche)", e);
                 throw new Exception("F_System", e);
@@ -5249,7 +5334,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param1", systemId);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteScalar(out idUo, queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteScalar(out idUo, queryString);
+            }
+            
             if (idUo != null && idUo != "")
             {
                 if (!idUoRef.Equals(idUo))
@@ -5259,7 +5349,12 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("param2", systemId);
                     queryString = q.getSQL();
                     logger.Debug(queryString);
-                    ExecuteNonQuery(queryString);
+
+                    using (DBProvider dbProvider = new DBProvider())
+                    {
+                        dbProvider.ExecuteNonQuery(queryString);
+                    }
+                    
                     retvalue = true;
                 }
             }
@@ -5317,7 +5412,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         idDocArrivoPar = AddDocArrivoPar(schedaDoc, corrispondente, corrispondente.tipoCorrispondente);
                     else
                         idDocArrivoPar = AddDocArrivoPar(schedaDoc, corrispondente, "D");
-
+                    
                     //idDocArrivoPar = AddDocArrivoPar(schedaDoc, corrispondente, "D");
                     //					updateStatoInvio(db, corrispondente, idDocArrivoPar, schedaDoc.registro.systemId, schedaDoc.systemId);
                     //InsertStatoInvio(corrispondente, idDocArrivoPar, schedaDoc.registro.systemId, schedaDoc.systemId);
@@ -5455,7 +5550,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param3", idProfile);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
         }
 
         #endregion
@@ -5602,12 +5702,15 @@ namespace DocsPaDB.Query_DocsPAWS
                     string queryString = q.getSQL();
                     logger.Debug(queryString);
                     //luluciani alcune volte il dato non torna per il problema della executeScalar
-                    //ExecuteScalar(out impronta, queryString);		
-                    using (IDataReader rtn = ExecuteReader(queryString))
+                    //ExecuteScalar(out impronta, queryString);	
+                    using (DBProvider dbProvider = new DBProvider())
                     {
-                        if (rtn != null && rtn.FieldCount > 0)
-                            while (rtn.Read())
-                                nomeOriginale = rtn.GetString(0);
+                        using (IDataReader rtn = dbProvider.ExecuteReader(queryString))
+                        {
+                            if (rtn != null && rtn.FieldCount > 0)
+                                while (rtn.Read())
+                                    nomeOriginale = rtn.GetString(0);
+                        }
                     }
                 }
                 return nomeOriginale;
@@ -5675,12 +5778,15 @@ namespace DocsPaDB.Query_DocsPAWS
                 string queryString = q.getSQL();
                 logger.Debug(queryString);
                 //luluciani alcune volte il dato non torna per il problema della executeScalar
-                //ExecuteScalar(out impronta, queryString);		
-                using (IDataReader rtn = ExecuteReader(queryString))
+                //ExecuteScalar(out impronta, queryString);	
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    if (rtn != null && rtn.FieldCount > 0)
-                        while (rtn.Read())
-                            impronta = rtn.GetString(0);
+                    using (IDataReader rtn = dbProvider.ExecuteReader(queryString))
+                    {
+                        if (rtn != null && rtn.FieldCount > 0)
+                            while (rtn.Read())
+                                impronta = rtn.GetString(0);
+                    }
                 }
             }
             catch
@@ -5776,7 +5882,7 @@ namespace DocsPaDB.Query_DocsPAWS
         public bool UpdateComponentsPath(string path, string version_id, string docnumber)
         {
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_Components");
-            q.setParam("param1", "PATH= '" + path.Replace("'", "''") + "'");
+            q.setParam("param1", "PATH= '" + path.Replace("'","''") + "'");
             q.setParam("param2", "VERSION_ID=" + version_id + " AND DOCNUMBER=" + docnumber);
             string queryString = q.getSQL();
             logger.Debug(queryString);
@@ -5857,16 +5963,21 @@ namespace DocsPaDB.Query_DocsPAWS
                     logger.Debug(queryString);
 
                     DataSet ds;
-                    ExecuteQuery(out ds, "APP", queryString);
-                    foreach (System.Data.DataRow dr in ds.Tables["APP"].Rows)
+                    
+                    using (DBProvider dbProvider = new DBProvider())
                     {
-                        DocsPaVO.documento.Applicazione appl = new DocsPaVO.documento.Applicazione();
-                        appl.systemId = dr["SYSTEM_ID"].ToString();
-                        appl.descrizione = dr["DESCRIPTION"].ToString();
-                        appl.application = dr["APPLICATION"].ToString();
-                        appl.estensione = dr["DEFAULT_EXTENSION"].ToString();
-                        appl.mimeType = dr["MIME_TYPE"].ToString();
-                        res.Add(appl);
+
+                        dbProvider.ExecuteQuery(out ds, "APP", queryString);
+                        foreach (System.Data.DataRow dr in ds.Tables["APP"].Rows)
+                        {
+                            DocsPaVO.documento.Applicazione appl = new DocsPaVO.documento.Applicazione();
+                            appl.systemId = dr["SYSTEM_ID"].ToString();
+                            appl.descrizione = dr["DESCRIPTION"].ToString();
+                            appl.application = dr["APPLICATION"].ToString();
+                            appl.estensione = dr["DEFAULT_EXTENSION"].ToString();
+                            appl.mimeType = dr["MIME_TYPE"].ToString();
+                            res.Add(appl);
+                        }
                     }
 
                     ds.Dispose();
@@ -5981,7 +6092,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
         }
         //modifica
-        public List<AnteprimaPdf> getPdfPreviews(string versionId, string docNumber)
+public List<AnteprimaPdf> getPdfPreviews(string versionId, string docNumber)
         {
             List<AnteprimaPdf> retVal = null;
 
@@ -6022,18 +6133,8 @@ namespace DocsPaDB.Query_DocsPAWS
         {
             try
             {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_PDF_PREVIEW");
-
-                q.setParam("DOC_NUMBER", "'" + fda.docNumber + "'");
-                q.setParam("VERSION_ID", "'" + fda.versionId + "'");
-                q.setParam("PAGE_FROM", fda.previewPageFrom.ToString());
-
-                logger.Debug("insPdfPreviews-> query: " + q.getSQL());
-                ExecuteNonQuery(q.getSQL());
-
-
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("I_PDF_PREVIEW");
-
+                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_PDF_PREVIEW");
+                
                 q.setParam("DOC_NUMBER", "'" + fda.docNumber + "'");
                 q.setParam("VERSION_ID", "'" + fda.versionId + "'");
                 q.setParam("TOTAL_PAGES", fda.totalPageNumber.ToString());
@@ -6104,7 +6205,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("default_extension", "'" + estensione + "'");
                 q.setParam("mime_type", "'" + mime_type + "'");
                 logger.Debug("InsertApp-> query: " + q.getSQL());
-                return ExecuteNonQuery(q.getSQL());
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    return dbProvider.ExecuteNonQuery(q.getSQL());
+                }
             }
             catch (Exception e)
             {
@@ -6401,7 +6506,7 @@ namespace DocsPaDB.Query_DocsPAWS
             string filtroDataPitre = string.Empty;
             int numAndStr = 0;
             string tipo = string.Empty;
-
+            
             ArrayList listaOR = new ArrayList();
 
             for (int i = 0; i < objQueryList.Length; i++)
@@ -7165,7 +7270,6 @@ namespace DocsPaDB.Query_DocsPAWS
             string filtroStatoCons = string.Empty;
             string UserDB = String.Empty;
             bool fromRicercaVis = false;
-            bool documentiInRisposta = false;
 
             string filtroRepertorio = string.Empty;
 
@@ -7429,24 +7533,9 @@ namespace DocsPaDB.Query_DocsPAWS
                                 andStr += "F.ID_MITT_DEST" + GetQueryCorrispondente(f.valore, objQueryList);
                                 break;
                             case "COD_MITT_DEST":
-                                string codiceRubrica = DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper();
-
-                                queryFrom += "INNER JOIN ( SELECT F1.ID_PROFILE FROM DPA_DOC_ARRIVO_PAR F1 JOIN DPA_CORR_GLOBALI G1 ON F1.ID_MITT_DEST = G1.SYSTEM_ID ";
-                                queryFrom += " AND (UPPER(G1.VAR_COD_RUBRICA) = '" + codiceRubrica + "'";
-
-                                if (RicercaPerMittentiDestinatariStoricizzati(objQueryList[i]))
-                                {
-                                    // Ricerca i documenti con i mittenti / destinatari storicizzati
-                                    if (!dbType.ToUpper().Equals("SQL"))
-                                        queryFrom += " OR UPPER(G1.VAR_COD_RUBRICA) = ('" + codiceRubrica + "_' || G1.SYSTEM_ID))";
-                                    else
-                                        queryFrom += " OR UPPER(G1.VAR_COD_RUBRICA) = ('" + codiceRubrica + "_' + Convert(varchar(100),G1.SYSTEM_ID)))";
-                                }
-
-                                queryFrom += " GROUP BY (F1.ID_PROFILE) ) DOC_ARRIVO_PAR ON A.SYSTEM_ID = DOC_ARRIVO_PAR.ID_PROFILE ";
-                                /*
                                 andStr += " AND ";
-                                andStr += " EXISTS (SELECT 'X' FROM DPA_DOC_ARRIVO_PAR F, DPA_CORR_GLOBALI G  where F.ID_PROFILE = A.SYSTEM_ID AND  G.SYSTEM_ID=F.ID_MITT_DEST AND (UPPER(G.VAR_COD_RUBRICA) = '" + codiceRubrica + "'";
+                                string codiceRubrica = DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper();
+                                andStr += " A.SYSTEM_ID IN (SELECT F.ID_PROFILE FROM DPA_DOC_ARRIVO_PAR F ,DPA_CORR_GLOBALI G  where G.SYSTEM_ID=F.ID_MITT_DEST AND (UPPER(G.VAR_COD_RUBRICA) = '" + codiceRubrica + "'";
 
                                 if (RicercaPerMittentiDestinatariStoricizzati(objQueryList[i]))
                                 {
@@ -7457,67 +7546,12 @@ namespace DocsPaDB.Query_DocsPAWS
                                         andStr += " OR UPPER(G.VAR_COD_RUBRICA) = ('" + codiceRubrica + "_' + Convert(varchar(100),G.SYSTEM_ID)))";
                                 }
                                 andStr += ")";
-                                */
                                 break;
                             case "MITT_DEST":
-                                queryFrom += "INNER JOIN ( SELECT F1.ID_PROFILE FROM DPA_DOC_ARRIVO_PAR F1 JOIN DPA_CORR_GLOBALI G1 ON F1.ID_MITT_DEST = G1.SYSTEM_ID ";
-                                if (Cfg_USE_TEXT_INDEX.Equals("0"))
-                                    queryFrom += " AND UPPER(G1.VAR_DESC_CORR) LIKE '%" + DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper() + "%' ";
-                                else
-                                {
-                                    if (Cfg_USE_TEXT_INDEX.Equals("1"))
-                                    {
-                                        string searchMittDest = " AND G1.SYSTEM_id in ( \n " +
-                                                                " select system_id from table(fulltext_onvar_desc_corr ( \n " +
-                                                                "'" + DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper() + "'))) \n";
-                                        queryFrom += searchMittDest;
-                                    }
-                                    else
-                                    {
-                                        if (Cfg_USE_TEXT_INDEX.Equals("2"))
-                                        {
-                                            string value = DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper();
-                                            string valueA = value;
-                                            if (valueA.Contains("&&"))
-                                                valueA = valueA.Replace("&&", "");
-                                            bool casoA = false;
-                                            if (value.Substring(0, value.Length - 1).Contains("%") && !value.Substring(0, value.Length - 1).Contains("%&&"))
-                                                casoA = true;
-                                            if (value.Contains("&&"))
-                                            {
-                                                string result = string.Empty;
-                                                foreach (string filter in new Regex("&&").Split(value))
-                                                    if (!string.IsNullOrEmpty(filter))
-                                                        result += filter + " AND ";
-                                                value = result.Substring(0, result.Length - 5);
-                                            }
-                                            if (value.Contains("%") && value.IndexOf("%") != value.Length - 1)
-                                            {
-                                                bool finale = value.EndsWith("%");
-                                                string result = string.Empty;
-                                                foreach (string filter in new Regex("%").Split(value))
-                                                    if (!string.IsNullOrEmpty(filter))
-                                                        result += filter + "% AND ";
-                                                value = result.Substring(0, result.Length - 6);
-                                                if (finale)
-                                                    value = value + "%";
-                                            }
-                                            if (value.ToUpper().Contains(" AND  AND "))
-                                                value = value.ToUpper().Replace(" AND  AND ", " AND ");
-                                            queryFrom += " AND " + DocsPaDbManagement.Functions.Functions.GetContainsTextQuery("G1.VAR_DESC_CORR", value);
-                                            if (casoA)
-                                                queryFrom += " and upper(G1.VAR_DESC_CORR) like upper('%" + valueA + "%')";
-                                        }
-                                    }
-                                }
-
-                                queryFrom += " GROUP BY (F1.ID_PROFILE) ) DOC_ARRIVO_PAR ON A.SYSTEM_ID = DOC_ARRIVO_PAR.ID_PROFILE ";
-
-                                /*
                                 andStr += " AND ";
                                 numAndStr += 1;
                                 if (Cfg_USE_TEXT_INDEX.Equals("0"))
-                                    andStr += " EXISTS (SELECT 'X' FROM DPA_DOC_ARRIVO_PAR F, DPA_CORR_GLOBALI G  where F.ID_PROFILE = A.SYSTEM_ID AND  G.SYSTEM_ID=F.ID_MITT_DEST AND UPPER(G.VAR_DESC_CORR) LIKE '%" + DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper() + "%') ";
+                                    andStr += " A.SYSTEM_ID IN (SELECT F.ID_PROFILE FROM DPA_DOC_ARRIVO_PAR F ,DPA_CORR_GLOBALI G  where G.SYSTEM_ID=F.ID_MITT_DEST AND UPPER(G.VAR_DESC_CORR) LIKE '%" + DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper() + "%') ";
                                 else
                                 {
                                     if (Cfg_USE_TEXT_INDEX.Equals("1"))
@@ -7525,7 +7559,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                         string searchMittDest = " AND g.SYSTEM_id in ( \n " +
                                                                 " select system_id from table(fulltext_onvar_desc_corr ( \n " +
                                                                 "'" + DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper() + "'))) \n";
-                                        andStr += " EXISTS (SELECT 'X' FROM DPA_DOC_ARRIVO_PAR F, DPA_CORR_GLOBALI G  where F.ID_PROFILE = A.SYSTEM_ID AND  G.SYSTEM_ID=F.ID_MITT_DEST " + searchMittDest + ") ";
+                                        andStr += " A.SYSTEM_ID IN (SELECT F.ID_PROFILE FROM DPA_DOC_ARRIVO_PAR F ,DPA_CORR_GLOBALI G  where G.SYSTEM_ID=F.ID_MITT_DEST " + searchMittDest + ") ";
                                     }
                                     else
                                     {
@@ -7560,14 +7594,51 @@ namespace DocsPaDB.Query_DocsPAWS
                                             if (value.ToUpper().Contains(" AND  AND "))
                                                 value = value.ToUpper().Replace(" AND  AND ", " AND ");
                                             //andStr += " A.SYSTEM_ID IN (SELECT F.ID_PROFILE FROM DPA_DOC_ARRIVO_PAR F ,DPA_CORR_GLOBALI G  where F.ID_PROFILE=a.system_id and  G.SYSTEM_ID=F.ID_MITT_DEST AND " + DocsPaDbManagement.Functions.Functions.GetContainsTextQuery("G.VAR_DESC_CORR", new SearchTextItem(DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper(), SearchTextOptionsEnum.InitWithWord)) + ") ";
-                                            andStr += " EXISTS (SELECT 'X' FROM DPA_DOC_ARRIVO_PAR F, DPA_CORR_GLOBALI G  where F.ID_PROFILE = A.SYSTEM_ID AND  G.SYSTEM_ID=F.ID_MITT_DEST AND " + DocsPaDbManagement.Functions.Functions.GetContainsTextQuery("G.VAR_DESC_CORR", value);
+                                            andStr += " A.SYSTEM_ID IN (SELECT F.ID_PROFILE FROM DPA_DOC_ARRIVO_PAR F ,DPA_CORR_GLOBALI G  where G.SYSTEM_ID=F.ID_MITT_DEST AND " + DocsPaDbManagement.Functions.Functions.GetContainsTextQuery("G.VAR_DESC_CORR", value);
                                             if (casoA)
                                                 andStr += " and upper(G.VAR_DESC_CORR) like upper('%" + valueA + "%')";
                                             andStr += ") ";
                                         }
                                     }
                                 }
-                                */
+                                break;
+                            case "COD_UO_PROT":
+                                andStr += " AND ";
+                                string codiceUoProt = DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper();
+                                andStr += " A.ID_UO_PROT IN (SELECT G.SYSTEM_ID FROM DPA_CORR_GLOBALI G  where CHA_TIPO_URP='U' AND CHA_TIPO_IE = 'I' AND (UPPER(G.VAR_COD_RUBRICA) = '" + codiceUoProt + "'";
+
+                                if (RicercaPerUoProtollatriceStoricizzate(objQueryList[i]))
+                                {
+                                    // Ricerca i documenti con i mittenti / destinatari storicizzati
+                                    if (!dbType.ToUpper().Equals("SQL"))
+                                        andStr += " OR UPPER(G.VAR_COD_RUBRICA) = ('" + codiceUoProt + "_' || G.SYSTEM_ID))";
+                                    else
+                                        andStr += " OR UPPER(G.VAR_COD_RUBRICA) = ('" + codiceUoProt + "_' + Convert(varchar(100),G.SYSTEM_ID)))";
+                                }
+                                andStr += ")";
+                                break;
+                            case "ID_UO_PROT":
+                                bool uoSottostanti = RicercaPerUoProtocollatriciSottostanti(objQueryList[i]);
+                                bool uoStoricizzate = RicercaPerUoProtollatriceStoricizzate(objQueryList[i]);
+                                if (!uoSottostanti && !uoStoricizzate)
+                                    andStr += " AND A.ID_UO_PROT= " + f.valore + " ";
+                                else
+                                {
+                                    string chaSottostanti = uoSottostanti ? "1" : "0";
+                                    string chaStoricizzate = uoStoricizzate ? "1" : "0";
+                                    if(dbType.ToUpper().Equals("SQL"))
+                                        andStr += " AND " + getUserDB() + ".checkUoProto(A.SYSTEM_ID, " + f.valore + ", '" + chaStoricizzate + "', '" + chaSottostanti + "')=1  ";
+                                    else
+                                        andStr += " AND checkUoProto(A.SYSTEM_ID, " + f.valore + ", '" + chaStoricizzate + "', '" + chaSottostanti + "')=1  ";
+                                }
+                                break;
+                            case "ID_UO_PROT_GERARCHIA":
+                                Console.WriteLine("GERARCHIA");
+                                //List<string> idList = this.getIdUOSottoposte(f.valore);
+                                andStr += " AND " + getUserDB() + ".checkUoProto(A.SYSTEM_ID, " + f.valore + ", '0', '1')=1  ";
+                                break;
+                            case "DESC_UO_PROT":
+                                andStr += " AND A.ID_UO_PROT IN (SELECT G.SYSTEM_ID FROM DPA_CORR_GLOBALI G  where G.CHA_TIPO_URP='U' AND CHA_TIPO_IE = 'I' AND DTA_FINE IS NULL AND UPPER(G.VAR_DESC_CORR) LIKE '%" + DocsPaUtils.Functions.Functions.ReplaceApexes(f.valore).ToUpper() + "%') ";
                                 break;
                             case "NUM_PROTOCOLLO":
                                 andStr += " AND ";
@@ -8328,8 +8399,8 @@ namespace DocsPaDB.Query_DocsPAWS
                                 filtroDataSped += " and s.DTA_SPEDIZIONE <=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, false);
                                 break;
                             case "DOC_MAI_SPEDITI":
-                                numAndStr += 1;
-                                andStr += " AND NOT EXISTS (SELECT 'X' FROM DPA_STATO_INVIO WHERE ID_PROFILE = A.SYSTEM_ID AND ROWNUM = 1) ";
+                                    numAndStr += 1;
+                                    andStr += " AND NOT EXISTS (SELECT 'X' FROM DPA_STATO_INVIO WHERE ID_PROFILE = A.SYSTEM_ID AND ROWNUM = 1) ";
                                 break;
                             case "DOC_MAI_SPEDITI_DA_UTENTE":
                                 numAndStr += 1;
@@ -8425,13 +8496,13 @@ namespace DocsPaDB.Query_DocsPAWS
                                                     sqlDb = InitQuery.getInstance().getQuery("S_GET_ROLE_CHAIN_ID_CORR_GLOBALI_OUT_CLAUSOLE");
                                                     sqlDb.setParam("idCorrGlob", f.valore);
                                                     chaiTableDef = sqlDb.getSQL();
-
+                                                    
                                                 }
                                                 else
                                                 {
                                                     q = InitQuery.getInstance().getQuery("S_GET_ROLE_CHAIN_ID_CORR_GLOBALI");
                                                     q.setParam("idCorrGlob", f.valore);
-
+                                                    
                                                 }
 
                                                 filterConditionAuthorId.AppendFormat("id_ruolo_creatore IN ({0})", q.getSQL());
@@ -8581,7 +8652,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 if (Cfg_USE_TEXT_INDEX.Equals("0"))
                                 {
                                     if (corrTypeOwnerDescr.valore != "U")
-                                        filterConditionOwnerDescr.AppendFormat(" FROM dpa_corr_globali cg WHERE dta_fine IS NULL AND UPPER(cg.var_desc_corr) LIKE UPPER('%{0}%')))", f.valore);
+                                         filterConditionOwnerDescr.AppendFormat(" FROM dpa_corr_globali cg WHERE dta_fine IS NULL AND UPPER(cg.var_desc_corr) LIKE UPPER('%{0}%')))", f.valore);
                                     else
                                         filterConditionOwnerDescr.AppendFormat(" FROM dpa_corr_globali cg WHERE dta_fine IS NULL AND EXISTS(SELECT 'X' FROM DPA_CORR_GLOBALI cg1 WHERE cg1.system_id = cg.id_uo AND UPPER(cg1.var_desc_corr) LIKE UPPER('%{0}%'))))", f.valore);
                                 }
@@ -8817,7 +8888,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             //
                             // ---- INTEGRAZIONE PITRE-PARER ----
                             case "STATO_CONSERVAZIONE":
-                                if (!(f.valore.Equals("NVWCRETFBK")))
+                                if (!(f.valore.Equals("NVWCRETF")))
                                 {
                                     string value = string.Empty;
                                     string condNoQueue = string.Empty;
@@ -8874,18 +8945,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                             value += ",";
                                         value += "'F'";
                                     }
-                                    if (f.valore.Contains("B"))
-                                    {
-                                        if (!string.IsNullOrEmpty(value))
-                                            value += ",";
-                                        value += "'B'";
-                                    }
-                                    if (f.valore.Contains("K"))
-                                    {
-                                        if (!string.IsNullOrEmpty(value))
-                                            value += ",";
-                                        value += "'K'";
-                                    }
                                     if (!string.IsNullOrEmpty(value))
                                     {
                                         if (string.IsNullOrEmpty(condNoQueue))
@@ -8916,14 +8975,14 @@ namespace DocsPaDB.Query_DocsPAWS
                                     else
                                     {
                                         // ricerco solo su documenti non in coda
-                                        if (!string.IsNullOrEmpty(condNoQueue))
+                                        if(!string.IsNullOrEmpty(condNoQueue))
                                             andStr += " AND " + condNoQueue;
                                     }
                                 }
                                 break;
                             case "DATA_VERSAMENTO_DA":
                                 numAndStr += 1;
-                                if (queryFrom.IndexOf("DPA_VERSAMENTO VS") < 0)
+                                if(queryFrom.IndexOf("DPA_VERSAMENTO VS") < 0)
                                     queryFrom += " , DPA_VERSAMENTO VS";
                                 queryWhere += " AND VS.ID_PROFILE=A.SYSTEM_ID ";
                                 andStr += "AND VS.DTA_INVIO>" + DocsPaDbManagement.Functions.Functions.ToDate(f.valore + " 00:00:00", true);
@@ -8948,7 +9007,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                     queryFrom += ", DPA_POLICY_PARER POL";
                                 if (queryFrom.IndexOf("DPA_VERSAMENTI_POLICY VP") < 0)
                                     queryFrom += ", DPA_VERSAMENTI_POLICY VP";
-                                queryWhere += " AND A.SYSTEM_ID=VP.ID_PROFILE AND VP.ID_POLICY=POL.SYSTEM_ID AND UPPER(POL.VAR_CODICE)='" + f.valore.ToUpper() + "' ";
+                                queryWhere += " AND A.SYSTEM_ID=VP.ID_PROFILE AND VP.ID_POLICY=POL.SYSTEM_ID AND UPPER(POL.VAR_CODICE)='" + f.valore.ToUpper() + "' " ;
                                 break;
                             case "POLICY_NUM_ESECUZIONE":
                                 numAndStr += 1;
@@ -8988,11 +9047,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 numAndStr += 1;
                                 queryWhere += "AND EXISTS (SELECT 'x' FROM DPA_VERSAMENTI_POLICY VP WHERE VP.ID_PROFILE=A.SYSTEM_ID AND to_date(to_char(VP.DATA_ESECUZIONE_POLICY,'dd/mm/yyyy'),'dd/mm/yyyy')  = " + DocsPaDbManagement.Functions.Functions.ToDate(f.valore, false) + " ) ";
                                 break;
-                            case "DOCUMENTI_IN_RISPOSTA":
-                                if (f.valore.Equals("true"))
-                                    documentiInRisposta = true;
-                                break;
-                                // --------------FINE----------------
+                            // --------------FINE----------------
 
                         }
                     }
@@ -9022,11 +9077,11 @@ namespace DocsPaDB.Query_DocsPAWS
                                                                      || f.argomento.Equals("PROFILAZIONE_DINAMICA") || f.argomento.Equals("TIPO_ATTO")
                                                                      || f.argomento.Equals("DATA_CREAZIONE_SUCCESSIVA_AL") || f.argomento.Equals("DOC_IN_ADL")
                                                                  select f).FirstOrDefault();
-                    if (checkFilter == null && !unionStampaReg && !documentiInRisposta)
+                    if (checkFilter == null && !unionStampaReg)
                     {
                         //Aggiungo limite intervallo temporale sulla data di creazione
                         if (!dbType.ToUpper().Equals("SQL"))
-                            andStr += " AND A.CREATION_TIME BETWEEN (add_months(sysdate, -12 * " + Convert.ToInt32(numAnni) + " )) AND SYSDATE";
+                            andStr += " AND A.CREATION_TIME BETWEEN (add_months(sysdate, -12 * " + Convert.ToInt32(numAnni) +" )) AND SYSDATE";
                     }
                 }
                 if (andStr.Length > 0)
@@ -9613,21 +9668,21 @@ namespace DocsPaDB.Query_DocsPAWS
                     // INTEGRAZIONE PITRE-PARER
                     if (this.isConservazionePARER())
                     {
-                        if (!string.IsNullOrEmpty(filtro_versamento))
+                    if (!string.IsNullOrEmpty(filtro_versamento))
+                    {
+                        if (dbType == "SQL")
                         {
-                            if (dbType == "SQL")
-                            {
-                                queryDef.setParam("stato_cons", " ,@dbuser@.GetStatoConservazione(a.system_id) as StatoConservazione ");
-                            }
-                            else
-                            {
-                                queryDef.setParam("stato_cons", " ,GetStatoConservazione(a.system_id) as StatoConservazione ");
-                            }
+                            queryDef.setParam("stato_cons", " ,@dbuser@.GetStatoConservazione(a.system_id) as StatoConservazione ");
                         }
                         else
                         {
-                            queryDef.setParam("stato_cons", string.Empty);
+                            queryDef.setParam("stato_cons", " ,GetStatoConservazione(a.system_id) as StatoConservazione ");
                         }
+                    }
+                    else
+                    {
+                        queryDef.setParam("stato_cons", string.Empty);
+                    }
                     }
                     else
                     {
@@ -9641,7 +9696,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             queryDef.setParam("stato_cons", " ,getInConservazioneDoc(a.system_id) as StatoConservazione ");
                         }
                     }
-
+                    
 
                     // PEC 4 Requisito 3: ricerca documenti spediti
                     // Inserisco il parametro aggiuntivo.
@@ -10572,16 +10627,16 @@ namespace DocsPaDB.Query_DocsPAWS
                         }
                         break;
 
-                        //case "ALLEGATO":
-                        //    if (f.valore.ToUpper().Equals("TRUE"))
-                        //    {
-                        //        if (!Grigi)
-                        //        {
-                        //            tipo += "'G',";
-                        //            Grigi = true;
-                        //        }
-                        //    }
-                        //    break;
+                    //case "ALLEGATO":
+                    //    if (f.valore.ToUpper().Equals("TRUE"))
+                    //    {
+                    //        if (!Grigi)
+                    //        {
+                    //            tipo += "'G',";
+                    //            Grigi = true;
+                    //        }
+                    //    }
+                    //    break;
                 }
             }
             return tipo;
@@ -10646,7 +10701,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         if (f.valore != null)
                         {
                             //if (numAndStr > 0)
-                            if (!string.IsNullOrEmpty(andStr))
+                            if(!string.IsNullOrEmpty(andStr))
                                 andStr += " AND ";
                             numAndStr += 1;
                             //andStr += "A.CHA_TIPO_PROTO IN " + in_valor;
@@ -11213,9 +11268,9 @@ namespace DocsPaDB.Query_DocsPAWS
                             //andStr += "EXISTS (SELECT 'X' FROM components c WHERE c.docnumber=A.SYSTEM_ID AND c.version_id = " +
                             //          "(select max(v.version_id)  from versions v, components c1 where v.docnumber=A.SYSTEM_ID AND v.version_id=c1.version_id) AND c.ext is not null AND c.ext <> '0' AND ROWNUM = 1) ";
                             if (dbType.ToUpper() == "SQL")
-                            andStr += " ISNULL(a.ext, '0') <> '0'";
-                        else
-                            andStr += "a.ext is NOT NULL";
+                                andStr += " ISNULL(a.ext, '0') <> '0'";
+                            else
+                                andStr += "a.ext is NOT NULL";
                         break;
                     //case "MANCANZA_ASSEGNAZIONE":
                     //    if (numAndStr > 0)
@@ -11286,7 +11341,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         DocsPaDB.Query_DocsPAWS.Model model = new Model();
                         andStr += model.getSeriePerRicercaProfilazione(f.template, anno_prof);
                         if (ConfigurationManager.AppSettings["dbType"].ToUpper() == "SQL")
-                        {
+                        {              
                             idCorrespondentTemplate = model.GetIdCorrespondentForTemplate(f.template);
                         }
                         break;
@@ -11319,70 +11374,70 @@ namespace DocsPaDB.Query_DocsPAWS
                                 andStr += getUserDB() + ".getchafirmato(A.DOCNUMBER) = '1'";
                             else
                             {
-                                //OLD
+                               //OLD
                                 //andStr += " exists (";
                                 //andStr += "SELECT /*+index ( components )*/   'x'";
                                 //andStr += " FROM components";
                                 //andStr += " WHERE docnumber = a.docnumber AND version_id = getmaxver(docnumber) and  cha_firmato='1') ";
 
-                                andStr += " exists   ( SELECT /*+index ( c1 )*/ ";
-                                andStr += "  'x' ";
-                                andStr += " FROM components c1 ";
-                                andStr += " WHERE     c1.docnumber = a.docnumber ";
-                                andStr += "     AND version_id = ";
+                              andStr += " exists   ( SELECT /*+index ( c1 )*/ ";
+                              andStr += "  'x' ";
+                              andStr += " FROM components c1 ";
+                            andStr += " WHERE     c1.docnumber = a.docnumber ";
+                              andStr += "     AND version_id = "; 
                                 andStr += "          (SELECT /*+index (c) index (v1)*/ ";
-                                andStr += "             MAX (v1.version_id) ";
-                                andStr += "          FROM VERSIONS v1, components c ";
-                                andStr += "       WHERE     v1.docnumber = ";
-                                andStr += "                    a.docnumber ";
-                                andStr += "             AND v1.version_id = ";
-                                andStr += "                     c.version_id ";
-                                andStr += "              AND c.file_size > 0) ";
+                                    andStr += "             MAX (v1.version_id) ";
+                                   andStr += "          FROM VERSIONS v1, components c ";
+                                     andStr += "       WHERE     v1.docnumber = ";
+                                     andStr += "                    a.docnumber ";
+                                     andStr += "             AND v1.version_id = ";
+                                    andStr += "                     c.version_id ";
+                                    andStr += "              AND c.file_size > 0) ";
                                 andStr += "    AND cha_firmato = '1') ";
                             }
                         }
                         else
                             if (f.valore == "0")
-                        {
-                            if (dbType.ToUpper() == "SQL")
-                                andStr += getUserDB() + ".getchafirmato(A.DOCNUMBER) = '0'";
-                            else
                             {
-                                //OLD
-                                //andStr += " exists (";
-                                //andStr += "SELECT /*+index ( components )*/   'x'";
-                                //andStr += " FROM components";
-                                //andStr += " WHERE docnumber = a.docnumber AND version_id = getmaxver(docnumber) and  cha_firmato='0') ";
+                                if (dbType.ToUpper() == "SQL")
+                                    andStr += getUserDB() + ".getchafirmato(A.DOCNUMBER) = '0'";
+                                else
+                                {
+                                    //OLD
+                                    //andStr += " exists (";
+                                    //andStr += "SELECT /*+index ( components )*/   'x'";
+                                    //andStr += " FROM components";
+                                    //andStr += " WHERE docnumber = a.docnumber AND version_id = getmaxver(docnumber) and  cha_firmato='0') ";
 
-                                andStr += " exists   ( SELECT /*+index ( c1 )*/ ";
-                                andStr += "  'x' ";
-                                andStr += " FROM components c1 ";
-                                andStr += " WHERE     c1.docnumber = a.docnumber ";
-                                andStr += "     AND version_id = ";
-                                andStr += "          (SELECT /*+index (c) index (v1)*/ ";
-                                andStr += "             MAX (v1.version_id) ";
-                                andStr += "          FROM VERSIONS v1, components c ";
-                                andStr += "       WHERE     v1.docnumber = ";
-                                andStr += "                    a.docnumber ";
-                                andStr += "             AND v1.version_id = ";
-                                andStr += "                     c.version_id ";
-                                andStr += "              AND c.file_size > 0) ";
-                                andStr += "    AND cha_firmato = '0') ";
+                                    andStr += " exists   ( SELECT /*+index ( c1 )*/ ";
+                                    andStr += "  'x' ";
+                                    andStr += " FROM components c1 ";
+                                    andStr += " WHERE     c1.docnumber = a.docnumber ";
+                                    andStr += "     AND version_id = ";
+                                    andStr += "          (SELECT /*+index (c) index (v1)*/ ";
+                                    andStr += "             MAX (v1.version_id) ";
+                                    andStr += "          FROM VERSIONS v1, components c ";
+                                    andStr += "       WHERE     v1.docnumber = ";
+                                    andStr += "                    a.docnumber ";
+                                    andStr += "             AND v1.version_id = ";
+                                    andStr += "                     c.version_id ";
+                                    andStr += "              AND c.file_size > 0) ";
+                                    andStr += "    AND cha_firmato = '0') ";
 
 
-                            }
-                        }
-                        else
-                        {
-                            if (dbType.ToUpper() == "SQL")
-                            {
-                                andStr += getUserDB() + ".getchaimg(A.SYSTEM_ID)<>'0'";
+                                }
                             }
                             else
                             {
-                                andStr += "getchaimg(A.SYSTEM_ID)<>'0'";
+                                if (dbType.ToUpper() == "SQL")
+                                {
+                                    andStr += getUserDB() + ".getchaimg(A.SYSTEM_ID)<>'0'";
+                                }
+                                else
+                                {
+                                    andStr += "getchaimg(A.SYSTEM_ID)<>'0'";
+                                }
                             }
-                        }
                         break;
 
                     case "TIPO_FILE_ACQUISITO":
@@ -11418,7 +11473,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     //o conservata (cha_stato='V' in dpa_area_conservazione)
                     case "FIRMA_ELETTRONICA":
                         if (f.valore == "1")
-                        {
+                        { 
                             andStr += " AND ";
                             numAndStr += 1;
                             andStr += "EXISTS (SELECT /*+INDEX(F) */ 'X' FROM DPA_FIRMA_ELETTRONICA F WHERE F.ID_DOCUMENTO = A.SYSTEM_ID  AND XML IS NOT NULL ";
@@ -11482,7 +11537,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         break;
 
                     // Modifica per INC000000622977 - controllo timestamp multiversione.
-                    // Commento la vecchia logica
+                        // Commento la vecchia logica
                     //case "TIMESTAMP_SCADUTO":
                     //    andStr += " AND a.docnumber in (select distinct doc_number from dpa_timestamp_doc where dta_scadenza <= " + DocsPaDbManagement.Functions.Functions.ToDate(System.DateTime.Now.Date.ToString()) + ") ";
                     //    break;
@@ -11684,37 +11739,11 @@ namespace DocsPaDB.Query_DocsPAWS
             return queryWhere;
         }
 
-        private string GetQueryCondDocInNodieFasicoli(DocsPaVO.filtri.FiltroRicerca f, string idPeople)
-        {
-            string idAmm = GetIdAmministrazioneByIdPeople(idPeople);
-            string queryWhere = string.Empty;
-            queryWhere += " AND EXISTS (SELECT LINK FROM PROJECT_COMPONENTS PC WHERE PC.LINK=A.SYSTEM_ID AND PC.PROJECT_ID IN ";
-            queryWhere += " (SELECT SYSTEM_ID FROM PROJECT WHERE UPPER(VAR_CODICE) LIKE '" + f.valore.ToUpper() + "%' AND ID_AMM =" + idAmm;
-            queryWhere += " UNION SELECT SYSTEM_ID FROM PROJECT WHERE ID_AMM=" + idAmm + " AND";
-            queryWhere += " ID_FASCICOLO IN (SELECT SYSTEM_ID FROM PROJECT WHERE ID_AMM=" + idAmm + " AND UPPER(VAR_CODICE) LIKE '" + f.valore.ToUpper() + "%')))";
-
-            return queryWhere;
-        }
-
-        private string GetIdAmministrazioneByIdPeople(string idPeople)
-        {
-            // Sql da eseguire
-            string sql = "SELECT ID_AMM FROM PEOPLE WHERE SYSTEM_ID = " + idPeople;
-
-            string idAmm = String.Empty;
-            using (DBProvider dbProvider = new DBProvider())
-            {
-                dbProvider.ExecuteScalar(out idAmm, sql);
-            }
-
-            return idAmm;
-        }
-
         public string GetQueryCondDocRepertoriato(DocsPaVO.filtri.FiltroRicerca f)
         {
             string queryWhere = string.Empty;
 
-            switch (f.argomento)
+            switch(f.argomento)
             {
                 case "NUM_REPERTORIO":
                     if (dbType.ToUpper() == "SQL")
@@ -12029,59 +12058,59 @@ namespace DocsPaDB.Query_DocsPAWS
 
                             // Aggiunto filtro su data creazione per risoluzione INC000000640211
                             // ATTENZIONE - mancano anche gli altri filtri accessibili dalla maschera di ricerca avanzata (non ricerca stampe!)
-                            case "DATA_CREAZIONE_IL":
-                                // if (numAndStr > 0)
-                                andStr += " AND ";
-                                numAndStr += 1;
-                                andStr += " A.CREATION_TIME >=" +
-                                    DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, true) +
-                                    " AND A.CREATION_TIME <=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, false);
-                                break;
-                            case "DATA_CREAZIONE_SUCCESSIVA_AL":
-                                // if (numAndStr > 0)
-                                andStr += " AND ";
-                                numAndStr += 1;
-                                andStr += "A.CREATION_TIME>=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, true);
-                                dtaCreazSucc = "'" + f.valore + "'";
-                                break;
-                            case "DATA_CREAZIONE_PRECEDENTE_IL":
-                                // if (numAndStr > 0)
-                                andStr += " AND ";
-                                numAndStr += 1;
-                                andStr += "A.CREATION_TIME<=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, false);
-                                dtaCreazPreced = "'" + f.valore + "'";
-                                break;
-                            case "DATA_CREAZ_SC":
-                                // data creazione nella settimana corrente
-                                andStr += " AND ";
-                                numAndStr += 1;
-                                if (!dbType.ToUpper().Equals("SQL"))
-                                    andStr += "A.CREATION_TIME>=(select to_date(to_char(sysdate+ (1-to_char(sysdate,'D')))) startdayofweek from dual) AND A.CREATION_TIME<(select to_date(to_char(sysdate+ (8-to_char(sysdate,'D')))) enddayofweek from dual) ";
-                                else
-                                    andStr += "A.CREATION_TIME>=(select DATEADD(DAY,-DATEPART(WEEKDAY,(DATEADD(DAY,7-DATEPART(WEEKDAY,GETDATE()),GETDATE())))+(7-DATEPART(WEEKDAY,GETDATE()))+2 ,GETDATE())) AND A.CREATION_TIME<=(select DATEADD(DAY , 8-DATEPART(WEEKDAY,GETDATE()),GETDATE())) ";
-                                break;
-                            case "DATA_CREAZ_MC":
-                                // data creazione nel mese corrente
-                                andStr += " AND ";
-                                numAndStr += 1;
-                                if (!dbType.ToUpper().Equals("SQL"))
-                                    // andStr += "A.CREATION_TIME>=(select to_date(trunc(sysdate,'MM')) as start_date from dual) AND A.CREATION_TIME<(select to_date(last_day(sysdate)+1) as DAY from dual) ";
+                    case "DATA_CREAZIONE_IL":
+                        // if (numAndStr > 0)
+                        andStr += " AND ";
+                        numAndStr += 1;
+                        andStr += " A.CREATION_TIME >=" +
+                            DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, true) +
+                            " AND A.CREATION_TIME <=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, false);
+                        break;
+                    case "DATA_CREAZIONE_SUCCESSIVA_AL":
+                        // if (numAndStr > 0)
+                        andStr += " AND ";
+                        numAndStr += 1;
+                        andStr += "A.CREATION_TIME>=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, true);
+                        dtaCreazSucc = "'" + f.valore + "'";
+                        break;
+                    case "DATA_CREAZIONE_PRECEDENTE_IL":
+                        // if (numAndStr > 0)
+                        andStr += " AND ";
+                        numAndStr += 1;
+                        andStr += "A.CREATION_TIME<=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, false);
+                        dtaCreazPreced = "'" + f.valore + "'";
+                        break;
+                    case "DATA_CREAZ_SC":
+                        // data creazione nella settimana corrente
+                        andStr += " AND ";
+                        numAndStr += 1;
+                        if (!dbType.ToUpper().Equals("SQL"))
+                            andStr += "A.CREATION_TIME>=(select to_date(to_char(sysdate+ (1-to_char(sysdate,'D')))) startdayofweek from dual) AND A.CREATION_TIME<(select to_date(to_char(sysdate+ (8-to_char(sysdate,'D')))) enddayofweek from dual) ";
+                        else
+                            andStr += "A.CREATION_TIME>=(select DATEADD(DAY,-DATEPART(WEEKDAY,(DATEADD(DAY,7-DATEPART(WEEKDAY,GETDATE()),GETDATE())))+(7-DATEPART(WEEKDAY,GETDATE()))+2 ,GETDATE())) AND A.CREATION_TIME<=(select DATEADD(DAY , 8-DATEPART(WEEKDAY,GETDATE()),GETDATE())) ";
+                        break;
+                    case "DATA_CREAZ_MC":
+                        // data creazione nel mese corrente
+                        andStr += " AND ";
+                        numAndStr += 1;
+                        if (!dbType.ToUpper().Equals("SQL"))
+                            // andStr += "A.CREATION_TIME>=(select to_date(trunc(sysdate,'MM')) as start_date from dual) AND A.CREATION_TIME<(select to_date(last_day(sysdate)+1) as DAY from dual) ";
 
-                                    andStr += "A.CREATION_TIME>= Trunc(Sysdate,'MM')    AND A.CREATION_TIME<(Sysdate+1 ) ";
-                                else
-                                    andStr += "A.CREATION_TIME>=(SELECT DATEADD(dd,-(DAY(getdate())-1),getdate())) AND A.CREATION_TIME<=(SELECT DATEADD(dd,-(DAY(DATEADD(mm,1,getdate()))),DATEADD(mm,1,getdate()))) ";
-                                break;
-                            case "DATA_CREAZ_TODAY":
-                                // if (numAndStr > 0)
-                                andStr += " AND ";
-                                numAndStr += 1;
-                                if (!dbType.ToUpper().Equals("SQL"))
-                                    //andStr += "to_char(A.CREATION_TIME, 'DD/MM/YYYY') = (select to_char(sysdate, 'DD/MM/YYYY') from dual)";
-                                    andStr += "A.CREATION_TIME between trunc(sysdate ,'DD') and sysdate";
-                                else
-                                    //andStr += "A.CREATION_TIME>=(SELECT getdate()) AND A.CREATION_TIME<=(SELECT getdate()) ";
-                                    andStr += "DATEDIFF(DD, A.CREATION_TIME, GETDATE()) = 0 ";
-                                break;
+                            andStr += "A.CREATION_TIME>= Trunc(Sysdate,'MM')    AND A.CREATION_TIME<(Sysdate+1 ) ";
+                        else
+                            andStr += "A.CREATION_TIME>=(SELECT DATEADD(dd,-(DAY(getdate())-1),getdate())) AND A.CREATION_TIME<=(SELECT DATEADD(dd,-(DAY(DATEADD(mm,1,getdate()))),DATEADD(mm,1,getdate()))) ";
+                        break;
+                    case "DATA_CREAZ_TODAY":
+                        // if (numAndStr > 0)
+                        andStr += " AND ";
+                        numAndStr += 1;
+                        if (!dbType.ToUpper().Equals("SQL"))
+                            //andStr += "to_char(A.CREATION_TIME, 'DD/MM/YYYY') = (select to_char(sysdate, 'DD/MM/YYYY') from dual)";
+                            andStr += "A.CREATION_TIME between trunc(sysdate ,'DD') and sysdate";
+                        else
+                            //andStr += "A.CREATION_TIME>=(SELECT getdate()) AND A.CREATION_TIME<=(SELECT getdate()) ";
+                            andStr += "DATEDIFF(DD, A.CREATION_TIME, GETDATE()) = 0 ";
+                        break;
 
                             //case "DATA_TIPO_NOTIFICA_DA":
                             //    andStr += " AND ";
@@ -12229,7 +12258,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 break;
                             // ---- INTEGRAZIONE PITRE-PARER ----
                             case "STATO_CONSERVAZIONE":
-                                if (!(f.valore.Equals("NVWCRETFBK")))
+                                if (!(f.valore.Equals("NVWCRETF")))
                                 {
                                     string value = string.Empty;
                                     string condNoQueue = string.Empty;
@@ -12282,18 +12311,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                             value += ",";
                                         value += "'F'";
                                     }
-                                    if (f.valore.Contains("B"))
-                                    {
-                                        if (!string.IsNullOrEmpty(value))
-                                            value += ",";
-                                        value += "'B'";
-                                    }
-                                    if (f.valore.Contains("K"))
-                                    {
-                                        if (!string.IsNullOrEmpty(value))
-                                            value += ",";
-                                        value += "'K'";
-                                    }
                                     if (!string.IsNullOrEmpty(value))
                                     {
                                         if (string.IsNullOrEmpty(condNoQueue))
@@ -12302,14 +12319,14 @@ namespace DocsPaDB.Query_DocsPAWS
                                             //andStr += string.Format(" AND a.SYSTEM_ID IN (SELECT id_profile FROM dpa_versamento WHERE cha_stato IN ({0}) )", value);
                                             andStr += string.Format(" AND EXISTS (SELECT 'x' FROM DPA_VERSAMENTO V WHERE V.ID_PROFILE=A.SYSTEM_ID AND V.CHA_STATO IN ({0}))", value);
                                         }
-                                        else
+                                        else 
                                         {
                                             // ricerca mista in coda e non in coda
                                             //condQueue = string.Format("a.SYSTEM_ID IN (SELECT id_profile FROM dpa_versamento WHERE cha_stato IN ({0}) )", value);
                                             condQueue = string.Format(" EXISTS (SELECT 'x' FROM DPA_VERSAMENTO V WHERE V.ID_PROFILE=A.SYSTEM_ID AND V.CHA_STATO IN ({0}))", value);
                                             andStr += string.Format("AND ( ({0}) OR ({1}) )", condNoQueue, condQueue);
                                         }
-
+                                        
                                         //andStr += string.Format(" AND a.SYSTEM_ID IN (SELECT id_profile FROM dpa_versamento WHERE cha_stato IN ({0}) )", value);
                                     }
                                     else
@@ -12375,7 +12392,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                     queryFrom += " ,DPA_VERSAMENTI_POLICY VP ";
                                 queryWhere += " AND A.SYSTEM_ID=VP.ID_PROFILE AND VP.DATA_ESECUZIONE_POLICY BETWEEN " + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, true) + " AND " + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.valore, false) + " ";
                                 break;
-                                // --------------FINE----------------
+                            // --------------FINE----------------
                         }
                     }
                 }
@@ -12764,7 +12781,12 @@ namespace DocsPaDB.Query_DocsPAWS
             //end modifica per ricerca Top N Documenti
             logger.Debug(queryString);
             DataSet dataSet;
-            ExecuteQuery(out dataSet, "DOCUMENTI", queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out dataSet, "DOCUMENTI", queryString);
+            }
+            
 
             AppendiListaDocumenti(listaDoc, dataSet, corr);
 
@@ -13049,7 +13071,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("param1", "A.SYSTEM_ID, A.VAR_DESC_CORR, B.ID_PROFILE, B.CHA_TIPO_MITT_DEST ");
                 q.setParam("param2", "B.ID_PROFILE IN " + inStr);
                 string queryString = q.getSQL();
-                ExecuteQuery(dataSet, "CORRISPONDENTI", queryString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(dataSet, "CORRISPONDENTI", queryString);
+                }
+               
             }
             // TODO: DocsPa_V15_Utils.Logger.log("Fine setTableCorrispondenti", logLevelTime);
         }
@@ -13110,8 +13137,8 @@ namespace DocsPaDB.Query_DocsPAWS
                     DateTime dataArchiviazione;
                     if (DateTime.TryParse(dataRow["DATA_ARCHIVIAZIONE"].ToString(), out dataArchiviazione))
                         infoDoc.dataArchiviazione = dataArchiviazione.ToString("dd/MM/yyyy");
+                    }
                 }
-            }
 
             //custom per ADL Info
             if (dataRow.Table.Columns.Contains("IN_ADL"))
@@ -13134,7 +13161,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             if (dataRow.Table.Columns.Contains("isRimovibile"))
                 infoDoc.isRimovibile = dataRow["isRimovibile"] != DBNull.Value ? dataRow["isRimovibile"].ToString() : "";
-
+            
             if (dataRow["ID_DOCUMENTO_PRINCIPALE"] != DBNull.Value)
                 infoDoc.allegato = (Convert.ToInt32(dataRow["ID_DOCUMENTO_PRINCIPALE"]) > 0);
 
@@ -13172,7 +13199,7 @@ namespace DocsPaDB.Query_DocsPAWS
             infoDoc.ultimaNota = GetUltimaNotaVisibileTuttiDocumento(infoDoc.idProfile);
 
             #region Conversion Invalid Character
-
+            
             infoDoc = (DocsPaVO.documento.InfoDocumento)DocsPaUtils.Functions.Functions.XML_Serialization_Deserialization_By_Encode(
                 infoDoc, typeof(DocsPaVO.documento.InfoDocumento), null, System.Text.Encoding.UTF8);
 
@@ -14421,7 +14448,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 string queryString = q.getSQL();
                 DataSet dataSet;
                 logger.Debug(queryString);
-                ExecuteQuery(out dataSet, "STATO_INVIO", queryString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(out dataSet, "STATO_INVIO", queryString);
+                }
+
                 foreach (DataRow dr in dataSet.Tables["STATO_INVIO"].Rows)
                 {
                     DocsPaVO.documento.ProtocolloDestinatario pd = new DocsPaVO.documento.ProtocolloDestinatario();
@@ -14661,7 +14693,11 @@ namespace DocsPaDB.Query_DocsPAWS
             string queryString = q.getSQL();
             logger.Debug(queryString);
             DataSet dataSet;
-            ExecuteQuery(out dataSet, queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out dataSet, queryString);
+            }
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
                 listaIdCorr.Add(row[0].ToString());
@@ -14732,6 +14768,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 // inserisco nella tabella DPA_OGGETTARIO
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPAOggettario");
                 q.setParam("param1", DocsPaDbManagement.Functions.Functions.GetSystemIdColName() + " ID_REGISTRO, ID_AMM, VAR_DESC_OGGETTO, CHA_OCCASIONALE");
+
+                if (String.IsNullOrEmpty(idAmministrazione) && !String.IsNullOrEmpty(schedaDoc.registro.idAmministrazione))
+                {
+                    idAmministrazione = schedaDoc.registro.idAmministrazione;
+                    
+                }
 
                 q.setParam("param2", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_OGGETTARIO") +
                 idRegistro + ", " + idAmministrazione + ", '" + schedaDoc.oggetto.descrizione.Replace("'", "''").Replace("°", Functions.convertDegre()) + "', '1'");
@@ -14890,7 +14932,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         //15-09-2016 INC000000821327: commentato ed estendo la visibilta ai superiori solamente del ruolo protocollatore(se diverso da IS)
                         //List<String> roles = GetRuoliConVisibilitaSuDocumento(schedaDoc.systemId);
                         string role = GetRuoloProtocollatore(schedaDoc, null);
-                        if (!string.IsNullOrEmpty(role))
+                        if(!string.IsNullOrEmpty(role))
                         {
                             documentale.ExtendVisibilityByQuery(
                                 infoUt.idAmministrazione,
@@ -14973,7 +15015,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", "SYSTEM_ID=" + systemId);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteScalar(out result, queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteScalar(out result, queryString);
+            }
+            
         }
 
         public void GetNumRegistri(out string res, string systemId, string date)
@@ -14983,7 +15030,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", "SYSTEM_ID = " + systemId + " AND DTA_ULTIMO_PROTO > " + date);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteScalar(out res, queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+
+                dbProvider.ExecuteScalar(out res, queryString);
+            }
         }
 
         /// <summary>
@@ -15039,7 +15091,13 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", "DOCNUMBER=" + docNumber);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            if (!ExecuteNonQuery(queryString)) throw new Exception();
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                if (!dbProvider.ExecuteNonQuery(queryString)) throw new Exception();
+            }
+
+            
             //ExecuteNonQuery(queryString);
         }
 
@@ -15050,7 +15108,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", docNumber);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
         }
 
         /// <summary>
@@ -15332,8 +15395,9 @@ namespace DocsPaDB.Query_DocsPAWS
                                         //Un ruolo disabilitato non deve ereditare nulla.
                                         //ArrayList listaRuoli = GetRuoliRiferimento(pu.mittente.systemId, schedaDoc.registro.systemId);
 
-                                        //NEW 02 feb 2007
-                                        listaRuoli = GetListaRuoliAbilitati(pu.mittente.systemId, schedaDoc.registro.systemId);
+                                        //ABBATANGELI - 09/03/2020 - Non deve pubblicare a ruolo di riferimento se privato o personale
+                                        if ((schedaDoc.privato == null || schedaDoc.privato.Equals("0")) && (schedaDoc.personale == null || schedaDoc.personale.Equals("0")))
+                                            listaRuoli = GetListaRuoliAbilitati(pu.mittente.systemId, schedaDoc.registro.systemId);
                                         //
                                         if (listaRuoli != null && listaRuoli.Count > 0)
                                         {
@@ -16000,9 +16064,9 @@ namespace DocsPaDB.Query_DocsPAWS
             }
 
             //ABBATANGELI - CODICE DISGUSTOSO IMPOSTO DAL GRUPPO PANZERA-LUCIANI
-            if (codice.ToUpper().StartsWith("MIBACT|MIBACT_"))
+            if (codice.ToUpper().StartsWith("MIBAC|MIBAC_"))
             {
-                codice = codice.Substring(0, 7) + codice.Substring(14);
+                codice = codice.Substring(0, 6) + codice.Substring(12);
             }
 
             return codice;
@@ -16469,7 +16533,12 @@ namespace DocsPaDB.Query_DocsPAWS
 
                 int rowsAffected = 0;
                 //ExecuteNonQuery("update profile set VAR_PROF_OGGETTO = 'xxxxx' WHERE DOCNUMBER =" + schedaDoc.docNumber, out rowsAffected);
-                ExecuteNonQuery(queryString, out rowsAffected);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteNonQuery(queryString, out rowsAffected);
+                }
+                
 
                 logger.Debug("righe modificate=>" + rowsAffected);
 
@@ -16513,25 +16582,29 @@ namespace DocsPaDB.Query_DocsPAWS
                 string numProto = null;
 
 
-                dr = ExecuteReader(queryString); //09.03.2006 - ExecuteScalar(out numProto, queryString);
-                if (dr != null && dr.FieldCount > 0)
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    while (dr.Read())
+                    dr = dbProvider.ExecuteReader(queryString); //09.03.2006 - ExecuteScalar(out numProto, queryString);
+                    if (dr != null && dr.FieldCount > 0)
                     {
-                        numProto = dr.GetValue(0).ToString();
-                        // il ciclo è solo per una volta...
+                        while (dr.Read())
+                        {
+                            numProto = dr.GetValue(0).ToString();
+                            // il ciclo è solo per una volta...
+                        }
+                        if (numProto != null && !numProto.ToString().Equals("") && !numProto.ToString().Equals(schedaDoc.protocollo.numero))
+                        {
+                            logger.Debug("Errore nella gestione dei documenti (Query - CheckProto). Tentativo di aggiornare il numero di protocollo fallito! Protocollo = " + numProto.ToString());
+                            //throw new Exception("Tentativo di aggiornare il numero di protocollo fallito! Protocollo = " + numProto.ToString());
+                            retValue = false;
+                        }
                     }
-                    if (numProto != null && !numProto.ToString().Equals("") && !numProto.ToString().Equals(schedaDoc.protocollo.numero))
+                    else
                     {
-                        logger.Debug("Errore nella gestione dei documenti (Query - CheckProto). Tentativo di aggiornare il numero di protocollo fallito! Protocollo = " + numProto.ToString());
-                        //throw new Exception("Tentativo di aggiornare il numero di protocollo fallito! Protocollo = " + numProto.ToString());
                         retValue = false;
                     }
                 }
-                else
-                {
-                    retValue = false;
-                }
+                
             }
             catch
             {
@@ -16593,7 +16666,12 @@ namespace DocsPaDB.Query_DocsPAWS
             string queryString = q.getSQL();
             logger.Debug(queryString);
             string idCorrispondente;
-            InsertLocked(out idCorrispondente, queryString, "DPA_CORR_GLOBALI");
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.InsertLocked(out idCorrispondente, queryString, "DPA_CORR_GLOBALI");
+            }
+            
             return idCorrispondente;
         }
         public string InsertCorrispondentiSP(DocsPaVO.documento.SchedaDocumento schedaDoc, DocsPaVO.utente.Corrispondente corrispondente)
@@ -16638,7 +16716,12 @@ namespace DocsPaDB.Query_DocsPAWS
             sp_params.Add(res);
             //BeginTransaction();
             // modifica per l'email dell corrispondente occasionale
-            int resultStore = ExecuteStoredProcedure("INS_OCC_2", sp_params, null);
+            int resultStore = 0;
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                resultStore = dbProvider.ExecuteStoredProcedure("INS_OCC_2", sp_params, null);
+            }
 
             if (res.Valore != null && res.Valore.ToString() != "" && resultStore != -1 && resultStore != 0)
             {
@@ -16661,7 +16744,12 @@ namespace DocsPaDB.Query_DocsPAWS
                             "''");
                         recordInsert.Append(")");
                         q.setParam("value", recordInsert.ToString());
-                        resemail = ExecuteNonQuery(q.getSQL());
+
+                        using (DBProvider dbProvider = new DBProvider())
+                        {
+                            resemail = dbProvider.ExecuteNonQuery(q.getSQL());
+                        }
+                        
                     }
                     catch (Exception ex)
                     {
@@ -16748,8 +16836,13 @@ namespace DocsPaDB.Query_DocsPAWS
 
             // 03.02.2006 - gadamo: modifica 
             //InsertLocked(out idDocArrivoPar, queryString, "DPA_DOC_ARRIVO_PAR");  - - - commentata perchè esegue una CommitTransaction()
-            bool rtn = ExecuteNonQuery(queryString);
 
+            bool rtn = false;
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                rtn = dbProvider.ExecuteNonQuery(queryString);
+            }
+            
             if (!rtn)
                 throw new Exception("Tentativo di inserimento di id_mitt_dest errato nella dpa_doc_arrivo_par");
 
@@ -16794,7 +16887,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("param1", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_PROF_PAROLE") + idProfile + "," + idParola);
                 queryString = q.getSQL();
                 logger.Debug(queryString);
-                ExecuteNonQuery(queryString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteNonQuery(queryString);
+                }
+                
             }
         }
 
@@ -17056,7 +17154,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
             try
             {
-                BeginTransaction();
+                //BeginTransaction();
 
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_COLL_MSPEDIZ_DOCUMENTO");
                 string dbType = System.Configuration.ConfigurationManager.AppSettings["DBType"].ToUpper();
@@ -17076,17 +17174,21 @@ namespace DocsPaDB.Query_DocsPAWS
 
                 int rowsAffected;
 
-                if (ExecuteNonQuery(commandText, out rowsAffected))
-                    retValue = (rowsAffected == 1);
 
-                if (retValue)
-                    CommitTransaction();
-                else
-                    RollbackTransaction();
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (ExecuteNonQuery(commandText, out rowsAffected))
+                        retValue = (rowsAffected == 1);
+                }
+
+                //if (retValue)
+                //    CommitTransaction();
+                //else
+                //    RollbackTransaction();
             }
             catch
             {
-                RollbackTransaction();
+                //RollbackTransaction();
                 retValue = false;
             }
             finally
@@ -17478,7 +17580,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //15-09-2016 INC000000821327: commentato ed estendo la visibilta ai superiori solamente del ruolo protocollatore(se diverso da IS)
                                 //List<String> roles = GetRuoliConVisibilitaSuDocumento(schedaDoc.systemId);
                                 string role = GetRuoloProtocollatore(schedaDoc, loadedData);
-                                if (!string.IsNullOrEmpty(role))
+                                if(!string.IsNullOrEmpty(role))
                                 {
                                     documentale.ExtendVisibilityByQuery(
                                         infoUtente.idAmministrazione,
@@ -17509,7 +17611,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //15-09-2016 INC000000821327: commentato ed estendo la visibilta ai superiori solamente del ruolo protocollatore(se diverso da IS)
                                 //List<String> roles = GetRuoliConVisibilitaSuDocumento(schedaDoc.systemId);
                                 string role = GetRuoloProtocollatore(schedaDoc, null);
-                                if (!string.IsNullOrEmpty(role))
+                                if(!string.IsNullOrEmpty(role))
                                 {
                                     documentale.ExtendVisibilityByQuery(
                                         infoUtente.idAmministrazione,
@@ -17820,7 +17922,12 @@ namespace DocsPaDB.Query_DocsPAWS
                         string queryString = q.getSQL();
                         logger.Debug(queryString);
                         string result;
-                        ExecuteScalar(out result, queryString);
+
+                        using (DBProvider dbProvider = new DBProvider())
+                        {
+                            dbProvider.ExecuteScalar(out result, queryString);
+                        }
+                        
                         if (!string.IsNullOrEmpty(result))
                             corrispondente.systemId = result;
                     }
@@ -18080,7 +18187,11 @@ namespace DocsPaDB.Query_DocsPAWS
                 DocsPaUtils.Data.ParameterSP versionIdParam = new DocsPaUtils.Data.ParameterSP("versionId", 0, 0, DocsPaUtils.Data.DirectionParameter.ParamOutput, System.Data.DbType.Int32);
                 parameters.Add(versionIdParam);
 
-                ExecuteStoredProcedure("createAllegato", parameters, null);
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteStoredProcedure("createAllegato", parameters, null);
+                }
+                
 
                 if (idProfileParam.Valore != null)
                 {
@@ -18778,7 +18889,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             {
                                 throw new Exception("Errore nella SP Cestina documento: cestina notifica");
                             }
-
+                            
                         }
                         else
                         {
@@ -19084,7 +19195,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("docNumber", infoDoc.docNumber);
             string queryString = q.getSQL();
             DataSet dataSet = new DataSet();
-            ExecuteQuery(out dataSet, queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out dataSet, queryString);
+            }
+           
 
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
@@ -19468,44 +19584,44 @@ namespace DocsPaDB.Query_DocsPAWS
                                 }
                                 else
                                     if (f.valore == "0")
-                                {
-                                    if (dbType.ToUpper() == "SQL")
-                                        andStr += getUserDB() + ".getchafirmato(A.DOCNUMBER) = '0'";
-                                    else
                                     {
-                                        //OLD
-                                        //andStr += " exists (";
-                                        //andStr += "SELECT /*+index ( components )*/   'x'";
-                                        //andStr += " FROM components";
-                                        //andStr += " WHERE docnumber = a.docnumber AND version_id = getmaxver(docnumber) and  cha_firmato='0') ";
+                                        if (dbType.ToUpper() == "SQL")
+                                            andStr += getUserDB() + ".getchafirmato(A.DOCNUMBER) = '0'";
+                                        else
+                                        {
+                                            //OLD
+                                            //andStr += " exists (";
+                                            //andStr += "SELECT /*+index ( components )*/   'x'";
+                                            //andStr += " FROM components";
+                                            //andStr += " WHERE docnumber = a.docnumber AND version_id = getmaxver(docnumber) and  cha_firmato='0') ";
 
-                                        andStr += " exists   ( SELECT /*+index ( c1 )*/ ";
-                                        andStr += "  'x' ";
-                                        andStr += " FROM components c1 ";
-                                        andStr += " WHERE     c1.docnumber = a.docnumber ";
-                                        andStr += "     AND version_id = ";
-                                        andStr += "          (SELECT /*+index (c) index (v1)*/ ";
-                                        andStr += "             MAX (v1.version_id) ";
-                                        andStr += "          FROM VERSIONS v1, components c ";
-                                        andStr += "       WHERE     v1.docnumber = ";
-                                        andStr += "                    a.docnumber ";
-                                        andStr += "             AND v1.version_id = ";
-                                        andStr += "                     c.version_id ";
-                                        andStr += "              AND c.file_size > 0) ";
-                                        andStr += "    AND cha_firmato = '0') ";
-                                    }
-                                }
-                                else
-                                {
-                                    if (dbType.ToUpper() == "SQL")
-                                    {
-                                        andStr += getUserDB() + ".getchaimg(A.SYSTEM_ID)<>'0'";
+                                            andStr += " exists   ( SELECT /*+index ( c1 )*/ ";
+                                            andStr += "  'x' ";
+                                            andStr += " FROM components c1 ";
+                                            andStr += " WHERE     c1.docnumber = a.docnumber ";
+                                            andStr += "     AND version_id = ";
+                                            andStr += "          (SELECT /*+index (c) index (v1)*/ ";
+                                            andStr += "             MAX (v1.version_id) ";
+                                            andStr += "          FROM VERSIONS v1, components c ";
+                                            andStr += "       WHERE     v1.docnumber = ";
+                                            andStr += "                    a.docnumber ";
+                                            andStr += "             AND v1.version_id = ";
+                                            andStr += "                     c.version_id ";
+                                            andStr += "              AND c.file_size > 0) ";
+                                            andStr += "    AND cha_firmato = '0') ";
+                                        }
                                     }
                                     else
                                     {
-                                        andStr += "getchaimg(A.SYSTEM_ID)<>'0'";
+                                        if (dbType.ToUpper() == "SQL")
+                                        {
+                                            andStr += getUserDB() + ".getchaimg(A.SYSTEM_ID)<>'0'";
+                                        }
+                                        else
+                                        {
+                                            andStr += "getchaimg(A.SYSTEM_ID)<>'0'";
+                                        }
                                     }
-                                }
                                 break;
 
                             case "TIPO_FILE_ACQUISITO":
@@ -19769,9 +19885,9 @@ namespace DocsPaDB.Query_DocsPAWS
             log.userIdOperatore = dataRow["PEOPLE_DESC"].ToString();// ut.GetUtente(dataRow["ID_PEOPLE_OPERATORE"].ToString()).descrizione;
             log.idGruppoOperatore = dataRow["RUOLO_DESC"].ToString();// ut.GetRuoloByIdGruppo(dataRow["ID_GRUPPO_OPERATORE"].ToString()).descrizione;
             string desc = dataRow["VAR_DESC_AZIONE"].ToString();
-            if (!string.IsNullOrEmpty(desc) && desc.Contains("(sostituto"))
+            if (!string.IsNullOrEmpty(desc) && desc.Contains("(delegato"))
             {
-                int start = desc.IndexOf("(sostituto");
+                int start = desc.IndexOf("(delegato");
                 int end = desc.LastIndexOf(")");
                 desc = desc.Substring(start, end - start + 1);
             }
@@ -19991,7 +20107,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", "WHERE B.VERSION_ID=A.VERSION_ID AND A.VERSION_ID=" + versionId + " AND A.DOCNUMBER=" + docNumber);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteQuery(out ds, "VERS", queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out ds, "VERS", queryString);
+            }
+            
         }
 
 
@@ -20021,8 +20142,14 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("docnumber", docnumber);
                 string sql = q.getSQL();
                 logger.Debug(sql);
-                if (!ExecuteNonQuery(sql))
-                    throw new Exception();
+                /*
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    if (!dbProvider.ExecuteNonQuery(sql))
+                        throw new Exception();
+                }
+                */
+                
             }
             catch (Exception e)
             {
@@ -20086,14 +20213,19 @@ namespace DocsPaDB.Query_DocsPAWS
                 }
                 if (!string.IsNullOrEmpty(fr.idPeopleDelegato))
                 {
-                    firstParam += ", ID_PEOPLE_DELEGATO = " + fr.idPeopleDelegato;
+                    firstParam += ", ID_PEOPLE_DELEGATO = "+ fr.idPeopleDelegato;
                 }
             }
             q.setParam("param1", firstParam);
             q.setParam("param2", "VERSION_ID=" + fr.versionId);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
             UpdateExtensionIntoProfile(fr);
             logger.Info("END");
         }
@@ -20105,7 +20237,7 @@ namespace DocsPaDB.Query_DocsPAWS
         {
             logger.Info("BEGIN");
             logger.Debug("ResetExtensionIntoProfile");
-            string queryString = string.Empty;
+            string queryString  = string.Empty;
             try
             {
                 string ext = string.IsNullOrEmpty(fr.fileName) ? "null" : ext = "'" + Path.GetExtension(fr.fileName) + "'";
@@ -20113,7 +20245,12 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("docnumber", fr.docNumber);
                 q.setParam("ext", ext);
                 queryString = q.getSQL();
-                ExecuteNonQuery(queryString);
+
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteNonQuery(queryString);
+                }
+                
             }
             catch (Exception ex)
             {
@@ -20131,7 +20268,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("param2", "APPLICATION != " + appId + " AND DOCNUMBER=" + docNumber);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
         }
 
         /// <summary>
@@ -20216,7 +20358,7 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <param name="impronta"></param>
         /// <param name="dbProvider"></param>
         /// <returns></returns>
-        private bool UpdateComponentsScambiaAllegato(string versionId, string path, string fileSize, string impronta, string estensione, string firmato, string nomeOriginale, string fileInfo, string authorFile, string dataAcquisizione, string idPeopleDelegatoPutfile, string tipoFirma, DBProvider dbProvider)
+        private bool UpdateComponentsScambiaAllegato(string versionId, string path, string fileSize, string impronta, string estensione, string firmato, string nomeOriginale, string fileInfo, string authorFile, string dataAcquisizione, string idPeopleDelegatoPutfile, DBProvider dbProvider)
         {
             DocsPaUtils.Query queryDef = DocsPaUtils.InitQuery.getInstance().getQuery("U_UPDATE_COMPONENTS_SCAMBIA_ALLEGATO");
 
@@ -20231,7 +20373,6 @@ namespace DocsPaDB.Query_DocsPAWS
             queryDef.setParam("idPeoplePutfile", string.IsNullOrEmpty(authorFile) ? "null" : authorFile);
             queryDef.setParam("idPeopleDelegatoPutfile", string.IsNullOrEmpty(idPeopleDelegatoPutfile) ? "null" : idPeopleDelegatoPutfile);
             queryDef.setParam("dtaFileAcquired", DocsPaDbManagement.Functions.Functions.ToDate(dataAcquisizione));
-            queryDef.setParam("chaTipoFirma", string.IsNullOrEmpty(tipoFirma) ? DocsPaVO.documento.TipoFirma.NESSUNA_FIRMA : tipoFirma);
             string commandText = queryDef.getSQL();
             logger.Debug(commandText);
 
@@ -20316,7 +20457,6 @@ namespace DocsPaDB.Query_DocsPAWS
                             DocsPaUtils.Data.DataReaderHelper.GetValue<object>(rowDocumento, "ID_PEOPLE_PUTFILE", true, string.Empty).ToString(),
                             DocsPaUtils.Data.DataReaderHelper.GetValue<object>(rowDocumento, "DTA_FILE_ACQUIRED", true, string.Empty).ToString(),
                             DocsPaUtils.Data.DataReaderHelper.GetValue<object>(rowDocumento, "ID_PEOPLE_DELEGATO_PUTFILE", true, string.Empty).ToString(),
-                            DocsPaUtils.Data.DataReaderHelper.GetValue<object>(rowDocumento, "CHA_TIPO_FIRMA", true, string.Empty).ToString(),
                             dbProvider);
 
                     if (retValue)
@@ -20333,7 +20473,6 @@ namespace DocsPaDB.Query_DocsPAWS
                             DocsPaUtils.Data.DataReaderHelper.GetValue<object>(rowAllegato, "ID_PEOPLE_PUTFILE", true, string.Empty).ToString(),
                             DocsPaUtils.Data.DataReaderHelper.GetValue<object>(rowAllegato, "DTA_FILE_ACQUIRED", true, string.Empty).ToString(),
                             DocsPaUtils.Data.DataReaderHelper.GetValue<object>(rowAllegato, "ID_PEOPLE_DELEGATO_PUTFILE", true, string.Empty).ToString(),
-                            DocsPaUtils.Data.DataReaderHelper.GetValue<object>(rowAllegato, "CHA_TIPO_FIRMA", true, string.Empty).ToString(),
                             dbProvider);
                     }
                 }
@@ -20532,7 +20671,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 if (string.IsNullOrEmpty(versionId))
                     return false;
-
+                
                 ExecuteScalar(out res, queryString);
                 return res.Equals("1");
             }
@@ -20981,9 +21120,9 @@ namespace DocsPaDB.Query_DocsPAWS
                 queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI_VELOCE";
             else
                 if (getIdProfilesList)
-                queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI_MASSIVE_OPERATIONS";
-            else
-                queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI";
+                    queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI_MASSIVE_OPERATIONS";
+                else
+                    queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI";
 
             DocsPaUtils.Query queryDef = DocsPaUtils.InitQuery.getInstance().getQuery(queryName);
 
@@ -21012,7 +21151,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 idAmm = u.GetIdAmm(idPeople);
             }
             string idRuoloPubblico = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue(idAmm, "ENABLE_FASCICOLO_PUBBLICO");
-            if (string.IsNullOrEmpty(idRuoloPubblico))
+            if(string.IsNullOrEmpty(idRuoloPubblico))
                 idRuoloPubblico = "0";
 
             if (security)
@@ -21250,9 +21389,9 @@ namespace DocsPaDB.Query_DocsPAWS
                     preferedIndex = " ";
                 else
                     if (filters.IndexOf("A.CREATION_") > -1)
-                    preferedIndex = "/*+index (a)*/";     //"/*+index (a indx_profile_time)*/"
-                else if (filters.IndexOf("A.DTA_PROTO") > -1)
-                    preferedIndex = "/*+index (a indx_profile6)*/";
+                        preferedIndex = "/*+index (a)*/";     //"/*+index (a indx_profile_time)*/"
+                    else if (filters.IndexOf("A.DTA_PROTO") > -1)
+                        preferedIndex = "/*+index (a indx_profile6)*/";
             }
             string idAmm = "0";
             if (!string.IsNullOrEmpty(idPeople))
@@ -21648,7 +21787,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     {
                         // Altrimenti viene creato il filtro standard
                         extractFieldValue = String.Empty;
-                        order = String.Format(" A.DATA {0}, A.SYSTEM_ID {0} ", orderDirection.valore);
+                        order = String.Format(" DATA {0}, A.SYSTEM_ID {0} ", orderDirection.valore);
                         reverseOrder = String.Format("A.DATA {0}, A.SYSTEM_ID {0}", orderDirection.valore == "ASC" ? "DESC" : "ASC");
                     }
                 }
@@ -21722,7 +21861,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 string _dbType = System.Configuration.ConfigurationManager.AppSettings["DBType"].ToUpper();
                 if (_dbType.ToUpper().Equals("SQL"))
                 {
-                    order = "A.DATA DESC, A.SYSTEM_ID DESC";
+                    order = "DATA DESC, A.SYSTEM_ID DESC";
                     reverseOrder = "A.DATA ASC, A.SYSTEM_ID ASC";
                 }
                 else
@@ -21844,9 +21983,9 @@ namespace DocsPaDB.Query_DocsPAWS
                         preferedIndex = " ";
                     else
                         if (filters.IndexOf("A.CREATION_") > -1)
-                        preferedIndex = "/*+index (a)*/";    //"/*+index (a indx_profile_time)*/";
-                    else if (filters.IndexOf("A.DTA_PROTO") > -1)
-                        preferedIndex = "/*+index (a indx_profile6)*/";
+                            preferedIndex = "/*+index (a)*/";    //"/*+index (a indx_profile_time)*/";
+                        else if (filters.IndexOf("A.DTA_PROTO") > -1)
+                            preferedIndex = "/*+index (a indx_profile6)*/";
                 }
                 string verSecurity = string.Empty;
                 string idAmm = "0";
@@ -22004,9 +22143,9 @@ namespace DocsPaDB.Query_DocsPAWS
                         preferedIndex = " ";
                     else
                         if (filters.IndexOf("A.CREATION_") > -1)
-                        preferedIndex = "/*+index (a)*/";   //"/*+index (a indx_profile_time)*/";
-                    else if (filters.IndexOf("A.DTA_PROTO") > -1)
-                        preferedIndex = "/*+index (a indx_profile6)*/";
+                            preferedIndex = "/*+index (a)*/";   //"/*+index (a indx_profile_time)*/";
+                        else if (filters.IndexOf("A.DTA_PROTO") > -1)
+                            preferedIndex = "/*+index (a indx_profile6)*/";
                 }
                 string idAmm = "0";
                 if (!string.IsNullOrEmpty(idPeople))
@@ -22119,7 +22258,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         "A.ID_DOCUMENTO_PRINCIPALE, A.CHA_IN_ARCHIVIO," +
                         "a.id_tipo_atto as ID_TIPO_ATTO, ta.var_desc_atto as DESC_TIPO_ATTO, " +
                         "getPeopleUserId (a.AUTHOR) as AUTHOR, a.prot_tit as PROT_TIT " +
-                        //"getchafirmato(A.DOCNUMBER) as CHA_FIRMATO " +
+                            //"getchafirmato(A.DOCNUMBER) as CHA_FIRMATO " +
                         "@customFieldFilter@" +
                         " FROM DPA_STAMPAREGISTRI R, PROFILE a " +
                         "LEFT JOIN dpa_tipo_atto ta on a.id_tipo_atto = ta.system_id " +
@@ -22284,8 +22423,8 @@ namespace DocsPaDB.Query_DocsPAWS
                                         !string.IsNullOrEmpty(filterItem.valore));
                     else
                         if (!ricercaOggetto)
-                        ricercaOggetto = (filterItem.argomento == "OGGETTO" &&
-                                          !string.IsNullOrEmpty(filterItem.valore));
+                            ricercaOggetto = (filterItem.argomento == "OGGETTO" &&
+                                              !string.IsNullOrEmpty(filterItem.valore));
                 }
             }
 
@@ -22344,7 +22483,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 RollbackTransaction();
                 logger.Error("Errore procedura di modifica a non_privato del documento di fatturazione elettronica - UpdateChaPrivatoPersonale");
                 return false;
-
+            
             }
 
             //Elimino il vecchio proprietario dalla Security
@@ -22386,7 +22525,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
 
             //Aggiungo utente TIBCO il diritto di WRITE nella Security
-            if (!insertSecurity(schedaDocumento.systemId, " ( Select system_id from people where upper(user_id)='TIBCO' and id_amm=" + infoUtente.idAmministrazione + " ) ", "63", "NULL", "A"))
+            if (!insertSecurity(schedaDocumento.systemId, " ( Select system_id from people where upper(user_id)='TIBCO' and id_amm="+infoUtente.idAmministrazione+" ) ", "63", "NULL", "A"))
             {
                 RollbackTransaction();
                 logger.Error("Errore procedura di acquisizione dei diritti documento fatturazione elettronica - insertSecurity Diritti di scrittura TIBCO");
@@ -23701,7 +23840,12 @@ namespace DocsPaDB.Query_DocsPAWS
             queryString = q.getSQL();
             queryString = queryString + " AND CHA_TIPO_DIRITTO='P'";
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString, out affectedRows);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString, out affectedRows);
+            }
+            
         }
 
         #region Nuovo visualizzatore
@@ -23817,7 +23961,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                         row["VERSION_ID"].ToString(),
                                         row["PATH"].ToString());
 
-                                    temp.Firmato = row.Table.Columns.Contains("CHA_FIRMATO") && row["CHA_FIRMATO"] != DBNull.Value ? row["CHA_FIRMATO"].ToString() : "0";
+                                        temp.Firmato = row.Table.Columns.Contains("CHA_FIRMATO") && row["CHA_FIRMATO"] != DBNull.Value ? row["CHA_FIRMATO"].ToString() : "0";
                                 }
                             }
                             else
@@ -24845,9 +24989,9 @@ namespace DocsPaDB.Query_DocsPAWS
                     preferedIndex = " ";
                 else
                     if (filters.IndexOf("A.CREATION_") > -1)
-                    preferedIndex = "/*+index (a)*/";   // "/*+index (a indx_profile_time)*/";
-                else if (filters.IndexOf("A.DTA_PROTO") > -1)
-                    preferedIndex = "/*+index (a indx_profile6)*/";
+                        preferedIndex = "/*+index (a)*/";   // "/*+index (a indx_profile_time)*/";
+                    else if (filters.IndexOf("A.DTA_PROTO") > -1)
+                        preferedIndex = "/*+index (a indx_profile6)*/";
             }
             string idAmm = "0";
             if (!string.IsNullOrEmpty(idPeople))
@@ -24944,7 +25088,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     "A.ID_DOCUMENTO_PRINCIPALE, A.CHA_IN_ARCHIVIO," +
                     "a.id_tipo_atto as ID_TIPO_ATTO, ta.var_desc_atto as DESC_TIPO_ATTO, " +
                     "getPeopleUserId (a.AUTHOR) as AUTHOR, a.prot_tit as PROT_TIT " +
-                    //"getchafirmato(A.DOCNUMBER) as CHA_FIRMATO " +
+                        //"getchafirmato(A.DOCNUMBER) as CHA_FIRMATO " +
                     "@customFieldFilter@" +
                     " FROM DPA_STAMPAREGISTRI R, PROFILE a " +
                     "LEFT JOIN dpa_tipo_atto ta on a.id_tipo_atto = ta.system_id " +
@@ -25416,11 +25560,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                 extractFieldValue = String.Format(", ISNULL(convert(int, @dbuser@.getValCampoProfDocOrder(DOCNUMBER, {0})),999999)", profilationField.valore);
                                 extractFieldValue2 = String.Format(" ISNULL(convert(int, @dbuser@.getValCampoProfDocOrder(DOCNUMBER, {0})),999999)", profilationField.valore);
                             }
-                            else if (this.IsOggettoCustomTipoData(profilationField.valore))
-                            {
-                                extractFieldValue = String.Format(", convert(datetime, @dbuser@.getValCampoProfDoc(DOCNUMBER, {0}), 103)", profilationField.valore);
-                                extractFieldValue2 = String.Format(" convert(datetime, @dbuser@.getValCampoProfDoc(DOCNUMBER, {0}), 103)", profilationField.valore);
-                            }
                             else
                             {
                                 extractFieldValue = String.Format(", ISNULL(@dbuser@.getValCampoProfDoc(DOCNUMBER, {0}),'zzzzzzzzzzzz')", profilationField.valore);
@@ -25433,11 +25572,6 @@ namespace DocsPaDB.Query_DocsPAWS
                             {
                                 extractFieldValue = String.Format(", convert(int, @dbuser@.getValCampoProfDocOrder(DOCNUMBER, {0}))", profilationField.valore);
                                 extractFieldValue2 = String.Format(" convert(int, @dbuser@.getValCampoProfDocOrder(DOCNUMBER, {0}))", profilationField.valore);
-                            }
-                            else if (this.IsOggettoCustomTipoData(profilationField.valore)) 
-                            {
-                                extractFieldValue = String.Format(", convert(datetime, @dbuser@.getValCampoProfDoc(DOCNUMBER, {0}), 103)", profilationField.valore);
-                                extractFieldValue2 = String.Format(" convert(datetime, @dbuser@.getValCampoProfDoc(DOCNUMBER, {0}), 103)", profilationField.valore);
                             }
                             else
                             {
@@ -25520,11 +25654,6 @@ namespace DocsPaDB.Query_DocsPAWS
                             extractFieldValue = String.Format(", to_number(getValCampoProfDocOrder(A.DOCNUMBER, {0}))", profilationField.valore);
                             extractFieldValue2 = String.Format(" to_number(getValCampoProfDocOrder(A.DOCNUMBER, {0}))", profilationField.valore);
                         }
-                        else if (this.IsOggettoCustomTipoData(profilationField.valore))
-                        {
-                            extractFieldValue = String.Format(", to_date(getValCampoProfDoc(DOCNUMBER, {0}), 'dd/mm/yyyy HH24:mi:ss')", profilationField.valore);
-                            extractFieldValue2 = String.Format(" to_date(getValCampoProfDoc(DOCNUMBER, {0}), 'dd/mm/yyyy HH24:mi:ss')", profilationField.valore);
-                        }
                         else
                         {
                             extractFieldValue = String.Format(", getValCampoProfDoc(A.DOCNUMBER, {0})", profilationField.valore);
@@ -25544,8 +25673,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         // ...creazione di filtro e impostazione dell'ordine diretto ed inverso
                         extractFieldValue = String.Empty;
                         order = String.Format("{0} {1}", oracleField.valore, orderDirection.valore);
-                        if (string.IsNullOrEmpty(oracleField.valore) || !oracleField.valore.Equals("NVL (a.dta_proto, a.creation_time)"))
-                            order = order + " NULLS LAST, NVL (a.dta_proto, a.creation_time) DESC";
+                        order = order + " NULLS LAST, NVL (a.dta_proto, a.creation_time) DESC";
                     }
                     else
                     {
@@ -25711,21 +25839,21 @@ namespace DocsPaDB.Query_DocsPAWS
                     // INTEGRAZIONE PITRE-PARER
                     if (this.isConservazionePARER())
                     {
-                        if (!string.IsNullOrEmpty(filtro_versamento) || stampaReg)
+                    if (!string.IsNullOrEmpty(filtro_versamento) || stampaReg)
+                    {
+                        if (dbType.ToUpper().Equals("SQL"))
                         {
-                            if (dbType.ToUpper().Equals("SQL"))
-                            {
-                                queryDef.setParam("stato_cons", " ,@dbuser@.GetStatoConservazione(a.system_id) as StatoConservazione ");
-                            }
-                            else
-                            {
-                                queryDef.setParam("stato_cons", " ,GetStatoConservazione(a.system_id) as StatoConservazione ");
-                            }
+                            queryDef.setParam("stato_cons", " ,@dbuser@.GetStatoConservazione(a.system_id) as StatoConservazione ");
                         }
                         else
                         {
-                            queryDef.setParam("stato_cons", string.Empty);
+                            queryDef.setParam("stato_cons", " ,GetStatoConservazione(a.system_id) as StatoConservazione ");
                         }
+                    }
+                    else
+                    {
+                        queryDef.setParam("stato_cons", string.Empty);
+                    }
                     }
                     else
                     {
@@ -25797,7 +25925,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     {
 
                         //if (filters.ToUpper().IndexOf("CONTAINS(A.VAR_PROF_OGGETTO") > -1)
-                        //  index2 = "/*+index (a indx_ogg_text)*/ ";
+                          //  index2 = "/*+index (a indx_ogg_text)*/ ";
 
 
 
@@ -26025,7 +26153,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 strStatoConservazione = " GetStatoConservazione(a.system_id) ";
                             else
                                 strStatoConservazione = " getInConservazioneDoc(a.system_id) ";
-                            unionStampe += "SELECT a.*, getpeopleuserid (a.author) AS code_author, getchaimg (a.docnumber) AS cha_img, getinadl (a.system_id, 'D',  " + infoUtente.idGruppo + ",  " + infoUtente.idPeople + ") AS in_adl, getinadl (a.system_id, 'D', " + infoUtente.idGruppo + ", 0) AS in_adlrole, getinconservazione (a.system_id,NULL,'D'," + infoUtente.idPeople + "," + infoUtente.idGruppo + ") AS in_conservazione,getchafirmato (a.docnumber) AS cha_firmato, corrcat (a.system_id, a.cha_tipo_proto) AS mitt_dest,gettestoultimanota ('D',a.system_id," + infoUtente.idGruppo + "," + infoUtente.idPeople + "," + infoUtente.idGruppo + ") AS ultima_nota,getpeoplename (a.author) AS desc_autore,getdesccorr (a.id_ruolo_creatore) AS desc_ruolo_autore,getcodruolobyidcorr (a.id_ruolo_creatore) AS cod_ruolo_autore,getcodreg (a.id_registro) AS cod_registro,classcat (a.system_id) AS cod_fascicoli,getdataarrivodoc (a.docnumber) AS data_arrivo,getdiagrammistato (a.docnumber, 'D') AS stato,corrcatbytipo (a.docnumber, a.cha_tipo_proto, 'M') AS mittenti,corrcatbytipo (a.docnumber, a.cha_tipo_proto, 'D') AS destinatari,getesitopubblicazione (a.system_id) AS pubblicazione,esistenotavisibile ('D', a.system_id," + infoUtente.idGruppo + "," + infoUtente.idPeople + "," + infoUtente.idGruppo + ") AS esiste_nota, a.cha_cod_t_a, getimpronta (a.docnumber) AS impronta,getnomeoriginale (a.docnumber) AS nome_originale,TO_CHAR (getdateinadl (a.system_id, 'D', " + infoUtente.idGruppo + "," + infoUtente.idPeople + "),'dd/mm/yyyy') AS dta_ins_adl,getesitospedizione (a.system_id) AS esito_spedizione,getcountricevuteinterop (a.system_id, '') AS count_ric_interop  @contatore@ @valoriCustom@ ," + strStatoConservazione + " as StatoConservazione, getPolicyVersamentoCod(A.SYSTEM_ID) AS CODICE_POLICY, getPolicyVersamentoCounter(A.SYSTEM_ID) AS CONTATORE_POLICY, getPolicyVersamentoDataExec(A.SYSTEM_ID) AS DATA_ESECUZIONE_POLICY  FROM (SELECT " + preferedIndex + "interna.*, ROWNUM rnum FROM (SELECT   /*+INDEX(a)*/a.system_id, a.docnumber, a.dta_annulla,a.var_prof_oggetto AS var_desc_oggetto, a.id_registro, a.cha_tipo_proto, a.cha_evidenza,a.num_anno_proto,TO_CHAR (NVL (a.dta_proto, a.creation_time),'dd/mm/yyyy') AS DATA, TO_CHAR (a.creation_time,'dd/mm/yyyy') AS creation_date,a.num_proto, a.var_segnatura,TO_CHAR (a.dta_proto, 'dd/mm/yyyy') AS dta_proto, a.cha_privato, a.cha_personale,a.id_documento_principale, a.cha_in_archivio,a.id_tipo_atto AS id_tipo_atto,ta.var_desc_atto AS desc_tipo_atto, a.prot_tit AS prot_tit,a.archive_date AS dta_archiviazione, a.id_ruolo_creatore, a.author, a.cha_cod_t_a, a.cod_ext_app, a.ext, a.in_librofirma @customFieldFilter@ FROM dpa_stamparegistri r, PROFILE a LEFT JOIN dpa_tipo_atto ta ON a.id_tipo_atto = ta.system_id WHERE (checksecuritydocumento (a.system_id, " + infoUtente.idPeople + ", " + infoUtente.idGruppo + ", " + idRuoloPubblico + ", 'D') > 0) " + filters_stampe + "ORDER BY @order@ )interna @paging@";
+                            unionStampe += "SELECT a.*, getpeopleuserid (a.author) AS code_author, getchaimg (a.docnumber) AS cha_img, getinadl (a.system_id, 'D',  " + infoUtente.idGruppo + ",  " + infoUtente.idPeople + ") AS in_adl, getinadl (a.system_id, 'D', " + infoUtente.idGruppo + ", 0) AS in_adlrole, getinconservazione (a.system_id,NULL,'D'," + infoUtente.idPeople + "," + infoUtente.idGruppo + ") AS in_conservazione,getchafirmato (a.docnumber) AS cha_firmato, corrcat (a.system_id, a.cha_tipo_proto) AS mitt_dest,gettestoultimanota ('D',a.system_id," + infoUtente.idGruppo + "," + infoUtente.idPeople + "," + infoUtente.idGruppo + ") AS ultima_nota,getpeoplename (a.author) AS desc_autore,getdesccorr (a.id_ruolo_creatore) AS desc_ruolo_autore,getcodruolobyidcorr (a.id_ruolo_creatore) AS cod_ruolo_autore,getcodreg (a.id_registro) AS cod_registro,classcat (a.system_id) AS cod_fascicoli,getdataarrivodoc (a.docnumber) AS data_arrivo,getdiagrammistato (a.docnumber, 'D') AS stato,corrcatbytipo (a.docnumber, a.cha_tipo_proto, 'M') AS mittenti,corrcatbytipo (a.docnumber, a.cha_tipo_proto, 'D') AS destinatari,getesitopubblicazione (a.system_id) AS pubblicazione,esistenotavisibile ('D', a.system_id," + infoUtente.idGruppo + "," + infoUtente.idPeople + "," + infoUtente.idGruppo + ") AS esiste_nota, a.cha_cod_t_a, getimpronta (a.docnumber) AS impronta,getnomeoriginale (a.docnumber) AS nome_originale,TO_CHAR (getdateinadl (a.system_id, 'D', " + infoUtente.idGruppo + "," + infoUtente.idPeople + "),'dd/mm/yyyy') AS dta_ins_adl,getesitospedizione (a.system_id) AS esito_spedizione,getcountricevuteinterop (a.system_id, '') AS count_ric_interop  @contatore@ @valoriCustom@ ," + strStatoConservazione + " as StatoConservazione, getPolicyVersamentoCod(A.SYSTEM_ID) AS CODICE_POLICY, getPolicyVersamentoCounter(A.SYSTEM_ID) AS CONTATORE_POLICY, getPolicyVersamentoDataExec(A.SYSTEM_ID) AS DATA_ESECUZIONE_POLICY  FROM (SELECT " + preferedIndex + "interna.*, ROWNUM rnum FROM (SELECT   /*+INDEX(a)*/a.system_id, a.docnumber, a.dta_annulla,a.var_prof_oggetto AS var_desc_oggetto, a.id_registro, a.cha_tipo_proto, a.cha_evidenza,a.num_anno_proto,TO_CHAR (NVL (a.dta_proto, a.creation_time),'dd/mm/yyyy') AS DATA, TO_CHAR (a.creation_time,'dd/mm/yyyy') AS creation_date,a.num_proto, a.var_segnatura,TO_CHAR (a.dta_proto, 'dd/mm/yyyy') AS dta_proto, a.cha_privato, a.cha_personale,a.id_documento_principale, a.cha_in_archivio,a.id_tipo_atto AS id_tipo_atto,ta.var_desc_atto AS desc_tipo_atto, a.prot_tit AS prot_tit,a.archive_date AS dta_archiviazione, a.id_ruolo_creatore, a.author, a.cha_cod_t_a, a.cod_ext_app, a.ext, a.in_librofirma @customFieldFilter@ FROM dpa_stamparegistri r, PROFILE a LEFT JOIN dpa_tipo_atto ta ON a.id_tipo_atto = ta.system_id WHERE (checksecuritydocumento (a.system_id, " + infoUtente.idPeople + ", " + infoUtente.idGruppo  + ", " + idRuoloPubblico + ", 'D') > 0) " + filters_stampe + "ORDER BY @order@ )interna @paging@";
                         }
                     }
                     queryDef.setParam("unionStampe", unionStampe);
@@ -26359,13 +26487,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 objField.SearchObjectFieldID = "DTA_ADL";
                 objDoc.SearchObjectField.Add(objField);
             }
-            if (dataRow.Table.Columns.Contains("var_motivo_adl"))
-            {
-                objField = new DocsPaVO.Grids.SearchObjectField();
-                objField.SearchObjectFieldValue = dataRow["var_motivo_adl"].ToString();
-                objField.SearchObjectFieldID = "MOTIVO_ADL";
-                objDoc.SearchObjectField.Add(objField);
-            }
 
             // PEC 4 Requisito 3: ricerca documenti spediti
             if (dataRow.Table.Columns.Contains("esito_spedizione"))
@@ -26449,13 +26570,22 @@ namespace DocsPaDB.Query_DocsPAWS
 
             if (dataRow.Table.Columns.Contains("IN_LIBROFIRMA"))
                 objDoc.SearchObjectField.Add(new DocsPaVO.Grids.SearchObjectField()
-                {
+            {
                     SearchObjectFieldValue = dataRow["IN_LIBROFIRMA"].ToString(),
                     SearchObjectFieldID = "IN_LIBROFIRMA"
                 });
 
+            //TODO aggiungere altro searchobjectfield
+            //if (dataRow.Table.Columns.Contains("dettagliTrasm"))
+            //{
+            //    objField = new DocsPaVO.Grids.SearchObjectField();
+            //    objField.SearchObjectFieldValue = dataRow["dettagliTrasm"].ToString();
+            //    objField.SearchObjectFieldID = "dettagliTrasm";
+            //    objDoc.SearchObjectField.Add(objField);
+            //}
+
             #region Invalid Character
-            objDoc = (DocsPaVO.Grids.SearchObject)DocsPaUtils.Functions.Functions.XML_Serialization_Deserialization_By_Encode(
+            objDoc = (DocsPaVO.Grids.SearchObject) DocsPaUtils.Functions.Functions.XML_Serialization_Deserialization_By_Encode(
                 objDoc, typeof(DocsPaVO.Grids.SearchObject), null, System.Text.Encoding.UTF8);
             #endregion
 
@@ -26498,9 +26628,9 @@ namespace DocsPaDB.Query_DocsPAWS
                 queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI_VELOCE_CUSTOM";
             else
                 if (getIdProfilesList)
-                queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI_MASSIVE_OPERATIONS_CUSTOM";
-            else
-                queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI_CUSTOM";
+                    queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI_MASSIVE_OPERATIONS_CUSTOM";
+                else
+                    queryName = "S_GET_COUNT_ROWS_RICERCA_DOCUMENTI_CUSTOM";
 
             DocsPaUtils.Query queryDef = DocsPaUtils.InitQuery.getInstance().getQuery(queryName);
 
@@ -26649,16 +26779,16 @@ namespace DocsPaDB.Query_DocsPAWS
             if (dbType.ToUpper().Equals("SQL"))
             {
                 string with = string.Empty;
-                if (!string.IsNullOrEmpty(idCorrespondentTemplate))
+                if(!string.IsNullOrEmpty(idCorrespondentTemplate))
                 {
-                    with = " WITH N (system_id) AS (SELECT system_id FROM dpa_corr_globali WHERE system_id = " + idCorrespondentTemplate + " UNION ALL SELECT  np.system_id FROM dpa_corr_globali AS np JOIN N ON N.system_id = np.id_old )";
+                     with = " WITH N (system_id) AS (SELECT system_id FROM dpa_corr_globali WHERE system_id = " + idCorrespondentTemplate + " UNION ALL SELECT  np.system_id FROM dpa_corr_globali AS np JOIN N ON N.system_id = np.id_old )";
                 }
                 else if (!string.IsNullOrEmpty(chaiTableDef))
                 {
                     with = chaiTableDef;
                     //chaiTableDef = string.Empty;
                 }
-
+                
                 queryDef.setParam("with", with);
             }
             queryDef.setParam("unionStampe", unionStampe);
@@ -26730,7 +26860,12 @@ namespace DocsPaDB.Query_DocsPAWS
             q.setParam("systemId", systemId);
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            ExecuteNonQuery(queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteNonQuery(queryString);
+            }
+            
         }
 
         public DocsPaVO.documento.InfoDocumento[] GetListaDocumentiPolicyConservazione(DocsPaVO.Conservazione.Policy policy, string lastSystemId)
@@ -27249,7 +27384,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 outParam = new DocsPaUtils.Data.ParameterSP("returnvalue", new Int32(), 10, DocsPaUtils.Data.DirectionParameter.ParamOutput, System.Data.DbType.Int32);
                 arguments.Add(outParam);
             }
-
+                
 
             using (DBProvider dbProvider = new DBProvider())
             {
@@ -27594,7 +27729,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 if (loadedData != null && idGruppo.Equals(loadedData.RoleId.ToString()))
                     idGruppo = string.Empty;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 logger.Error("Errore durante il reperimento dell'idGruppo del protocollatore " + e.Message);
                 idGruppo = string.Empty;
@@ -27782,7 +27917,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //15-09-2016 INC000000821327: commentato ed estendo la visibilta ai superiori solamente del ruolo protocollatore(se diverso da IS)
                                 //List<String> roles = GetRuoliConVisibilitaSuDocumento(schedaDoc.systemId);
                                 string role = GetRuoloProtocollatore(schedaDoc, loadedData);
-                                if (!string.IsNullOrEmpty(role))
+                                if(!string.IsNullOrEmpty(role))
                                 {
                                     documentale.ExtendVisibilityByQuery(
                                         infoUtente.idAmministrazione,
@@ -27813,7 +27948,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //15-09-2016 INC000000821327: commentato ed estendo la visibilta ai superiori solamente del ruolo protocollatore(se diverso da IS)
                                 //List<String> roles = GetRuoliConVisibilitaSuDocumento(schedaDoc.systemId);
                                 string role = GetRuoloProtocollatore(schedaDoc, null);
-                                if (!string.IsNullOrEmpty(role))
+                                if(!string.IsNullOrEmpty(role))
                                 {
                                     documentale.ExtendVisibilityByQuery(
                                         infoUtente.idAmministrazione,
@@ -28136,9 +28271,9 @@ namespace DocsPaDB.Query_DocsPAWS
                     commandText = query.getSQL();
                     logger.Debug(commandText);
                     int row = 0;
-                    if (dbProvider.ExecuteNonQuery(commandText, out row))
+                    if(dbProvider.ExecuteNonQuery(commandText, out row ))
                     {
-                        if (row > 0)
+                        if(row > 0)
                             result = true;
                     }
                 }
@@ -28435,11 +28570,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 schedaDoc.protocollo.numero = dataRow["NUM_PROTO"].ToString();
                 schedaDoc.protocollo.segnatura = dataRow["VAR_SEGNATURA"].ToString();
                 schedaDoc.protocollo.dataProtocollazione = dataRow["DTA_PROTO"].ToString();
-
-                //if (dataRow.Table.Columns.Contains("VAR_AUT_ANNULLA") && dataRow.Table.Columns.Contains("DTA_ANNULLA"))
-                //{
-                //    schedaDoc.protocollo.protocolloAnnullato = GetDatiAnnullamento(dataRow);
-                //}
                 //GetDatiProtocollo(dataRow, ref schedaDoc);
                 //schedaDoc.rispostaDocumento = GetRispostaAlProtocollo(dataRow);
 
@@ -28888,7 +29018,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 Versionid = row["VERSION_ID"].ToString(),
                                 Xml = !string.IsNullOrEmpty(row["XML"].ToString()) ? row["XML"].ToString() : string.Empty
                             };
-                            if (!string.IsNullOrEmpty(electronicSignature.Xml))
+                            if(!string.IsNullOrEmpty(electronicSignature.Xml))
                             {
                                 ElaborateXmlElectronicSignature(ref electronicSignature);
                                 listElectronicSignature.Add(electronicSignature);
@@ -28897,7 +29027,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 logger.Error("Errore nel Metodo GetElectronicSignatureDocument in DocsPaDb.Query_DocsPAWS.Documenti: " + ex.Message);
                 return null;
@@ -28912,11 +29042,11 @@ namespace DocsPaDB.Query_DocsPAWS
             XmlDocument doc = new XmlDocument();
             XmlTextReader xtr = new XmlTextReader(new System.IO.StringReader(electronicSignature.Xml)); //new XmlTextReader(electronicSignature.XmlElectronicSignature);
             doc.Load(xtr);
-
+            
             XmlElement elFirmatario = (XmlElement)doc.DocumentElement.SelectSingleNode("FirmaElettronica/Firmatario");
             string ruoloFirmatario = elFirmatario.SelectSingleNode("Ruolo").InnerText.Trim();
             string utenteFirmatario = elFirmatario.SelectSingleNode("Utente").InnerText.Trim();
-
+            
             XmlElement elDataCreazione = (XmlElement)doc.DocumentElement.SelectSingleNode("FirmaElettronica/DataCreazione");
             electronicSignature.DataApposizione = elDataCreazione.InnerText.Trim();
 
@@ -28927,7 +29057,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             else
             {
-                electronicSignature.Firmatario = delegato + " (" + ruoloFirmatario + ") SOSTITUTO DI " + utenteFirmatario;
+                electronicSignature.Firmatario = delegato + " (" + ruoloFirmatario + ") DELEGATO DA " + utenteFirmatario;
             }
         }
 
@@ -28950,7 +29080,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Debug(commandText);
                 ExecuteNonQuery(commandText, out rowsAffected);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 logger.Error("Errore nel Metodo UpdateComponentsChaFirmato in DocsPaDb.Query_DocsPAWS.Documenti: " + e.Message);
             }
@@ -29031,19 +29161,19 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Debug("GetInfoDocumentoLite: " + queryString);
 
             if (ExecuteQuery(out ds, "GetInfoDocumentoLite", queryString))
-            {
-                if (ds.Tables["GetInfoDocumentoLite"] != null && ds.Tables["GetInfoDocumentoLite"].Rows.Count > 0)
-                {
-                    DataRow row = ds.Tables["GetInfoDocumentoLite"].Rows[0];
-                    infoDoc = new InfoDocumento()
-                    {
-                        docNumber = row["SYSTEM_ID"].ToString(),
-                        idProfile = row["DOCNUMBER"].ToString(),
-                        oggetto = row["VAR_DESC_OGGETTO"].ToString(),
-                        tipoProto = !string.IsNullOrEmpty(row["CHA_TIPO_PROTO"].ToString()) ? row["CHA_TIPO_PROTO"].ToString() : string.Empty
-                    };
-                }
-            }
+             {
+                 if (ds.Tables["GetInfoDocumentoLite"] != null && ds.Tables["GetInfoDocumentoLite"].Rows.Count > 0)
+                 {
+                     DataRow row = ds.Tables["GetInfoDocumentoLite"].Rows[0];
+                     infoDoc = new InfoDocumento()
+                     {
+                         docNumber = row["SYSTEM_ID"].ToString(),
+                         idProfile = row["DOCNUMBER"].ToString(),
+                         oggetto = row["VAR_DESC_OGGETTO"].ToString(),
+                         tipoProto = !string.IsNullOrEmpty(row["CHA_TIPO_PROTO"].ToString()) ? row["CHA_TIPO_PROTO"].ToString() : string.Empty
+                     };
+                 }
+             }
 
             logger.Debug("END : DocsPaDB > Query_DocsPAWS > Documenti > GetInfoDocumentoLite");
 
@@ -29070,7 +29200,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         throw new Exception(dbProvider.LastExceptionMessage);
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 logger.Debug(ex.Message);
                 return string.Empty;
@@ -29135,7 +29265,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         {
                             docVis = new DocumentoVisualizzato()
                             {
-                                IdPeople = row["ID_PEOPLE"].ToString(),
+                                IdPeople =  row["ID_PEOPLE"].ToString(),
                                 IdGruppo = row["ID_GRUPPO"].ToString(),
                                 IdAmm = row["ID_AMM"].ToString(),
                                 IdProfile = row["ID_PROFILE"].ToString(),
@@ -29168,16 +29298,20 @@ namespace DocsPaDB.Query_DocsPAWS
 
             try
             {
-                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_LOG_BY_ID_OGGETTO_COD_AZIONE");
-                queryMng.setParam("param1", docnumber);
-                queryMng.setParam("param2", codAzione);
-                string commandText = queryMng.getSQL();
-                DataSet ds = new DataSet();
-                ExecuteQuery(ds, "CheckDocumentIsSent", commandText);
+                using (DBProvider dbProvider = new DBProvider())
+                { 
+                    DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_LOG_BY_ID_OGGETTO_COD_AZIONE");
+                    queryMng.setParam("param1", docnumber);
+                    queryMng.setParam("param2", codAzione);
+                    string commandText = queryMng.getSQL();
+                    DataSet ds = new DataSet();
 
-                if (ds.Tables["CheckDocumentIsSent"] != null && ds.Tables["CheckDocumentIsSent"].Rows.Count > 0)
-                {
-                    result = true;
+                    dbProvider.ExecuteQuery(ds, "CheckDocumentIsSent", commandText);
+
+                    if (ds.Tables["CheckDocumentIsSent"] != null && ds.Tables["CheckDocumentIsSent"].Rows.Count > 0)
+                    {
+                        result = true;
+                    }
                 }
             }
             catch (Exception e)
@@ -29211,134 +29345,82 @@ namespace DocsPaDB.Query_DocsPAWS
 
         }
 
-        public int TotalFileSizeDocument(string idDocumento)
+        private string GetQueryCondDocInNodieFasicoli(DocsPaVO.filtri.FiltroRicerca f, string idPeople)
         {
-            int fileSize = 0;
+            string idAmm = GetIdAmministrazioneByIdPeople(idPeople);
+            string queryWhere = string.Empty;
+            queryWhere += " AND EXISTS (SELECT LINK FROM PROJECT_COMPONENTS PC WHERE PC.LINK=A.SYSTEM_ID AND EXISTS  ";
+            queryWhere += " (SELECT SYSTEM_ID FROM PROJECT P1 WHERE P1.SYSTEM_ID = PC.PROJECT_ID AND UPPER(P1.VAR_CODICE) LIKE '" + f.valore.ToUpper() + "%' AND P1.ID_AMM =" + idAmm;
+            queryWhere += " UNION SELECT SYSTEM_ID FROM PROJECT P2 WHERE P2.SYSTEM_ID = PC.PROJECT_ID AND EXISTS ( SELECT SYSTEM_ID FROM PROJECT P3  WHERE UPPER(P3.VAR_CODICE) LIKE '" + f.valore.ToUpper() + "%' AND P3.ID_AMM =" + idAmm + " AND P2.ID_FASCICOLO =P3.SYSTEM_ID)";
+            queryWhere += " AND P2.ID_AMM =" + idAmm + " ))";
+
+            return queryWhere;
+        }
+
+        private string GetIdAmministrazioneByIdPeople(string idPeople)
+        {
+            // Sql da eseguire
+            string sql = "SELECT ID_AMM FROM PEOPLE WHERE SYSTEM_ID = " + idPeople;
+
+            string idAmm = String.Empty;
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteScalar(out idAmm, sql);
+            }
+
+            return idAmm;
+        }
+        protected bool RicercaPerUoProtollatriceStoricizzate(DocsPaVO.filtri.FiltroRicerca[] filters)
+        {
+            bool retValue = false;
+
+            string value = (from item in filters
+                            where item.argomento == DocsPaVO.filtri.ricerca.listaArgomenti.UO_PROT_STORICIZZATE.ToString()
+                            select item.valore).FirstOrDefault();
+            if (!string.IsNullOrEmpty(value))
+                bool.TryParse(value, out retValue);
+
+            return retValue;
+        }
+
+        protected bool RicercaPerUoProtocollatriciSottostanti(DocsPaVO.filtri.FiltroRicerca[] filters)
+        {
+            bool retValue = false;
+            string value = (from item in filters
+                            where item.argomento == DocsPaVO.filtri.ricerca.listaArgomenti.UO_PROT_SOTTOSTATNTI.ToString()
+                            select item.valore).FirstOrDefault();
+            if(!string.IsNullOrEmpty(value))
+                bool.TryParse(value, out retValue);
+
+            return retValue;
+        }
+
+        private List<string> getIdUOSottoposte(string idUo)
+        {
+            List<String> result = new List<string>();
             try
             {
-                string valore = null;
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DOCUMENT_TOTAL_FILE_SIZE");
-                q.setParam("param1", idDocumento);
-                string queryString = q.getSQL();
-                logger.Debug(queryString);
-                this.ExecuteScalar(out valore, queryString);
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_UO_SOTTOPOSTE");
+                    q.setParam("idUo", idUo);
+                    string command = q.getSQL();
+                    logger.Debug(command);
 
-                if (valore != null)
-                    fileSize = Convert.ToInt32(valore);
+                    IDataReader dr = dbProvider.ExecuteReader(command);
+
+                    while (dr.Read())
+                    {
+                        result.Add(dr.GetValue(0).ToString());
+                    }
+                    dr.Close();
+                }
             }
             catch (Exception ex)
             {
-                logger.DebugFormat("Errore nel reperimento della dimensione totale dei file! {0}\r\n{1}", ex.Message, ex.StackTrace);
-                fileSize = 0;
+                logger.Debug(ex.Message);
             }
-            return fileSize;
-        }
-
-        public string GetTipoFirmaDocumento(string docnumber)
-        {
-            string tipoFirma = DocsPaVO.documento.TipoFirma.NESSUNA_FIRMA;
-            try
-            {
-                if (!string.IsNullOrEmpty(docnumber))
-                {
-                    DataSet ds = new DataSet();
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_COMPONENTS_CHA_TIPO_FIRMA");
-                    q.setParam("docnumber", docnumber);
-                    string queryString = q.getSQL();
-                    logger.Debug(queryString);
-                    string fileName = string.Empty;
-                    string firmato = string.Empty;
-                    if (this.ExecuteQuery(out ds, queryString))
-                    {
-                        if (ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
-                        {
-                            DataRow row = ds.Tables[0].Rows[0];
-                            tipoFirma = !string.IsNullOrEmpty(row["CHA_TIPO_FIRMA"].ToString()) ? row["CHA_TIPO_FIRMA"].ToString() : DocsPaVO.documento.TipoFirma.NESSUNA_FIRMA;
-                            firmato = !string.IsNullOrEmpty(row["CHA_FIRMATO"].ToString()) ? row["CHA_FIRMATO"].ToString() : string.Empty;
-                            //Controllo anche l'estenzione del file
-                            if (firmato.Equals("1") && (tipoFirma.Equals(DocsPaVO.documento.TipoFirma.NESSUNA_FIRMA) || tipoFirma.Equals(DocsPaVO.documento.TipoFirma.ELETTORNICA)))
-                            {
-                                fileName = !string.IsNullOrEmpty(row["VAR_NOMEORIGINALE"].ToString()) ? row["VAR_NOMEORIGINALE"].ToString() : string.Empty;
-                                if (!string.IsNullOrEmpty(fileName) && fileName.ToUpper().EndsWith("P7M"))
-                                    tipoFirma = tipoFirma.Equals(DocsPaVO.documento.TipoFirma.ELETTORNICA) ? DocsPaVO.documento.TipoFirma.CADES_ELETTORNICA : DocsPaVO.documento.TipoFirma.CADES;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in GetTipoFirmaDocumento" + e.Message);
-            }
-
-            return tipoFirma;
-        }
-
-        private bool IsOggettoCustomTipoData(string idOggettoCustom)
-        {
-            bool isTipoData = false;
-            string query;
-            string result = string.Empty;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_TIPO_OGGETTO_CUSTOM");
-                q.setParam("idOggetto", idOggettoCustom);
-                query = q.getSQL();
-                logger.Debug("IsOggettoCustomTipoData query: " + query);
-
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    if (!dbProvider.ExecuteScalar(out result, query))
-                        throw new Exception(dbProvider.LastExceptionMessage);
-
-                    if (!string.IsNullOrEmpty(result) && result.ToUpper().Equals("DATA"))
-                        isTipoData = true;
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in IsOggettoCustomTipoData: " + e.Message);
-                isTipoData = false;
-            }
-
-            return isTipoData;
-        }
-
-        public EsitoFirma GetMessaggioEsitoFirma(string id)
-        {
-            EsitoFirma esito = new EsitoFirma();
-            string queryString;
-            string valore = string.Empty;
-            try
-            {
-                if (string.IsNullOrEmpty(id))
-                    throw new Exception("L'id del messaggio non è specificato");
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_MESSAGGIO_ESITO_FIRMA");
-                DataSet ds = new DataSet();
-                q.setParam("id", id);
-                queryString = q.getSQL();
-                logger.Debug("GetMessaggioEsitoFirma query: " + queryString);
-                if (this.ExecuteQuery(out ds, queryString))
-                {
-                    if (ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
-                    {
-                        DataRow row = ds.Tables[0].Rows[0];
-                        esito.Id = row["ID"].ToString();
-                        esito.Codice = row["CODICE"].ToString();
-                        esito.Messaggio = row["MESSAGGIO"].ToString();
-                    }
-                }
-                else
-                {
-                    throw new Exception("Non è stato identificato nessun messaggio con tale ID:" + id);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in GetMessaggioEsitoFirma:" + e.Message);
-                esito = null;
-            }
-            return esito;
+            return result;
         }
 
         public bool SetDataFirmaDocumento(string idProfile, string idVersione)
@@ -29361,7 +29443,7 @@ namespace DocsPaDB.Query_DocsPAWS
 
                 result = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug("Errore in SetDataFirmaDocumento - ", ex);
             }
@@ -29371,62 +29453,5 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-        public bool ExistsTrasmPendenteConWorkflowDocumento(string idProfile, string idRuoloInUO, string idPeople)
-        {
-            bool result = false;
-
-            try
-            {
-                Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_PENDENTI_DOC_COUNT");
-                query.setParam("idProfile", idProfile);
-                query.setParam("idCorrGlobali", idRuoloInUO);
-                query.setParam("idPeople", idPeople);
-
-                string commandText = query.getSQL();
-                logger.Debug("QUERY - " + commandText);
-
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    string field;
-                    if (dbProvider.ExecuteScalar(out field, commandText))
-                        if (field != "0") result = true;
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in ExistsTrasmPendenteConWorkflowDocumento: " + e);
-            }
-
-            return result;
-        }
-
-        public bool ExistsTrasmPendenteSenzaWorkflowDocumento(string idProfile, string idRuoloInUO, string idPeople)
-        {
-            bool result = false;
-
-            try
-            {
-                Query query = InitQuery.getInstance().getQuery("S_DPA_TRASM_IN_TODOLIST_DOC_COUNT");
-                query.setParam("idProfile", idProfile);
-                query.setParam("idCorrGlobali", idRuoloInUO);
-                query.setParam("idPeople", idPeople);
-
-                string commandText = query.getSQL();
-                logger.Debug("QUERY - " + commandText);
-
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    string field;
-                    if (dbProvider.ExecuteScalar(out field, commandText))
-                        if (field != "0") result = true;
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in ExistsTrasmPendenteSenzaWorkflowDocumento: " + e);
-            }
-
-            return result;
-        }
     }
 }

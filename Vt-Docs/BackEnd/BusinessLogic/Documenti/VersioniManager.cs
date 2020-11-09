@@ -42,8 +42,6 @@ namespace BusinessLogic.Documenti
             {
                 // Verifica stato di consolidamento del documento
                 DocumentConsolidation.CanExecuteAction(infoUtente, fileRequest.docNumber, DocumentConsolidation.ConsolidationActionsDeniedEnum.AddVersions, true);
-                if (!LibroFirma.LibroFirmaManager.CanExecuteAction(fileRequest, infoUtente))
-                    throw new Exception("Non è possibile creare la versione poichè il documento principale è in libro firma");
 
                 DocsPaDocumentale.Documentale.DocumentManager documentManager = new DocsPaDocumentale.Documentale.DocumentManager(infoUtente);
                 if (!documentManager.AddVersion(fileRequest, daInviare))

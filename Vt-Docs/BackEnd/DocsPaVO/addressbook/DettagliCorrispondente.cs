@@ -1,7 +1,9 @@
-﻿namespace DocsPaVO.addressbook {
-    
-    
-    public partial class DettagliCorrispondente {
+﻿namespace DocsPaVO.addressbook
+{
+
+
+    public partial class DettagliCorrispondente
+    {
         partial class CorrispondenteDataTable
         {
         }

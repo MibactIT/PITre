@@ -273,12 +273,12 @@ namespace Amministrazione.Gestione_Login
                         //MIBACT: riciesta abilitazione HomePage pe gli utenti amministratori
                         redirectUrl = "../Gestione_Homepage/Home2.aspx?from=HP1";
                         break;
-					default:
+                    default:
 						redirectUrl = "../Gestione_Homepage/Home.aspx";
 						break;
 				}
 
-				// apre la homepage dell'amministrazione
+                // apre la homepage dell'amministrazione
                 script = "<script>; var popup = window.open('" + redirectUrl + "','Home'," +
                     "'fullscreen=no,toolbar=no,directories=no,statusbar=no,menubar=no,resizable=yes,scrollbars=yes');" +
                     "popup.moveTo(0,0); popup.resizeTo(screen.availWidth,screen.availHeight);" +
@@ -293,10 +293,12 @@ namespace Amministrazione.Gestione_Login
                 //script += "popup.moveTo(0,0); popup.resizeTo(screen.availWidth,screen.availHeight);";
                 //script += " if(popup!=self) {window.opener=null;self.close();}";
                 //script += "</script>";
-                
-				this.scriptJP(script);
+
+              //  this.scriptJP(script);
+
+                this.Response.Redirect(redirectUrl);
 			}
-			catch
+			catch (Exception ex)
 			{
 				this.GUI("error");
 			}

@@ -56,7 +56,7 @@ namespace ClrVerificationService
                     KeepAliveEnabled = true,
                     ProxyAuthenticationScheme = System.Net.AuthenticationSchemes.Anonymous,
                     Realm = "",
-                    TransferMode = System.ServiceModel.TransferMode.Buffered,
+                    TransferMode = System.ServiceModel.TransferMode.Streamed,
                     UnsafeConnectionNtlmAuthentication = false,
                     UseDefaultWebProxy = false,
                     RequireClientCertificate = true
@@ -85,7 +85,7 @@ namespace ClrVerificationService
         {
             if (string.IsNullOrEmpty(dominioCertificato))
                 dominioCertificato = ConfigurationManager.AppSettings["HSMCERTDOMAIN"];
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             try
             {
                 string retval = client.RichiestaOTP(aliasCertificato, dominioCertificato);
@@ -159,7 +159,7 @@ namespace ClrVerificationService
                 
 
             DateTime dataVerifica = DateTime.Now;
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             try
             {
 
@@ -191,7 +191,7 @@ namespace ClrVerificationService
             if (marcaTemporale)
                 marca = 1;
 
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             try
             {
                 ClrVerificationService.FirmaRemota.fileFirmato retval = client.FirmaRemotaPDF(fileDafirmare, aliasCertificato, dominioCertificato, pinCertificato, otpFirma, marca);
@@ -224,7 +224,7 @@ namespace ClrVerificationService
             if (marcaTemporale)
                 marca = 1;
 
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             List<byte[]> fileArr = new List<byte[]>();
             fileArr.Add(fileDafirmare);
             try
@@ -262,7 +262,7 @@ namespace ClrVerificationService
                 firmaParallela= 1;
 
 
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
             try
             {
                 ClrVerificationService.FirmaRemota.fileFirmato retval = client.FirmaRemotaP7M(fileDafirmare, aliasCertificato, dominioCertificato, pinCertificato, otpFirma, marca, firmaParallela);
@@ -393,7 +393,7 @@ namespace ClrVerificationService
                     {
                         if (client != null)
                         {
-                            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Ssl3;
+                            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3;
                             if (mft.SignatureType == Manifest.SignType.CADES)
                             {
                                 retval = client.FirmaRemotaMultiplaP7M(filesRead.ToArray(), aliasCertificato, dominioCertificato, pinCertificato, otpFirma, marca, firmaParallela);

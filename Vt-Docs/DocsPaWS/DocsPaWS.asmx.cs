@@ -2824,27 +2824,6 @@ namespace DocsPaWS
             }
         }
 
-
-        [WebMethod]
-        [return: XmlArray()]
-        [return: XmlArrayItem(typeof(DocsPaVO.ExternalServices.FornitoreFattAttiva))]
-        public ArrayList FattElAttiveGetFornitori(DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            ArrayList result = null;
-
-            try
-            {
-                result = BusinessLogic.Amministrazione.SistemiEsterni.FattElAttiveGetFornitori(infoUtente.idAmministrazione);
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: FattElAttiveGetFornitori", e);
-                result = null;
-            }
-            return result;
-        }
-
-
         [WebMethod]
         public string DocumentoGetTipoProto(string docNumber)
         {
@@ -3414,8 +3393,8 @@ namespace DocsPaWS
 
                 //aggiorno la CI documento solo e solo se la data di riferimento è la stessa..
                 DateTime dataRif = BusinessLogic.Documenti.FileManager.dataRiferimentoValitaDocumento(fileRequest, infoUtente);
-                //if (dataRif.Date == dataDiVerifica.Date)
-                BusinessLogic.Documenti.FileManager.processFileInformationCRLUpdate(fileRequest, infoUtente, fileDocumento, dataDiVerifica);
+                if (dataRif.Date == dataDiVerifica.Date)
+                    BusinessLogic.Documenti.FileManager.processFileInformationCRLUpdate(fileRequest, infoUtente, fileDocumento, dataDiVerifica);
 
                 DocsPaVO.Logger.CodAzione.Esito esito = DocsPaVO.Logger.CodAzione.Esito.OK;
                 string risultato = "Non Definito";
@@ -3546,67 +3525,6 @@ namespace DocsPaWS
                 BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTO_VISUAL", fileRequest.docNumber, "Documento visualizzato da " + infoUtente.userId, DocsPaVO.Logger.CodAzione.Esito.KO);
             }
 
-
-            logger.Info("END");
-            return fileDocumento;
-        }
-
-        /// <summary>
-        /// Restituisce l'anteprima pdf di n pagine
-        /// </summary>
-        /// <param name="fileRequest"></param>
-        /// <param name="infoUtente"></param>
-        /// <param name="firstPg"></param>
-        /// <param name="lastPg"></param>
-        /// <param name="msgErr"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public virtual DocsPaVO.documento.FileDocumentoAnteprima DocumentoGetAnteprimaFilePdf(DocsPaVO.documento.FileRequest fileRequest, int firstPg, int lastPg, DocsPaVO.documento.SchedaDocumento sch, DocsPaVO.documento.labelPdf position, DocsPaVO.utente.InfoUtente infoUtente, out string msgErr)
-        {
-            SetUserId(infoUtente);
-            logger.Info("BEGIN");
-            DocsPaVO.documento.FileDocumentoAnteprima fileDocumento = null;
-            msgErr = string.Empty;
-            try
-            {
-                //gestione tracer
-#if TRACE_WS
-				DocsPaUtils.LogsManagement.PerformaceTracer pt = new DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
-#endif
-                //Per evitare situazioni anomale...
-                if (firstPg == 0 && lastPg == 0) firstPg = 1;
-
-                fileDocumento = BusinessLogic.Documenti.FileManager.getPreviewFilePdf(fileRequest, firstPg, lastPg, sch, position, infoUtente);
-#if TRACE_WS
-				pt.WriteLogTracer("DocumentoGetFile");
-#endif
-                //LINEARIZZAZIONE
-                fileDocumento = BusinessLogic.Documenti.FileManager.LinearizzePDFContent(fileDocumento);
-
-                //Celeste
-                if (fileDocumento != null)
-                {
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTOGETANTEPRIMAFILE", fileRequest.docNumber, string.Format("{0} {1} {2} {3}", "Visualizzazione anteprima Doc. nr.", fileRequest.docNumber, "Ver.", fileRequest.version), DocsPaVO.Logger.CodAzione.Esito.OK);
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTO_ANTEPRIMA", fileRequest.docNumber, "Anteprima documento visualizzato da " + infoUtente.userId, DocsPaVO.Logger.CodAzione.Esito.OK);
-                    msgErr = "OK";
-                }
-                else
-                {
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTOGETANTEPRIMAFILE", fileRequest.docNumber, string.Format("{0} {1} {2} {3}", "Visualizzazione anteprima Doc. nr.", fileRequest.docNumber, "Ver.", fileRequest.version), DocsPaVO.Logger.CodAzione.Esito.KO);
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTO_ANTEPRIMA", fileRequest.docNumber, "Anteprima documento visualizzato da " + infoUtente.userId, DocsPaVO.Logger.CodAzione.Esito.KO);
-                    msgErr = "Non è stato possibile visualizzare l'anteprima del documento. Consultare il log per maggiori dettagli";
-                }
-                //Fine Celeste
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: DocumentoGetAnteprimaFilePdf", e);
-                fileDocumento = null;
-                msgErr = "Errore: " + e.Message;
-
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTOGETANTEPRIMAFILE", fileRequest.versionId, string.Format("{0} {1} {2} {3}", "Visualizzazione anteprima Doc. nr.", fileRequest.docNumber, "Ver.", fileRequest.version), DocsPaVO.Logger.CodAzione.Esito.KO);
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTO_ANTEPRIMA", fileRequest.docNumber, "Anteprima documento visualizzato da " + infoUtente.userId, DocsPaVO.Logger.CodAzione.Esito.KO);
-            }
 
             logger.Info("END");
             return fileDocumento;
@@ -3881,86 +3799,6 @@ namespace DocsPaWS
 
                     #endregion
                 }
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: DocumentoPutFile", e);
-
-                if (result != null)
-                {
-                    if (DocsPaUtils.Functions.Functions.isDocumentoFirmato(result.fileName)) //se l'estensione è p7m
-                    {
-                        isFirmato = " Firmato ";
-                    }
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTOPUTFILE", fileRequest.docNumber, string.Format("{0} {1}", "Acquisito documento " + isFirmato + "N.ro:", fileRequest.docNumber), DocsPaVO.Logger.CodAzione.Esito.KO);
-                }
-            }
-            logger.Info("END");
-
-            return result;
-        }
-
-        /// <summary>
-        /// </summary>
-        [WebMethod]
-        public virtual DocsPaVO.documento.FileRequest DocumentoPutFileImport(DocsPaVO.documento.FileRequest fileRequest, DocsPaVO.documento.FileDocumento fileDocument, DocsPaVO.utente.InfoUtente infoUtente, out string errorMsg)
-        {
-            SetUserId(infoUtente);
-            logger.Info("BEGIN");
-            string isFirmato = " ";
-            DocsPaVO.documento.FileRequest result = null;
-            string errore = string.Empty;
-            errorMsg = string.Empty;
-            try
-            {
-                //gestione tracer
-#if TRACE_WS
-				DocsPaUtils.LogsManagement.PerformaceTracer pt = new DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
-#endif
-                result = BusinessLogic.Documenti.FileManager.putFile(fileRequest, fileDocument, infoUtente);
-#if TRACE_WS
-				pt.WriteLogTracer("DocumentoPutFile");
-#endif
-
-                if (result != null)
-                {
-
-                    if (DocsPaUtils.Functions.Functions.isDocumentoFirmato(result.fileName)) //se l'estensione è p7m
-                    {
-                        isFirmato = " Firmato ";
-                    }
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "DOCUMENTOPUTFILE", fileRequest.docNumber, string.Format("{0} {1}", "Acquisito documento " + isFirmato + "N.ro:", fileRequest.docNumber), DocsPaVO.Logger.CodAzione.Esito.OK);
-
-                    #region event FOLLOW_DOC_EXT_APP
-
-                    //traccio l'evento FOLLOW_DOC_EXT_APP
-                    string description = string.Empty;
-                    string idDocMain = string.Empty;
-                    string method = "FOLLOWDOCEXTAPP";
-                    if (fileRequest.GetType() == typeof(DocsPaVO.documento.Allegato))
-                    {
-                        /*l'evento FOLLOW_DOC_EXT_APP scatta in seguito all'acquisizione del file
-                        per uno degli allegati del documento.*/
-                        idDocMain = BusinessLogic.Documenti.AllegatiManager.getIdDocumentoPrincipale(fileRequest as DocsPaVO.documento.Allegato);
-                        description = "AddFileAttachDoc#Aggiunto file all'allegato " + fileRequest.descrizione + ", documento " + idDocMain;
-                    }
-                    else
-                    {
-                        //l'evento FOLLOW_DOC_EXT_APP scatta in seguito all'acquisizione del file per il doc principale
-                        idDocMain = fileRequest.docNumber;
-                        description = "AddFileDoc#Aggiunto file al documento " + idDocMain;
-                    }
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo,
-                        infoUtente.idAmministrazione, method, idDocMain, description, DocsPaVO.Logger.CodAzione.Esito.OK,
-                        (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "1", null);
-
-                    #endregion
-                }
-            }
-            catch (System.IO.PathTooLongException e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: DocumentoPutFile", e);
-                errorMsg = "NOME_FILE_TROPPO_LUNGO";
             }
             catch (Exception e)
             {
@@ -6446,15 +6284,6 @@ namespace DocsPaWS
                 {
                     string method = "DOC_SIGNATURE";
                     string description = "Il documento è stato firmato";
-
-                    // Non viene settato nel FE
-                    //if (massSignature.fileRequest.inLibroFirma)
-                    if (BusinessLogic.LibroFirma.LibroFirmaManager.IsDocInLibroFirma(fileRequest.docNumber))
-                    {
-                        BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fileRequest.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                        BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(fileRequest.docNumber, description, infoUtente);
-                    }
-
                     BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, fileRequest.docNumber,
                         description, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "0");
                 }
@@ -6493,15 +6322,6 @@ namespace DocsPaWS
                 {
                     string method = "DOC_SIGNATURE";
                     string description = "Il documento è stato firmato";
-
-                    // Non viene settato nel FE
-                    //if (massSignature.fileRequest.inLibroFirma)
-                    if (BusinessLogic.LibroFirma.LibroFirmaManager.IsDocInLibroFirma(fileRequest.docNumber))
-                    {
-                        BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fileRequest.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                        BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(fileRequest.docNumber, description, infoUtente);
-                    }
-
                     BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, fileRequest.docNumber,
                         description, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "0");
                 }
@@ -7365,6 +7185,8 @@ namespace DocsPaWS
 
             return result;
         }
+
+
 
         [WebMethod]
         [return: XmlArray()]
@@ -8265,7 +8087,6 @@ namespace DocsPaWS
         /// <summary>
         /// </summary>
         [WebMethod]
-        [XmlInclude(typeof(DocsPaVO.documento.ResultFascicolazione))]
         public virtual bool FascicolazioneAddDocFascicolo(DocsPaVO.utente.InfoUtente infoutente, string idProfile, DocsPaVO.fascicolazione.Fascicolo Fascicolo, bool fascRapida, out string msg)
         {
             SetUserId(infoutente);
@@ -8308,17 +8129,7 @@ namespace DocsPaWS
             catch (Exception e)
             {
                 BusinessLogic.UserLog.UserLog.WriteLog(infoutente, "FASCICOLOADDDOC", Fascicolo.systemID, "Inserimento doc " + idProfile + " in fascicolo: " + Fascicolo.codice, DocsPaVO.Logger.CodAzione.Esito.KO);
-
-                if (e != null && !string.IsNullOrEmpty(e.Message))
-                {
-                    int lengh = (e.Message.Length > 1500) ? 1500 : e.Message.Length;
-                    string messageError = e.Message.Substring(0, lengh);
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoutente, "DOCADDINFASC", idProfile, "Inserimento doc " + idProfile + " in fascicolo: " + Fascicolo.codice + " " + messageError, DocsPaVO.Logger.CodAzione.Esito.KO);
-                }
-                else
-                {
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoutente, "DOCADDINFASC", idProfile, "Inserimento doc " + idProfile + " in fascicolo: " + Fascicolo.codice, DocsPaVO.Logger.CodAzione.Esito.KO);
-                }
+                BusinessLogic.UserLog.UserLog.WriteLog(infoutente, "DOCADDINFASC", idProfile, "Inserimento doc " + idProfile + " in fascicolo: " + Fascicolo.codice, DocsPaVO.Logger.CodAzione.Esito.KO);
                 logger.Debug("Errore in DocsPaWS.asmx  - metodo: FascicolazioneAddDocFascicolo", e);
                 result = false;
             }
@@ -8409,7 +8220,6 @@ namespace DocsPaWS
         /// <param name="outValue"></param>
         /// <returns></returns>
         [WebMethod]
-        [XmlInclude(typeof(DocsPaVO.documento.ResultFascicolazione))]
         public virtual bool FascicolazioneAddDocFolder(DocsPaVO.utente.InfoUtente infoutente, string idProfile, DocsPaVO.fascicolazione.Folder Folder, string descrFasc, out string msg)
         {
             SetUserId(infoutente);
@@ -8467,12 +8277,6 @@ namespace DocsPaWS
             }
             logger.Info("END");
             return result;
-        }
-
-        [WebMethod]
-        public virtual DocsPaVO.documento.ResultFascicolazione ResultFascicolazioneMethod()
-        {
-            return DocsPaVO.documento.ResultFascicolazione.OK;
         }
 
         /// <summary>
@@ -12142,7 +11946,7 @@ namespace DocsPaWS
             {
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmInsNuovaUO(nuovaUO);
                 if (esito.Codice != 1 || esito.Codice != 2 || esito.Codice != 3)
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMNEWUO", "0", "Creazione UO " + nuovaUO.Codice + " - " + nuovaUO.Descrizione, DocsPaVO.Logger.CodAzione.Esito.OK, nuovaUO.IDAmministrazione);
+                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMNEWUO", "0", "Creazione UO " + nuovaUO.Descrizione, DocsPaVO.Logger.CodAzione.Esito.OK, nuovaUO.IDAmministrazione);
                 else
                 {
                     string report = string.Empty;
@@ -12329,7 +12133,7 @@ namespace DocsPaWS
             {
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmInsNuovoRuolo(infoUtente, newRuolo, computeAtipicita);
                 //if (esito.Codice == 0)
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMNEWROLE", newRuolo.IDCorrGlobale, "Creazione ruolo " + newRuolo.Codice + " - " + newRuolo.Descrizione , DocsPaVO.Logger.CodAzione.Esito.OK, newRuolo.IDAmministrazione);
+                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMNEWROLE", newRuolo.IDCorrGlobale, "Creazione ruolo " + newRuolo.Codice, DocsPaVO.Logger.CodAzione.Esito.OK, newRuolo.IDAmministrazione);
             }
             catch (Exception e)
             {
@@ -12390,7 +12194,7 @@ namespace DocsPaWS
             {
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmEliminaRuolo(infoUtente, ruolo);
                 //if (esito.Codice == 0)
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMDISABILROLE", ruolo.IDCorrGlobale, "Disabilitazione ruolo " + ruolo.Codice + " - " + ruolo.Descrizione, DocsPaVO.Logger.CodAzione.Esito.OK, ruolo.IDAmministrazione);
+                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMDISABILROLE", ruolo.IDCorrGlobale, "Disabilitazione ruolo " + ruolo.Codice, DocsPaVO.Logger.CodAzione.Esito.OK, ruolo.IDAmministrazione);
             }
             catch (Exception e)
             {
@@ -12413,7 +12217,7 @@ namespace DocsPaWS
             {
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmSpostaRuolo(infoUtente, ruolo);
                 //if (esito.Codice == 0)
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMSPOSTAROLE", ruolo.IDCorrGlobale, "Spostamento ruolo " + ruolo.Codice + " - " + ruolo.Descrizione, DocsPaVO.Logger.CodAzione.Esito.OK, ruolo.IDAmministrazione);
+                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMSPOSTAROLE", ruolo.IDCorrGlobale, "Spostamento ruolo " + ruolo.Codice, DocsPaVO.Logger.CodAzione.Esito.OK, ruolo.IDAmministrazione);
             }
             catch (Exception e)
             {
@@ -12476,11 +12280,11 @@ namespace DocsPaWS
             {
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmInsNuovoUtente(infoUtente, utente);
                 //if(esito.Codice == 0)
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMNEWUSER", utente.IDPeople, "Creazione utente " + utente.Codice + " - " + utente.Nome + " " + utente.Cognome, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
+                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMNEWUSER", utente.IDPeople, "Creazione utente " + utente.Nome + " " + utente.Cognome, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
             }
             catch (Exception e)
             {
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMNEWUSER", utente.IDPeople, "Creazione utente " + utente.Codice + " - " + utente.Nome + " " + utente.Cognome, DocsPaVO.Logger.CodAzione.Esito.KO, idAmm);
+                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMNEWUSER", utente.IDPeople, "Creazione utente " + utente.Nome + " " + utente.Cognome, DocsPaVO.Logger.CodAzione.Esito.KO, idAmm);
                 logger.Debug("Errore in DocsPaWS.asmx  - metodo: AmmInsUtente - ", e);
                 esito.Codice = 1;
                 esito.Descrizione = "si è verificato un errore";
@@ -12647,14 +12451,10 @@ namespace DocsPaWS
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmInsUtenteInRuolo(infoUtente, idPeople, idGruppo);
                 //if (esito.Codice == 0)
                 //{
-                DocsPaVO.utente.Utente utente = BusinessLogic.Utenti.UserManager.getUtenteById(idPeople);
-                DocsPaVO.utente.Ruolo ruolo = BusinessLogic.Utenti.UserManager.getRuoloByIdGruppo(idGruppo);
-                string codiceAmm = BusinessLogic.Amministrazione.AmministraManager.GetCodAmmById(idAmm);
-
                 if (type.Equals("newUser"))
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMASSRUOLOUSER", idPeople, "Associazione ruolo " + ruolo.codice + "(" + ruolo.descrizione + ") utente " + utente.userId + "(" + utente.descrizione + ")" , DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
+                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMASSRUOLOUSER", idPeople, "Associazione ruolo " + idGruppo + " utente " + idPeople, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
                 else
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMSPOSTAUSER", idPeople, "Spostamento utente " + utente.userId + " - " + utente.descrizione , DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
+                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMSPOSTAUSER", idPeople, "Spostamento utente " + idPeople, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
                 //}
             }
             catch (Exception e)
@@ -12734,12 +12534,9 @@ namespace DocsPaWS
             DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
             try
             {
-                DocsPaVO.utente.Ruolo ruolo = BusinessLogic.Utenti.UserManager.getRuoloByIdGruppo(idGruppo);
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmEliminaUtenteInRuolo(infoUtente, idPeople, idGruppo);
-                DocsPaVO.utente.Utente utente = BusinessLogic.Utenti.UserManager.getUtenteById(idPeople);
-                string codiceAmm = BusinessLogic.Amministrazione.AmministraManager.GetCodAmmById(idAmm);
                 //if (esito.Codice == 0)
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMDISASSRUOLOUSER", idPeople, "Disassociazione ruolo " + ruolo.codiceRubrica + "(" + ruolo.descrizione + ")" + " utente " + utente.userId + "(" + utente.descrizione + ")", DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
+                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMDISASSRUOLOUSER", idPeople, "Disassociazione ruolo " + idGruppo + " utente " + idPeople, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
             }
             catch (Exception e)
             {
@@ -12841,24 +12638,6 @@ namespace DocsPaWS
         }
 
         [WebMethod]
-        public DocsPaVO.amministrazione.EsitoOperazione AmmAccettaTrasmConWFRuolo(string idCorrGlobRuolo)
-        {
-            DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
-            try
-            {
-                esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmAccettaTrasmConWFRuolo(idCorrGlobRuolo);
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: AmmAccettaTrasmConWFRuolo - ", e);
-                esito.Codice = 1;
-                esito.Descrizione = "si è verificato un errore";
-            }
-
-            return esito;
-        }
-
-        [WebMethod]
         public virtual DocsPaVO.amministrazione.EsitoOperazione AmmSostituzioneUtente(string idPeopleNewUT, string idCorrGlobRuolo)
         {
             DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
@@ -12884,10 +12663,8 @@ namespace DocsPaWS
             try
             {
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmDisabilitaUtente(infoUtente, idPeople);
-                DocsPaVO.utente.Utente utente = BusinessLogic.Utenti.UserManager.getUtenteById(idPeople);
-                string codiceAmm = BusinessLogic.Amministrazione.AmministraManager.GetCodAmmById(idAmm);
                 //if (esito.Codice == 0)
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMDISABILUSER", idPeople, "Disabilitazione utente " + utente.userId + " - " + utente.descrizione, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
+                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMDISABILUSER", idPeople, "Disabilitazione utente " + idPeople, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
             }
             catch (Exception e)
             {
@@ -12907,12 +12684,9 @@ namespace DocsPaWS
             DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
             try
             {
-                DocsPaVO.utente.Utente utente = BusinessLogic.Utenti.UserManager.getUtenteById(idPeople);
-                string codiceAmm = BusinessLogic.Amministrazione.AmministraManager.GetCodAmmById(idAmm);
-
                 esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmAbilitaUtente(infoUtente, idPeople);
                 if (esito.Codice == 9)
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMABILUSER", idPeople, "Abilitazione utente "+ utente.userId + " - " + utente.descrizione, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
+                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente, "AMMABILUSER", idPeople, "Abilitazione utente " + idPeople, DocsPaVO.Logger.CodAzione.Esito.OK, idAmm);
             }
             catch (Exception e)
             {
@@ -15511,6 +15285,51 @@ namespace DocsPaWS
             return esito;
         }
 
+        [WebMethod]
+        public DocsPaVO.amministrazione.EsitoOperazione LoginAmministratoreProfilatoLDAP(DocsPaVO.utente.UserLogin userLogin, bool forceLogin, out DocsPaVO.amministrazione.InfoUtenteAmministratore datiAmministratore)
+        {
+            DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
+            datiAmministratore = null;
+            SetUserId(userLogin.UserName);
+            try
+            {
+                esito = BusinessLogic.Amministrazione.AmministraManager.LoginAmministratoreProfilatoLDAP(userLogin, forceLogin, out datiAmministratore);
+                if (esito.Codice == 0)
+                    BusinessLogic.UserLog.UserLog.WriteLog(datiAmministratore, "AMM_LOGIN", datiAmministratore.idPeople, "Accesso ad amministrazione di " + datiAmministratore.userId + " da IP " + userLogin.IPAddress, DocsPaVO.Logger.CodAzione.Esito.OK);
+                else
+                {
+                    if (datiAmministratore == null)
+                    {
+                        datiAmministratore = new InfoUtenteAmministratore();
+                        datiAmministratore.idPeople = "0";
+                        datiAmministratore.userId = userLogin.UserName;
+                        datiAmministratore.idGruppo = "0";
+                        datiAmministratore.idAmministrazione = "0";
+                        datiAmministratore.delegato = null;
+                    }
+                    BusinessLogic.UserLog.UserLog.WriteLog(datiAmministratore, "AMM_LOGIN", datiAmministratore.idPeople, "Accesso ad amministrazione fallito di " + datiAmministratore.userId + " da IP " + userLogin.IPAddress, DocsPaVO.Logger.CodAzione.Esito.KO);
+                }
+            }
+            catch (Exception e)
+            {
+                if (datiAmministratore == null)
+                {
+                    datiAmministratore = new InfoUtenteAmministratore();
+                    datiAmministratore.idPeople = "0";
+                    datiAmministratore.userId = userLogin.UserName;
+                    datiAmministratore.idGruppo = "0";
+                    datiAmministratore.idAmministrazione = "0";
+                    datiAmministratore.delegato = null;
+                }
+                BusinessLogic.UserLog.UserLog.WriteLog(datiAmministratore, "AMM_LOGIN", datiAmministratore.idPeople, "Accesso ad amministrazione fallito di " + datiAmministratore.userId + " da IP " + userLogin.IPAddress, DocsPaVO.Logger.CodAzione.Esito.KO);
+                logger.Debug("Errore in DocsPaWS.asmx  - metodo: LoginAmministratoreProfilatoLDAP ", e);
+                esito.Codice = 1;
+                esito.Descrizione = "errore di sistema!";
+            }
+
+            return esito;
+        }
+
         //[WebMethod]
         //public DocsPaVO.amministrazione.EsitoOperazione UpdateLoginAmministrazione(string userid, string sessionID) 
         //{						
@@ -16881,31 +16700,6 @@ namespace DocsPaWS
         }
 
         /// <summary>
-        /// Restituisce la lista degli id_corr_globali all'interno della UO, per cui il documento è stato già trasmesso
-        /// </summary>
-        /// <param name="idUo"></param>
-        /// <param name="docnumber"></param>
-        /// <param name="mittente"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public virtual string[] GetIdDestinatariTrasmDocInUo(string idUo, string docnumber)
-        {
-            string[] retValue = null;
-
-            try
-            {
-                retValue = BusinessLogic.SmistamentoDocumenti.SmistamentoManager.GetIdDestinatariTrasmDocInUo(idUo, docnumber);
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: GetIdDestinatariTrasmDocInUo - ", e);
-            }
-
-            return retValue;
-        }
-
-
-        /// <summary>
         /// Reperimento array di oggetti "DocsPaVO.SmistamentoDocumenti.UnitaOrganizzativa" 
         /// contenente i ruoli gerarchicamente inferiori definiti nell'ambito
         /// delle UO direttamente inferiori
@@ -18155,6 +17949,44 @@ namespace DocsPaWS
         }
 
         /// <summary>
+        /// PROCEDIMENTI
+        /// Aggiorna il parametro Procedimentale di un campo di una tipologia documentale
+        /// </summary>
+        /// <param name="systemId_template"></param>
+        /// <param name="procedimentale"></param>
+        [WebMethod]
+        public virtual void updateProcedimentoTipoDoc(int systemId_template, string procedimentale)
+        {
+            try
+            {
+                BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.UpdateProcedimentoTipoDoc(systemId_template, procedimentale);
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: updateProcedimentoTipoDoc", ex);
+            }
+        }
+
+        /// <summary>
+        /// PROCEDIMENTI
+        /// Aggiorna il parametro Procedimentale di un campo di una tipologia fascicolo
+        /// </summary>
+        /// <param name="systemId_template"></param>
+        /// <param name="procedimentale"></param>
+        [WebMethod]
+        public virtual void updateProcedimentoTipoFasc(int systemId_template, string procedimentale)
+        {
+            try
+            {
+                BusinessLogic.ProfilazioneDinamica.ProfilazioneFascicoli.UpdateProcedimentoTipoFasc(systemId_template, procedimentale);
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: updateProcedimentoTipoFasc", ex);
+            }
+        }
+
+        /// <summary>
         /// Aggiorna il campo privato al tipo fascicolo da privato a pubblico o viceversa
         /// </summary>
         /// <param name="systemId_template"></param>
@@ -19335,6 +19167,22 @@ namespace DocsPaWS
         }
 
         [WebMethod]
+        public virtual ArrayList getCorrispondentiByCodRFIdAmm(string codiceRF, string idAmm)
+        {
+            ArrayList corr = new ArrayList();
+            try
+            {
+                corr = BusinessLogic.Rubrica.RF.getCorrispondentiByCodRF(codiceRF, idAmm);
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx  - metodo: getCorrispondentiByCodRF", e);
+                return null;
+            }
+            return corr;
+        }
+
+        [WebMethod]
         public virtual string getCheckInteropFromSysIdCorrGlob(string systemId)
         {
             string check = string.Empty;
@@ -19490,22 +19338,6 @@ namespace DocsPaWS
             try
             {
                 listaModelli = BusinessLogic.Trasmissioni.ModelliTrasmissioni.getModelliByAmm(idAmm);
-                return listaModelli;
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: getModelliByAmm", e);
-                return null;
-            }
-        }
-
-        [WebMethod]
-        public virtual ArrayList getModelliByAmmLite(string idAmm)
-        {
-            ArrayList listaModelli = new ArrayList();
-            try
-            {
-                listaModelli = BusinessLogic.Trasmissioni.ModelliTrasmissioni.getModelliByAmmLite(idAmm);
                 return listaModelli;
             }
             catch (Exception e)
@@ -20942,6 +20774,34 @@ namespace DocsPaWS
 				DocsPaUtils.LogsManagement.PerformaceTracer pt = new DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 #endif
                 result = BusinessLogic.Fascicoli.FascicoloManager.getListaFolderDaCodiceFascicolo(infoUtente, codiceFascicolo, descrFolder, registro, enableUffRef, enableProfilazione);
+#if TRACE_WS
+				pt.WriteLogTracer("FascicolazioneGetListaFolderDaCodice");
+#endif
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx  - metodo: FascicolazioneGetListaFolderDaCodice", e);
+                result = null;
+            }
+
+            return result;
+        }
+
+        [WebMethod]
+        [return: XmlArray()]
+        [return: XmlArrayItem(typeof(DocsPaVO.fascicolazione.Folder))]
+        public virtual ArrayList FascicolazioneGetListaFolderDaCodiceInsRic(DocsPaVO.utente.InfoUtente infoUtente, string codiceFascicolo, string descrFolder, DocsPaVO.utente.Registro registro, bool enableUffRef, bool enableProfilazione, string insRic)
+        {
+            SetUserId(infoUtente);
+            ArrayList result = null;
+
+            try
+            {
+                //gestione tracer
+#if TRACE_WS
+				DocsPaUtils.LogsManagement.PerformaceTracer pt = new DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
+#endif
+                result = BusinessLogic.Fascicoli.FascicoloManager.getListaFolderDaCodiceFascicolo(infoUtente, codiceFascicolo, descrFolder, registro, enableUffRef, enableProfilazione, insRic);
 #if TRACE_WS
 				pt.WriteLogTracer("FascicolazioneGetListaFolderDaCodice");
 #endif
@@ -24415,8 +24275,15 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         [WebMethod]
         public void AsposeServerPdfConversion(byte[] content, DocsPaVO.documento.FileRequest fileReq, DocsPaVO.utente.InfoUtente infoUtente)
         {
-            BusinessLogic.Modelli.AsposeModelProcessor.DocModelProcessor processor = new BusinessLogic.Modelli.AsposeModelProcessor.DocModelProcessor();
-            processor.ConvertToPdfAsync(content, fileReq, infoUtente);
+            try
+            {
+                BusinessLogic.Modelli.AsposeModelProcessor.DocModelProcessor processor = new BusinessLogic.Modelli.AsposeModelProcessor.DocModelProcessor();
+                processor.ConvertToPdfAsync(content, fileReq, infoUtente);
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: AsposeServerPdfConversion", ex);
+            }
         }
 
         [WebMethod]
@@ -26338,14 +26205,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return BusinessLogic.Spedizione.SpedizioneManager.GetReportSpedizioni(filters, infoUtente);
         }
 
-        [WebMethod(Description = "Lista report spedizioni documenti")]
-        [return: XmlArray()]
-        [return: XmlArrayItem(typeof(DocsPaVO.Spedizione.InfoDocumentoSpedito))]
-        public virtual List<DocsPaVO.Spedizione.InfoDocumentoSpedito> GetReportSpedizioniDocumenti(DocsPaVO.Spedizione.FiltriReportSpedizioni filters, List<string> idDocumenti, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.Spedizione.SpedizioneManager.GetReportSpedizioniDocumenti(filters, idDocumenti, infoUtente);
-        }
-
         #endregion
 
         [WebMethod]
@@ -28247,6 +28106,54 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
             }
 
+        }
+
+        [WebMethod(Description = "Web service per l'importazione di un documento del Registro Documenti di Emergenza")]
+        [XmlInclude(typeof(DocsPaVO.PrjDocImport.ImportResult))]
+        public virtual ResultsContainer ImportRDEDocuments(
+            DocumentRowDataContainer container,
+            DocsPaVO.utente.InfoUtente userInfo,
+            DocsPaVO.utente.Ruolo role,
+            string serverPath,
+            bool isRapidClassificationRequired,
+            bool isSmistamentoEnabled,
+            bool isProfilationRequired)
+        {
+
+            ResultsContainer result = new ResultsContainer();
+            try
+            {
+                SetUserId(userInfo);
+                result = BusinessLogic.Import.RDE.ImportRDE.ImportDocumentsRDE(
+                    container,
+                    userInfo,
+                    role,
+                    serverPath,
+                    isProfilationRequired,
+                    isRapidClassificationRequired,
+                    isSmistamentoEnabled,
+                    System.Configuration.ConfigurationManager.AppSettings["FTP_ADDRESS"],
+                    System.Configuration.ConfigurationManager.AppSettings["FTP_USERNAME"],
+                    System.Configuration.ConfigurationManager.AppSettings["FTP_PASSWORD"],
+                    false);     // Impostare questo parametro a true per abilitare l'RDE Corte dei Conti (protocollazione libera)
+
+            }
+            catch (Exception e)
+            {
+                logger.Debug(
+                    String.Format("Errore durante l'importazione dei documenti. Dettagli: {0}",
+                        e.Message));
+
+                DocsPaVO.PrjDocImport.ImportResult toReturn = new DocsPaVO.PrjDocImport.ImportResult()
+                {
+                    Message = e.Message,
+                    Outcome = DocsPaVO.PrjDocImport.ImportResult.OutcomeEnumeration.KO
+                };
+                result.InDocument.Add(toReturn);
+                result.OutDocument.Add(toReturn);
+                result.OwnDocument.Add(toReturn);
+            }
+            return result;
         }
 
         /// <summary>
@@ -30397,6 +30304,56 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return BusinessLogic.Utenti.Login.LoginAndImpersonate(userLogin, userToImpersonate);
         }
 
+        /// <summary>
+        /// </summary>
+        [WebMethod(MessageName = "LoginUtenteLdap")]
+        public virtual DocsPaVO.utente.UserLogin.LoginResult LoginLDAP(string userId, string IdAmm,
+            out DocsPaVO.utente.Utente utente, string webSessionId, out string ipAddress)
+        {
+            SetUserId(userId);
+            utente = null;
+            ipAddress = "";
+            DocsPaVO.utente.UserLogin.LoginResult loginResult = DocsPaVO.utente.UserLogin.LoginResult.OK;
+
+            try
+            {
+                //gestione tracer
+#if TRACE_WS
+				DocsPaUtils.LogsManagement.PerformaceTracer pt = new DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
+#endif
+                utente = BusinessLogic.Utenti.Login.loginMethodLDAP(userId, IdAmm, out loginResult, webSessionId, ipAddress);
+
+#if TRACE_WS
+				pt.WriteLogTracer("Login");
+#endif
+                //Celeste								
+                if (utente != null)
+                {
+                    BusinessLogic.UserLog.UserLog.WriteLog(utente.userId, utente.idPeople, (utente.ruoli[0] as DocsPaVO.utente.Ruolo).idGruppo, ((DocsPaVO.utente.Corrispondente)(utente)).idAmministrazione, "LOGIN", utente.systemId, utente.systemId, DocsPaVO.Logger.CodAzione.Esito.OK, null);
+                    // implemento il metodo per la scrittura nella apposita tabella DPA_UA_INFO dei dati relativi al browser utente
+
+
+                    //if (login.BrowserInfo != null)
+                    //    BusinessLogic.Utenti.Login.AddBrowserInfo(login, utente.idPeople);
+                }
+                //Fine Celeste
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore durante la Login.", e);
+                loginResult = DocsPaVO.utente.UserLogin.LoginResult.APPLICATION_ERROR;
+                //Celeste
+                if (utente != null)
+                    utente = new Utente();
+                utente.idPeople = "0"; utente.systemId = "1";
+                BusinessLogic.UserLog.UserLog.WriteLog(null, utente.idPeople, null, null, "LOGIN", null, utente.systemId, DocsPaVO.Logger.CodAzione.Esito.KO, null);
+                //Fine Celeste
+                utente = null;
+            }
+
+            return loginResult;
+        }
+
         #endregion
 
         /// <summary>
@@ -31701,7 +31658,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
                         retVal = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.ActiveSelectiveHistory(request);
                         break;
                     case DocsPaVO.ProfilazioneDinamica.SelectiveHistoryRequest.ObjectType.Folder:
-                        retVal = BusinessLogic.ProfilazioneDinamica.ProfilazioneFascicoli.ActiveSelectiveHistory(request);
                         break;
 
                 }
@@ -31762,7 +31718,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
                         response = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.GetCustomHistoryList(request);
                         break;
                     case DocsPaVO.ProfilazioneDinamica.SelectiveHistoryRequest.ObjectType.Folder:
-                        response = BusinessLogic.ProfilazioneDinamica.ProfilazioneFascicoli.GetCustomHistoryList(request);
                         break;
                     default:
                         break;
@@ -31883,6 +31838,27 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             catch (Exception e)
             {
                 logger.Debug("Errore in DocsPaWS.asmx  - metodo: GetFascicoloDaCodiceNoSecurity", e);
+
+                throw e;
+            }
+        }
+
+        [WebMethod()]
+        [XmlInclude(typeof(DocsPaVO.Conservazione.Policy))]
+        public bool Inserisci
+            (DocsPaVO.Conservazione.Policy policy)
+        {
+            try
+            {
+                bool result = false;
+
+                result = BusinessLogic.Conservazione.Policy.PolicyManager.InsertNewPolicy(policy);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx  - metodo: InserisciPolicyConservazione", e);
 
                 throw e;
             }
@@ -33898,6 +33874,58 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         }
 
         [WebMethod]
+        public List<DocsPaVO.DiagrammaStato.Phases> GetFasi()
+        {
+            try
+            {
+                return BusinessLogic.DiagrammiStato.DiagrammiStato.GetFasi();
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [WebMethod]
+        public bool SetFasiStatiDiagramma(DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma[] list, string idDiagramma)
+        {
+            try
+            {
+                return BusinessLogic.DiagrammiStato.DiagrammiStato.SetFasiStatiDiagramma(new List<DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma>(list), idDiagramma);
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+        }
+
+        [WebMethod]
+        public List<DocsPaVO.DiagrammaStato.AssStatoScadenza> GetAssociazioneStatoScadenza(string idDiagramma)
+        {
+            try
+            {
+                return BusinessLogic.DiagrammiStato.DiagrammiStato.GetAssociazioneStatoScadenza(idDiagramma);
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [WebMethod]
+        public bool SetAssociazioneStatoScadenza(string idDiagramma, DocsPaVO.DiagrammaStato.AssStatoScadenza[] list)
+        {
+            try
+            {
+                return BusinessLogic.DiagrammiStato.DiagrammiStato.SetAssociazioneStatoScadenza(idDiagramma, new List<DocsPaVO.DiagrammaStato.AssStatoScadenza>(list));
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+        }
+
+        [WebMethod]
         public DocsPaVO.DiagrammaStato.Stato GetStatoById(string idStato, DocsPaVO.utente.InfoUtente infoUtente)
         {
             try
@@ -33907,6 +33935,58 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             catch (Exception e)
             {
                 return null;
+            }
+        }
+
+        [WebMethod]
+        public List<DocsPaVO.DiagrammaStato.EventoCambioStato> GetEventiCambioStatoAutomatico()
+        {
+            try
+            {
+                return BusinessLogic.DiagrammiStato.DiagrammiStato.GetEventiCambioStatoAutomatico();
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [WebMethod]
+        public List<DocsPaVO.DiagrammaStato.CambioStatoAutomatico> GetCambiAutomaticiStato(string idStato)
+        {
+            try
+            {
+                return BusinessLogic.DiagrammiStato.DiagrammiStato.GetCambiAutomaticiStato(idStato);
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [WebMethod]
+        public bool CreaCambioStatoAutomatico(DocsPaVO.DiagrammaStato.CambioStatoAutomatico item)
+        {
+            try
+            {
+                return BusinessLogic.DiagrammiStato.DiagrammiStato.CreaCambioStatoAutomatico(item);
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+        }
+
+        [WebMethod]
+        public bool EliminaCambioStatoAutomatico(DocsPaVO.DiagrammaStato.CambioStatoAutomatico item)
+        {
+            try
+            {
+                return BusinessLogic.DiagrammiStato.DiagrammiStato.EliminaCambioStatoAutomatico(item);
+            }
+            catch(Exception ex)
+            {
+                return false;
             }
         }
 
@@ -34980,24 +35060,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return file;
         }
 
-        [WebMethod]
-        public virtual DocsPaVO.documento.FileDocumento ExportVisibilitaProcessiFirma(DocsPaVO.utente.InfoUtente infoUtente, string exportType, string title, ArrayList campiSelezionati, List<DocsPaVO.LibroFirma.ProcessoFirma> listaProcessiFirma)
-        {
-            SetUserId(infoUtente);
-            DocsPaVO.documento.FileDocumento file = null;
-            try
-            {
-                BusinessLogic.ExportDati.ExportDatiManager manager = new BusinessLogic.ExportDati.ExportDatiManager();
-                file = manager.ExportVisibilitaProcessiFirma(infoUtente, exportType, title, campiSelezionati, listaProcessiFirma);
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: ExportVisibilitaProcessiFirma", e);
-                file = null;
-            }
-            return file;
-        }
-
 
         /// <summary>
         /// Rimuove le asserzioni.
@@ -35467,7 +35529,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             }
             else
             {
-                //fd = BusinessLogic.Documenti.FileManager.getFileFirmato(massSignature.fileRequest, infoUtente, false);
+                fd = BusinessLogic.Documenti.FileManager.getFileFirmato(massSignature.fileRequest, infoUtente, false);
                 byte[] signed = BusinessLogic.Documenti.DigitalSignature.Pades_Utils.Pades.SignPadesFile(content, Convert.FromBase64String(massSignature.base64Signature));
                 massSignature.result = BusinessLogic.Documenti.SignedFileManager.AppendDocumentoFirmatoPades(signed, massSignature.cosign, ref massSignature.fileRequest, infoUtente);
 
@@ -35475,6 +35537,13 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
             if (massSignature.result)
             {
+
+                // Non viene settato nel FE
+                //if (massSignature.fileRequest.inLibroFirma)
+                if (BusinessLogic.LibroFirma.LibroFirmaManager.IsDocInLibroFirma(massSignature.fileRequest.docNumber))
+                {
+                    BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(massSignature.fileRequest.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
+                }
                 string method = "DOC_SIGNATURE";
                 string description = "Il documento è stato firmato digitalmente CADES";
 
@@ -35482,13 +35551,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
                 {
                     method = "DOC_SIGNATURE_P";
                     description = "Il documento è stato firmato digitalmente PADES";
-                }
-                // Non viene settato nel FE
-                //if (massSignature.fileRequest.inLibroFirma)
-                if (BusinessLogic.LibroFirma.LibroFirmaManager.IsDocInLibroFirma(massSignature.fileRequest.docNumber))
-                {
-                    BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(massSignature.fileRequest.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                    BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(massSignature.fileRequest.docNumber, description, infoUtente);
                 }
 
                 BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, massSignature.fileRequest.docNumber,
@@ -35534,59 +35596,22 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         public bool HSM_Sign(DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.documento.FileRequest fr, bool cofirma, bool timestamp, String TipoFirma, String AliasCertificato, String DominioCertificato, String OtpFirma, String PinCertificato, bool ConvertPdf)
         {
             bool retValue = BusinessLogic.Documenti.FileManager.HSM_Sign(infoUtente, fr, cofirma, timestamp, TipoFirma, AliasCertificato, DominioCertificato, OtpFirma, PinCertificato, ConvertPdf);
-            fr.inLibroFirma = BusinessLogic.LibroFirma.LibroFirmaManager.IsDocInLibroFirma(fr.docNumber);
+
             //Emanuela 03/02/2014 MEV FONDIMPRESA: se la firma al documento è andata a buon fine, occorre prevedere
             //l'invio  della notifica informativa
             if (retValue)
             {
+                if (fr.inLibroFirma)
+                {
+                    BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fr.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
+                }
+
                 string method = "DOC_SIGNATURE";
                 string description = "Il documento è stato firmato digitalmente HSM CADES";
                 if (TipoFirma.ToString() == "PADES")
                 {
                     method = "DOC_SIGNATURE_P";
                     description = "Il documento è stato firmato digitalmente HSM PADES";
-                }
-                if (fr.inLibroFirma)
-                {
-                    BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fr.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                    BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(fr.docNumber, description, infoUtente);
-                }
-
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, fr.docNumber,
-                    description, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "0");
-            }
-            else
-            {
-                if (fr.inLibroFirma)
-                {
-                    BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaErroreEsitoFirma(fr.docNumber, "Errore durante la procedura di firma");
-                }
-            }
-
-            return retValue;
-        }
-
-        [WebMethod]
-        public bool HSM_SignConEsito(DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.documento.FileRequest fr, bool cofirma, bool timestamp, String TipoFirma, String AliasCertificato, String DominioCertificato, String OtpFirma, String PinCertificato, bool ConvertPdf, out DocsPaVO.documento.FirmaResult firmaResult)
-        {
-            firmaResult = new DocsPaVO.documento.FirmaResult();
-            bool retValue = BusinessLogic.Documenti.FileManager.HSM_Sign(infoUtente, fr, cofirma, timestamp, TipoFirma, AliasCertificato, DominioCertificato, OtpFirma, PinCertificato, ConvertPdf, out firmaResult);
-            fr.inLibroFirma = BusinessLogic.LibroFirma.LibroFirmaManager.IsDocInLibroFirma(fr.docNumber);
-            //Emanuela 03/02/2014 MEV FONDIMPRESA: se la firma al documento è andata a buon fine, occorre prevedere
-            //l'invio  della notifica informativa
-            if (retValue)
-            {
-                string method = "DOC_SIGNATURE";
-                string description = "Il documento è stato firmato digitalmente HSM CADES";
-                if (TipoFirma.ToString() == "PADES")
-                {
-                    method = "DOC_SIGNATURE_P";
-                    description = "Il documento è stato firmato digitalmente HSM PADES";
-                }
-                if (fr.inLibroFirma)
-                {
-                    BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fr.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                    BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(fr.docNumber, description, infoUtente);
                 }
 
                 BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, fr.docNumber,
@@ -36529,7 +36554,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
             try
             {
-                retVal = BusinessLogic.Fatturazione.FatturazioneManager.GetFattura(infoUtente.idAmministrazione, idFattura);
+                retVal = retVal = BusinessLogic.Fatturazione.FatturazioneManager.GetFattura(infoUtente.idAmministrazione, idFattura);
             }
             catch (Exception exception)
             {
@@ -36618,97 +36643,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return retVal;
         }
 
-        [WebMethod]
-        public string CheckNumFattura(string numFattura, string idAmm)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.CheckNumFattura(numFattura, idAmm);
-        }
-
-        [WebMethod]
-        public bool LogFattura(string numero, string dataCreazione, string idFornitore, string logFattura, string idProfile)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.LogFattura(numero, dataCreazione, idFornitore, logFattura, idProfile);
-        }
-
-        [WebMethod]
-        public bool LogFatturaFirmata(string docNumber, string nomeFatt, string nomeAllegato, string logMessage)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.LogFatturaFirmata(docNumber, nomeFatt, nomeAllegato, logMessage);
-        }
-
-        [WebMethod]
-        public string GetIdDocFatturaFromNomefile(string nomeFile)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.GetIdDocFatturaFromNomefile(nomeFile);
-        }
-
-        [WebMethod]
-        public string CheckFatturaPassiva(string numero, string data, string partitaIva)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.CheckFatturaPassiva(numero, data, partitaIva);
-        }
-
-        [WebMethod]
-        public string GetIdAutFatturaPassiva(string numAutorizzazione, string idCampo, string idTemplate)
-        {
-            string retval = null;
-            ArrayList items = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getIdDocByAssTemplates(idCampo, numAutorizzazione, "DESC", idTemplate);
-            if (items != null && items.Count > 0)
-            {
-                retval = items[0].ToString();
-            }
-            return retval;
-        }
-
-        [WebMethod]
-        public List<DocsPaVO.Fatturazione.AssociazioneFatturaPassiva> InvioNotificheGetFatture(string stato)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.InvioNotificheGetFatture(stato);
-        }
-
-        [WebMethod]
-        public bool InvioNotificheSetStatoInvio(string docnumber)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.InvioNotificheSetStatoInvio(docnumber);
-        }
-
-        [WebMethod]
-        public string FatturazioneGetIdSdiByIdFattura(string id)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.GetIdSdiByIdFattura(id);
-        }
-
-        [WebMethod]
-        public string FatturazioneGetIdSdiByDocnumber(string docnumber)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.GetIdSdiByDocnumber(docnumber);
-        }
-
-        [WebMethod]
-        public bool FatturazioneSetIdSdi(string id, string sdiId, string docnumber)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.SetIdSdi(id, sdiId, docnumber);
-        }
-
-        [WebMethod]
-        public List<string> FatturazioneGetFattureImport()
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.ImportFatture_GetFatture();
-        }
-
-        [WebMethod]
-        public void FatturazioneInvioAutomaticoFatture(InfoUtente infoUtente)
-        {
-            BusinessLogic.Fatturazione.FatturazioneManager.ImportFatture_InvioASDI(infoUtente);
-        }
-
         #endregion
-
-        [WebMethod]
-        public DocsPaVO.documento.FileDocumento FatturazioneGetPreviewPdf(byte[] content)
-        {
-            return BusinessLogic.Fatturazione.FatturazioneManager.GetPreviewPdf(content);
-        }
 
         #region INTEGRAZIONE PITRE-PARER
 
@@ -36762,7 +36697,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             try
             {
                 BusinessLogic.Conservazione.ConservazioneManager manager = new BusinessLogic.Conservazione.ConservazioneManager();
-                retVal = manager.insertDocInCons(idDoc, utente, string.Empty, string.Empty);
+                retVal = manager.insertDocInCons(idDoc, utente);
 
                 // PER TEST
                 //manager.VersamentoDoc(idDoc, utente, "pitre.versatore", "password1", "1.3", "https://parer-pre.regione.emilia-romagna.it/sacer/VersamentoSync");
@@ -36869,6 +36804,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return result;
         }
 
+        /* 11/02/19 Conservazione - MEV Reportistica */
         [WebMethod]
         public DocsPaVO.Conservazione.PARER.Mailbox GetMailStruttura(string idAmm)
         {
@@ -36906,43 +36842,8 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return result;
         }
 
-        [WebMethod]
-        public bool GetStatoAttivazione(string idAmm)
-        {
-            bool result = false;
-
-            try
-            {
-                BusinessLogic.Conservazione.ConservazioneManager cons = new BusinessLogic.Conservazione.ConservazioneManager();
-                result = cons.GetStatoAttivazione(idAmm);
-            }
-            catch(Exception ex)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx - metodo: GetStatoAttivazione", ex);
-            }
-
-            return result;
-        }
-
-        [WebMethod]
-        public bool SetStatoAttivazione(string idAmm, string stato)
-        {
-            bool result = false;
-
-            try
-            {
-                BusinessLogic.Conservazione.ConservazioneManager cons = new BusinessLogic.Conservazione.ConservazioneManager();
-                result = cons.SetStatoAttivazione(idAmm, stato);
-            }
-            catch(Exception ex)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx - metodo: SetStatoAttivazione", ex);
-            }
-
-            return result;
-        }
-
         #endregion
+
 
         [WebMethod]
         public virtual DocsPaVO.amministrazione.EsitoOperazione AmmVerificaUtenteRespStampaRep(string userId, string roleId, string idAmm)
@@ -37192,6 +37093,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return result;
         }
 
+        /* 11/02/19 Conservazione - MEV Reportistica */
         [WebMethod]
         public DocsPaVO.Conservazione.PARER.Report.ReportSingolaAmmResponse GetDataReportSingolaAmm(DocsPaVO.Conservazione.PARER.Report.ReportSingolaAmmRequest request)
         {
@@ -37208,6 +37110,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
             return response;
         }
+
 
         [WebMethod()]
         [XmlInclude(typeof(DocsPaVO.fascicolazione.Fascicolo))]
@@ -37281,13 +37184,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
             return result;
         }
-
-        [WebMethod]
-        public DocsPaVO.Conservazione.PARER.Report.ReportMonitoraggioPolicyResponse ReportMonitoraggioPolicy(DocsPaVO.Conservazione.PARER.Report.ReportMonitoraggioPolicyRequest request)
-        {
-            return BusinessLogic.Conservazione.PARER.ReportManager.ReportMonitoraggioPolicy(request);
-        }
-
 
         #region Libro Firma
 
@@ -37379,12 +37275,12 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         /// <param name="infoUtente"></param>
         /// <returns></returns>
         [WebMethod]
-        public DocsPaVO.LibroFirma.ProcessoFirma[] GetProcessesSignatureVisibleRole(bool asProponente, bool asMonitoratore, DocsPaVO.utente.InfoUtente infoUtente)
+        public DocsPaVO.LibroFirma.ProcessoFirma[] GetProcessesSignatureVisibleRole(DocsPaVO.utente.InfoUtente infoUtente)
         {
             List<DocsPaVO.LibroFirma.ProcessoFirma> listaProcessiDiFirma = new List<DocsPaVO.LibroFirma.ProcessoFirma>();
             try
             {
-                listaProcessiDiFirma = BusinessLogic.LibroFirma.LibroFirmaManager.GetProcessesSignatureVisibleRole(asProponente, asMonitoratore, infoUtente);
+                listaProcessiDiFirma = BusinessLogic.LibroFirma.LibroFirmaManager.GetProcessesSignatureVisibleRole(infoUtente);
             }
             catch (Exception e)
             {
@@ -37409,21 +37305,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             catch (Exception e)
             {
                 logger.Error("Errore in DocsPaWS.asmx  - metodo: GetProcessiDiFirma", e);
-            }
-            return listaProcessiDiFirma.ToArray();
-        }
-
-        [WebMethod]
-        public DocsPaVO.LibroFirma.ProcessoFirma[] GetProcessiDiFirmaByIdAmm(string idAmministrazione)
-        {
-            List<DocsPaVO.LibroFirma.ProcessoFirma> listaProcessiDiFirma = new List<DocsPaVO.LibroFirma.ProcessoFirma>();
-            try
-            {
-                listaProcessiDiFirma = BusinessLogic.LibroFirma.LibroFirmaManager.GetProcessiDiFirmaByIdAmm(idAmministrazione);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: GetProcessiDiFirmaByIdAmm", e);
             }
             return listaProcessiDiFirma.ToArray();
         }
@@ -37521,105 +37402,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return listaProcessiDiFirma.ToArray();
         }
 
-        #region AMMINISTRAZIONE LF
-
-        [WebMethod]
-        public DocsPaVO.LibroFirma.ProcessoFirma[] GetProcessiDiFirmaByTitolarePaging(string idRuoloTitolare, string idUtenteTitolare, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            List<DocsPaVO.LibroFirma.ProcessoFirma> listaProcessiDiFirma = new List<DocsPaVO.LibroFirma.ProcessoFirma>();
-            numTotPage = 0;
-            nRec = 0;
-            try
-            {
-                listaProcessiDiFirma = BusinessLogic.LibroFirma.LibroFirmaManager.GetProcessiDiFirmaByTitolarePaging(idRuoloTitolare, idUtenteTitolare, numPage, pageSize, out numTotPage, out nRec);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: GetProcessiDiFirmaByTitolarePaging ", e);
-            }
-            return listaProcessiDiFirma.ToArray();
-        }
-
-        [WebMethod]
-        public int GetCountProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare)
-        {
-            int result = 0;
-            try
-            {
-                result = BusinessLogic.LibroFirma.LibroFirmaManager.GetCountProcessiDiFirmaByTitolare(idRuoloTitolare, idUtenteTitolare);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: GetCountProcessiDiFirmaByTitolare", e);
-            }
-            return result;
-        }
-
-        [WebMethod]
-        public DocsPaVO.LibroFirma.IstanzaProcessoDiFirma[] GetIstanzeProcessiDiFirmaByTitolarePaging(string idRuoloTitolare, string idUtenteTitolare, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma> listaProcessiDiFirma = new List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma>();
-            numTotPage = 0;
-            nRec = 0;
-            try
-            {
-                listaProcessiDiFirma = BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzaProcessiDiFirmaByTitolarePaging(idRuoloTitolare, idUtenteTitolare, numPage, pageSize, out numTotPage, out nRec);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: GetIstanzeProcessiDiFirmaByTitolare", e);
-            }
-            return listaProcessiDiFirma.ToArray();
-        }
-
-        [WebMethod]
-        public int GetCountIstanzaProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare)
-        {
-            int result = 0;
-            try
-            {
-                result = BusinessLogic.LibroFirma.LibroFirmaManager.GetCountIstanzaProcessiDiFirmaByTitolare(idRuoloTitolare, idUtenteTitolare);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: GetCountIstanzaProcessiDiFirmaByTitolare", e);
-            }
-            return result;
-        }
-
-        [WebMethod]
-        public List<string> GetIdRuoliProcessiUltimoUtente(string idPeople)
-        {
-            try
-            {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.GetIdRuoliProcessiUltimoUtente(idPeople);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: GetIdRuoliProcessiUltimoUtente", e);
-            }
-            return null;
-        }
-
-        [WebMethod()]
-        public DocsPaVO.documento.FileDocumento GetReportProcessiFirma(string idRuolo, string idUtente, string formato)
-        {
-            DocsPaVO.documento.FileDocumento retVal = new DocsPaVO.documento.FileDocumento();
-
-            try
-            {
-                retVal = BusinessLogic.LibroFirma.LibroFirmaManager.GetReportProcessiFirma(idRuolo, idUtente, formato);
-            }
-            catch (Exception ex)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: GetReportProcessiFirma", ex);
-                retVal = null;
-            }
-
-            return retVal;
-        }
-        #endregion
-
         [WebMethod]
         public int GetCountIstanzeProcessiDiFirmaByRuoloCoinvolto(string idRuoloCoinvolto)
         {
@@ -37714,65 +37496,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return result;
         }
 
-        [WebMethod]
-        public bool InvalidaPassiCorrelatiTitolare(string idRuolo, string idPeople, string tipoTick, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = false;
-            try
-            {
-                result = BusinessLogic.LibroFirma.LibroFirmaManager.InvalidaPassiCorrelatiTitolare(idRuolo, idPeople, tipoTick, infoUtente);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: InvalidaPassiCorrelatiByUtenteCoinvolto", e);
-            }
-            return result;
-        }
-
-        [WebMethod]
-        public bool AmmSostituisciUtentePassiCorrelati(string idRuolo, string idOldPeople, string idNewPeople)
-        {
-            bool result = false;
-            try
-            {
-                result = BusinessLogic.LibroFirma.LibroFirmaManager.AmmSostituisciUtentePassiCorrelati(idRuolo, idOldPeople, idNewPeople);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: InvalidaPassiCorrelatiByUtenteCoinvolto", e);
-            }
-            return result;
-        }
-
-        [WebMethod]
-        public bool AmmStoricizzaRuoloPassiCorrelati(string idRuoloOld, string idRuoloNew)
-        {
-            bool result = false;
-            try
-            {
-                result = BusinessLogic.LibroFirma.LibroFirmaManager.AmmStoricizzaRuoloPassiCorrelati(idRuoloOld, idRuoloNew);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: AmmStoricizzaRuoloPassiCorrelati", e);
-            }
-            return result;
-        }
-
-        [WebMethod]
-        public string GetDescDiagrammiByIdProcesso(string idProcesso)
-        {
-            string result = string.Empty;
-            try
-            {
-                result = BusinessLogic.LibroFirma.LibroFirmaManager.GetDescDiagrammiByIdProcesso(idProcesso);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: GetDescDiagrammiByIdProcesso", e);
-            }
-            return result;
-        }
         /// <summary>
         /// Verifica se il documento è in Libro firma
         /// </summary>
@@ -37789,21 +37512,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             catch (Exception e)
             {
                 logger.Error("Errore in DocsPaWS.asmx  - metodo: IsDocInLibroFirma", e);
-            }
-            return retVal;
-        }
-
-        [WebMethod]
-        public bool IsModelloDiFirma(string idProcesso)
-        {
-            bool retVal = false;
-            try
-            {
-                retVal = BusinessLogic.LibroFirma.LibroFirmaManager.IsModelloDiFirma(idProcesso);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: IsModelloDiFirma", e);
             }
             return retVal;
         }
@@ -37829,38 +37537,17 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         }
 
         /// <summary>
-        /// Verifica se almeno uno degli allegati del documento è in Libro Firma
-        /// </summary>
-        /// <param name="idDocumentoPrincipale"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool CheckAllegatiInLibroFirma(string idDocumentoPrincipale)
-        {
-            bool retVal = false;
-            try
-            {
-                retVal = BusinessLogic.LibroFirma.LibroFirmaManager.CheckAllegatiInLibroFirma(idDocumentoPrincipale);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: CheckAllegatiInLibroFirma", e);
-            }
-            return retVal;
-        }
-
-        /// <summary>
         /// Creazione del processo di firma
         /// </summary>
         /// <param name="processoDiFirma"></param>
         /// <param name="infoUtente"></param>
         /// <returns></returns>
         [WebMethod]
-        public DocsPaVO.LibroFirma.ProcessoFirma InsertProcessoDiFirma(DocsPaVO.LibroFirma.ProcessoFirma processoDiFirma, DocsPaVO.utente.InfoUtente infoUtente, out DocsPaVO.LibroFirma.ResultProcessoFirma resultCreazioneProcesso)
+        public DocsPaVO.LibroFirma.ProcessoFirma InsertProcessoDiFirma(DocsPaVO.LibroFirma.ProcessoFirma processoDiFirma, DocsPaVO.utente.InfoUtente infoUtente)
         {
-            resultCreazioneProcesso = DocsPaVO.LibroFirma.ResultProcessoFirma.OK;
             try
             {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.InsertProcessoDiFirma(processoDiFirma, infoUtente, out resultCreazioneProcesso);
+                return BusinessLogic.LibroFirma.LibroFirmaManager.InsertProcessoDiFirma(processoDiFirma, infoUtente);
             }
             catch (Exception e)
             {
@@ -37911,26 +37598,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             }
         }
 
-        /// <summary>
-        /// Metodo per l'estrazione del dettaglio dell'istanza di processo di firma
-        /// </summary>
-        /// <param name="idIstanzaProcesso"></param>
-        /// <param name="infoUtente"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public DocsPaVO.LibroFirma.IstanzaProcessoDiFirma GetIstanzaProcessoDiFirmaByIdIstanzaProcesso(string idIstanzaProcesso, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            try
-            {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzaProcessoDiFirmaByIdIstanzaProcesso(idIstanzaProcesso, infoUtente);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: GetIstanzaProcessoDiFirmaByIdIstanzaProcesso", e);
-                return null;
-            }
-        }
-
         [WebMethod]
         public DocsPaVO.LibroFirma.PassoFirma InserisciPassoDiFirma(DocsPaVO.LibroFirma.PassoFirma passo, DocsPaVO.utente.InfoUtente infoUtente)
         {
@@ -37961,17 +37628,18 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
 
         /// <summary>
-        /// Inserisce le visibilita dei ruoli sui processi
+        /// Inserisce la visibilita del processo per i corrispondenti specificati in listaCorr
         /// </summary>
-        /// <param name="visibilita"></param>
+        /// <param name="listaCorr"></param>
+        /// <param name="idProcesso"></param>
         /// <param name="infoUtente"></param>
         /// <returns></returns>
         [WebMethod]
-        public bool InsertVisibilitaProcesso(List<DocsPaVO.LibroFirma.VisibilitaProcessoRuolo> visibilita, DocsPaVO.utente.InfoUtente infoUtente)
+        public bool InsertVisibilitaProcesso(List<DocsPaVO.utente.Corrispondente> listaCorr, string idProcesso, DocsPaVO.utente.InfoUtente infoUtente)
         {
             try
             {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.InsertVisibilitaProcesso(visibilita, infoUtente);
+                return BusinessLogic.LibroFirma.LibroFirmaManager.InsertVisibilitaProcesso(listaCorr, idProcesso, infoUtente);
             }
             catch (Exception e)
             {
@@ -37987,12 +37655,12 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         /// <param name="infoUtente"></param>
         /// <returns></returns>
         [WebMethod]
-        public DocsPaVO.LibroFirma.VisibilitaProcessoRuolo[] GetVisibilitaProcesso(string idProcesso, List<DocsPaVO.LibroFirma.FiltroProcessoFirma> filtroRicerca, DocsPaVO.utente.InfoUtente infoUtente)
+        public DocsPaVO.utente.Corrispondente[] GetVisibilitaProcesso(string idProcesso, DocsPaVO.utente.InfoUtente infoUtente)
         {
-            List<DocsPaVO.LibroFirma.VisibilitaProcessoRuolo> listaCorr = new List<DocsPaVO.LibroFirma.VisibilitaProcessoRuolo>();
+            List<DocsPaVO.utente.Corrispondente> listaCorr = new List<DocsPaVO.utente.Corrispondente>();
             try
             {
-                listaCorr = BusinessLogic.LibroFirma.LibroFirmaManager.GetVisibilitaProcesso(idProcesso, filtroRicerca, infoUtente);
+                listaCorr = BusinessLogic.LibroFirma.LibroFirmaManager.GetVisibilitaProcesso(idProcesso, infoUtente);
             }
             catch (Exception e)
             {
@@ -38080,37 +37748,15 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         /// Rimuove la visibilità del processo per il corrispondente selezionato
         /// </summary>
         /// <param name="idProcesso"></param>
-        /// <param name="idGruppo"></param>
+        /// <param name="idCorr"></param>
         /// <param name="infoUtente"></param>
         /// <returns></returns>
         [WebMethod]
-        public bool RimuoviVisibilitaProcesso(string idProcesso, string idGruppo, DocsPaVO.utente.InfoUtente infoUtente)
+        public bool RimuoviVisibilitaProcesso(string idProcesso, string idCorr, DocsPaVO.utente.InfoUtente infoUtente)
         {
             try
             {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.RimuoviVisibilitaProcesso(idProcesso, idGruppo, infoUtente);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: RimuoviVisibilitaProcesso", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Aggiorna il tipo di visibilita che ha il ruolo sul processo di firma
-        /// </summary>
-        /// <param name="idProcesso"></param>
-        /// <param name="idGruppo"></param>
-        /// <param name="tipoVisibilita"></param>
-        /// <param name="infoUtente"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool UpdateTipoVisibilitaProcesso(string idProcesso, string idGruppo, DocsPaVO.LibroFirma.TipoVisibilita tipoVisibilita, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            try
-            {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.UpdateTipoVisibilitaProcesso(idProcesso, idGruppo, tipoVisibilita, infoUtente);
+                return BusinessLogic.LibroFirma.LibroFirmaManager.RimuoviVisibilitaProcesso(idProcesso, idCorr, infoUtente);
             }
             catch (Exception e)
             {
@@ -38216,13 +37862,13 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         /// <param name="infoUtente"></param>
         /// <returns></returns>
         [WebMethod]
-        public bool StartProcessoDiFirma(DocsPaVO.LibroFirma.ProcessoFirma processoDiFirma, DocsPaVO.documento.FileRequest file, DocsPaVO.utente.InfoUtente infoUtente, string modalita, string note, DocsPaVO.LibroFirma.OpzioniNotifica opzioniNotifiche, out DocsPaVO.LibroFirma.ResultProcessoFirma resultAvvioProcesso)
+        public bool StartProcessoDiFirma(DocsPaVO.LibroFirma.ProcessoFirma processoDiFirma, DocsPaVO.documento.FileRequest file, DocsPaVO.utente.InfoUtente infoUtente, string modalita, string note, bool notificaInterruzione, bool notificaConclusione, out DocsPaVO.LibroFirma.ResultProcessoFirma resultAvvioProcesso)
         {
             bool result;
             resultAvvioProcesso = DocsPaVO.LibroFirma.ResultProcessoFirma.OK;
             try
             {
-                result = BusinessLogic.LibroFirma.LibroFirmaManager.StartProcessoDiFirma(processoDiFirma, file, infoUtente, modalita, note, opzioniNotifiche, out resultAvvioProcesso);
+                result = BusinessLogic.LibroFirma.LibroFirmaManager.StartProcessoDiFirma(processoDiFirma, file, infoUtente, modalita, note, notificaInterruzione, notificaConclusione, out resultAvvioProcesso);
                 if (result)
                 {
                     string method = "AVVIATO_PROCESSO_DI_FIRMA_DOCUMENTO";
@@ -38245,36 +37891,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         }
 
         [WebMethod]
-        public bool SalvaModificaStatoStartSignatureProcess(DocsPaVO.LibroFirma.ProcessoFirma processoDiFirma, DocsPaVO.documento.FileRequest file,
-            DocsPaVO.utente.InfoUtente infoUtente, string modalita, string note, DocsPaVO.LibroFirma.OpzioniNotifica opzioniNotifiche,
-            string idStato, DocsPaVO.DiagrammaStato.DiagrammaStato diagramma, string dataScadenza,
-            out DocsPaVO.LibroFirma.ResultProcessoFirma resultAvvioProcesso)
-        {
-            bool result;
-            resultAvvioProcesso = DocsPaVO.LibroFirma.ResultProcessoFirma.OK;
-            try
-            {
-                SetUserId(infoUtente);
-                DocsPaVO.DiagrammaStato.Stato[] stati = (DocsPaVO.DiagrammaStato.Stato[])diagramma.STATI.ToArray(typeof(DocsPaVO.DiagrammaStato.Stato));
-                DocsPaVO.DiagrammaStato.Stato stato = stati.Where(e => e.SYSTEM_ID.ToString() == idStato).First();
-
-                result = BusinessLogic.DiagrammiStato.DiagrammiStato.SalvaModificaStatoAvviaProcesso(file.docNumber, idStato, diagramma, infoUtente.userId, infoUtente, dataScadenza,
-                                    processoDiFirma, modalita, note, opzioniNotifiche, out resultAvvioProcesso);
-
-                BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, "DOC_CAMBIO_STATO", file.docNumber, String.Format("Stato passato a  {0}", stato.DESCRIZIONE.ToUpper()), DocsPaVO.Logger.CodAzione.Esito.OK,
-                    infoUtente.delegato, "1");
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: SalvaModificaStatoStartSignatureProcess", e);
-                return false;
-            }
-            return result;
-        }
-
-
-        [WebMethod]
-        public List<DocsPaVO.documento.FirmaResult> StartProcessoDiFirmaMassive(DocsPaVO.LibroFirma.ProcessoFirma processoDiFirma, List<DocsPaVO.documento.FileRequest> fileRequest, DocsPaVO.utente.InfoUtente infoUtente, string modalita, string note, DocsPaVO.LibroFirma.OpzioniNotifica opzioniNotifiche)
+        public List<DocsPaVO.documento.FirmaResult> StartProcessoDiFirmaMassive(DocsPaVO.LibroFirma.ProcessoFirma processoDiFirma, List<DocsPaVO.documento.FileRequest> fileRequest, DocsPaVO.utente.InfoUtente infoUtente, string modalita, string note, bool notificaInterruzione, bool notificaConclusione)
         {
             List<DocsPaVO.documento.FirmaResult> firmaResult = new List<DocsPaVO.documento.FirmaResult>();
             DocsPaVO.LibroFirma.ResultProcessoFirma resultAvvioProcess = DocsPaVO.LibroFirma.ResultProcessoFirma.OK;
@@ -38282,7 +37899,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             {
                 foreach (DocsPaVO.documento.FileRequest file in fileRequest)
                 {
-                    if (BusinessLogic.LibroFirma.LibroFirmaManager.StartProcessoDiFirma(processoDiFirma, file, infoUtente, modalita, note, opzioniNotifiche, out resultAvvioProcess))
+                    if (BusinessLogic.LibroFirma.LibroFirmaManager.StartProcessoDiFirma(processoDiFirma, file, infoUtente, modalita, note, notificaInterruzione, notificaConclusione, out resultAvvioProcess))
                     {
                         firmaResult.Add(new DocsPaVO.documento.FirmaResult() { fileRequest = file });
 
@@ -38298,7 +37915,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
                     }
                     else
                     {
-                        firmaResult.Add(new DocsPaVO.documento.FirmaResult() { fileRequest = file, errore = resultAvvioProcess.ToString() });
+                        firmaResult.Add(new DocsPaVO.documento.FirmaResult() { fileRequest = file, errore = "KO" });
                     }
                 }
             }
@@ -38308,24 +37925,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
                 return null;
             }
             return firmaResult;
-        }
-
-        [WebMethod]
-        [XmlInclude(typeof(DocsPaVO.LibroFirma.FiltroProcessoFirma))]
-        public DocsPaVO.LibroFirma.ProcessoFirma[] GetProcessiFirmaByFilter(List<DocsPaVO.LibroFirma.FiltroProcessoFirma> filtro, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            {
-                List<DocsPaVO.LibroFirma.ProcessoFirma> listaProcessi = new List<DocsPaVO.LibroFirma.ProcessoFirma>();
-                try
-                {
-                    listaProcessi = BusinessLogic.LibroFirma.LibroFirmaManager.GetProcessiDiFirmaByFilter(filtro, infoUtente);
-                }
-                catch (Exception e)
-                {
-                    logger.Error("Errore in DocsPaWS.asmx  - metodo: GetProcessiFirmaByFilter", e);
-                }
-                return listaProcessi.ToArray();
-            }
         }
 
         [WebMethod]
@@ -38349,15 +37948,14 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
         [WebMethod]
         [XmlInclude(typeof(DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma))]
-        public DocsPaVO.LibroFirma.IstanzaProcessoDiFirma[] GetIstanzaProcessiDiFirmaByFilter(List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma> filtro, DocsPaVO.utente.InfoUtente infoUtente, int numPage, int pageSize, out int numTotPage, out int nRec, out DataSet istanzeProcessi)
+        public DocsPaVO.LibroFirma.IstanzaProcessoDiFirma[] GetIstanzaProcessiDiFirmaByFilter(List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma> filtro, DocsPaVO.utente.InfoUtente infoUtente, int numPage, int pageSize, out int numTotPage, out int nRec)
         {
-            istanzeProcessi = null;
             numTotPage = 0;
             nRec = 0;
             List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma> listaIstanze = new List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma>();
             try
             {
-                listaIstanze = BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(filtro, numPage, pageSize, out numTotPage, out nRec, infoUtente, out istanzeProcessi);
+                listaIstanze = BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzaProcessiDiFirmaByFilter(filtro, numPage, pageSize, out numTotPage, out nRec, infoUtente);
             }
             catch (Exception e)
             {
@@ -38458,20 +38056,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         }
 
         [WebMethod]
-        public bool IsTitolarePassoInAttesa(string docNumber, DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.LibroFirma.Azione azione)
-        {
-            try
-            {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.IsTitolarePassoInAttesa(docNumber, infoUtente, azione);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: IsTitolarePassoInAttesa", e);
-                return false;
-            }
-        }
-
-        [WebMethod]
         public string GetTypeSignatureToBeEntered(DocsPaVO.documento.FileRequest fileReq, DocsPaVO.utente.InfoUtente infoUtente)
         {
             try
@@ -38485,21 +38069,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             }
         }
 
-
-        [WebMethod]
-        public DocsPaVO.LibroFirma.IstanzaPassoDiFirma GetIstanzaPassoFirmaInAttesaByDocnumber(string docnumber)
-        {
-            try
-            {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzaPassoFirmaInAttesaByDocnumber(docnumber);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in BusinessLogic.LibroFirma.LibroFirmaManager  - metodo: GetIstanzaPassoFirmaInAttesaByDocnumber ", e);
-                return null;
-            }
-        }
-
         [WebMethod]
         public bool PutElectronicSignature(DocsPaVO.documento.FileRequest approvingFile, DocsPaVO.utente.InfoUtente infoUtente, bool isAdvancementProcess, out string message)
         {
@@ -38509,6 +38078,10 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             {
                 if (BusinessLogic.LibroFirma.LibroFirmaManager.PutElectronicSignature(approvingFile, infoUtente, isAdvancementProcess, out message))
                 {
+                    if (approvingFile.inLibroFirma)
+                    {
+                        BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(approvingFile.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
+                    }
 
                     string method2 = "DOC_VERIFIED";
                     string description2 = "Il documento è stato firmato elettronicamente";
@@ -38518,11 +38091,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
                         description2 = "Eseguito passo avanzamento iter";
                     }
 
-                    if (approvingFile.inLibroFirma)
-                    {
-                        BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(approvingFile.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                        BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(approvingFile.docNumber, description2, infoUtente);
-                    }
                     BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method2, approvingFile.docNumber,
                         description2, DocsPaVO.Logger.CodAzione.Esito.OK, (infoUtente != null && infoUtente.delegato != null ? infoUtente.delegato : null), "0");
 
@@ -38566,6 +38134,10 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
                 {
                     if (BusinessLogic.LibroFirma.LibroFirmaManager.PutElectronicSignature(fileReq, infoUtente, isAdvancementProcess, out message))
                     {
+                        if (fileReq.inLibroFirma)
+                        {
+                            BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fileReq.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
+                        }
 
                         string method2 = "DOC_VERIFIED";
                         string description2 = "Il documento è stato firmato elettronicamente";
@@ -38573,11 +38145,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
                         {
                             description2 = "Eseguito passo avanzamento iter";
                             method2 = "DOC_STEP_OVER";
-                        }
-                        if (fileReq.inLibroFirma)
-                        {
-                            BusinessLogic.LibroFirma.LibroFirmaManager.AggiornaDataEsecuzioneElemento(fileReq.docNumber, DocsPaVO.LibroFirma.TipoStatoElemento.FIRMATO.ToString());
-                            BusinessLogic.LibroFirma.LibroFirmaManager.SalvaStoricoIstanzaProcessoFirmaByDocnumber(fileReq.docNumber, description2, infoUtente);
                         }
 
                         BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method2, fileReq.docNumber,
@@ -38714,64 +38281,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             {
 
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="processoBase"></param>
-        /// <param name="nomeNuovoProcesso"></param>
-        /// <param name="utente"></param>
-        /// <param name="resultCreazioneProcesso"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public DocsPaVO.LibroFirma.ProcessoFirma DuplicaProcessoFirma(string idProcessoOld, string nomeNuovoProcesso, bool copiaVisibilita, DocsPaVO.utente.InfoUtente utente, out DocsPaVO.LibroFirma.ResultProcessoFirma resultCreazioneProcesso)
-        {
-            resultCreazioneProcesso = DocsPaVO.LibroFirma.ResultProcessoFirma.OK;
-            try
-            {
-                return BusinessLogic.LibroFirma.LibroFirmaManager.DuplicaProcessoFirma(idProcessoOld, nomeNuovoProcesso, copiaVisibilita, utente, out resultCreazioneProcesso);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: DuplicaProcessoFirma", e);
-                return null;
-            }
-        }
-
-        [WebMethod]
-        public List<DocsPaVO.areaLavoro.ResultAddAreaLavoro> AddMassiveObjectInADL(List<DocsPaVO.areaLavoro.WorkingArea> listAreaLavoro, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            List<DocsPaVO.areaLavoro.ResultAddAreaLavoro> results = new List<DocsPaVO.areaLavoro.ResultAddAreaLavoro>();
-            try
-            {
-                results = BusinessLogic.Documenti.areaLavoroManager.AddMassiveObjectInADL(listAreaLavoro, infoUtente);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: AddMassiveObjectInADL", e);
-            }
-            return results;
-        }
-
-        /// <summary>
-        /// Estrae il numero totale di elementi presenti in libro firma dell'utente-ruolo
-        /// </summary>
-        /// <param name="infoUtente"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public int CountElementiInLibroFirma (DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            int count = 0;
-            try
-            {
-                count = BusinessLogic.LibroFirma.LibroFirmaManager.CountElementiInLibroFirma(infoUtente);
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in DocsPaWS.asmx  - metodo: CountElementiInLibroFirma", e);
-            }
-            return count;
         }
         #endregion
 
@@ -39084,40 +38593,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
             return retVal;
         }
-
-        [WebMethod()]
-        public bool PutFileFromUploadManagerLight(ref DocsPaVO.documento.FileRequest fileRequest, DocsPaVO.documento.FileDocumento fileDocument, string repositoryId, InfoUtente infoUtente)
-        {
-            bool retVal = false;
-            try
-            {
-                retVal = BusinessLogic.UploadFiles.UploadFilesManager.PutFileFromUploadManagerLight(ref fileRequest, fileDocument, repositoryId, infoUtente);
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: PutFileFromUploadManager", e);
-                retVal = false;
-            }
-
-            return retVal;
-        }
-
-        [WebMethod()]
-        public bool DeletePersonalFile(DocsPaVO.documento.FileDocumento fileDocument, string repositoryId, InfoUtente infoUtente)
-        {
-            bool retVal = false;
-            try
-            {
-                retVal = BusinessLogic.UploadFiles.UploadFilesManager.DeletePersonalFile(fileDocument, repositoryId, infoUtente);
-            }
-            catch (Exception e)
-            {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: PutFileFromUploadManager", e);
-                retVal = false;
-            }
-
-            return retVal;
-        }
         #endregion
 
         /*
@@ -39200,7 +38675,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
 
             return retVal;
         }
-        #endregion
+        #endregion 
 
         #region FASCICOLAZIONE OBBLIGATORIA TIPI DOCUMENTO
 
@@ -39215,7 +38690,7 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return BusinessLogic.Amministrazione.AmministraManager.SetFascicolazioneTipiDocumento(listTipiDoc, idAmm, infoutente);
         }
 
-        #endregion
+        #endregion 
 
         #region Strutture Sottofascicoli
 
@@ -39642,18 +39117,6 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         }
 
         /// <summary>
-        /// Restituisce la dimensione totale dei file delle ultime versioni del documento principale ed allegati
-        /// </summary>
-        /// <param name="idDocumento"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public int TotalFileSizeDocument(string idDocumento)
-        {
-            return BusinessLogic.Documenti.DocManager.TotalFileSizeDocument(idDocumento);
-        }
-
-
-        /// <summary>
         /// Restituisce i tipi di procedimento definiti nell'amministrazione
         /// </summary>
         /// <param name="idAmm"></param>
@@ -39676,9 +39139,21 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
         }
 
         [WebMethod]
-        public string FattElAttiveDaImport(string idDoc, InfoUtente infoUt)
+        public DocsPaVO.utente.Registro[] GetAOOAssociateProcedimento(string template, string idAmm)
         {
-            return BusinessLogic.Amministrazione.SistemiEsterni.FattElAttiveDaImport(idDoc, infoUt);
+            return BusinessLogic.Procedimenti.ProcedimentiManager.GetAOOAssociateProcedimento(template, idAmm).ToArray();
+        }
+
+        [WebMethod]
+        public DocsPaVO.Procedimento.Reindirizzamento.ReindirizzaProcedimentoResponse ReindirizzaProcedimento(DocsPaVO.Procedimento.Reindirizzamento.ReindirizzaProcedimentoRequest request)
+        {
+            return BusinessLogic.Procedimenti.ProcedimentiManager.ReindirizzaProcedimento(request.IdProject, request.IdAOO, request.Utente, request.Note);
+        }
+
+        [WebMethod]
+        public bool CheckProcedimentoReindirizzato(string idProject)
+        {
+            return BusinessLogic.Procedimenti.ProcedimentiManager.CheckProcedimentoReindirizzato(idProject);
         }
 
         /// <summary>
@@ -39693,85 +39168,29 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return BusinessLogic.Amministrazione.AmministraManager.GetDatiAmministratore(userId, idAmm);
         }
 
+        [WebMethod]
+        public bool AmmImpostaRuoloPubblico(string idCorrGlobali, string idGruppo, string idAmm)
+        {
+            return BusinessLogic.Amministrazione.AmministraManager.ImpostaRuoloPubblico(idCorrGlobali, idGruppo, idAmm);
+        }
+
+        #region RDE
         /// <summary>
         /// Restituisce il tipo firma dell'ultima versione del documento
         /// </summary>
-        /// <param name="docnumber"></param>
+        /// <param name="infoAmm"></param>
+        /// <param name="stream" type="out"></param>
         /// <returns></returns>
         [WebMethod]
-        public string GetTipoFirmaDocumento(string docnumber)
+        public bool downloadSoftwareRDE(InfoAmministrazione infoAmm, out byte[] stream)
         {
-            return BusinessLogic.Documenti.DocManager.GetTipoFirmaDocumento(docnumber);
-        }
+            bool retVal = false;
+            retVal = BusinessLogic.RDE.RDEManager.DownloadRDE(infoAmm, out stream);
 
-        #region Descrizione Fascicolo
-        /// <summary>
-        /// Inserisce la descrizione nell'elenco delle descrizioni dei fascicoli
-        /// </summary>
-        /// <param name="descFasc"></param>
-        /// <param name="infoUtente"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool InsertDescrizioneFascicolo(DescrizioneFascicolo descFasc, DocsPaVO.utente.InfoUtente infoUtente, out DocsPaVO.fascicolazione.ResultDescrizioniFascicolo resultInsertDescrizioniFascicolo)
-        {
-            resultInsertDescrizioniFascicolo = ResultDescrizioniFascicolo.OK;
-            return BusinessLogic.Fascicoli.FascicoloManager.InsertDescrizioneFascicolo(descFasc, infoUtente, out resultInsertDescrizioniFascicolo);
-        }
-
-        /// <summary>
-        /// Estrae l'elendo delle dscrizioni dei fascicoli
-        /// </summary>
-        /// <param name="filters"></param>
-        /// <param name="infoUtente"></param>
-        /// <param name="numPage"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="numTotPage"></param>
-        /// <param name="nRec"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public List<DescrizioneFascicolo> GetListDescrizioniFascicolo(List<DocsPaVO.fascicolazione.FiltroDescrizioniFascicolo> filters, DocsPaVO.utente.InfoUtente infoUtente, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            List<DescrizioneFascicolo> descFascList = new List<DescrizioneFascicolo>();
-            numTotPage = 0;
-            nRec = 0;
-
-            descFascList = BusinessLogic.Fascicoli.FascicoloManager.GetListDescrizioniFascicolo(filters, infoUtente, numPage, pageSize, out numTotPage, out nRec);
-
-            return descFascList;
-        }
-
-        /// <summary>
-        /// Aggiorna la descrizione nell'elenco delle descrizioni dei fascicoli
-        /// </summary>
-        /// <param name="descFasc"></param>
-        /// <param name="infoUtente"></param>
-        /// <param name="resultUpdateDescrizioniFascicolo"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool AggiornaDescrizioneFascicolo(DescrizioneFascicolo descFasc, DocsPaVO.utente.InfoUtente infoUtente, out DocsPaVO.fascicolazione.ResultDescrizioniFascicolo resultUpdateDescrizioniFascicolo)
-        {
-            resultUpdateDescrizioniFascicolo = ResultDescrizioniFascicolo.OK;
-            return BusinessLogic.Fascicoli.FascicoloManager.AggiornaDescrizioneFascicolo(descFasc, infoUtente, out resultUpdateDescrizioniFascicolo);
-        }
-
-        /// <summary>
-        /// Elimina la descrizione dall'elenco delle descrizioni dei fascicoli
-        /// </summary>
-        /// <param name="systemId"></param>
-        /// <param name="infoUtente"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool EliminaDescrizioneFascicolo(string systemId, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.Fascicoli.FascicoloManager.EliminaDescrizioneFascicolo(systemId, infoUtente);
+            return retVal;
         }
         #endregion
 
-        [WebMethod]
-        public DocsPaVO.RegistroAccessi.RegistroAccessiReportResponse RegistroAccessiPubblicazione(DocsPaVO.RegistroAccessi.RegistroAccessiReportRequest request)
-        {
-            return BusinessLogic.RegistroAccessi.RegistroAccessiManager.PubblicaRegistroAccessi(request);
-        }
 
         [WebMethod]
         public bool AmmSbloccoCasella(string email, string idRegistro)
@@ -39779,401 +39198,522 @@ DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_WS");
             return BusinessLogic.Amministrazione.AmministraManager.SbloccoCasella(email, idRegistro);
         }
 
-        #region PROCESSI AUTOMATICI LIBRO FIRMA
         /// <summary>
-        /// Torna true se l'evento in input può essere un evento di passo automatico
+        /// Replica la tipologia fascicolo selezionata in tutte le amministrazioni in input
         /// </summary>
-        /// <param name="codiceEvento"></param>
+        /// <param name="idAmministrazioni"></param>
+        /// <param name="idTipoFasc"></param>
         /// <returns></returns>
         [WebMethod]
-        public bool IsEventoAutomatico(string codiceEvento)
+        public bool ReplicaTipoFascicolo(string idTipoFasc, List<string> idAmministrazioni)
         {
-            return BusinessLogic.LibroFirma.LibroFirmaManager.IsEventoAutomatico(codiceEvento);
-        }
-
-
-        [WebMethod]
-        public CasellaRegistro GetCasellaRegistroByIdMail(string idMail)
-        {
-            return BusinessLogic.LibroFirma.LibroFirmaManager.GetCasellaRegistroByIdMail(idMail);
-        }
-
-        [WebMethod]
-        public Utente GetUtenteAutomatico(string idAmministrazione)
-        {
-            return BusinessLogic.Utenti.UserManager.GetUtenteAutomatico(idAmministrazione);
+            return BusinessLogic.ProfilazioneDinamica.ProfilazioneFascicoli.ReplicaTipoFascicolo(idTipoFasc, idAmministrazioni);
         }
 
         /// <summary>
-        /// Ritenta l'esecuzione dei passi dei processi automatici in input che sono nello stato "IN_ERROR"
+        /// Replica la tipologia documento selezionata in tutte le amministrazioni in input
         /// </summary>
-        /// <param name="istanzeProcessi"></param>
-        /// <param name="infoUtente"></param>
-        [WebMethod]
-        public bool RitentaIstanzeProcessiInErrore(List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma> istanzeProcessi, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.LibroFirma.LibroFirmaManager.RitentaIstanzeProcessiInErrore(istanzeProcessi, infoUtente);
-        }
-
-        /// <summary>
-        /// Restituisce, per gli id delle istanze in ingresso, le istanze in errore
-        /// </summary>
-        /// <param name="idIstanzeProcessi"></param>
-        /// <param name="infoUtente"></param>
+        /// <param name="idAmministrazioni"></param>
+        /// <param name="idTipoDoc"></param>
         /// <returns></returns>
         [WebMethod]
-        public List<DocsPaVO.LibroFirma.IstanzaProcessoDiFirma> GetIstanzeProcessiInErrore(List<string> idIstanzeProcessi, DocsPaVO.utente.InfoUtente infoUtente)
+        public bool ReplicaTipoDocumento(string idTipoDoc, List<string> idAmministrazioni)
         {
-            return BusinessLogic.LibroFirma.LibroFirmaManager.GetIstanzeProcessiInErrore(idIstanzeProcessi, infoUtente);
-        }
-
-        /// <summary>
-        /// Verifica l'esistenza di passi di firma in cui sono coinvolti il ruolo ed i registri visibili al ruolo non inclusi nella lista in input e che verranno quindi rimmossi tra le visibilita del ruolo
-        /// </summary>
-        /// <param name="rightRuoloMailReg"></param>
-        /// <param name="idRuoloInUO"></param>
-        /// <param name="idGruppo"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool AmmExistsPassiFirmaByRuoloTitolareAndRegistro(DocsPaVO.amministrazione.RightRuoloMailRegistro[] rightRuoloMailReg, string idRuoloInUO, string idGruppo)
-        {
-            return BusinessLogic.LibroFirma.LibroFirmaManager.ExistsPassiFirmaByRuoloTitolareAndRegistro(rightRuoloMailReg, idRuoloInUO, idGruppo);
-        }
-
-        /// <summary>
-        /// Verifica l'esistenza di passi di firma per il registro e la casella di posta indicata
-        /// </summary>
-        /// <param name="idRegistro"></param>
-        /// <param name="emailRegistro"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool AmmExistsPassiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro)
-        {
-            return BusinessLogic.LibroFirma.LibroFirmaManager.ExistsPassiFirmaByIdRegistroAndEmailRegistro(idRegistro, emailRegistro);
-        }
-
-        /// <summary>
-        /// Invalida i processi di firma in cui sono presenti passi che hanno associato il registro e la casella in input
-        /// </summary>
-        /// <param name="idRegistro"></param>
-        /// <param name="emailRegistro"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool AmmInvalidaProcessiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.LibroFirma.LibroFirmaManager.InvalidaProcessiFirmaByIdRegistroAndEmailRegistro(idRegistro, emailRegistro, infoUtente);
-        }
-
-        /// <summary>
-        /// Invalida i processi di firma per cui sono state modificate le impostazioni di registro nel ruolo
-        /// </summary>
-        /// <param name="rightRuoloMailReg"></param>
-        /// <param name="idRuoloInUO"></param>
-        /// <param name="idGruppo"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool AmmInvalidaProcessiRegistriCoinvolti(DocsPaVO.amministrazione.RightRuoloMailRegistro[] rightRuoloMailReg, string idRuoloInUO, string idGruppo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.LibroFirma.LibroFirmaManager.InvalidaProcessiRegistriCoinvolti(rightRuoloMailReg, idRuoloInUO, idGruppo, infoUtente);
-        }
-
-        #endregion
-
-        [WebMethod]
-        public bool ExistsTrasmPendenteConWorkflowDocumento(string idProfile, string idRuoloInUO, string idPeople, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.Documenti.DocManager.ExistsTrasmPendenteConWorkflowDocumento(idProfile, idRuoloInUO, idPeople);
+            return BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.ReplicaTipoDocumento(idTipoDoc, idAmministrazioni);
         }
 
         [WebMethod]
-        public bool ExistsTrasmPendenteSenzaWorkflowDocumento(string idProfile, string idRuoloInUO, string idPeople, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.Documenti.DocManager.ExistsTrasmPendenteSenzaWorkflowDocumento(idProfile, idRuoloInUO, idPeople);
-        }
-
-        [WebMethod]
-        public bool ExistsTrasmPendenteConWorkflowFascicolo(string idProject, string idRuoloInUO, string idPeople, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.Fascicoli.FascicoloManager.ExistsTrasmPendenteConWorkflowFascicolo(idProject, idRuoloInUO, idPeople);
-        }
-
-        [WebMethod]
-        public bool ExistsTrasmPendenteSenzaWorkflowFascicolo(string idProject, string idRuoloInUO, string idPeople, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.Fascicoli.FascicoloManager.ExistsTrasmPendenteSenzaWorkflowFascicolo(idProject, idRuoloInUO, idPeople);
-        }
-
-        /// <summary>
-        /// Restituisce tutte le trasmissioni con workflow pendenti per la coppia utente/ruolo
-        /// </summary>
-        /// <param name="idDocOrFasc"></param>
-        /// <param name="docOrFasc"></param>
-        /// <param name="idRuoloInUO"></param>
-        /// <param name="idPeople"></param>
-        /// <param name="pagingContext"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public List<DocsPaVO.trasmissione.InfoTrasmissione> GetTrasmissioniPendentiConWorkflow(string idDocOrFasc, string docOrFasc, string idRuoloInUO, string idPeople, ref DocsPaVO.ricerche.SearchPagingContext pagingContext, out List<string> idTrasmsSingola)
-        {
-            idTrasmsSingola = new List<string>();
-            return BusinessLogic.Trasmissioni.TrasmManager.GetTrasmissioniPendentiConWorkflow(idDocOrFasc, docOrFasc, idRuoloInUO, idPeople, out idTrasmsSingola, ref pagingContext);
-        }
-
-        /// <summary>
-        /// Accetta massivamente le trasmissioni
-        /// </summary>
-        /// <param name="idTrasmSingole"></param>
-        /// <param name="noteAccettazione"></param>
-        /// <param name="ruolo"></param>
-        /// <param name="infoUtente"></param>
-        /// <returns></returns>
-        [WebMethod]
-        public bool AcceptTransmissions(List<string> idTrasmSingole, string noteAccettazione, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            return BusinessLogic.Trasmissioni.TrasmManager.AcceptTransmissions(idTrasmSingole, noteAccettazione, ruolo, infoUtente);
-        }
-
-        [WebMethod]
-        public bool AcceptMassiveTrasmDocument(string idProfile, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
+        public bool GetStatoAttivazione(string idAmm)
         {
             bool result = false;
-            try
-            {
-                result = BusinessLogic.Trasmissioni.TrasmManager.AcceptMassiveTrasmDocument(idProfile, ruolo, infoUtente);
-
-                if (result)
-                {
-                    string msg = "Accettazione massiva della trasmissione. Id documento: " + idProfile;
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, ruolo.idGruppo, infoUtente.idAmministrazione, "ACCEPTTRASMDOCUMENT", idProfile, msg, DocsPaVO.Logger.CodAzione.Esito.OK, infoUtente.delegato, "1", null);
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in AcceptMassiveTrasmDocument: " + e);
-                result = false;
-            }
-            return result;
-        }
-
-        [WebMethod]
-        public bool ViewMassiveTrasmDocument(string idProfile, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = false;
-            try
-            {
-                result = BusinessLogic.Trasmissioni.TrasmManager.ViewMassiveTrasmDocument(idProfile, ruolo, infoUtente);
-
-                if (result)
-                {
-                    string method = "CHECKTRASMDOCUMENT";
-                    string desc = "Click sul tasto Visto del documento " + idProfile + " da parte dell'utente " + infoUtente.userId;
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, idProfile, desc, DocsPaVO.Logger.CodAzione.Esito.OK, infoUtente.delegato, "1", null);                
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in ViewMassiveTrasmDocument: " + e);
-                result = false;
-            }
-            return result;            
-        }
-
-        [WebMethod]
-        public bool ViewMassiveTrasmFasc(string idProject, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = false;
-            try
-            {
-                result = BusinessLogic.Trasmissioni.TrasmManager.ViewMassiveTrasmFasc(idProject, ruolo, infoUtente);
-
-                if (result)
-                {
-                    string method = "CHECKTRASMFOLDER";
-                    string desc = "Click sul tasto Visto del fascicolo " + idProject + " da parte dell'utente " + infoUtente.userId;
-                    
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, infoUtente.idGruppo, infoUtente.idAmministrazione, method, idProject, desc, DocsPaVO.Logger.CodAzione.Esito.OK, infoUtente.delegato, "1", null);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in ViewMassiveTrasmFasc: " + e);
-                result = false;
-            }
-            return result;
-        }
-
-        [WebMethod]
-        public bool AcceptMassiveTrasmFasc(string idProject, DocsPaVO.utente.Ruolo ruolo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = false;
-            try
-            {
-                result = BusinessLogic.Trasmissioni.TrasmManager.AcceptMassiveTrasmFasc(idProject, ruolo, infoUtente);
-
-                if (result)
-                {
-                    string msg = "Accettazione massiva della trasmissione. Id fascicolo: " + idProject;
-                    BusinessLogic.UserLog.UserLog.WriteLog(infoUtente.userId, infoUtente.idPeople, ruolo.idGruppo, infoUtente.idAmministrazione, "ACCEPTTRASMFOLDER", idProject, msg, DocsPaVO.Logger.CodAzione.Esito.OK, infoUtente.delegato, "1", null);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in AcceptMassiveTrasmDocument: " + e);
-                result = false;
-            }
-            return result;
-        }
-
-
-        [WebMethod]
-        public bool UploadFileOnSharedFolder(byte[] fileStream, string fileName, InfoUtente infoUtente)
-        {
-            bool result = true;
-            string docRootPath;
-            string userPath;
-            string userTempDedicatedFolder;
-            string filePath;
 
             try
             {
-                if(!(fileStream != null && fileStream.Length > 0)) { throw new ArgumentNullException("Contenuto del file vuoto"); }
-                string _rootPath = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_TEMP_PATH");
-
-                docRootPath = System.IO.Path.Combine(_rootPath, @"Import\Documents\");  //System.Configuration.ConfigurationManager.AppSettings["IMPORT_TEMP_FOLDER"];
-                // docRootPath = System.Configuration.ConfigurationManager.AppSettings["IMPORT_TEMP_FOLDER"];
-
-                // Cartella dedicata Utente
-                userPath = System.IO.Path.Combine(docRootPath, infoUtente.idPeople);
-                if (!System.IO.Directory.Exists(userPath))
-                {
-                    System.IO.Directory.CreateDirectory(userPath);
-                }
-
-                // cartella temporanea con data odierna
-                userTempDedicatedFolder = System.IO.Path.Combine(userPath, DateTime.Now.ToString("yyyyMMdd"));
-                if (!System.IO.Directory.Exists(userTempDedicatedFolder))
-                {
-                    System.IO.Directory.CreateDirectory(userTempDedicatedFolder);
-                }
-                fileName = System.IO.Path.GetFileName(fileName);
-                // file
-                filePath = System.IO.Path.Combine(userTempDedicatedFolder, fileName);
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-                System.IO.File.WriteAllBytes(filePath, fileStream);
+                BusinessLogic.Conservazione.ConservazioneManager cons = new BusinessLogic.Conservazione.ConservazioneManager();
+                result = cons.GetStatoAttivazione(idAmm);
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                result = false;
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: GetStatoAttivazione", ex);
             }
+
             return result;
         }
 
         [WebMethod]
-        public bool UploadAttachmentOnSharedFolder(byte[] fileStream, string fileName, InfoUtente infoUtente)
+        public bool SetStatoAttivazione(string idAmm, string stato)
         {
-            bool result = true;
-            string docRootPath;
-            string attachmentsFolder;
-            string userPath;
-            string userTempDedicatedFolder;
-            string filePath;
+            bool result = false;
 
             try
             {
-                if (!(fileStream != null && fileStream.Length > 0)) { throw new ArgumentNullException("Contenuto del file vuoto"); }
-
-                string _rootPath = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_TEMP_PATH");
-
-                docRootPath = System.IO.Path.Combine(_rootPath, @"Import\Documents\");  //System.Configuration.ConfigurationManager.AppSettings["IMPORT_TEMP_FOLDER"];
-                attachmentsFolder = "Attachments"; // System.Configuration.ConfigurationManager.AppSettings["IMPORT_TEMP_ATTACHMENT_FOLDER"];
-                // Cartella dedicata Utente
-                userPath = System.IO.Path.Combine(docRootPath, infoUtente.idPeople);
-                if (!System.IO.Directory.Exists(userPath))
-                {
-                    System.IO.Directory.CreateDirectory(userPath);
-                }
-
-                // cartella temporanea con data odierna
-                userTempDedicatedFolder = System.IO.Path.Combine(userPath, DateTime.Now.ToString("yyyyMMdd"));
-                if (!System.IO.Directory.Exists(userTempDedicatedFolder))
-                {
-                    System.IO.Directory.CreateDirectory(userTempDedicatedFolder);
-                }
-
-                // cartella allegati
-                userTempDedicatedFolder = System.IO.Path.Combine(userTempDedicatedFolder, attachmentsFolder);
-                if (!System.IO.Directory.Exists(userTempDedicatedFolder))
-                {
-                    System.IO.Directory.CreateDirectory(userTempDedicatedFolder);
-                }
-
-
-
-                fileName = System.IO.Path.GetFileName(fileName);
-                // file
-                filePath = System.IO.Path.Combine(userTempDedicatedFolder, fileName);
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-                System.IO.File.WriteAllBytes(filePath, fileStream);
+                BusinessLogic.Conservazione.ConservazioneManager cons = new BusinessLogic.Conservazione.ConservazioneManager();
+                result = cons.SetStatoAttivazione(idAmm, stato);
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                result = false;
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: SetStatoAttivazione", ex);
             }
+
             return result;
         }
 
-        #region Trasmissioni pendenti Utenti in Ruolo
-
         [WebMethod]
-        public bool ExistsTrasmissioniPendentiConWorkflowUtente(string idRuoloInUO, string idPeople)
+        public bool CheckScaricoOtherRole(string idReg, string email)
         {
-            return BusinessLogic.Amministrazione.AmministraManager.ExistsTrasmissioniPendentiConWorkflowUtente(idRuoloInUO, idPeople);
-        }
-
-        [WebMethod()]
-        public DocsPaVO.documento.FileDocumento GetReportTrasmissioniPendentiUtente(string idPeople, string idCorrGlobaliRuolo, string formato)
-        {
-            DocsPaVO.documento.FileDocumento retVal = new DocsPaVO.documento.FileDocumento();
+            bool result = false;
 
             try
             {
-                retVal = BusinessLogic.Amministrazione.AmministraManager.GetReportTrasmissioniPendentiUtente(idPeople, idCorrGlobaliRuolo, formato);
+                result = BusinessLogic.Interoperabilità.InteroperabilitaRicezione.CheckScaricoOtherRole(idReg, email);
             }
             catch (Exception ex)
             {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: GetReportTrasmissioniPendentiUtente", ex);
-                retVal = null;
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: SetStatoAttivazione", ex);
             }
 
-            return retVal;
+            return result;
         }
 
-        [WebMethod()]
-        public DocsPaVO.amministrazione.EsitoOperazione AmmAccettaTrasmConWFUtente(string idPeople, string idCorrGlobaliRuolo)
+        #region visualizzatore espi
+
+        [WebMethod]
+        public DocsPaVO.amministrazione.EsitoVerificaUtenteEspi CheckUtenteAbilitatoEspi(string idAmm, string userName)
         {
-            DocsPaVO.amministrazione.EsitoOperazione esito = new DocsPaVO.amministrazione.EsitoOperazione();
+            DocsPaVO.amministrazione.EsitoVerificaUtenteEspi esito = new DocsPaVO.amministrazione.EsitoVerificaUtenteEspi();
             try
             {
-                esito = BusinessLogic.Amministrazione.OrganigrammaManager.AmmAccettaTrasmConWFUtente(idPeople, idCorrGlobaliRuolo);
+                esito = BusinessLogic.Amministrazione.UtenteManager.CheckUtenteAbilitatoEspi(idAmm, userName);
             }
             catch (Exception e)
             {
-                logger.Debug("Errore in DocsPaWS.asmx  - metodo: AmmAccettaTrasmConWFUtente - ", e);
-                esito.Codice = 1;
-                esito.Descrizione = "si è verificato un errore";
+                logger.Debug("Errore in DocsPaWS.asmx  - metodo: CheckUtenteAbilitatoEspi - ", e);
             }
 
             return esito;
         }
+
+        [WebMethod]
+        public bool AbilitaEspi(string idAmm, string userName, int abilitaRiservati)
+        {
+            bool result = false;
+
+            try
+            {
+                result = BusinessLogic.Amministrazione.UtenteManager.AbilitaEspi(idAmm, userName, abilitaRiservati);
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: AbilitaEspi", ex);
+            }
+
+            return result;
+        }
+
+        [WebMethod]
+        public bool DisabilitaEspi(string idAmm, string userName)
+        {
+            bool result = false;
+
+            try
+            {
+                result = BusinessLogic.Amministrazione.UtenteManager.DisabilitaEspi(idAmm, userName);
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: DisabilitaEspi", ex);
+            }
+
+            return result;
+        }
+
+        [WebMethod]
+        public bool UpdateRiservati(string idAmm, string userName, int abilitaRiservati)
+        {
+            bool result = false;
+
+            try
+            {
+                result = BusinessLogic.Amministrazione.UtenteManager.UpdateRiservati(idAmm, userName, abilitaRiservati);
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore in DocsPaWS.asmx - metodo: UpdateRiservati", ex);
+            }
+
+            return result;
+        }
+
+
         #endregion
+
+
+        #region Segnatura Permanente
+
+
+        //[WebMethod]
+        //public DocsPaVO.documento.DettaglioSegnatura CalcolaDettaglioSegnaturaNP(string docNumber, InfoUtente infoUtente)
+        //{
+        //    logger.Info("START");
+        //    DocsPaVO.documento.DettaglioSegnatura _dettaglioSegnaturaNP = null;
+        //    try
+        //    {
+        //        _dettaglioSegnaturaNP = BusinessLogic.Documenti.SegnaturaManager.CalcolaDettaglioSegnaturaNP(docNumber, infoUtente);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error(ex.Message, ex);
+        //        _dettaglioSegnaturaNP = null;
+        //    }
+        //    logger.Info("END");
+
+        //    return _dettaglioSegnaturaNP;
+
+        //}
+
+        /// <summary>
+        /// Calcola la segnatura permanente in base al tipo:
+        /// - Protocollo
+        /// - Repertorio
+        /// - NP
+        /// </summary>
+        /// <param name="schedaDocumento"></param>
+        /// <param name="infoUtente"></param>
+        /// <returns><see cref="DocsPaVO.documento.DettaglioSegnatura"/></returns>
+        [WebMethod]
+        public DocsPaVO.documento.DettaglioSegnatura CalcolaDettaglioSegnatura(DocsPaVO.documento.SchedaDocumento schedaDocumento, InfoUtente infoUtente)
+        {
+            logger.Info("START");
+            DocsPaVO.documento.DettaglioSegnatura _dettaglioSegnatura = null;
+            try
+            {
+                _dettaglioSegnatura = BusinessLogic.Documenti.SegnaturaManager.CalcolaDettaglioSegnatura(schedaDocumento, infoUtente);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                _dettaglioSegnatura = null;
+            }
+            logger.Info("END");
+
+            return _dettaglioSegnatura;
+
+        }
+
+        /// <summary>
+        /// Appone la segnatura permanente al documento principale ed a tutti gli allegati
+        /// </summary>
+        /// <param name="schedaDocumento"></param>
+        /// <param name="dettaglioSegnatura"></param>
+        /// <param name="infoUtente"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public bool ApponiSegnaturaPermanenteCompleta(DocsPaVO.documento.SchedaDocumento schedaDocumento, DocsPaVO.documento.DettaglioSegnatura dettaglioSegnatura, InfoUtente infoUtente)
+        {
+            logger.Info("START");
+            bool _result;
+            try
+            {
+                _result = BusinessLogic.Documenti.SegnaturaManager.ApponiSegnaturaPermanenteCompleta(schedaDocumento, dettaglioSegnatura, infoUtente);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                _result = false;
+            }
+
+            //try
+            //{
+            //    if (_result)
+            //    {
+            //        BusinessLogic.Documenti.DocumentConsolidation.Consolidate(infoUtente, schedaDocumento.docNumber, DocsPaVO.documento.DocumentConsolidationStateEnum.Step2);
+            //    }
+            //}
+            //catch(Exception ex)
+            //{
+            //    logger.Error(ex.Message, ex);
+            //}
+
+            logger.Info("END");
+            return _result;
+        }
+
+
+
+
+
+
+
+
+        //public DocsPaVO.documento.DettaglioSegnatura CalcolaDettaglioSegnaturaProtocollo(DocsPaVO.documento.SchedaDocumento schedaDocumento, DocsPaVO.utente.InfoUtente infoUtente)
+        //{
+        //    logger.Info("START");
+        //    DocsPaVO.documento.DettaglioSegnatura _dettaglio;
+
+        //    try
+        //    {
+        //        _dettaglio = BusinessLogic.Documenti.SegnaturaManager.CalcolaDettaglioSegnaturaProtocollo(schedaDocumento, infoUtente);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error(ex.Message, ex);
+        //        _dettaglio = null;
+        //    }
+
+        //    logger.Info("END");
+        //    return _dettaglio;
+        //}
+        //
+
+
+
+
+
+        //public DocsPaVO.documento.DettaglioSegnatura CalcolaDettaglioSegnaturaNP(DocsPaVO.documento.SchedaDocumento schedaDocumento, DocsPaVO.utente.InfoUtente infoUtente)
+        //{
+        //    logger.Info("START");
+        //    DocsPaVO.documento.DettaglioSegnatura _dettaglio;
+
+        //    try
+        //    {
+        //        _dettaglio = BusinessLogic.Documenti.SegnaturaManager.CalcolaDettaglioSegnaturaNP(schedaDocumento, infoUtente);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error(ex.Message, ex);
+        //        _dettaglio = null;
+        //    }
+
+        //    logger.Info("END");
+        //    return _dettaglio;
+        //}
+
+
+
+
+
+
+
+        /// <summary>
+        /// Recupera da DB il dettaglio della segnatura calcolato al momento della protocollazione.
+        /// </summary>
+        /// <param name="systemIdProfile">SystemId del Profile</param>
+        /// <returns><see cref="DocsPaVO.documento.DettaglioSegnatura"/></returns>
+        [WebMethod]
+        public DocsPaVO.documento.DettaglioSegnatura GetDettaglioSegnaturaDocumento(string systemIdProfile)
+        {
+            logger.Info("START");
+            DocsPaVO.documento.DettaglioSegnatura _dettaglio = null;
+            try
+            {
+                _dettaglio = BusinessLogic.Documenti.SegnaturaManager.GetDettaglioSegnaturaDocumento(systemIdProfile);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw new ApplicationException("Errore in GetDettaglioSegnaturaProfile :" + ex.Message);
+            }
+
+            logger.Info("END");
+            return _dettaglio;
+        }
+
+
+
+
+        //public bool SetDettaglioSegnaturaDocumento(DocsPaVO.documento.DettaglioSegnatura dettaglioSegnatura)
+        //{
+        //    logger.Info("START");
+        //    bool _result = true;
+        //    try
+        //    {
+        //        _result = BusinessLogic.Documenti.SegnaturaManager.DettaglioSegnatura_Insert(dettaglioSegnatura);
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        _result = false;
+        //        logger.Error(ex.Message, ex);
+        //    }
+        //    logger.Info("END");
+        //    return _result;
+        //}
+
+
+
+
+        //public bool AddSegnaturaPermanenteToFile(string docNumber, InfoUtente infoUtente)
+        //{
+        //    logger.Info("START");
+        //    bool _result = true;
+
+        //    try
+        //    {
+
+        //        _result = BusinessLogic.Documenti.SegnaturaManager.ApponiSegnaturaPermanente(docNumber, infoUtente);
+        //        logger.Debug("RISULTATO APPOSIZIONE: " + _result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _result = false;
+        //        logger.Error(ex.Message, ex);
+        //    }
+
+        //    logger.Info("END");
+        //    return _result;
+        //}
+
+
+        //public bool AddSegnaturaPermanenteToFilePredisposto(DocsPaVO.documento.DettaglioSegnatura dettaglioSegnatura, InfoUtente infoUtente)
+        //{
+        //    logger.Info("START");
+        //    bool _result = true;
+        //    try
+        //    {
+        //        _result = BusinessLogic.Documenti.SegnaturaManager.ApponiSegnaturaPermanenteToPredisposto(dettaglioSegnatura, infoUtente);
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        _result = false;
+        //        logger.Error(ex.Message, ex);
+        //    }
+
+        //    logger.Info("END");
+        //    return _result;
+        //}
+        //
+
+
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="profileId"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public DocsPaVO.documento.DettaglioSegnaturaPosition DettaglioSegnaturaPosition_Select(string profileId)
+        {
+            logger.Info("START");
+            DocsPaVO.documento.DettaglioSegnaturaPosition _dettaglioSegnaturaPosition;
+            try
+            {
+                _dettaglioSegnaturaPosition = BusinessLogic.Documenti.SegnaturaManager.DettaglioSegnaturaPosition_Select(profileId);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                _dettaglioSegnaturaPosition = null;
+            }
+            logger.Info("END");
+            return _dettaglioSegnaturaPosition;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dettaglioSegnaturaPosition"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public bool DettaglioSegnaturaPosition_Insert(DocsPaVO.documento.DettaglioSegnaturaPosition dettaglioSegnaturaPosition)
+        {
+            logger.Info("START");
+            bool _result = true;
+            try
+            {
+                _result = BusinessLogic.Documenti.SegnaturaManager.DettaglioSegnaturaPosition_Insert(dettaglioSegnaturaPosition);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                _result = false;
+            }
+            logger.Info("END");
+            return _result;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dettaglioSegnaturaPosition"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public bool DettaglioSegnaturaPosition_Update(DocsPaVO.documento.DettaglioSegnaturaPosition dettaglioSegnaturaPosition)
+        {
+            bool _result = true;
+            logger.Info("START");
+            try
+            {
+                _result = BusinessLogic.Documenti.SegnaturaManager.DettaglioSegnatura_Update_SetPosition(dettaglioSegnaturaPosition);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                _result = false;
+            }
+            logger.Info("END");
+            return _result;
+        }
+
+
+        #endregion
+
+
+        #region PdfService
+
+        /// <summary>
+        /// Recupera le informazioni della pagina PDF (altezza, larghezza, margini...)
+        /// </summary>
+        /// <param name="docNumber"></param>
+        /// <param name="infoUtente"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public PdfService.Model.PdfPageInfo PdfService_GetPageInfo(String docNumber, DocsPaVO.utente.InfoUtente infoUtente)
+        {
+            PdfService.Model.PdfPageInfo _pageInfo;
+            DocsPaVO.documento.SchedaDocumento _schedaDocumento;
+            DocsPaVO.documento.FileRequest _lastDocumento;
+            DocsPaVO.documento.FileDocumento _file;
+            logger?.Info("START");
+            try
+            {
+                _schedaDocumento = BusinessLogic.Documenti.DocManager.getDettaglio(infoUtente, docNumber, docNumber);
+                _lastDocumento = _schedaDocumento.documenti[0] as DocsPaVO.documento.Documento;
+                _file = BusinessLogic.Documenti.FileManager.getFile(_lastDocumento, infoUtente);
+                _pageInfo = BusinessLogic.Pdf.PdfManager.GetPdfPageInfo(new System.IO.MemoryStream(_file.content), 1);
+                if (_pageInfo == null)
+                {
+                    logger.Warn("Informazioni nulle");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.Error(ex.Message, ex);
+                _pageInfo = null;
+            }
+            logger?.Info("END");
+            return _pageInfo;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Server su cui è ospitato il servizio
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public string Gat_infoServer()
+        {
+            string retVal = "NN";
+
+            if (System.Configuration.ConfigurationManager.AppSettings["MY_SERVER"] != null)
+            {
+                retVal = System.Configuration.ConfigurationManager.AppSettings["MY_SERVER"].ToString();
+            }
+
+            return retVal;
+        }
 
     }
 }

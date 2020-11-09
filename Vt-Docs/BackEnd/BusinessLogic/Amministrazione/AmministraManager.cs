@@ -117,11 +117,63 @@ namespace BusinessLogic.Amministrazione
             }
 
             return result;
-		}	
-			
-		#endregion
-		
-		#region LOGIN  [...deprecated...]
+		}
+
+        public static EsitoOperazione LoginAmministratoreProfilatoLDAP(DocsPaVO.utente.UserLogin userLogin, bool forceLogin, out DocsPaVO.amministrazione.InfoUtenteAmministratore infoUtente)
+        {
+            logger.Debug("START");
+            EsitoOperazione result = new EsitoOperazione();
+            infoUtente = null;
+
+            // Creazione contesto transazionale
+            using (DocsPaDB.TransactionContext transactionContext = new TransactionContext())
+            {
+                DocsPaDocumentale.Documentale.UserManager userManager = new DocsPaDocumentale.Documentale.UserManager();
+
+                DocsPaVO.utente.UserLogin.LoginResult loginResult;
+
+                // Connessione dell'utente nel documentale corrente
+                if (!userManager.LoginAdminUserLDAP(userLogin, forceLogin, out infoUtente, out loginResult))
+                {
+                    if (loginResult == DocsPaVO.utente.UserLogin.LoginResult.UNKNOWN_USER)
+                    {
+                        // Utente amministratore non riconosciuto
+                        result.Codice = 99;
+                        result.Descrizione = string.Format("Utente {0} non riconosciuto", userLogin.UserName);
+                    }
+                    else if (loginResult == DocsPaVO.utente.UserLogin.LoginResult.USER_ALREADY_LOGGED_IN)
+                    {
+                        // Utente amministratore già collegato
+                        result.Codice = 100;
+                        result.Descrizione = string.Format("Utente {0} già collegato", userLogin.UserName);
+                    }
+                    else if (loginResult == DocsPaVO.utente.UserLogin.LoginResult.DTCM_SERVICE_NO_CONTACT)
+                    {
+                        // Utente amministratore già collegato
+                        result.Codice = 100;
+                        result.Descrizione = string.Format("Errore, Servizi del Documentale DTCM non sono raggiungibili.", userLogin.UserName);
+                    }
+                    else
+                    {
+                        result.Codice = 101;
+                        result.Descrizione = string.Format("Errore nella connessione dell'utente {0}", userLogin.UserName);
+                    }
+                }
+                else
+                {
+                    // Completamento della transazione
+                    transactionContext.Complete();
+                }
+            }
+            if (result != null)
+                logger.Debug("Risultato: " + result.Descrizione);
+
+            return result;
+        }
+
+        #endregion
+
+        #region LOGIN  [...deprecated...]
         ///// <summary>
         ///// verifica se l'utente è:
         /////							-	Super-Amministratore
@@ -222,7 +274,7 @@ namespace BusinessLogic.Amministrazione
         //    esito = DeleteLoginAmministrazione(userid); //prima elimina...
         //    if(esito.Codice.Equals(0))
         //        esito = LoginNewSessionAmministratore(userid,sessionID); //poi inserisce
-            
+
         //    return esito;
         //}
 
@@ -240,10 +292,10 @@ namespace BusinessLogic.Amministrazione
         //    queryDef.setParam("param4",DocsPaDbManagement.Functions.Functions.GetDate(true));
         //    queryDef.setParam("param5",sessionID);					
         //    string commandText=queryDef.getSQL();
-			
+
         //    DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
         //    dbProvider.ExecuteNonQuery(commandText,out rowsAffected);
-            
+
         //    if (rowsAffected == 0)
         //    {
         //        esito.Codice = 1;
@@ -253,7 +305,7 @@ namespace BusinessLogic.Amministrazione
         //    return esito;
         //}
 
-		public static EsitoOperazione UpdateLoginAmministrazione(string userid, string sessionID)
+        public static EsitoOperazione UpdateLoginAmministrazione(string userid, string sessionID)
 		{
 			EsitoOperazione esito = new EsitoOperazione();
 
@@ -1364,6 +1416,28 @@ namespace BusinessLogic.Amministrazione
             }
         }
 
+        public static bool ImpostaRuoloPubblico(string idCorrGlobali, string idGruppo, string idAmm)
+        {
+            bool result = false;
+            try
+            {
+                DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
+                if(amm.ImpostaRuoloPubblico(idCorrGlobali, idGruppo, idAmm))
+                {
+                    result = true;
+
+                    //Rimuovo le visibilità assegnate al ruolo pubblico per risalita gerarchica
+                    amm.RimuoviVisibilitaImpostazioneRuoloPubblico(idGruppo);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("Errore in ImpostaRuoloPubblico");
+                return false;
+            }
+            return result;
+        }
+
         public static bool SbloccoCasella(string email, string idRegistro)
         {
             try
@@ -1374,96 +1448,8 @@ namespace BusinessLogic.Amministrazione
             catch (Exception e)
             {
                 logger.Error("Errore in SbloccoCasella " + e.Message);
-                return false;
+                return false; 
             }
-        }
-
-        #region Trasmissioni pendenti Utenti in Ruolo
-        public static bool ExistsTrasmissioniPendentiConWorkflowUtente(string idRuoloInUO, string idPeople)
-        {
-            try
-            {
-                DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione();
-                return amm.ExistsTrasmissioniPendentiConWorkflowUtente(idRuoloInUO, idPeople);
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in ExistsTrasmissioniPendentiConWorkflowUtente " + e.Message);
-                return false;
-            }
-        }
-
-        public static DocsPaVO.documento.FileDocumento GetReportTrasmissioniPendentiUtente(string idPeople, string idCorrGlobalRuolo, string formato)
-        {
-            DocsPaVO.documento.FileDocumento report = new DocsPaVO.documento.FileDocumento();
-            try
-            {
-
-                // filtri report
-                List<DocsPaVO.filtri.FiltroRicerca> filters = new List<DocsPaVO.filtri.FiltroRicerca>();
-                filters.Add(new DocsPaVO.filtri.FiltroRicerca() { argomento = "idPeople", valore = idPeople });
-                filters.Add(new DocsPaVO.filtri.FiltroRicerca() { argomento = "idCorrGlobali", valore = idCorrGlobalRuolo });
-
-                // request generazione report
-                DocsPaVO.Report.PrintReportRequest request = new DocsPaVO.Report.PrintReportRequest();
-                request.SearchFilters = filters;
-
-                // selezione formato report
-                switch (formato)
-                {
-                    case "XLS":
-                        request.ReportType = DocsPaVO.Report.ReportTypeEnum.Excel;
-                        break;
-
-                    case "ODS":
-                        request.ReportType = DocsPaVO.Report.ReportTypeEnum.ODS;
-                        break;
-                }
-
-                string descrizione = string.Empty;
-
-                string descrizioneRuolo = BusinessLogic.Utenti.UserManager.GetRoleDescriptionByIdCorrGlobali(idCorrGlobalRuolo);
-                string descrizioneUtente = BusinessLogic.Utenti.UserManager.getUtente(idPeople).descrizione;
-
-                request.ContextName = "ExportTrasmissioniPendenti";
-                request.ReportKey = "ExportTrasmissioniPendenti";
-                request.Title = string.Empty;
-
-                if (!string.IsNullOrEmpty(descrizioneRuolo) && !string.IsNullOrEmpty(descrizioneUtente))
-                    request.SubTitle = string.Format("Utente: {0} - Ruolo: {1}", descrizioneUtente, descrizioneRuolo);
-                else if (!string.IsNullOrEmpty(descrizioneRuolo))
-                    request.SubTitle = string.Format("Ruolo: {0}", descrizioneRuolo);
-                else if (!string.IsNullOrEmpty(descrizioneUtente))
-                    request.SubTitle = string.Format("Utente: {0}", descrizioneUtente);
-
-                request.AdditionalInformation = string.Empty;
-
-                report = BusinessLogic.Reporting.ReportGeneratorCommand.GetReport(request).Document;
-
-            }
-            catch (Exception ex)
-            {
-                logger.Debug(ex.Message);
-            }
-
-            return report;
-        }
-        #endregion
-
-        public static string GetCodAmmById(string idAmm)
-        {
-            string codiceAmm = string.Empty;
-            try
-            {
-                using (DocsPaDB.Query_Utils.Utils dbUtils = new DocsPaDB.Query_Utils.Utils())
-                    codiceAmm = dbUtils.getCodAmm(idAmm);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore in GetCodAmm " + ex.Message);
-                codiceAmm = string.Empty;
-            }
-            return codiceAmm;
         }
     }
 }

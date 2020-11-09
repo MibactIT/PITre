@@ -55,7 +55,7 @@ namespace FatturazioneElettronicaServiceConsumer
 
                 //Ho tutti i parametri impostati: Passare i parametri nella firma del metodo per fare la Stored Procedure
                 //Il metodo avvia la Stored Procedure
-                amm = WR.AmmModificaUoSysExternal(oldCodiceUO, theUO, codiceAmmIPA, codiceAooIPA, isFatturazione, codiceUAC, codiceClassificazione, amm, out result);
+                //amm = WR.AmmModificaUoSysExternal(oldCodiceUO, theUO, codiceAmmIPA, codiceAooIPA, isFatturazione, codiceUAC, codiceClassificazione, amm, out result);
             }
             else
                 logger.Debug("webReference is null");
@@ -288,7 +288,7 @@ namespace FatturazioneElettronicaServiceConsumer
                 //Devo recuperare anche le informazioni dell'amministrazione da PITRE
                 amm = getInfoAmministrazione(theUO.IDAmministrazione);
 
-                amm = WR.AmmEliminaUoSysExternal(theUO, codiceAmmIPA, codiceAooIPA, amm, out result);
+                //amm = WR.AmmEliminaUoSysExternal(theUO, codiceAmmIPA, codiceAooIPA, amm, out result);
             }
             else
                 logger.Debug("webReference is null");

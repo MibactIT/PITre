@@ -30,27 +30,14 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
             // Stream in cui produrre il file PDF
             using (MemoryStream stream = new MemoryStream())
             {
-
-                Rectangle pageSize;
-                if(request.ReportKey == "RegistroAccessiPublish")
-                {
-                    pageSize = PageSize.A3.Rotate();
-                }
-                else
-                {
-                    pageSize = PageSize.A4.Rotate();
-                }
-
                 // Creazione del documento PDF
-                Document pdfDocument = new Document(pageSize, 10, 10, 90, 10);
+                Document pdfDocument = new Document(PageSize.A4.Rotate(), 10, 10, 90, 10);
 
                 // Per gestione margini nella stampa del registro di conservazione (GM 04/07/2013)
                 if (request.ReportKey == "StampaConservazione")
                 {
                     bool dummy = pdfDocument.SetMargins(10, 10, 20, 10);
                 }
-
-                
 
                 // Creazione del writer per la generazione delle pagine
                 PdfWriter writer = PdfWriter.GetInstance(pdfDocument, stream);

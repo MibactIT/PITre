@@ -133,36 +133,6 @@ namespace Amministrazione.Gestione_RF
                 this.CommandPending = string.Empty;
             }
 
-            if (!String.IsNullOrEmpty(this.hd_ReturnValueProcessiFirmaRegistroRF.Value)
-                 && this.hd_ReturnValueProcessiFirmaRegistroRF.Value != "undefined")
-            {
-                this.hd_ReturnValueProcessiFirmaRegistroRF.Value = string.Empty;
-                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                //this.InvalidaProcessiFirmaRegistriCoinvolti();
-                foreach (DocsPAWA.DocsPaWR.CasellaRegistro c in Caselle)
-                {
-                    if (c.EmailRegistro.Equals(ddl_caselle.SelectedValue))
-                    {
-                        DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                        theManager.InvalidaProcessiFirmaByIdRegistroAndEmailRegistro(c.IdRegistro, c.EmailRegistro, sessionManager.getUserAmmSession());
-                        EliminaCasella(c);
-                        break;
-                    }
-                }
-            }
-
-            if (!String.IsNullOrEmpty(this.hd_ReturnValueProcessiFirmaRegistro.Value)
-                 && this.hd_ReturnValueProcessiFirmaRegistro.Value != "undefined")
-            {
-                this.hd_ReturnValueProcessiFirmaRegistro.Value = string.Empty;
-                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                DocsPAWA.DocsPaWR.OrgRegistro registro = new DocsPAWA.DocsPaWR.OrgRegistro();
-                this.RefreshRFFromUI(ref registro, false);
-                DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                theManager.InvalidaProcessiFirmaByIdRegistroAndEmailRegistro(registro.IDRegistro, string.Empty, sessionManager.getUserAmmSession());
-                UpdateRF(registro);
-            }
-
             //modifica
             switch (ddl_posta.SelectedValue)
             {
@@ -257,6 +227,7 @@ namespace Amministrazione.Gestione_RF
             this.ChkMailPec.CheckedChanged += new EventHandler(this.cbx_ChkMailPec_CheckedChanged);
             img_eliminaCasella.Click += new ImageClickEventHandler(this.img_eliminaCasella_Click);
             this.btn_SbloccaCasella.Click += new EventHandler(this.btn_SbloccaCasella_Click);
+
         }
 
         void ddl_registri_SelectedIndexChanged(object sender, EventArgs e)
@@ -318,13 +289,7 @@ namespace Amministrazione.Gestione_RF
                 //salvo le informazioni sulle caselle associate all'RF corrente
                 this.SetCaselleRegistro(this.CurrentIDRF);
                 if (Caselle != null && Caselle.Length > 0) // aggiorno le note della casella di default
-                {
                     this.txt_note.Text = Caselle[0].Note;
-
-                    //Aggiorno il messaggio
-                    this.txt_msg_posta_in_uscita.Text = Caselle[0].MessageSendMail;
-                    this.cbx_sovrascrivi_messaggio.Checked = Caselle[0].OverwriteMessageAmm;
-                }
             }
         }
 
@@ -610,11 +575,13 @@ namespace Amministrazione.Gestione_RF
             this.RubricaComune1.IdElemento = registro.IDRegistro;
 
             //Se l'utente è super-amministratore abilito il pulsante sblocco casella
+            /*
             DocsPAWA.DocsPaWR.InfoUtenteAmministratore _datiAmministratore = new DocsPAWA.DocsPaWR.InfoUtenteAmministratore();
             DocsPAWA.AdminTool.Manager.SessionManager session = new DocsPAWA.AdminTool.Manager.SessionManager();
             _datiAmministratore = session.getUserAmmSession();
-            if (_datiAmministratore.tipoAmministratore.Equals("1"))
-                this.btn_SbloccaCasella.Visible = true;
+            if(_datiAmministratore.tipoAmministratore.Equals("1"))
+            */
+            this.btn_SbloccaCasella.Visible = true;
         }
 
         /// <summary>
@@ -755,15 +722,20 @@ namespace Amministrazione.Gestione_RF
             }
             else
             {
-                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                if (registro.rfDisabled == "0" || !theManager.ExistsPassiFirmaByIdRegistroAndEmailRegistro(registro.IDRegistro, string.Empty))
-                    UpdateRF(registro);
-                else
+                result = this.UpdateRF(ref registro);
+                if (result.Value && Caselle != null && Caselle.Length > 0)
+                    result = DocsPAWA.utils.MultiCasellaManager.UpdateMailRegistro(registro.IDRegistro, Caselle);
+                if (result.Value && this.GestioneRubricaComuneAbilitata)
                 {
-                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "AvvisoPresenzaProcessiFirmaRegistro", "<script>AvvisoPresenzaProcessiFirmaRegistro();</script>", false);
-                    return;
+                    // verifico che l'RF sia stato già precedentemente inviato alla rubrica comune
+                    DocsPAWA.AdminTool.Manager.SessionManager sessionMng = new DocsPAWA.AdminTool.Manager.SessionManager();
+                    RubricaComune.Proxy.Elementi.ElementoRubrica elemento = DocsPAWA.RubricaComune.RubricaServices.GetElementoRubricaRF(sessionMng.getUserAmmSession(), this.CurrentIDRF);
+                    if (elemento != null)
+                    {
+                        string msg = "alert('Attenzione, l\\'RF è già stato pubblicato in rubrica comune; è necessario ripetere la pubblicazione!');";
+                        ScriptManager.RegisterStartupScript(UpdatePanelGridRF, UpdatePanelGridRF.GetType(), "msgPublication", msg, true);
+                    }
                 }
-                return;
             }
 
             if (!result.Value)
@@ -797,41 +769,6 @@ namespace Amministrazione.Gestione_RF
             this.RubricaComune1.IdElemento = this.CurrentIDRF;
         }
 
-        private void UpdateRF(DocsPAWA.DocsPaWR.OrgRegistro registro)
-        {
-            DocsPAWA.DocsPaWR.ValidationResultInfo result = this.UpdateRF(ref registro);
-            if (result.Value && Caselle != null && Caselle.Length > 0)
-                result = DocsPAWA.utils.MultiCasellaManager.UpdateMailRegistro(registro.IDRegistro, Caselle);
-            if (result.Value && this.GestioneRubricaComuneAbilitata)
-            {
-                // verifico che l'RF sia stato già precedentemente inviato alla rubrica comune
-                DocsPAWA.AdminTool.Manager.SessionManager sessionMng = new DocsPAWA.AdminTool.Manager.SessionManager();
-                RubricaComune.Proxy.Elementi.ElementoRubrica elemento = DocsPAWA.RubricaComune.RubricaServices.GetElementoRubricaRF(sessionMng.getUserAmmSession(), this.CurrentIDRF);
-                if (elemento != null)
-                {
-                    string msg = "alert('Attenzione, l\\'RF è già stato pubblicato in rubrica comune; è necessario ripetere la pubblicazione!');";
-                    ScriptManager.RegisterStartupScript(UpdatePanelGridRF, UpdatePanelGridRF.GetType(), "msgPublication", msg, true);
-                }
-            }
-            if (!result.Value)
-            {
-                this.ShowValidationMessage(result);
-            }
-            else
-            {
-                // Aggiornamento
-                pnl_info.Visible = false;
-
-                this.ClearData();
-
-                // Aggiornamento elemento griglia corrente
-                this.RefreshGridItem(registro);
-                dg_RF.SelectedIndex = -1;
-            }
-            this.RubricaComune1.IdElemento = this.CurrentIDRF;
-
-        }
-
         /// <summary>
         /// Rimozione dati controlli UI
         /// </summary>
@@ -858,9 +795,6 @@ namespace Amministrazione.Gestione_RF
             txt_note.Text = string.Empty;
             Chk_sslImap.Checked = false;
             ChkBoxPopSSl.Checked = false;
-
-            this.txt_msg_posta_in_uscita.Text = string.Empty;
-            this.cbx_sovrascrivi_messaggio.Checked = false;
         }
 
         /// <summary>
@@ -1332,7 +1266,6 @@ namespace Amministrazione.Gestione_RF
 
             }
         }
-
         /// <summary>
         /// Verifica se la rubrica comune è abilitata
         /// </summary>
@@ -1475,8 +1408,10 @@ namespace Amministrazione.Gestione_RF
                     if (!OnInsertMode())
                         SetCaselleRegistro(CurrentIDRF);
                     //salvo in sessione i parametri sulla casella selezionata al momento del nuovo inserimento
-                    if (!string.IsNullOrEmpty(ddl_caselle.SelectedValue))
+                    //Commento perchè nella parte di codice sopra in alto mi pulisce la combo delle caselle e quindi non sò più chi è selezionata realmente ed le informazioni si mischiano
+                    /*if (!string.IsNullOrEmpty(ddl_caselle.SelectedValue))
                         RefreshCasellaFromUI(ddl_caselle.SelectedValue);
+                        */
                     //rendo visibile nella ddl la prima delle nuove caselle inserite
                     ddl_caselle.SelectedValue = newCaselle[0].EmailRegistro;
                     PrevCasella = ddl_caselle.SelectedValue;
@@ -1761,8 +1696,6 @@ namespace Amministrazione.Gestione_RF
                 string tipoPec = casella.RicevutaPEC.Substring(0, 1);
                 this.ddl_ricevutaPec.SelectedIndex = ddl_ricevutaPec.Items.IndexOf(ddl_ricevutaPec.Items.FindByValue(tipoPec));
             }
-            this.txt_msg_posta_in_uscita.Text = casella.MessageSendMail;
-            this.cbx_sovrascrivi_messaggio.Checked = casella.OverwriteMessageAmm;
         }
 
         /// <summary>
@@ -2037,8 +1970,6 @@ namespace Amministrazione.Gestione_RF
                     c.ImapSSL = (this.Chk_sslImap.Checked == true) ? "1" : "0";
                     c.RicevutaPEC = this.ddl_ricevutaPec.SelectedValue;
                     c.Note = this.txt_note.Text;
-                    c.MessageSendMail = txt_msg_posta_in_uscita.Text;
-                    c.OverwriteMessageAmm = this.cbx_sovrascrivi_messaggio.Checked;
 
                     break;
                 }
@@ -2210,14 +2141,40 @@ namespace Amministrazione.Gestione_RF
 
                             //siamo in update
                             else
-                            {
-                                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                                if (!theManager.ExistsPassiFirmaByIdRegistroAndEmailRegistro(c.IdRegistro, c.EmailRegistro))
-                                    EliminaCasella(c);
+                            {                                
+                                //elimino da db la casella di posta
+                                DocsPAWA.DocsPaWR.CasellaRegistro [] listaCaselleInDB = ws.AmmGetMailRegistro(CurrentIDRF);
+                                //se in db la casella che si sta eliminando è salvata come principale, allora avviso l'utente che prima dell'eliminazione
+                                //deve salvare la nuova casella di posta principale
+                                if(Caselle.Length > 1 && listaCaselleInDB[0] != null && listaCaselleInDB[0].EmailRegistro.Equals(c.EmailRegistro))                                 
+                                {
+                                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "warningElim2", "<script>alert('Prima di eliminare la casella è necessario salvare la nuova casella principale');</script>", false);
+                                    return;
+                                }
+                                DocsPAWA.DocsPaWR.ValidationResultInfo result= ws.AmmDeleteMailRegistro(CurrentIDRF, c.EmailRegistro);
+                                if (result.Value)
+                                {
+                                    //elimino i diritti sulla nuova casella per tutti i ruoli dell'RF
+                                    Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
+                                    //Cerco solo i ruoli della AOO COLLEGATA: idReg 
+                                    theManager.GetListaRuoliAOO(this.CurrentIDRF);
+                                    if (theManager.getListaRuoliAOO() != null && theManager.getListaRuoliAOO().Count > 0)
+                                    {
+                                        foreach (DocsPAWA.DocsPaWR.OrgRuolo ruolo in theManager.getListaRuoliAOO())
+                                        {
+                                            ws.AmmDelRightMailRegistro(this.CurrentIDRF, ruolo.IDCorrGlobale, c.EmailRegistro);
+                                        }
+                                    } //end aggiornamento diritti ruoli
+                                    SetCaselleRegistro(CurrentIDRF);
+                                    if (Caselle.Length > 0)
+                                    {
+                                        RefreshCasella(Caselle[0]);
+                                    }
+                                    FillListRF();
+                                }
                                 else
                                 {
-                                    ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "AvvisoPresenzaProcessiFirmaEmail", "<script>AvvisoPresenzaProcessiFirmaEmail();</script>", false);
-                                    return;
+                                    this.ShowValidationMessage(result);   
                                 }
                             }
                             
@@ -2234,44 +2191,6 @@ namespace Amministrazione.Gestione_RF
                     this.img_aggiungiCasella.Enabled = true;
                     this.ddl_caselle.Enabled = true;
                 }
-            }
-        }
-
-        private void EliminaCasella(DocsPAWA.DocsPaWR.CasellaRegistro c)
-        {
-            //elimino da db la casella di posta
-            DocsPAWA.DocsPaWR.CasellaRegistro[] listaCaselleInDB = ws.AmmGetMailRegistro(CurrentIDRF);
-            //se in db la casella che si sta eliminando è salvata come principale, allora avviso l'utente che prima dell'eliminazione
-            //deve salvare la nuova casella di posta principale
-            if (Caselle.Length > 1 && listaCaselleInDB[0] != null && listaCaselleInDB[0].EmailRegistro.Equals(c.EmailRegistro))
-            {
-                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "warningElim2", "<script>alert('Prima di eliminare la casella è necessario salvare la nuova casella principale');</script>", false);
-                return;
-            }
-            DocsPAWA.DocsPaWR.ValidationResultInfo result = ws.AmmDeleteMailRegistro(CurrentIDRF, c.EmailRegistro);
-            if (result.Value)
-            {
-                //elimino i diritti sulla nuova casella per tutti i ruoli dell'RF
-                Amministrazione.Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                //Cerco solo i ruoli della AOO COLLEGATA: idReg 
-                theManager.GetListaRuoliAOO(this.CurrentIDRF);
-                if (theManager.getListaRuoliAOO() != null && theManager.getListaRuoliAOO().Count > 0)
-                {
-                    foreach (DocsPAWA.DocsPaWR.OrgRuolo ruolo in theManager.getListaRuoliAOO())
-                    {
-                        ws.AmmDelRightMailRegistro(this.CurrentIDRF, ruolo.IDCorrGlobale, c.EmailRegistro);
-                    }
-                } //end aggiornamento diritti ruoli
-                SetCaselleRegistro(CurrentIDRF);
-                if (Caselle.Length > 0)
-                {
-                    RefreshCasella(Caselle[0]);
-                }
-                FillListRF();
-            }
-            else
-            {
-                this.ShowValidationMessage(result);
             }
         }
     #endregion

@@ -30,6 +30,11 @@ namespace Amministrazione.Gestione_Organigramma
         protected System.Web.UI.WebControls.Button btnGenerateSummary;
         //private enum statoRuoloInLibroFirma {NON_IN_LIBRO_FIRMA, IN_LIBRO_FIRMA_DISATTIVO, IN_LIBRO_FIRMA_ATTIVO};
 
+        private int countProcessiCoinvolti_R = 0;
+        private int countIstazaProcessiCoinvolti_R = 0;
+        private int countProcessiCoinvolti_U = 0;
+        private int countIstazaProcessiCoinvolti_U = 0;
+
         #region class myTreeNode
         /// <summary>
         /// Summary description for myTreeNode
@@ -358,15 +363,8 @@ namespace Amministrazione.Gestione_Organigramma
         protected System.Web.UI.WebControls.DropDownList ddlRegistriInteropSemplificata, ddlRfInteropSemplificata;
         protected System.Web.UI.HtmlControls.HtmlTableRow trInteropSemplificata;
         protected System.Web.UI.WebControls.Label lblInteroperanteIS;
-        protected System.Web.UI.WebControls.Button btn_processiFirmaUtente;
-        protected System.Web.UI.WebControls.Button btn_processiFirmaRuolo;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_returnValueModalLFRuolo;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_returnValueModalLFUtente;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_TipoOperazione;
-
-        private InvalidaPassiCorrelatiDelegate invalidaPassiCorrelati;
-        private StoricizzaPassiCorrelatiDelegate storicizzaPassiCorrelati;
-        protected System.Web.UI.HtmlControls.HtmlInputHidden hd_ReturnValueProcessiFirmaRegistroRF;
+        protected System.Web.UI.WebControls.Panel pnlChkRuoloPubblico;
+        protected System.Web.UI.WebControls.CheckBox chkRuoloPubblico;
 
         #endregion
 
@@ -556,27 +554,12 @@ namespace Amministrazione.Gestione_Organigramma
                     this.btn_ins_ruolo_uo.Enabled = true;
                     this.btn_ins_sotto_uo.Enabled = true;
                 }
-                RemoveSessionInterrompiProcessi();
-                RemoveSessionStoricizzaProcessi();
 
                 //processiCoinvolti_R = (Session["processiCoinvolti_R"] != null?(List<ProcessoFirma>)Session["processiCoinvolti_R"]:new List<ProcessoFirma>());
                 //istazaProcessiCoinvolti_R = (Session["istazaProcessiCoinvolti_R"] != null ? (List<IstanzaProcessoDiFirma>)Session["istazaProcessiCoinvolti_R"] : new List<IstanzaProcessoDiFirma>());
                 //processiCoinvolti_U = (Session["processiCoinvolti_U"] != null ? (List<ProcessoFirma>)Session["processiCoinvolti_U"] : new List<ProcessoFirma>());
                 //istazaProcessiCoinvolti_U = (Session["istazaProcessiCoinvolti_U"] != null ? (List<IstanzaProcessoDiFirma>)Session["istazaProcessiCoinvolti_U"] : new List<IstanzaProcessoDiFirma>());
                 //Session["InfoUtenteAmministratore"] = getIfoUtenteAmministratore();
-            }
-            else
-            {
-                if (this.hd_returnValueModalLFRuolo.Value != null && this.hd_returnValueModalLFRuolo.Value != string.Empty && this.hd_returnValueModalLFRuolo.Value != "undefined")
-                {
-                    this.GestRitornoAvvisoLFRuolo(this.hd_returnValueModalLFRuolo.Value);
-                    return;
-                }
-                if (this.hd_returnValueModalLFUtente.Value != null && this.hd_returnValueModalLFUtente.Value != string.Empty && this.hd_returnValueModalLFUtente.Value != "undefined")
-                {
-                    this.GestRitornoAvvisoLFUtente(this.hd_returnValueModalLFUtente.Value);
-                    return;
-                }
             }
 
             // Le opzioni del calcolo atipicità devono essere visualizzate solo se è attiva
@@ -635,19 +618,17 @@ namespace Amministrazione.Gestione_Organigramma
                     this.trExtendVisibility.Visible = Utils.GetAbilitazioneAtipicita();
                     this.rblExtendVisibility.SelectedIndex = 0;
                     this.trCalculateAtipicita.Visible = Utils.GetAbilitazioneAtipicita();
+
+                    myTreeNode TreeNodo;
+                    TreeNodo = (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex);
+                    if (TreeNodo.getTipoNodo() == "R" || TreeNodo.getTipoNodo() == "P")
+                        VerificaProcessiCoinvolti(TreeNodo);
                 }
             }
 
-            if (!String.IsNullOrEmpty(this.hd_ReturnValueProcessiFirmaRegistroRF.Value)
-                && this.hd_ReturnValueProcessiFirmaRegistroRF.Value != "undefined")
-            {
-                this.hd_ReturnValueProcessiFirmaRegistroRF.Value = string.Empty;
-                this.InvalidaProcessiFirmaRegistriCoinvolti();
-                this.InserimentoRegistri();
-            }
-                #endregion
+            #endregion
 
-                try
+            try
             {
                 Session["AdminBookmark"] = "Organigramma";
 
@@ -736,7 +717,6 @@ namespace Amministrazione.Gestione_Organigramma
             try
             {
                 string idAmm = AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "3");
-
                 Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
 
                 if (idAmm != null && idAmm != string.Empty)
@@ -1084,7 +1064,7 @@ namespace Amministrazione.Gestione_Organigramma
                     TreeNodo = (myTreeNode)treeViewUO.GetNodeFromIndex(e.NewNode);
                     if (TreeNodo!=null && !TreeNodo.Expanded && TreeNodo.getTipoNodo() != null && TreeNodo.getTipoNodo().Equals("R"))
                     {
-                        //VerificaProcessiCoinvolti(TreeNodo);
+                        VerificaProcessiCoinvolti(TreeNodo);
                     }
                     this.GestioneLoadDettagli(TreeNodo);
                     this.btn_storicizza.Visible = true;
@@ -1626,12 +1606,6 @@ namespace Amministrazione.Gestione_Organigramma
                 this.btnShowRoleHistory.Attributes["onclick"] = DocsPAWA.popup.RoleHistory.GetScriptToOpenWindow(TreeNode.getIDCorrGlobale(), String.Empty);
                 this.btnShowRoleHistory.Visible = true;
 
-                this.btn_processiFirmaRuolo.Attributes.Add("onclick", "ApriProcessiFirmaRuolo('" + nodoIdGruppo + "');");
-                if (!string.IsNullOrEmpty(DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_LIBRO_FIRMA")) && DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_LIBRO_FIRMA").Equals("1"))
-                    this.btn_processiFirmaRuolo.Visible = true; 
-                else
-                    this.btn_processiFirmaRuolo.Visible = false;
-
                 //pulsante visibiltà nodi di titolario
                 this.btn_visib_titolario.Visible = false;
                 if (this.isTitolarioRuoloAbilitato())
@@ -2141,15 +2115,11 @@ namespace Amministrazione.Gestione_Organigramma
                 this.cb_amm.Enabled = false;
 
                 //gestione pulsanti
-                if (VerificaProcessiCoinvolti("", TreeNode))
-                {
-                    if (TreeNodoPadre.Nodes.Count > 1)
-                        this.Gest_AperturaWnd_SpostaUtente(false);
-                    else
-                    {
-                        this.btn_sposta_utente.Attributes.Add("onclick", "alert('Attenzione,\\npoichè il ruolo presenta solo questo utente, per effettuare lo spostamento\\nè consigliato procedere come segue:\\n\\nutilizzare il tasto \\'Gestione utenti\\' presente nei dettagli del ruolo\\nper eliminare o inserire utenti nei ruoli.'); return true;");
-                    }
-                }
+                if (TreeNodoPadre.Nodes.Count > 1)
+                    this.Gest_AperturaWnd_SpostaUtente(false);
+                else
+                    this.btn_sposta_utente.Attributes.Add("onclick", "alert('Attenzione,\\npoichè il ruolo presenta solo questo utente, per effettuare lo spostamento\\nè consigliato procedere come segue:\\n\\nutilizzare il tasto \\'Gestione utenti\\' presente nei dettagli del ruolo\\nper eliminare o inserire utenti nei ruoli.');");
+
                 //gestione qualifiche
                 string chiaveQualifiche = DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "GESTIONE_QUALIFICHE");
                 if (!string.IsNullOrEmpty(chiaveQualifiche) && chiaveQualifiche.Equals("1"))
@@ -2171,11 +2141,6 @@ namespace Amministrazione.Gestione_Organigramma
                 {
                     this.btn_gest_app.Visible = false;
                 }
-                this.btn_processiFirmaUtente.Attributes.Add("onclick", "ApriProcessiFirmaUtente('" + TreeNodoPadre.getIDGruppo() + "','" + utente.IDPeople + "');");
-                if (!string.IsNullOrEmpty(DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_LIBRO_FIRMA")) && DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_LIBRO_FIRMA").Equals("1"))
-                    this.btn_processiFirmaUtente.Visible = true;
-                else
-                    this.btn_processiFirmaUtente.Visible = false;
             }
             catch(Exception ex)
             {
@@ -2193,6 +2158,10 @@ namespace Amministrazione.Gestione_Organigramma
 
             if (TreeNodo.getTipoNodo() == "P")
             {
+                VerificaProcessiCoinvolti(TreeNodo);
+                string messaggioLibroFirma = getCoinvoltoInLibroFirma();
+
+
                 myTreeNode TreeNodoPadre = (myTreeNode)this.GetNodoPadre(TreeNodo);
                 int contaUtentiNelRuolo = TreeNodoPadre.Nodes.Count;
                 string idCorrGlobGruppo = TreeNodoPadre.getIDCorrGlobale();
@@ -2212,12 +2181,12 @@ namespace Amministrazione.Gestione_Organigramma
                     if (!ClientScript.IsStartupScriptRegistered("openWndSpostaUt"))
                     {
 
-                        string scriptString = "<SCRIPT>ApriSpostaUtente('" + idCorrGlobUtente + "','" + userid + "','" + Server.UrlEncode(nome) + "','" + Server.UrlEncode(cognome) + "','" + idAmm + "','" + Convert.ToString(contaUtentiNelRuolo) + "','" + idCorrGlobGruppo + "','" + idGruppo + "');</SCRIPT>";
+                        string scriptString = "<SCRIPT>if(ShowConfirmUpdateUser('" + messaggioLibroFirma + "')) {ApriSpostaUtente('" + idCorrGlobUtente + "','" + userid + "','" + Server.UrlEncode(nome) + "','" + Server.UrlEncode(cognome) + "','" + idAmm + "','" + Convert.ToString(contaUtentiNelRuolo) + "','" + idCorrGlobGruppo + "','" + idGruppo + "');}</SCRIPT>";
                         ClientScript.RegisterStartupScript(this.GetType(), "openWndSpostaUt", scriptString);
                     }
                 }
                 else
-                    this.btn_sposta_utente.Attributes.Add("onclick", "ApriSpostaUtente('" + idCorrGlobUtente + "','" + userid + "','" + Server.UrlEncode(nome) + "','" + Server.UrlEncode(cognome) + "','" + idAmm + "','" + Convert.ToString(contaUtentiNelRuolo) + "','" + idCorrGlobGruppo + "','" + idGruppo + "');");
+                    this.btn_sposta_utente.Attributes.Add("onclick", "if(ShowConfirmUpdateUser('" + messaggioLibroFirma + "')) {ApriSpostaUtente('" + idCorrGlobUtente + "','" + userid + "','" + Server.UrlEncode(nome) + "','" + Server.UrlEncode(cognome) + "','" + idAmm + "','" + Convert.ToString(contaUtentiNelRuolo) + "','" + idCorrGlobGruppo + "','" + idGruppo + "');}");
             }
         }
 
@@ -2538,7 +2507,6 @@ namespace Amministrazione.Gestione_Organigramma
             this.btn_sposta_ruolo.Visible = false;
             this.btn_utenti_ruolo.Visible = false;
             this.btn_copiaVisRuolo.Visible = false;
-            this.btn_processiFirmaRuolo.Visible = false;
             this.btn_mod_ruolo.Text = "Inserisci";
 
             this.txt_rubricaRuolo.Text = "";
@@ -2576,6 +2544,8 @@ namespace Amministrazione.Gestione_Organigramma
         {
             // gestione della visibilità degli oggetti sulla GUI
             this.trCalculateAtipicita.Visible = false;
+            this.pnlChkRuoloPubblico.Visible = false;
+            this.chkRuoloPubblico.Checked = false;
             switch (from)
             {
                 case "ResetAll": //........................ annulla tutto!
@@ -2618,6 +2588,10 @@ namespace Amministrazione.Gestione_Organigramma
                     this.pnl_funzioni.Visible = true;
                     this.pnl_registri.Visible = true;
                     this.pnl_utente.Visible = false;
+
+                    string idAmm = AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "3");
+                    if (InitConfigurationKeys.GetValue(idAmm, "ENABLE_FASCICOLO_PUBBLICO") != null && InitConfigurationKeys.GetValue(idAmm, "ENABLE_FASCICOLO_PUBBLICO").Equals("1"))
+                        this.pnlChkRuoloPubblico.Visible = true;
                     break;
                 case "DettagliUtente": //.................... visualizzazione dati dell'utente selezionato
                     this.pnl_tv.Visible = true;
@@ -2828,20 +2802,16 @@ namespace Amministrazione.Gestione_Organigramma
 
         private void btn_mod_ruolo_Click(object sender, System.EventArgs e)
         {
-            RemoveSessionInterrompiProcessi();
-            RemoveSessionStoricizzaProcessi();
             switch (this.btn_mod_ruolo.Text)
             {
                 case "Inserisci":
                     this.InsModCanc_Ruolo("inserimento");
                     break;
                 case "Modifica":
-                    if(VerificaProcessiCoinvolti(this.btn_mod_ruolo.Text, (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex)))
-                        this.InsModCanc_Ruolo("modifica");
+                    this.InsModCanc_Ruolo("modifica");
                     break;
                 case "Sposta":
-                    if (VerificaProcessiCoinvolti(this.btn_mod_ruolo.Text, (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex)))
-                        this.InsModCanc_Ruolo("Sposta");
+                    this.InsModCanc_Ruolo("Sposta");
                     break;
                 default:
                     break;
@@ -2851,60 +2821,56 @@ namespace Amministrazione.Gestione_Organigramma
 
         private void btn_elimina_ruolo_Click(object sender, System.EventArgs e)
         {
-            if (VerificaProcessiCoinvolti("cancellazione", (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex)))
-                this.InsModCanc_Ruolo("cancellazione");
+            this.InsModCanc_Ruolo("cancellazione");
         }
 
         private void btn_utenti_ruolo_Click(object sender, System.EventArgs e)
         {
             try
             {
-                //if (VerificaProcessiCoinvolti("sposta_ruolo"))
-                //{
-                    myTreeNode TreeNodo;
-                    TreeNodo = (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex);
+                myTreeNode TreeNodo;
+                TreeNodo = (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex);
 
-                    if (TreeNodo.Nodes.Count > 0)
+                if (TreeNodo.Nodes.Count > 0)
+                {
+                    TreeNodo.Nodes.Clear();
+                }
+
+                Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
+
+                theManager.ListaUtenti(TreeNodo.getIDGruppo());
+
+                if (theManager.getListaUtenti() != null && theManager.getListaUtenti().Count > 0)
+                {
+                    myTreeNode nodoUtenti;
+
+                    foreach (DocsPAWA.DocsPaWR.OrgUtente utente in theManager.getListaUtenti())
                     {
-                        TreeNodo.Nodes.Clear();
+                        nodoUtenti = new myTreeNode();
+
+                        nodoUtenti.ID = utente.IDCorrGlobale;
+                        nodoUtenti.Text = utente.CodiceRubrica + " - " + utente.Cognome + " " + utente.Nome;
+                        nodoUtenti.ImageUrl = "../Images/utente.gif";
+
+                        TreeNodo.Nodes.Add(nodoUtenti);
+
+                        nodoUtenti.setTipoNodo("P");
+                        nodoUtenti.setIDCorrGlobale(utente.IDCorrGlobale);
+                        nodoUtenti.setCodice(utente.Codice);
+                        nodoUtenti.setCodiceRubrica(utente.CodiceRubrica);
+                        nodoUtenti.setIDAmministrazione(utente.IDAmministrazione);
                     }
+                }
+                else
+                {
+                    this.btn_elimina_ruolo.Visible = true;
+                }
 
-                    Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-
-                    theManager.ListaUtenti(TreeNodo.getIDGruppo());
-
-                    if (theManager.getListaUtenti() != null && theManager.getListaUtenti().Count > 0)
-                    {
-                        myTreeNode nodoUtenti;
-
-                        foreach (DocsPAWA.DocsPaWR.OrgUtente utente in theManager.getListaUtenti())
-                        {
-                            nodoUtenti = new myTreeNode();
-
-                            nodoUtenti.ID = utente.IDCorrGlobale;
-                            nodoUtenti.Text = utente.CodiceRubrica + " - " + utente.Cognome + " " + utente.Nome;
-                            nodoUtenti.ImageUrl = "../Images/utente.gif";
-
-                            TreeNodo.Nodes.Add(nodoUtenti);
-
-                            nodoUtenti.setTipoNodo("P");
-                            nodoUtenti.setIDCorrGlobale(utente.IDCorrGlobale);
-                            nodoUtenti.setCodice(utente.Codice);
-                            nodoUtenti.setCodiceRubrica(utente.CodiceRubrica);
-                            nodoUtenti.setIDAmministrazione(utente.IDAmministrazione);
-                        }
-                    }
-                    else
-                    {
-                        this.btn_elimina_ruolo.Visible = true;
-                    }
-
-                    //Serve per far ricaricare alla rubrica le modifiche apportate
-                    DocsPAWA.DocsPaWR.DocsPaWebService ws = new DocsPAWA.DocsPaWR.DocsPaWebService();
-                    ws.resetHashTable();
-                //}
+                //Serve per far ricaricare alla rubrica le modifiche apportate
+                DocsPAWA.DocsPaWR.DocsPaWebService ws = new DocsPAWA.DocsPaWR.DocsPaWebService();
+                ws.resetHashTable();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 this.lbl_avviso.Text = ex.ToString();
                 this.GUI("ResetAll");
@@ -2939,16 +2905,6 @@ namespace Amministrazione.Gestione_Organigramma
             }*/
 
             // Creazione del dettaglio del ruolo da spostare
-            RemoveSessionInterrompiProcessi();
-            RemoveSessionStoricizzaProcessi();
-            if (this.VerificaProcessiCoinvolti("sposta", (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex)))
-                SpostaRuolo();
-                 
-        }
-
-        private void SpostaRuolo()
-        {
-            // Creazione del dettaglio del ruolo da spostare
             myTreeNode treeNode;
             treeNode = (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex);
             treeNode.setTipoNodo("R");
@@ -2972,13 +2928,16 @@ namespace Amministrazione.Gestione_Organigramma
             SaveChangesToRole.SaveChangesRequest = new SaveChangesToRoleRequest()
             {
                 ModifiedRole = role,
-                Historicize = this.chkStoricizza.Checked,
+                Historicize =  this.chkStoricizza.Checked,
                 UpdateTransModelsAssociation = this.chkUpdateModels.Checked,
                 ExtendVisibility = (ExtendVisibilityOption)Enum.Parse(typeof(ExtendVisibilityOption), "N"),
                 ComputeAtipicita = Utils.GetAbilitazioneAtipicita() && this.calculateAtipicitaOptions.CalculateAtipicita()
 
             };
+
             this.ClientScript.RegisterStartupScript(this.GetType(), "OpenMove", SaveChangesToRole.ScriptToOpen, true);
+            
+            
         }
 
         #endregion
@@ -2993,13 +2952,7 @@ namespace Amministrazione.Gestione_Organigramma
         #region registri
         private void btn_mod_registri_Click(object sender, System.EventArgs e)
         {
-            if(!CheckPresenzaProcessiFirmaRegistri())
-                this.InserimentoRegistri();
-            else
-            {
-                string scriptString = "<SCRIPT>AvvisoPresenzaProcessiFirmaRegistroRf();</SCRIPT>";
-                ClientScript.RegisterStartupScript(GetType(), "AvvisoPresenzaProcessiFirmaRegistroRf", scriptString);
-            }
+            this.InserimentoRegistri();
         }
         #endregion
 
@@ -3850,6 +3803,20 @@ namespace Amministrazione.Gestione_Organigramma
                                     break;
 
                                 case "modifica":
+                                    if(this.chkRuoloPubblico.Checked)
+                                    {
+                                        if(!theManager.ImpostaRuoloPubblico(ruolo.IDCorrGlobale, ruolo.IDGruppo, ruolo.IDAmministrazione))
+                                        {
+                                            string scriptString = "<SCRIPT>alert('Attenzione, si è verificato un errore durante l\\'impostazione di Ruolo pubblico.');</SCRIPT>";
+                                            this.Page.RegisterStartupScript("alertJavaScript", scriptString);
+                                        }
+                                        else
+                                        {
+                                             theManager.Clear(ruolo.IDAmministrazione);
+                                        }
+                                  
+                                        break;
+                                    }
                                     //theManager.ModRuolo(ruolo);
                                     SaveChangesToRole.SaveChangesRequest = new SaveChangesToRoleRequest()
                                     {
@@ -3861,7 +3828,10 @@ namespace Amministrazione.Gestione_Organigramma
                                     };
 
                                     this.ClientScript.RegisterStartupScript(this.GetType(), "OpenMove", SaveChangesToRole.ScriptToOpen, true);
-                                return;
+
+                                    InvalidaPassiCorrelati("R");
+                                    
+                                    return;
                                     break;
 
 
@@ -3874,6 +3844,9 @@ namespace Amministrazione.Gestione_Organigramma
                                     if (this.hd_DisableRole.Value.Equals("disable"))
                                     {
                                         this.hd_DisableRole.Value = string.Empty;
+
+                                        InvalidaPassiCorrelati("R");
+
                                         theManager.EliminaRuolo(ruolo);
                                     }
                                     else if (this.hd_DisableRole.Value.Equals("no_disable"))
@@ -3905,8 +3878,10 @@ namespace Amministrazione.Gestione_Organigramma
                                             return;
                                         }
                                         else 
-                                        {                                     
-                                             theManager.EliminaRuolo(ruolo);
+                                        {
+                                            InvalidaPassiCorrelati("R");
+
+                                            theManager.EliminaRuolo(ruolo);
                                         }
                                     }
                                     break;
@@ -3914,6 +3889,7 @@ namespace Amministrazione.Gestione_Organigramma
 
                             DocsPAWA.DocsPaWR.EsitoOperazione esito = new DocsPAWA.DocsPaWR.EsitoOperazione();
                             esito = theManager.getEsitoOperazione();
+
                             switch (tipoAzione)
                             {
                                 case "inserimento":
@@ -3949,9 +3925,16 @@ namespace Amministrazione.Gestione_Organigramma
                                     }
                                     break;
                                 case "modifica":
+                                    if(this.chkRuoloPubblico.Checked)
+                                    {
+                                        this.AggiornaTreeviewDopoCanc("R");
+                                        break;
+                                    }
                                     if (esito.Codice.Equals(0))
                                     {
-                                    this.AggiornaTreeviewDopoMod("");
+                                        InvalidaPassiCorrelati("R");
+
+                                        this.AggiornaTreeviewDopoMod("");
                                     }
                                     else
                                     {
@@ -4011,11 +3994,9 @@ namespace Amministrazione.Gestione_Organigramma
                                             }
                                         }
                                         this.AggiornaTreeviewDopoCanc("R");
-                                        AsyncCallback callback = new AsyncCallback(CallBack);
-                                        invalidaPassiCorrelati = new InvalidaPassiCorrelatiDelegate(InvalidaPassiCorrelati);
-                                        DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                                        invalidaPassiCorrelati.BeginInvoke("R", ruolo.IDGruppo, string.Empty, sessionManager.getUserAmmSession(), callback, null);
-                                }
+
+                                        InvalidaPassiCorrelati("R");
+                                    }
                                     else
                                     {
                                         // codice errori : 3,4,5,6,7,8,10(errore nel metodo AmmOnlyDisabledRole)
@@ -4083,167 +4064,163 @@ namespace Amministrazione.Gestione_Organigramma
             }
         }
 
-        private void InvalidaPassiCorrelati(string tipoNodo, string idRuolo, string idPeople, InfoUtenteAmministratore infoAmm)
+        private void InvalidaPassiCorrelati(string tipoNodo)
         {
+            //DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
+            //processiCoinvolti_R = (Session["processiCoinvolti_R"] != null ? (List<ProcessoFirma>)Session["processiCoinvolti_R"] : new List<ProcessoFirma>());
+            //istazaProcessiCoinvolti_R = (Session["istazaProcessiCoinvolti_R"] != null ? (List<IstanzaProcessoDiFirma>)Session["istazaProcessiCoinvolti_R"] : new List<IstanzaProcessoDiFirma>());
+            //processiCoinvolti_U = (Session["processiCoinvolti_U"] != null ? (List<ProcessoFirma>)Session["processiCoinvolti_U"] : new List<ProcessoFirma>());
+            //istazaProcessiCoinvolti_U = (Session["istazaProcessiCoinvolti_U"] != null ? (List<IstanzaProcessoDiFirma>)Session["istazaProcessiCoinvolti_U"] : new List<IstanzaProcessoDiFirma>());
+
+            //if(tipoNodo.Equals("R"))
+            //{
+            //    if (processiCoinvolti_R.Count()>0)
+            //    {
+            //        List<string> idPassi = new List<string>();
+            //        foreach (ProcessoFirma processo in processiCoinvolti_R)
+            //        {
+            //            foreach(PassoFirma passo in processo.passi) 
+            //            {
+            //                if (!idPassi.Contains(passo.idPasso))
+            //                {
+            //                    idPassi.Add(passo.idPasso);
+            //                }
+            //            }
+            //        }
+
+            //        wws.TickPasso(idPassi.ToArray(), tipoNodo);
+            //    }
+
+            //    if (istazaProcessiCoinvolti_R.Count() > 0)
+            //    {
+            //        SessionManager sm = new SessionManager();
+            //        wws.TickIstanze(istazaProcessiCoinvolti_R.ToArray(), tipoNodo, sm.getUserAmmSession());
+            //    }
+            //}
+
+            //else if (tipoNodo.Equals("U"))
+            //{
+            //    if (processiCoinvolti_U.Count() > 0)
+            //    {
+            //        List<string> idPassi = new List<string>();
+            //        foreach (ProcessoFirma processo in processiCoinvolti_U)
+            //        {
+            //            foreach (PassoFirma passo in processo.passi)
+            //            {
+            //                if (!idPassi.Contains(passo.idPasso))
+            //                {
+            //                    idPassi.Add(passo.idPasso);
+            //                }
+            //            }
+            //        }
+
+            //        wws.TickPasso(idPassi.ToArray(), tipoNodo);
+            //    }
+
+            //    if (istazaProcessiCoinvolti_U.Count() > 0)
+            //    {
+            //        SessionManager sm = new SessionManager();
+            //        wws.TickIstanze(istazaProcessiCoinvolti_U.ToArray(), tipoNodo, sm.getUserAmmSession());
+            //    }
+            //}
+        }
+
+        private void VerificaProcessiCoinvolti(myTreeNode TreeNodo)
+        {
+            TreeNodo = (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex);
             DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
-            wws.Timeout = System.Threading.Timeout.Infinite;
-            wws.InvalidaPassiCorrelatiTitolare(idRuolo, idPeople, tipoNodo, infoAmm);
-        }
 
-        public delegate void InvalidaPassiCorrelatiDelegate(string tipoNodo, string idRuolo, string idPeople, InfoUtenteAmministratore infoAmm);
-
-        private void CallBack(IAsyncResult result)
-        {
-            invalidaPassiCorrelati.EndInvoke(result);
-        }
-
-        private void StoricizzaPassiCorrelati(string idRuoloOld, string idRuoloNew)
-        {
-            Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-            theManager.StoricizzaRuoloPassiCorrelati(idRuoloOld, idRuoloNew);
-        }
-
-        public delegate void StoricizzaPassiCorrelatiDelegate(string idRuoloOld, string idRuoloNew);
-
-        private void CallBackStoricizza(IAsyncResult result)
-        {
-            storicizzaPassiCorrelati.EndInvoke(result);
-        }
-
-        private bool VerificaProcessiCoinvolti(string tipoOperazione, myTreeNode TreeNodo)
-        {
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            bool result = true;
-            if (TreeNodo.getTipoNodo().Equals("R"))
+            if(TreeNodo.getTipoNodo().Equals("R"))
             {
-                if (!this.chkStoricizza.Checked && !this.cb_disabled_trasm.Checked && !tipoOperazione.Equals("sposta"))
-                    return result;
 
-                if (tipoOperazione.Equals("sposta"))
+                countProcessiCoinvolti_R = wws.GetCountProcessiDiFirmaByRuoloTitolare(TreeNodo.getIDGruppo());
+                if (countProcessiCoinvolti_R > 0)
                 {
-                    tipoOperazione = Amministrazione.Manager.OrganigrammaManager.TipoOperazione.SPOSTA_RUOLO;
-                }
-                else if (this.cb_disabled_trasm.Checked)
-                {
-                    tipoOperazione = Amministrazione.Manager.OrganigrammaManager.TipoOperazione.MODIFICA_RUOLO_CON_DISABILITAZIONE_TRASM;
+                    Session["processiCoinvolti_R"] = countProcessiCoinvolti_R;
+                    countIstazaProcessiCoinvolti_R = wws.GetCountIstanzeProcessiDiFirmaByRuoloCoinvolto(TreeNodo.getIDGruppo());
+                    if (countIstazaProcessiCoinvolti_R > 0)
+                    {
+                        Session["istazaProcessiCoinvolti_R"] = countIstazaProcessiCoinvolti_R;
+                    }
+                    else
+                    {
+                        Session["istazaProcessiCoinvolti_R"] = null;
+                    }
                 }
                 else
                 {
-                    tipoOperazione = Amministrazione.Manager.OrganigrammaManager.TipoOperazione.MODIFICA_RUOLO_CON_STORICIZZAZIONE;
-                }
-
-                //Verifico che non ci siano processi attivi
-                string idRuolo = TreeNodo.getIDGruppo();
-                int countProcessiCoinvolti_R = ws.GetCountProcessiDiFirmaByTitolare(idRuolo, string.Empty);
-                int countIstanzaProcessiCoinvolti_R = ws.GetCountIstanzaProcessiDiFirmaByTitolare(idRuolo, string.Empty);
-                if (countProcessiCoinvolti_R > 0 || countIstanzaProcessiCoinvolti_R > 0)
-                {
-                    string tipoTitolare = Amministrazione.Manager.OrganigrammaManager.SoggettoInModifica.RUOLO;
-                    string scriptString = "<SCRIPT>AvvisoRuoloConLF('" + tipoTitolare + "','" + idRuolo + "','" + countProcessiCoinvolti_R + "','" + countIstanzaProcessiCoinvolti_R + "','" + tipoOperazione + "');</SCRIPT>";
-                    this.Page.RegisterStartupScript("AvvisoRuoloConLF", scriptString);
-                    result = false;
+                    Session["processiCoinvolti_R"] = null;
                 }
             }
-            //Caso di sposta utente
             if (TreeNodo.getTipoNodo().Equals("P"))
             {
-                myTreeNode TreeNodoPadre = (myTreeNode)this.GetNodoPadre(TreeNodo);
-                Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-                theManager.DatiUtente(TreeNodo.getIDCorrGlobale());
-                DocsPAWA.DocsPaWR.OrgUtente utente = theManager.getDatiUtente();
-                string idUtente = utente.IDPeople;
-                string idRuolo = TreeNodoPadre.getIDGruppo();
-                int countProcessiCoinvolti_U = ws.GetCountProcessiDiFirmaByTitolare(idRuolo, idUtente);
-                int countIstanzaProcessiCoinvolti_U = ws.GetCountIstanzaProcessiDiFirmaByTitolare(idRuolo, idUtente);
-                if (countProcessiCoinvolti_U > 0 || countIstanzaProcessiCoinvolti_U > 0)
+
+                countProcessiCoinvolti_U = wws.GetCountProcessiDiFirmaByUtenteTitolare(TreeNodo.getIDPeople(), string.Empty);
+                if (countProcessiCoinvolti_U > 0)
                 {
-                    string msg = "Attenzione, l\\'utente in modifica è coinvolto in processi di firma o processi di firma avviati; procedendo con lo spostamento verranno invalidati/ interrotti tutti i processi. \\n\\nSe si vuole procedere senza interruzione/invalidazione dei processi è necessario effettuare la sostituzione dell\\'utente utilizzando il tasto \\'Gestione utenti\\' presente nei dettagli del ruolo.\\n\\nSicuro di voler procedere con l\\'operazione?";
-                    this.btn_sposta_utente.Attributes.Add("onclick", "if (!window.confirm('" + msg + "')) {return false};");
-                    result = false;
-                }
-                else if(TreeNodoPadre.Nodes.Count == 1) //l'utente non è coinvolto ma è l'ultimo di un ruolo coinvolto
-                {
-                    int countProcessiCoinvolti_R = ws.GetCountProcessiDiFirmaByTitolare(idRuolo, string.Empty);
-                    int countIstanzaProcessiCoinvolti_R = ws.GetCountIstanzaProcessiDiFirmaByTitolare(idRuolo, string.Empty);
-                    if (countProcessiCoinvolti_R > 0 || countIstanzaProcessiCoinvolti_R > 0)
+                    Session["processiCoinvolti_U"] = countProcessiCoinvolti_U;
+                    countIstazaProcessiCoinvolti_U = wws.GetCountIstanzeProcessiDiFirmaByUtenteCoinvolto(TreeNodo.getIDPeople(), string.Empty);
+                    if (countIstazaProcessiCoinvolti_U > 0)
                     {
-                        string msg = "Attenzione, l\\'utente in modifica è l\\'ultimo utente del ruolo coinvolto in processi di firma o processi di firma avviati; procedendo con lo spostamento verranno invalidati/ interrotti tutti i processi. \\n\\nSe si vuole procedere senza interruzione/invalidazione dei processi è necessario effettuare la sostituzione dell\\'utente utilizzando il tasto \\'Gestione utenti\\' presente nei dettagli del ruolo.\\n\\nSicuro di voler procedere con l\\'operazione?";
-                        this.btn_sposta_utente.Attributes.Add("onclick", "if (!window.confirm('" + msg + "')) {return false};");
-                        result = false;
+                        Session["istazaProcessiCoinvolti_U"] = countIstazaProcessiCoinvolti_U;
+                    }
+                    else
+                    {
+                        Session["istazaProcessiCoinvolti_U"] = null;
                     }
                 }
+                else
+                {
+                    Session["processiCoinvolti_U"] = null;
+                }
             }
-            return result;
         }
+
+        //private statoRuoloInLibroFirma StatoRuoloInLibroFirma(myTreeNode TreeNodo, out List<string> idPassi)
+        //{
+        //    DocsPAWA.DocsPaWR.DocsPaWebService wws = new DocsPAWA.DocsPaWR.DocsPaWebService();
+        //    statoRuoloInLibroFirma retVal = statoRuoloInLibroFirma.NON_IN_LIBRO_FIRMA;
+        //    List<string> tempIdPassi = new List<string>();
+
+        //    //Verifico se il ruolo selezionato è coinvolto in processi di firma.
+        //    List<ProcessoFirma> listProcessoFirma = wws.GetProcessiDiFirmaByRuoloTitolare(TreeNodo.getIDGruppo()).ToList();
+        //    if (listProcessoFirma != null && listProcessoFirma.Count > 0)
+        //    {
+        //        List<IstanzaPassoDiFirma> listPassoFirma = wws.GetPassiDiFirmaByRuoloCoinvolto(TreeNodo.getIDGruppo()).ToList();
+
+        //        if (listPassoFirma != null && listPassoFirma.Count > 0)
+        //        {
+        //            foreach (IstanzaPassoDiFirma passo in listPassoFirma)
+        //            {
+        //                if (passo.statoPasso != TipoStatoPasso.CLOSE || passo.statoPasso != TipoStatoPasso.CUT)
+        //                {
+        //                    retVal = statoRuoloInLibroFirma.IN_LIBRO_FIRMA_ATTIVO;
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            retVal = statoRuoloInLibroFirma.IN_LIBRO_FIRMA_DISATTIVO;
+
+        //            foreach (ProcessoFirma processo in listProcessoFirma)
+        //            {
+        //                foreach(PassoFirma passo in processo.passi)
+        //                {
+        //                    if (passo.ruoloCoinvolto.idGruppo == TreeNodo.getIDGruppo())
+        //                        tempIdPassi.Add(passo.idPasso);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    idPassi = tempIdPassi;
+        //    return retVal;
+        //}
 
         #endregion
 
         #region registri
-
-        private bool CheckPresenzaProcessiFirmaRegistri()
-        {
-            bool result = false;
-            myTreeNode TreeNodo;
-            TreeNodo = (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex);
-            string idRuoloInUo = TreeNodo.getIDCorrGlobale();
-            string idGruppo = TreeNodo.getIDGruppo();
-            Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-
-            //Verifico se le caselle sono coinvolte in processi di firma
-            System.Collections.Generic.List<RightRuoloMailRegistro> rightRuoloMailReg = new System.Collections.Generic.List<RightRuoloMailRegistro>();
-            //inserisco le coppie 1 a n (ruolo/casella di posta registro)
-            if (this.dg_registri.Items.Count > 0)
-            {
-                foreach (DataGridItem item in dg_registri.Items)
-                {
-                    CheckBox cbx_Sel = item.Cells[5].FindControl("cbx_Sel") as CheckBox;
-                    // se il registro/rf ha caselle di posta ed è associato al ruolo
-                    if (cbx_Sel.Checked && (!item.Cells[3].Text.Equals("&nbsp;") && (!string.IsNullOrEmpty(item.Cells[3].Text))))
-                    {
-                        string mail = (item.Cells[3].Text.Split('*').Length > 1) ? item.Cells[3].Text.Split('*')[1] : item.Cells[3].Text;
-                        string idRegistro = item.Cells[0].Text;
-                        string spedisci = (item.Cells[8].FindControl("cbx_Spedisci") as CheckBox).Checked.ToString();
-                        rightRuoloMailReg.Add(new RightRuoloMailRegistro
-                        {
-                            IdRegistro = idRegistro,
-                            EmailRegistro = mail,
-                            cha_spedisci = spedisci
-                        });
-                    }
-                }
-            }
-            //inserisco le coppie 1 a n (ruolo/casella di posta rf)
-            if (this.dg_registri.Items.Count > 0)
-            {
-                foreach (DataGridItem item in dg_rf.Items)
-                {
-                    CheckBox cbx_Sel = item.Cells[5].FindControl("cbx_Sel") as CheckBox;
-                    // se il registro/rf ha caselle di posta ed è associato al ruolo
-                    if (cbx_Sel.Checked && (!item.Cells[3].Text.Equals("&nbsp;") && (!string.IsNullOrEmpty(item.Cells[3].Text))))
-                    {
-                        string mail = (item.Cells[3].Text.Split('*').Length > 1) ? item.Cells[3].Text.Split('*')[1] : item.Cells[3].Text;
-                        string idRegistro = item.Cells[0].Text;
-                        string spedisci = (item.Cells[8].FindControl("cbx_Spedisci") as CheckBox).Checked.ToString();
-                            
-                            rightRuoloMailReg.Add(new RightRuoloMailRegistro
-                            {
-                                IdRegistro = idRegistro,
-                                EmailRegistro = mail,
-                                cha_spedisci = spedisci
-                            });
-                    }
-                }
-            }
-            if(rightRuoloMailReg != null && rightRuoloMailReg.Count() > 0)
-            {
-                if (theManager.ExistsPassiFirmaByRuoloTitolareAndRegistro(rightRuoloMailReg.ToArray(), idRuoloInUo, idGruppo))
-                {
-                    return true;
-                }
-            }
-            return result;
-        }
-
         /// <summary>
         /// Inserimento registri
         /// </summary>
@@ -4313,7 +4290,6 @@ namespace Amministrazione.Gestione_Organigramma
 
                     if (listaRegistriSelezionati != null && listaRegistriSelezionati.Count > 0)
                     {
-                        Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
                         DocsPAWA.DocsPaWR.OrgRegistro[] registri = new DocsPAWA.DocsPaWR.OrgRegistro[listaRegistriSelezionati.Count];
                         listaRegistriSelezionati.CopyTo(registri);
                         listaRegistriSelezionati = null;
@@ -4322,6 +4298,7 @@ namespace Amministrazione.Gestione_Organigramma
                         myTreeNode TreeNodoPadre = (myTreeNode)this.GetNodoPadre(TreeNodo);
                         string idUO = TreeNodoPadre.getIDCorrGlobale();
 
+                        Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
                         theManager.getListaRegistri();
                         theManager.InsRegistri(registri, idUO, TreeNodo.getIDCorrGlobale());
 
@@ -4367,78 +4344,6 @@ namespace Amministrazione.Gestione_Organigramma
                 this.lbl_avviso.Text = ex.ToString();
                 this.GUI("ResetAll");
             }
-        }
-
-        private bool InvalidaProcessiFirmaRegistriCoinvolti()
-        {
-            bool result = false;
-            myTreeNode TreeNodo;
-            try
-            {
-                TreeNodo = (myTreeNode)treeViewUO.GetNodeFromIndex(treeViewUO.SelectedNodeIndex);
-                string idRuoloInUo = TreeNodo.getIDCorrGlobale();
-                string idGruppo = TreeNodo.getIDGruppo();
-                Manager.OrganigrammaManager theManager = new Amministrazione.Manager.OrganigrammaManager();
-
-                //Verifico se le caselle sono coinvolte in processi di firma
-                System.Collections.Generic.List<RightRuoloMailRegistro> rightRuoloMailReg = new System.Collections.Generic.List<RightRuoloMailRegistro>();
-                //inserisco le coppie 1 a n (ruolo/casella di posta registro)
-                if (this.dg_registri.Items.Count > 0)
-                {
-                    foreach (DataGridItem item in dg_registri.Items)
-                    {
-                        CheckBox cbx_Sel = item.Cells[5].FindControl("cbx_Sel") as CheckBox;
-                        // se il registro/rf ha caselle di posta ed è associato al ruolo
-                        if (cbx_Sel.Checked && (!item.Cells[3].Text.Equals("&nbsp;") && (!string.IsNullOrEmpty(item.Cells[3].Text))))
-                        {
-                            string mail = (item.Cells[3].Text.Split('*').Length > 1) ? item.Cells[3].Text.Split('*')[1] : item.Cells[3].Text;
-                            string idRegistro = item.Cells[0].Text;
-                            string spedisci = (item.Cells[8].FindControl("cbx_Spedisci") as CheckBox).Checked.ToString();
-                            rightRuoloMailReg.Add(new RightRuoloMailRegistro
-                            {
-                                IdRegistro = idRegistro,
-                                EmailRegistro = mail,
-                                cha_spedisci = spedisci
-                            });
-                        }
-                    }
-                }
-                //inserisco le coppie 1 a n (ruolo/casella di posta rf)
-                if (this.dg_registri.Items.Count > 0)
-                {
-                    foreach (DataGridItem item in dg_rf.Items)
-                    {
-                        CheckBox cbx_Sel = item.Cells[5].FindControl("cbx_Sel") as CheckBox;
-                        // se il registro/rf ha caselle di posta ed è associato al ruolo
-                        if (cbx_Sel.Checked && (!item.Cells[3].Text.Equals("&nbsp;") && (!string.IsNullOrEmpty(item.Cells[3].Text))))
-                        {
-                            string mail = (item.Cells[3].Text.Split('*').Length > 1) ? item.Cells[3].Text.Split('*')[1] : item.Cells[3].Text;
-                            string idRegistro = item.Cells[0].Text;
-                            string spedisci = (item.Cells[8].FindControl("cbx_Spedisci") as CheckBox).Checked.ToString();
-
-                            rightRuoloMailReg.Add(new RightRuoloMailRegistro
-                            {
-                                IdRegistro = idRegistro,
-                                EmailRegistro = mail,
-                                cha_spedisci = spedisci
-                            });
-                        }
-                    }
-                }
-                if (rightRuoloMailReg != null && rightRuoloMailReg.Count() > 0)
-                {
-                    DocsPAWA.AdminTool.Manager.SessionManager sessionManager = new DocsPAWA.AdminTool.Manager.SessionManager();
-                    if (theManager.InvalidaProcessiRegistriCoinvolti(rightRuoloMailReg.ToArray(), idRuoloInUo, idGruppo, sessionManager.getUserAmmSession()))
-                    {
-                        return true;
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                result = false;
-            }      
-            return result;
         }
         #endregion
 
@@ -4611,8 +4516,8 @@ namespace Amministrazione.Gestione_Organigramma
                                 this.GestioneLoadDettagli(nodo);
                                 treeViewUO.SelectedNodeIndex = nodo.GetNodeIndex();
 
-                                //if (nodo.getTipoNodo().Equals("R"))
-                                //    VerificaProcessiCoinvolti(nodo);
+                                if (nodo.getTipoNodo().Equals("R"))
+                                    VerificaProcessiCoinvolti(nodo);
 
                                 break;
                             }
@@ -4750,6 +4655,43 @@ namespace Amministrazione.Gestione_Organigramma
             }
 
             return id;
+        }
+
+        /// <summary>
+        /// Reperimento dell'ID dell'UO corrente
+        /// </summary>
+        /// <returns></returns>
+        protected string getCoinvoltoInLibroFirma()
+        {
+            string retVal = string.Empty;
+
+            string passivi = string.Empty;
+            string attivi = string.Empty;
+
+            if ((countProcessiCoinvolti_R > 0) || (countProcessiCoinvolti_U > 0))
+            {
+                passivi = (
+                    ((countProcessiCoinvolti_R > 1) || (countProcessiCoinvolti_U > 1)) ?
+                    "Il soggetto in modifica è coinvolto in " + (
+                    (countProcessiCoinvolti_R > 0) ? countProcessiCoinvolti_R : countProcessiCoinvolti_U
+                    ) + " processi di firma. Proseguendo nella modifica, sarà necessario modificare i passi in cui esso è coinvolto per poter avviare tali processi.":
+                    "Il soggetto in modifica è coinvolto in un processo di firma. Proseguendo nella modifica, sarà necessario modificare i passi in cui esso è coinvolto per poter avviare tale processo.");
+            }
+
+            if ((countIstazaProcessiCoinvolti_R > 0) || (countIstazaProcessiCoinvolti_U > 0))
+            {
+                attivi = (
+                    ((countIstazaProcessiCoinvolti_R > 1) || (countIstazaProcessiCoinvolti_U > 1)) ?
+                    "l soggetto in modifica è coinvolto in " + (
+                    (countIstazaProcessiCoinvolti_R > 0) ? countIstazaProcessiCoinvolti_R : countIstazaProcessiCoinvolti_U) + " processi di firma avviati e non ancora conclusi. Proseguendo nella modifica, tutti i processi coivolti saranno interrotti." :
+                    "l soggetto in modifica è coinvolto in un processo di firma avviato e non ancora concluso. Proseguendo nella modifica, il processo coinvolto sarà interrotto.");
+            }
+            
+            retVal = (!string.IsNullOrEmpty(passivi) && !string.IsNullOrEmpty(attivi)? passivi + "\\n\\r Inoltre i" + attivi:(
+                !string.IsNullOrEmpty(passivi)?passivi:(!string.IsNullOrEmpty(attivi)?"I"+ attivi:"")));
+            if(!string.IsNullOrEmpty(retVal))
+                retVal = retVal + "\\n\\r Si vuole procedere comunque? Importante avvisare il creatore dei processi coinvolti e il proponente.";
+            return retVal;
         }
         
         /// <summary>
@@ -5345,101 +5287,7 @@ namespace Amministrazione.Gestione_Organigramma
             
 
         }
-        #endregion
 
-        #region Libro Firma
-
-        private void GestRitornoAvvisoLFRuolo(string valore)
-        {
-            try
-            {
-                string tipoOperazione = hd_TipoOperazione.Value;
-                switch (valore)
-                {
-                    case "Y":
-                        SetSessionInterrompiProcessi(true);
-                        if (tipoOperazione.Equals(Amministrazione.Manager.OrganigrammaManager.TipoOperazione.SPOSTA_RUOLO))
-                            SpostaRuolo();
-                        else
-                            this.InsModCanc_Ruolo("modifica");
-                        break;
-                    case "Y_SENZA_INTERRUZIONE":
-                        if (tipoOperazione.Equals(Amministrazione.Manager.OrganigrammaManager.TipoOperazione.SPOSTA_RUOLO))
-                            SpostaRuolo();
-                        else
-                        {
-                            SetSessionStoricizzaProcessi(true);
-                            this.InsModCanc_Ruolo("modifica");
-                        }
-                        break;
-                    case "N":
-                        break;
-                }
-                this.hd_returnValueModalLFRuolo.Value = "";
-                this.hd_TipoOperazione.Value = "";
-            }
-            catch
-            {
-            }
-        }
-
-        private void GestRitornoAvvisoLFUtente(string valore)
-        {
-            try
-            {
-                string tipoOperazione = hd_TipoOperazione.Value;
-                switch (valore)
-                {
-                    case "Y":
-                        if (tipoOperazione.Equals("sposta_utente"))
-                            this.Gest_AperturaWnd_SpostaUtente(true);
-                        break;
-                    case "N":
-                        break;
-                }
-                this.hd_returnValueModalLFRuolo.Value = "";
-                this.hd_TipoOperazione.Value = "";
-            }
-            catch
-            {
-            }
-        }
-
-        private void SetSessionInterrompiProcessi(bool interrompi)
-        {
-            Session["INTERROMPIPROCESSILF"] = interrompi;
-        }
-
-        private bool GetSessionInterrompiProcessi()
-        {
-            if (Session["INTERROMPIPROCESSILF"] == null)
-                return false;
-            else
-                return (bool)Session["INTERROMPIPROCESSILF"];
-        }
-
-        private void RemoveSessionInterrompiProcessi()
-        {
-            Session.Remove("INTERROMPIPROCESSILF");
-        }
-
-        private void SetSessionStoricizzaProcessi(bool storicizza)
-        {
-            Session["STORICIZZAPROCESSILF"] = storicizza;
-        }
-
-        private bool GetSessionStoricizzaProcessi()
-        {
-            if (Session["STORICIZZAPROCESSILF"] == null)
-                return false;
-            else
-                return (bool)Session["STORICIZZAPROCESSILF"];
-        }
-
-        private void RemoveSessionStoricizzaProcessi()
-        {
-            Session.Remove("STORICIZZAPROCESSILF");
-        }
         #endregion
     }
 }

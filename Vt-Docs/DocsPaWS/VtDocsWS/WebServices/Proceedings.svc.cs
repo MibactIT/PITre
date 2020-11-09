@@ -74,6 +74,28 @@ namespace VtDocsWS.WebServices
 
             return response;
         }
+
+        public Services.Proceedings.GetAOO.GetAOOResponse GetAOO(Services.Proceedings.GetAOO.GetAOORequest request )
+        {
+            logger.Info("BEGIN");
+
+            Services.Proceedings.GetAOO.GetAOOResponse response = Manager.ProceedingsManager.GetAOO(request);
+
+            Utils.CheckFaultException(response);
+
+            return response;
+        }
+
+        public Services.Proceedings.GetTipologies.GetTipologiesResponse GetTipologies(Services.Proceedings.GetTipologies.GetTipologiesRequest request)
+        {
+            logger.Info("BEGIN");
+
+            Services.Proceedings.GetTipologies.GetTipologiesResponse response = Manager.ProceedingsManager.GetTipologies(request);
+
+            Utils.CheckFaultException(response);
+
+            return response;
+        }
         
     }
 }

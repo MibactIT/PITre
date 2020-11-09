@@ -50,12 +50,6 @@ namespace BusinessLogic.ExternalServices
             return retList;
         }
 
-        public Servizio getServizioFatturazione()
-        {
-            DocsPaDB.Query_DocsPAWS.ExternalServices externalServices = new DocsPaDB.Query_DocsPAWS.ExternalServices();
-            return externalServices.getServizioFatturazione();
-        }
-
         public static string AvviaAzioniEsterne(DocsPaVO.utente.InfoUtente infoUtente, string docNumber, int diagramId)
         {
             string esitoAzione = "-1";
@@ -100,24 +94,6 @@ namespace BusinessLogic.ExternalServices
             return esitoAzione;
         }
 
-        public static string AvviaServizioFatturazione(DocsPaVO.utente.InfoUtente infoUtente, string docNumber, int diagramId)
-        {
-            string result = string.Empty;
-
-            try
-            {
-                DocsPaDB.Query_DocsPAWS.ExternalServices externalServices = new DocsPaDB.Query_DocsPAWS.ExternalServices();
-                Servizio servizioFatturazione = externalServices.getServizioFatturazione();
-                result = InviaASdi(infoUtente, docNumber, diagramId.ToString(), servizioFatturazione.getCodiceEsecutore());
-            }
-            catch(Exception ex)
-            {
-                result = "-1";
-            }
-
-            return result;
-        }
-
         private static bool EseguiAzione(Servizio servizio)
         {
             bool retVal = false;
@@ -138,34 +114,14 @@ namespace BusinessLogic.ExternalServices
             string retVal = "-1";
             string identificativo_Invio = string.Empty;
             string dbKey = (DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_SDI_VIA_PEC"));
-            string autoSign = (DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_FIRMA_AUTOMATICA_HSM"));
             bool PEC_ENABLED = (string.IsNullOrEmpty(dbKey) || dbKey == "0"?false:true) ;
-            bool automaticHsmSignature = (!string.IsNullOrEmpty(autoSign) && autoSign == "1");
-
-            if (PEC_ENABLED)
-            {
-                logger.Debug("INVIO PEC: ATTIVO");
-            }
-            else
-            {
-                logger.Debug("INVIO PEC: NON ATTIVO");
-            }
-            if (automaticHsmSignature)
-            {
-                logger.Debug("FIRMA HSM AUTOMATICA: ATTIVA");
-            }
-            else
-            {
-                logger.Debug("FIRMA HSM AUTOMATICA: NON ATTIVA");
-            }
 
             try
             {
                 string fileNameSdi = getNomeSDI(codEsecutore, docnumber);
                 DocsPaVO.documento.SchedaDocumento schedaDoc = Documenti.DocManager.getDettaglioNoSecurity(infoUtente, docnumber);
                 DocsPaVO.documento.FileRequest docPrincipale = (DocsPaVO.documento.FileRequest) schedaDoc.documenti[0];
-                //DocsPaVO.documento.FileDocumento fileDoc = Documenti.FileManager.getFile(docPrincipale, infoUtente);
-                DocsPaVO.documento.FileDocumento fileDoc = Documenti.FileManager.getFileFirmato(docPrincipale, infoUtente, false);
+                DocsPaVO.documento.FileDocumento fileDoc = Documenti.FileManager.getFile(docPrincipale, infoUtente);
 
                 string nomeOld = fileDoc.name;
                 string extOriginalName = System.IO.Path.GetExtension(fileDoc.nomeOriginale).ToLower();
@@ -176,10 +132,9 @@ namespace BusinessLogic.ExternalServices
                     fileDoc.nomeOriginale += extOriginalName; 
                 
                 fileDoc.name = fileDoc.nomeOriginale;
-                logger.Debug("FILENAME: " + fileDoc.name);
 
                 bool prosegui = true;
-                if (automaticHsmSignature)
+                if (PEC_ENABLED)
                 {
                     #region OLD CODE
                     //prosegui = docPrincipale.firmato.Equals("1");
@@ -190,7 +145,6 @@ namespace BusinessLogic.ExternalServices
                     // di firma HSM automatica
                     if (!docPrincipale.firmato.Equals("1"))
                     {
-                        Documenti.FileManager.setOriginalFileName(infoUtente, docPrincipale, fileDoc.nomeOriginale, true);
                         logger.Debug("FILE DA FIRMARE");
                         string rootPath = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_TEMP_PATH");
 
@@ -228,7 +182,7 @@ namespace BusinessLogic.ExternalServices
                             System.IO.File.WriteAllBytes(inputPath, fileDoc.content);
 
                             // Chiamo il servizio di firma automatica
-                            byte[] signedContent = Documenti.FileManager.HSM_AutomaticSignature(signer, inputPath, outputPath, false);
+                            byte[] signedContent = Documenti.FileManager.HSM_AutomaticSignature(signer, inputPath, outputPath);
 
                             if (signedContent != null)
                             {
@@ -254,8 +208,6 @@ namespace BusinessLogic.ExternalServices
                                     // Ricarico il file firmato
                                     schedaDoc = Documenti.DocManager.getDettaglioNoSecurity(infoUtente, docnumber);
                                     fileDoc = BusinessLogic.Documenti.FileManager.getFileFirmato((DocsPaVO.documento.FileRequest)schedaDoc.documenti[0], infoUtente, false);
-                                    fileDoc.name = fileDoc.nomeOriginale;
-                                    logger.Debug("FILENAME: " + fileDoc.name);
                                 }
                             }
                             else

@@ -662,19 +662,6 @@ namespace BusinessLogic.Fascicoli
             //DocsPaVO.Validations.ValidationResultInfo result = null;
             using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
             {
-                //Verifico se il documento è in libro firma e se, nel passo in attesa, è prevista la fascicolazione del documento
-                #region CHECK_LIBRO_FIRMA
-                /*if (LibroFirma.LibroFirmaManager.IsDocInLibroFirma(idProfile))
-                {
-                    if (!LibroFirma.LibroFirmaManager.IsTitolarePassoInAttesa(idProfile, infoUtente, DocsPaVO.LibroFirma.Azione.DOC_ADD_INFASC))
-                    {
-                        msg = DocsPaVO.documento.ResultFascicolazione.DOCUMENTO_IN_LIBRO_FIRMA_PASSO_NON_ATTESO.ToString();
-                        logger.Debug("Non è possibile procedere con la fascicolazione poichè il documento è in Libro Firma");
-                        return false;
-                    }
-                }
-                */
-                #endregion
                 if (BusinessLogic.CheckInOut.CheckInOutServices.IsCheckedOut(idProfile, idProfile, infoUtente))
                 {
                     msg = string.Format("Il documento con ID {0} risulta bloccato e non può essere inserito nel folder con ID {1}", idProfile, idFolder);
@@ -992,7 +979,6 @@ namespace BusinessLogic.Fascicoli
             }
             return result;
         }
-
 
         public static System.Collections.ArrayList getDocumentiPagingCustom(
                         DocsPaVO.utente.InfoUtente infoUtente,

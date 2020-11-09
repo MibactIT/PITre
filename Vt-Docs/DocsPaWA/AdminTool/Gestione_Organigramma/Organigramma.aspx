@@ -73,9 +73,6 @@
 			    var myUrl = "Sposta_Utente.aspx?idCorrGlobUtente=" + idCorrGlobUtente + "&userid=" + userid + "&idAmm=" + idAmm + "&nomeUtente=" + nomeUtente + "&cognomeUtente=" + cognomeUtente + "&countUtenti=" + countUtenti + "&idCorrGlobGruppo=" + idCorrGlobGruppo + "&idGruppo=" + idGruppo;
 			    rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:550px;dialogHeight:250px;status:no;resizable:no;scroll:no;center:yes;help:no;");
 			    Form1.hd_returnValueModal.value = rtnValue;
-			    if(rtnValue != null )
-			        window.document.Form1.submit();
-			       // __doPostBack('', '');
 			}
 			function ApriSpostaRuolo(idCorrGlobRuolo,idGruppo,descRuolo,idAmm,tipoRuolo) 
 			{			
@@ -91,8 +88,9 @@
 			{										
 				window.document.body.style.cursor='wait';
 
-				if (document.Form1.txt_ricCod.value.length > 0 || document.Form1.txt_ricDesc.value.length > 0) {
-				    var myUrl = "RisultatoRicercaOrg.aspx?idAmm=" + idAmm + "&tipo=" + document.Form1.ddl_ricTipo.value + "&cod=" + document.Form1.txt_ricCod.value + "&desc=" + document.Form1.txt_ricDesc.value + "&searchHistoricized=" + document.Form1.chkSearchHistoricized.checked;
+				//if (document.Form1.txt_ricCod.value.length > 0 || document.Form1.txt_ricDesc.value.length > 0) {
+                if (document.getElementById('txt_ricCod').value.length > 0 || document.getElementById('txt_ricDesc').value.length > 0) {
+                    var myUrl = "RisultatoRicercaOrg.aspx?idAmm=" + idAmm + "&tipo=" + document.getElementById('ddl_ricTipo').value + "&cod=" + document.getElementById('txt_ricCod').value + "&desc=" + document.getElementById('txt_ricDesc').value + "&searchHistoricized=" + document.getElementById('chkSearchHistoricized').checked;
 					rtnValue = window.showModalDialog(myUrl,"","dialogWidth:750px;dialogHeight:400px;status:no;resizable:no;scroll:no;center:yes;help:no;"); 				
 					Form1.hd_returnValueModal.value = rtnValue;
 				}
@@ -101,7 +99,8 @@
 			    var myUrl = "Navigazione_Organigramma.aspx?readonly=0&navigazione=1&selezione=1&subselezione=&idAmm=" + idAmm;
 			    rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:600px;dialogHeight:600px;status:no;resizable:yes;scroll:yes;center:yes;help:no;");
 			    Form1.hdReturnValueSelectedRicUO.value = rtnValue;
-			    window.document.Form1.submit();
+			    //window.document.Form1.submit();
+                Form1.submit();
 			}		
             function ApriCopiaVisibilitaRuolo(idAmm, idCorrGlobUO, idCorrGlobRuolo, idGruppo, descRuolo, codRuolo, tipoRuolo) {
                 var myUrl = "CopiaVisibilitaRuolo.aspx?idAmm=" + idAmm + "&idCorrGlobUO=" + idCorrGlobUO + "&idCorrGlobRuolo=" + idCorrGlobRuolo + "&idGruppo=" + idGruppo + "&descRuolo=" + descRuolo + "&codRuolo=" + codRuolo + "&tipoRuolo=" + tipoRuolo;
@@ -115,21 +114,7 @@
                 var myUrl = "GestApps_Utente.aspx?idPeople=" + idPeople + "&IdApplicazione=0";
                 rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:750px;dialogHeight:550px;status:no;resizable:no;scroll:no;center:yes;help:no;");
             }
-            function ApriProcessiFirmaRuolo(idGruppo) {
-                var myUrl = "ProcessiFirma.aspx?from=R&idGruppo=" + idGruppo;
-                rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:1200px;dialogHeight:600px;status:no;resizable:no;scroll:no;center:yes;help:no;");
-            }
-            function ApriProcessiFirmaUtente(idGruppo, idUtente) {
-                var myUrl = "ProcessiFirma.aspx?from=RU&idGruppo=" + idGruppo + "&idUtente=" + idUtente;
-                rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:1200px;dialogHeight:600px;status:no;resizable:no;scroll:no;center:yes;help:no;");
-            }
-            function AvvisoPresenzaProcessiFirmaRegistroRf() {
-                if(window.confirm('Attenzione! Sono presenti processi di firma in cui i Registri/RF o Mail di spedizione modificate sono coinvolti nel ruolo selezionato. Se si decide di proseguire verranno invalidati i processi coinvolti. Procedere?')) {
-                    Form1.hd_ReturnValueProcessiFirmaRegistroRF.value = 'true';
-                    Form1.submit();
-                }
-            }
-		</script>
+        </script>
 		<SCRIPT language="JavaScript">
 			
 			var cambiapass;
@@ -352,8 +337,14 @@
 
                  // Messaggio da mostrare nella confirm
                  var messageToShow;
-                 
-                 var agree = true;
+
+                 var messLibroFirma = '<%=getCoinvoltoInLibroFirma()%>'
+
+                 var agree;
+                 if (messLibroFirma != '')
+                     agree = confirm(messLibroFirma);
+                 else
+                     agree = true;
 
 			     if (agree)
                  {
@@ -361,7 +352,10 @@
                      if (buttonRef.value === 'Sposta' || buttonRef.value === 'Modifica') 
                      {
                          // Costruzione del testo da mostrare
-                         if (document.getElementById('chkStoricizza').checked)
+                         if (document.getElementById('chkRuoloPubblico').checked)
+                             messageToShow = 'Attenzione! Si sta impostando il ruolo come "Ruolo pubblico". Tale ruolo non sarà più visibile ' +
+                                             'in organigramma e non sarà possibile designare altro ruolo come "Ruolo pubblico".';
+                         else if (document.getElementById('chkStoricizza').checked)
                              messageToShow = 'La conferma delle modifiche provocherà la disabilitazione del ruolo (ruolo storicizzato), ' +
                                              'la creazione di un nuovo ruolo (legato logicamente al ruolo storicizzato) e la ' +
                                              'storicizzazione di tutti gli oggetti (documenti, fascicoli, trasmissioni) associati al ' + 
@@ -386,7 +380,6 @@
                     return false;
                  }
              }
-             
             
         </SCRIPT>
         <script type="text/javascript" language="javascript">
@@ -408,22 +401,6 @@
 
                 }
             }
-            function AvvisoRuoloConLF(tipoTitolare, idRuolo, numProcessi, numIstanze, tipoOperazione) {
-                var myUrl = "AvvisoRuoloConLF.aspx?tipoTitolare=" + tipoTitolare + "&idRuolo=" + idRuolo + "&numProcessi=" + numProcessi + "&numIstanze=" + numIstanze + "&tipoOperazione=" + tipoOperazione;
-                rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:450px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;");
-
-                Form1.hd_returnValueModalLFRuolo.value = rtnValue;
-                Form1.hd_TipoOperazione.value = tipoOperazione;
-                window.document.Form1.submit();
-            }
-            function AvvisoUtenteConLF(tipoTitolare, idRuolo, idUtente, numProcessi, numIstanze, tipoOperazione) {
-                var myUrl = "AvvisoRuoloConLF.aspx?tipoTitolare=" + tipoTitolare + "&idRuolo=" + idRuolo + "&idUtente=" + idUtente + "&numProcessi=" + numProcessi + "&numIstanze=" + numIstanze;
-                rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:450px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;");
-
-                Form1.hd_returnValueModalLFUtente.value = rtnValue;
-                Form1.hd_TipoOperazione.value = tipoOperazione;
-                window.document.Form1.submit();
-            }
         </script>
 	</HEAD>
 	<!--<body bottomMargin="0" leftMargin="0" topMargin="0" rightMargin="0" onunload="ClosePopUp()" onload = "GestioneLoadGridRegistriRF()">-->
@@ -434,10 +411,6 @@
             <input id="hd_returnValueModal" type="hidden" name="hd_returnValueModal" runat="server">
             <input id="hdReturnValueSelectedRicUO" type="hidden" name="hdReturnValueSelectedRicUO" runat="server" />
             <input id="hd_DisableRole" type="hidden" name="hd_DisableRole" runat="server">
-            <input id="hd_returnValueModalLFRuolo" type="hidden" name="hd_returnValueModalLFRuolo" runat="server">
-            <input id="hd_returnValueModalLFUtente" type="hidden" name="hd_returnValueModalLFUtente" runat="server">
-            <input id="hd_TipoOperazione" type="hidden" name="hd_TipoOperazione" runat="server">
-            <input id="hd_ReturnValueProcessiFirmaRegistroRF" type="hidden" name="hd_ReturnValueProcessiFirmaRegistroRF" runat="server">
             <asp:HiddenField ID="hfRetValModSposta" runat="server" />
 			<!-- TESTATA CON MENU' -->
 			<table height="100%" cellSpacing="1" cellPadding="0" width="100%" border="0">
@@ -733,7 +706,7 @@
 														            </table>
 														        </td>
 														    </TR>
-                                                            <TR>
+                                                            <TR style="visibility:hidden">
 															    <TD class="titolo_pnl" colSpan="2">
 																    <TABLE cellPadding="0" align="right" border="0">
 																	    <TR>
@@ -833,6 +806,20 @@
 															    <td align="left">
 																    <asp:CheckBox ID="chkUpdateModels" runat="server" CssClass="testo" />
                                                                 </td>
+															    <td colspan ="2">
+                                                                    <asp:Panel ID="pnlChkRuoloPubblico" runat="server" Visible="false">
+                                                                        <table>
+                                                                            <tr>
+                                                                                <td class="testo_grigio_scuro" width="85%">Ruolo pubblico
+                                                                                </td>
+                                                                                <td align="left">
+                                                                                    <asp:CheckBox ID="chkRuoloPubblico" runat="server" CssClass="testo" />
+                                                                                </td>
+
+                                                                            </tr>
+                                                                        </table>
+                                                                    </asp:Panel>
+                                                                </td>
                                                             </tr>
                                                             <tr id="trExtendVisibility" runat="server">
                                                                 <td class="testo_grigio_scuro">
@@ -872,9 +859,6 @@
 																		<TD class="titolo_pnl">&nbsp;
 																			<asp:button id="btn_visib_titolario" tabIndex="26" runat="server" CssClass="testo_btn_org" Text="Visibilità Titolario"
 																				ToolTip="Gestione della visibilità del ruolo sui nodi di titolario" Visible="false"></asp:button></TD>
-                                                                            <TD class="titolo_pnl">&nbsp;
-																			    <asp:button id="btn_processiFirmaRuolo" tabIndex="26" runat="server" CssClass="testo_btn_org" Text="Processi firma"
-																				    ToolTip="Visualizza processi di firma o istanze di processo in cui il ruolo è coinvolto" Visible="false"></asp:button></TD>
 																		<TD class="titolo_pnl">&nbsp;
 																			<asp:button id="btn_sposta_ruolo" tabIndex="26" runat="server" CssClass="testo_btn_org" Text="Sposta"
 																				ToolTip="Sposta il ruolo in un altra UO dell'organigramma" OnClientClick="return ShowConfirmBeforeStartModMove(this);"></asp:button></TD>
@@ -1196,9 +1180,6 @@
 															<TD class="titolo_pnl" colSpan="2">
 																<TABLE cellSpacing="0" cellPadding="0" align="right" border="0">
 																	<TR>
-                                                                        <TD class="titolo_pnl">&nbsp;
-																			<asp:button id="btn_processiFirmaUtente" tabIndex="26" runat="server" CssClass="testo_btn_org" Text="Processi firma"
-																			 ToolTip="Visualizza processi di firma o istanze di processo in cui l'utente è coinvolto" Visible="false"></asp:button></TD>
                                                                         <TD class="titolo_pnl">&nbsp;
 																			<asp:button id="btn_gest_qual" runat="server" CssClass="testo_btn_org" Text="Gestione qualifiche" ToolTip="Gestione delle qualifiche associate all'utente"></asp:button></TD>
                                                                         <TD class="titolo_pnl">&nbsp;

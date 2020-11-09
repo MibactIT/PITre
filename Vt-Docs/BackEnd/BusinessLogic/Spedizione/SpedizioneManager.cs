@@ -118,7 +118,7 @@ namespace BusinessLogic.Spedizione
 
             //NEW CODE:
             DocsPaVO.amministrazione.InfoAmministrazione _infamm = BusinessLogic.Amministrazione.AmministraManager.AmmGetInfoAmmCorrente(infoUtente.idAmministrazione);
-            
+
             //In base alla valorizzazione dei flag (spedizioneAutomatica e trasmissioneAutomatica) procedo con la valorizzazione 
             //o meno delle liste dei destinatari:
 
@@ -181,21 +181,6 @@ namespace BusinessLogic.Spedizione
             try
             {
                 CheckProtocolloUscita(documento);
-
-                //Verifico se il documento è in libro firma e in caso se il passo in attesa è quello di spedizione ed il titolare è l'utente che sta effettuando la spedizione
-                #region CHECK_LIBRO_FIRMA
-                if ((LibroFirma.LibroFirmaManager.IsDocInLibroFirma(documento.systemId)))
-                {
-                    if (!LibroFirma.LibroFirmaManager.IsTitolarePassoInAttesa(documento.systemId, infoUtente, DocsPaVO.LibroFirma.Azione.DOCUMENTOSPEDISCI))
-                    {
-                        throw new Exception("Non è possibile procedere con la spedizione poichè è attivo un processo di firma per il documento.");
-                    }
-                }
-                #endregion
-
-                //Aggiorno le versioni del documento principale da DB perchè in alcuni casi quello inviato dal FE non è aggiornato(caso di firma documento e poi spedisci INC000001057841)
-                documento.documenti = new ArrayList();
-                documento.documenti.AddRange(BusinessLogic.Documenti.DocManager.GetVersionsMainDocument(infoUtente, documento.docNumber));
 
                 // PEC 4 - requisito 5 - storico spedizioni
                 // Dato che alla fine i destinatari perdono l'includiInSpedizione, mi salvo i loro ID in un arraylist.
@@ -388,7 +373,7 @@ namespace BusinessLogic.Spedizione
                         (!string.IsNullOrEmpty(infoSpedizioni.IdRegistroRfMittente) ? infoSpedizioni.IdRegistroRfMittente : ""),
                         corr.StatoSpedizione.Descrizione,
                         false);
-                       
+
                 }
             }
             return infoSpedizioni;
@@ -417,7 +402,7 @@ namespace BusinessLogic.Spedizione
                     emailRecipients = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_EMAIL_ADDRESS_SUPPORT").ToString();
                 }
                 bodyMail = CreateBodyMessage(schedaDocumento, infoUtente, ruolo);
-                if(!string.IsNullOrEmpty(emailSender) && !string.IsNullOrEmpty(emailRecipients))
+                if (!string.IsNullOrEmpty(emailSender) && !string.IsNullOrEmpty(emailRecipients))
                     BusinessLogic.Interoperabilità.Notifica.notificaByMail(emailRecipients, emailSender, subject, bodyMail, string.Empty, infoUtente.idAmministrazione, null);
 
             }
@@ -1074,7 +1059,7 @@ namespace BusinessLogic.Spedizione
                     {
                         string idProcesso = BusinessLogic.FlussoAutomatico.FlussoAutomaticoManager.GetIdProcessoFlusso(documento, documento.spedizioneDocumento.tipoMessaggio);
 
-                         //Nel caso in cui non lo fosse, devo fascicolare il documento nello stesso fascicolo del documento padre
+                        //Nel caso in cui non lo fosse, devo fascicolare il documento nello stesso fascicolo del documento padre
                         if (!documento.spedizioneDocumento.tipoMessaggio.INIZIALE)
                         {
                             //Estraggo il fascicolo in cui fascicolare il predisposto in arrivo
@@ -1101,8 +1086,8 @@ namespace BusinessLogic.Spedizione
                             }
                         }
 
-                        DocsPaVO.FlussoAutomatico.InfoDocumentoFlusso infoDoc = new DocsPaVO.FlussoAutomatico.InfoDocumentoFlusso() {  ID_PROFILE = documento.docNumber };
-                        DocsPaVO.FlussoAutomatico.Flusso flusso = new DocsPaVO.FlussoAutomatico.Flusso() { ID_PROCESSO = idProcesso, MESSAGGIO = documento.spedizioneDocumento.tipoMessaggio, INFO_DOCUMENTO = infoDoc};
+                        DocsPaVO.FlussoAutomatico.InfoDocumentoFlusso infoDoc = new DocsPaVO.FlussoAutomatico.InfoDocumentoFlusso() { ID_PROFILE = documento.docNumber };
+                        DocsPaVO.FlussoAutomatico.Flusso flusso = new DocsPaVO.FlussoAutomatico.Flusso() { ID_PROCESSO = idProcesso, MESSAGGIO = documento.spedizioneDocumento.tipoMessaggio, INFO_DOCUMENTO = infoDoc };
                         BusinessLogic.FlussoAutomatico.FlussoAutomaticoManager.InsertFlussoProcedurale(flusso);
                     }
 
@@ -1218,22 +1203,10 @@ namespace BusinessLogic.Spedizione
         public static List<DocsPaVO.Spedizione.InfoDocumentoSpedito> GetReportSpedizioni(DocsPaVO.Spedizione.FiltriReportSpedizioni filters, DocsPaVO.utente.InfoUtente infoUtente)
         {
             DocsPaDB.Query_DocsPAWS.Interoperabilita interop = new DocsPaDB.Query_DocsPAWS.Interoperabilita();
-             if (string.IsNullOrEmpty(filters.IdDocumento))
-            return interop.GetReportSpedizioni(filters,infoUtente.idPeople, infoUtente.idGruppo);
-             return interop.GetReportSpedizioniDocumento(filters);
+            if (string.IsNullOrEmpty(filters.IdDocumento))
+                return interop.GetReportSpedizioni(filters, infoUtente.idPeople, infoUtente.idGruppo);
+            return interop.GetReportSpedizioniDocumento(filters);
         }
-
-        /// <summary>
-        /// Lista Report delle spedizioni
-        /// </summary>
-        public static List<DocsPaVO.Spedizione.InfoDocumentoSpedito> GetReportSpedizioniDocumenti(DocsPaVO.Spedizione.FiltriReportSpedizioni filters, List<string> idDocumenti, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            DocsPaDB.Query_DocsPAWS.Interoperabilita interop = new DocsPaDB.Query_DocsPAWS.Interoperabilita();
-            if (idDocumenti == null || idDocumenti.Count == 0)
-                return null;
-            return interop.GetReportSpedizioniDocumenti(filters, idDocumenti.Distinct().ToList(), infoUtente.idGruppo);
-        }
-
 
         #endregion
     }

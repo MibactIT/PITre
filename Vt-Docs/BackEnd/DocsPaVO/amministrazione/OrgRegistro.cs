@@ -37,6 +37,8 @@ namespace DocsPaVO.amministrazione
         public bool Sospeso = false;
         public string idRuoloResp;
         public string invioRicevutaManuale;
+
+        /* 11/02/19 Conservazione - MEV Reportistica */
         public string idUtenteResp;
 
         //Andrea De Marco

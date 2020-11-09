@@ -490,29 +490,32 @@ namespace DocsPaDB.Query_DocsPAWS
         public bool updateCache(DocsPaVO.Caching.InfoFileCaching info)
         {
             bool result = true;
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_CACHE");
-                q.setParam("docnumber", info.DocNumber.ToString());
-                q.setParam("pathcache", "'" + info.CacheFilePath + "'");
-                q.setParam("idAmministrazione", "'" + info.idAmministrazione + "'");
-                q.setParam("aggiornato", info.Aggiornato.ToString());
-                q.setParam("version_id", info.Version_id.ToString());
-                q.setParam("loked", "'" + info.locked.ToString() + "'");
-                q.setParam("comptype", "'" + info.comptype + "'");
-                q.setParam("file_size", info.file_size.ToString());
-                q.setParam("alternate_path", "'" + info.alternate_path + "'");
-                q.setParam("var_impronta", "'" + info.var_impronta + "'");
-                q.setParam("ext", "'" + info.ext.Trim() + "'");
-                q.setParam("data", "'"+info.last_access+"'");
-                string sql = q.getSQL();
-                logger.Debug("updateCache - query:" + sql);
-                if (!this.ExecuteNonQuery(sql))
+            DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_CACHE");
+            q.setParam("docnumber", info.DocNumber.ToString());
+            q.setParam("pathcache", "'" + info.CacheFilePath + "'");
+            q.setParam("idAmministrazione", "'" + info.idAmministrazione + "'");
+            q.setParam("aggiornato", info.Aggiornato.ToString());
+            q.setParam("version_id", info.Version_id.ToString());
+            q.setParam("loked", "'" + info.locked.ToString() + "'");
+            q.setParam("comptype", "'" + info.comptype + "'");
+            q.setParam("file_size", info.file_size.ToString());
+            q.setParam("alternate_path", "'" + info.alternate_path + "'");
+            q.setParam("var_impronta", "'" + info.var_impronta + "'");
+            q.setParam("ext", "'" + info.ext.Trim() + "'");
+            q.setParam("data", "'"+info.last_access+"'");
+            string sql = q.getSQL();
+            logger.Debug("updateCache - query:" + sql);
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                if (!dbProvider.ExecuteNonQuery(sql))
                 {
                     result = false;
                     throw new Exception();
-               
-                }
 
-                return result;
+                }
+            }
+
+            return result;
             
         }
 

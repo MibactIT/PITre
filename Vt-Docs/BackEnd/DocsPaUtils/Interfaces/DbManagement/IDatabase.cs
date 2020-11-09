@@ -53,13 +53,15 @@ namespace DocsPaUtils.Interfaces.DbManagement
 		/// <returns>true = OK; false = Errore durante l'esecuzione della query</returns>
 		bool ExecuteQuery(out DataSet dataSet, string tableName, string command);
 
-		/// <summary>
-		/// Esegue una query sul database aggiungendo una tabella ad un DataSet esistente.
-		/// </summary>
-		/// <param name="dataSet">Oggetto DataSet sul quale aggiungere una tabella.</param>
-		/// <param name="command">Query da eseguire sul database</param>
-		/// <returns>true = OK; false = Errore durante l'esecuzione della query o il popolamento del DataSet</returns>
-		bool ExecuteQuery(DataSet dataSet, string command);
+        bool ExecuteQueryNewConn(out DataSet dataSet, string tableName, string command);
+       
+        /// <summary>
+        /// Esegue una query sul database aggiungendo una tabella ad un DataSet esistente.
+        /// </summary>
+        /// <param name="dataSet">Oggetto DataSet sul quale aggiungere una tabella.</param>
+        /// <param name="command">Query da eseguire sul database</param>
+        /// <returns>true = OK; false = Errore durante l'esecuzione della query o il popolamento del DataSet</returns>
+        bool ExecuteQuery(DataSet dataSet, string command);
 
 		/// <summary>
 		/// Esegue una query sul database aggiungendo una tabella ad un DataSet esistente.

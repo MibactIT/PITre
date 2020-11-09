@@ -41,38 +41,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
                 controlloCbConsolidamento();
                 controlloCbNonRicercabile();
                 SetFocus(txt_descrizioneStato);
-                InitializeComboProcessiFirma();
-            }
-        }
-
-        private void InitializeComboProcessiFirma()
-        {
-            if (!string.IsNullOrEmpty(DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_LIBRO_FIRMA")) && DocsPAWA.utils.InitConfigurationKeys.GetValue("0", "FE_LIBRO_FIRMA").Equals("1"))
-                this.PnlProcessiFirma.Visible = true;
-
-            string[] amministrazione = ((string)Session["AMMDATASET"]).Split('@');
-            string codiceAmministrazione = amministrazione[0];
-            string idAmministrazione = DocsPAWA.Utils.getIdAmmByCod(codiceAmministrazione, this);
-
-            DocsPaWR.DocsPaWebService ws = DocsPAWA.ProxyManager.getWS();
-            DocsPaWR.ProcessoFirma[] listaProcessi = ws.GetProcessiDiFirmaByIdAmm(idAmministrazione);
-            if (listaProcessi != null && listaProcessi.Length > 0)
-            {
-                this.DdlProcessoFirma.Items.Clear();
-                this.DdlProcessoFirma.Items.Add(new ListItem(""));
-                ListItem item;
-                foreach (DocsPaWR.ProcessoFirma p in listaProcessi)
-                {
-                    item = new ListItem();
-                    item.Value = p.idProcesso;
-                    item.Text = p.IsProcessModel ? p.nome + " [MODELLO]" : p.nome;
-                    this.DdlProcessoFirma.Items.Add(item);
-                }
-
-                if (!string.IsNullOrEmpty(st.ID_PROCESSO_FIRMA))
-                {
-                    this.DdlProcessoFirma.SelectedValue = st.ID_PROCESSO_FIRMA;
-                }
             }
         }
 
@@ -145,7 +113,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
                             ((DocsPAWA.DocsPaWR.Stato)dg.STATI[i]).STATO_CONSOLIDAMENTO = (DocsPaWR.DocumentConsolidationStateEnum) Enum.Parse(typeof(DocsPaWR.DocumentConsolidationStateEnum), cb_consolidamento.SelectedValue, true);
                             ((DocsPAWA.DocsPaWR.Stato)dg.STATI[i]).NON_RICERCABILE = cb_statoNonRicercabile.Checked;
                             ((DocsPAWA.DocsPaWR.Stato)dg.STATI[i]).STATO_SISTEMA = cbxTransactionSystem.Checked;
-                            ((DocsPAWA.DocsPaWR.Stato)dg.STATI[i]).ID_PROCESSO_FIRMA = this.DdlProcessoFirma.SelectedValue;
                         }
                         
                         if (dg.PASSI != null)

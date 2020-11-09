@@ -269,26 +269,6 @@ namespace Amministrazione.Manager
 			this.AmmInsRegistri(listaRegistri,idUO,idCorrGlobRuolo);
 		}
 
-        public bool ExistsPassiFirmaByRuoloTitolareAndRegistro(DocsPAWA.DocsPaWR.RightRuoloMailRegistro[] listaRegistri, string idCorrGlobRuolo, string idGruppo)
-        {
-            return this.AmmExistsPassiFirmaByRuoloTitolareAndRegistro(listaRegistri, idCorrGlobRuolo, idGruppo);
-        }
-
-        public bool ExistsPassiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro)
-        {
-            return this.AmmExistsPassiFirmaByIdRegistroAndEmailRegistro(idRegistro, emailRegistro);
-        }
-
-        public bool InvalidaProcessiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro, InfoUtente infoUtente)
-        {
-            return this.AmmInvalidaProcessiFirmaByIdRegistroAndEmailRegistro(idRegistro, emailRegistro, infoUtente);
-        }
-
-        public bool InvalidaProcessiRegistriCoinvolti(DocsPAWA.DocsPaWR.RightRuoloMailRegistro[] listaRegistri, string idCorrGlobRuolo, string idGruppo, InfoUtente infoUtente)
-        {
-            return this.AmmInvalidaProcessiRegistriCoinvolti(listaRegistri, idCorrGlobRuolo, idGruppo, infoUtente);
-        }
-
         public void AssociazioneRFRuolo(string idRf, string idCorrGlobRuolo)
         {
             this.AmmAssociazioneRFRuolo(idRf, idCorrGlobRuolo);
@@ -339,22 +319,12 @@ namespace Amministrazione.Manager
 			this.AmmRifiutaTrasmConWF(idCorrGlobRuolo, idGruppo);
 		}
 
-        public void AccettaTrasmConWF(string idCorrGlobRuolo)
-        {
-            this.AmmAccettaTrasmConWF(idCorrGlobRuolo);
-        }
-
-        public void AccettaTrasmConWFUtente(string idPeople, string idCorrGlobaliRuolo)
-        {
-            this.AmmAccettaTrasmConWFUtente(idPeople, idCorrGlobaliRuolo);
-        }
-
-        public void SostituzioneUtente(string idPeopleNewUT, string idCorrGlobRuolo)
+		public void SostituzioneUtente(string idPeopleNewUT, string idCorrGlobRuolo)
 		{
 			this.AmmSostituzioneUtente(idPeopleNewUT,idCorrGlobRuolo);
 		}
 
-        public void InsTrasmUtente(string idPeople, string idCorrGlobRuolo)
+		public void InsTrasmUtente(string idPeople, string idCorrGlobRuolo)
 		{
 			this.AmmInsTrasmUtente(idPeople,idCorrGlobRuolo);
 		}
@@ -754,43 +724,6 @@ namespace Amministrazione.Manager
 			ws = null;
 		}
 
-        private bool AmmExistsPassiFirmaByRuoloTitolareAndRegistro(DocsPAWA.DocsPaWR.RightRuoloMailRegistro[] listaRegistri, string idCorrGlobRuolo, string idGruppo)
-        {
-            bool result = false;
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            result = ws.AmmExistsPassiFirmaByRuoloTitolareAndRegistro(listaRegistri, idCorrGlobRuolo, idGruppo);
-            ws = null;
-            return result;
-        }
-
-        private bool AmmExistsPassiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro)
-        {
-            bool result = false;
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            result = ws.AmmExistsPassiFirmaByIdRegistroAndEmailRegistro(idRegistro, emailRegistro);
-            ws = null;
-            return result;
-        }
-
-        private bool AmmInvalidaProcessiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro, InfoUtente infoUtente)
-        {
-            bool result = false;
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            result = ws.AmmInvalidaProcessiFirmaByIdRegistroAndEmailRegistro(idRegistro, emailRegistro, infoUtente);
-            ws = null;
-            return result;
-        }
-
-
-        private bool AmmInvalidaProcessiRegistriCoinvolti(DocsPAWA.DocsPaWR.RightRuoloMailRegistro[] listaRegistri, string idCorrGlobRuolo, string idGruppo, InfoUtente infoUtente)
-        {
-            bool result = false;
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            result = ws.AmmInvalidaProcessiRegistriCoinvolti(listaRegistri, idCorrGlobRuolo, idGruppo, infoUtente);
-            ws = null;
-            return result;
-        }
-
         private void AmmAssociazioneRFRuolo(string idRf,  string idCorrGlobRuolo)
         {
             AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
@@ -869,21 +802,7 @@ namespace Amministrazione.Manager
 			ws = null;
 		}
 
-        private void AmmAccettaTrasmConWF(string idCorrGlobRuolo)
-        {
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            this._esitoOperazione = ws.AmmAccettaTrasmConWFRuolo(idCorrGlobRuolo);
-            ws = null;
-        }
-
-        private void AmmAccettaTrasmConWFUtente(string idPeople, string idCorrGlobaliRuolo)
-        {
-            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            this._esitoOperazione = ws.AmmAccettaTrasmConWFUtente(idPeople, idCorrGlobaliRuolo);
-            ws = null;
-        }
-
-        private void AmmSostituzioneUtente(string idPeopleNewUT, string idCorrGlobRuolo)
+		private void AmmSostituzioneUtente(string idPeopleNewUT, string idCorrGlobRuolo)
 		{
 			AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
 			this._esitoOperazione = ws.AmmSostituzioneUtente(idPeopleNewUT, idCorrGlobRuolo);
@@ -1032,48 +951,17 @@ namespace Amministrazione.Manager
 
         }
 
-        #region Libro firma
-
-        public bool SostituisciUtentePassiCorrelati(string idRuolo, string idOldPeople, string idNewPeople)
-        {
-            return this.AmmSostituisciUtentePassiCorrelati(idRuolo, idOldPeople, idNewPeople);
-        }
-
-        private bool AmmSostituisciUtentePassiCorrelati(string idRuolo, string idOldPeople, string idNewPeople)
+        public bool ImpostaRuoloPubblico(string idCorrGlobali, string idGruppo, string idAmm)
         {
             AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            return ws.AmmSostituisciUtentePassiCorrelati(idRuolo, idOldPeople, idNewPeople);
-        }
+            return ws.AmmImpostaRuoloPubblico(idCorrGlobali, idGruppo, idAmm);
 
-        public bool StoricizzaRuoloPassiCorrelati(string idRuoloOld, string idRuoloNew)
-        {
-            return this.AmmStoricizzaRuoloPassiCorrelati(idRuoloOld, idRuoloNew);
         }
-
-        private bool AmmStoricizzaRuoloPassiCorrelati(string idRuoloOld, string idRuoloNew)
+        public void Clear(string idAmm)
         {
             AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
-            return ws.AmmStoricizzaRuoloPassiCorrelati(idRuoloOld, idRuoloNew);
+            ws.Clear(idAmm);
         }
-
-        public struct SoggettoInModifica
-        {
-            public const string UTENTE = "U";
-            public const string DISABILITA_UTENTE = "UD";
-            public const string ULTIMO_UTENTE = "UURC"; //L'utente che si stà rimuovendo è l'ultimo ed è coinvolto
-            public const string ULTIMO_UTENTE_RUOLO = "UURNC"; //L'utente che si stà rimuovendo non è coinvolto in processi/istanze
-            public const string ULTIMO_UTENTE_E_RUOLO = "UURCNC"; //L'utente che si stà rimuovendo è l'ultimo e ci sono processi in cui è coinvolti e altri no
-            public const string RUOLO = "R";
-        }
-
-        public struct TipoOperazione
-        {
-            public const string SPOSTA_RUOLO = "sposta_ruolo";
-            public const string MODIFICA_RUOLO_CON_STORICIZZAZIONE = "modifica_ruolo_con_storicizzazione";
-            public const string MODIFICA_RUOLO_CON_DISABILITAZIONE_TRASM = "modifica_con_disabilitazione_trasm";
-            public const string CANCELLAZIONE_RUOLO = "cancellazione_ruolo";
-        }
-        #endregion
 
     }
 }

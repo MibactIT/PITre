@@ -30,9 +30,9 @@ namespace DocsPAWA.AdminTool.Gestione_Homepage
 
 			DocsPAWA.AdminTool.Manager.SessionManager sessione = new DocsPAWA.AdminTool.Manager.SessionManager();
             DocsPAWA.DocsPaWR.InfoUtenteAmministratore datiAmministratore = new DocsPAWA.DocsPaWR.InfoUtenteAmministratore();
-            datiAmministratore = sessione.getUserAmmSession();
-
-            if (datiAmministratore!=null)
+			datiAmministratore = sessione.getUserAmmSession();
+			
+			if(datiAmministratore!=null)
 				lb_utente.Text = datiAmministratore.nome + " " + datiAmministratore.cognome;
 				
             lbl_position.Text = "&nbsp;&bull;&nbsp;Amministrazione: " + AmmUtils.UtilsXml.GetAmmDataSession((string)Session["AMMDATASET"], "1");

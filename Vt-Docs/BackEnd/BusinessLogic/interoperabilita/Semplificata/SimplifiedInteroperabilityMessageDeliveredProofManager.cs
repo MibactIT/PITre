@@ -103,7 +103,7 @@ namespace BusinessLogic.interoperabilita.Semplificata
             a.docNumber = documentId;
             a.version = "0";
             a.numeroPagine = 1;
-            a.TypeAttachment = 3;
+
             try
             {
                 bool usingTransactionContext = string.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_NOT_USING_TRANSACTION_CONTEXT")) ||

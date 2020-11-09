@@ -2512,34 +2512,10 @@ namespace BusinessLogic.Documenti
             return doc.GetDescrizioneTipoDocumento(typeId);
         }
 
-        public static int TotalFileSizeDocument(string idDocumento)
-        {
-            DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
-            return doc.TotalFileSizeDocument(idDocumento);
-        }
-
-        public static string GetTipoFirmaDocumento(string docnumber)
-        {
-            DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
-            return doc.GetTipoFirmaDocumento(docnumber);
-        }
-
         public static bool SetDataFirmaDocumento(string docnumber, string versionId)
         {
             DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
             return doc.SetDataFirmaDocumento(docnumber, versionId);
-        }
-
-        public static bool ExistsTrasmPendenteConWorkflowDocumento(string idProfile, string idRuoloInUO, string idPeople)
-        {
-            DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
-            return doc.ExistsTrasmPendenteConWorkflowDocumento(idProfile, idRuoloInUO, idPeople);
-        }
-
-        public static bool ExistsTrasmPendenteSenzaWorkflowDocumento(string idProfile, string idRuoloInUO, string idPeople)
-        {
-            DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
-            return doc.ExistsTrasmPendenteSenzaWorkflowDocumento(idProfile, idRuoloInUO, idPeople);
         }
     }
 }

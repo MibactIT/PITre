@@ -193,33 +193,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione {
         protected global::System.Web.UI.WebControls.TextBox txt_days_pr;
         
         /// <summary>
-        /// PanelStructure control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel PanelStructure;
-        
-        /// <summary>
-        /// txt_custom_ente control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txt_custom_ente;
-        
-        /// <summary>
-        /// txt_custom_struttura control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txt_custom_struttura;
-        
-        /// <summary>
         /// UpdatePanelPeriodicity control.
         /// </summary>
         /// <remarks>

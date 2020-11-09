@@ -1,0 +1,1 @@
+EXECUTE DOCSADM.Utl_Insert_Chiave_Config 'BE_SEG_PERM_ALLEGATI','Se 1 appone la segnatura permanente anche a tutti gli allegati','1','B','0','0','1','4.5.00',NULL, NULL, NULL;

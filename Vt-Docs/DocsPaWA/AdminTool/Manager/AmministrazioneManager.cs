@@ -107,7 +107,12 @@ namespace DocsPAWA.AdminTool.Manager
         //    return UpdateLoginAmministrazione(userid, sessionID);
         //}
 
-		public void GetAmmAppartenenza(string userid, string pwd)
+        public DocsPAWA.DocsPaWR.EsitoOperazione LoginLDAP(DocsPAWA.DocsPaWR.UserLogin userLogin, bool forceLogin, out DocsPAWA.DocsPaWR.InfoUtenteAmministratore datiAmministratore)
+        {
+            return LoginAmministrazioneLDAP(userLogin, forceLogin, out datiAmministratore);
+        }
+
+        public void GetAmmAppartenenza(string userid, string pwd)
 		{
 			this.GetAmmUtente(userid, pwd);
 		}
@@ -123,14 +128,13 @@ namespace DocsPAWA.AdminTool.Manager
 
             return ws.GetLabelTipoDocumento(idTipoDocumento);
         }
-
+        #endregion
         public DocsPAWA.DocsPaWR.InfoUtenteAmministratore GetDatiAmministratore(string userId, string idAmm)
         {
             AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
 
             return ws.GetDatiAmministratore(userId, idAmm);
         }
-        #endregion
 
         #region Private
 
@@ -189,6 +193,18 @@ namespace DocsPAWA.AdminTool.Manager
 			return esito;
 		}
 
+        private DocsPAWA.DocsPaWR.EsitoOperazione LoginAmministrazioneLDAP(DocsPAWA.DocsPaWR.UserLogin userLogin, bool forceLogin, out DocsPAWA.DocsPaWR.InfoUtenteAmministratore datiAmministratore)
+        {
+            datiAmministratore = null;
+
+            AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
+            DocsPaWR.EsitoOperazione esito = new DocsPAWA.DocsPaWR.EsitoOperazione();
+
+            esito = ws.LoginLDAP(userLogin, forceLogin, out datiAmministratore);
+
+            return esito;
+        }
+
         //private DocsPAWA.DocsPaWR.EsitoOperazione UpdateLoginAmministrazione(string userid, string sessionID)
         //{
         //    AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
@@ -199,7 +215,7 @@ namespace DocsPAWA.AdminTool.Manager
         //    return esito;
         //}
 
-		private void GetAmmUtente(string userid, string pwd)
+        private void GetAmmUtente(string userid, string pwd)
 		{
 			AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
 			this._amministrazioneCorrente = ws.GetInfoAmmAppartenenzaUtente(userid, pwd);
@@ -214,12 +230,12 @@ namespace DocsPAWA.AdminTool.Manager
 			ws = null;
 		}
 
+        #endregion
+
         public bool SbloccoCasella(string email, string idRegistro)
         {
             AmmUtils.WebServiceLink ws = new AmmUtils.WebServiceLink();
             return ws.SbloccoCasella(email, idRegistro);
-
         }
-        #endregion
     }
 }

@@ -68,20 +68,6 @@ namespace DocsPAWA
             }
         }
 
-        public static ArrayList getModelliByAmmLite(string idAmm, Page page)
-        {
-            try
-            {
-                ArrayList result = new ArrayList(docsPaWS.getModelliByAmmLite(idAmm));
-                return result;
-            }
-            catch (Exception ex)
-            {
-                ErrorManager.redirect(page, ex);
-                return null;
-            }
-        }
-
         public static ArrayList getModelliByAmmPaging(string idAmm, int nPagina, string ricerca, string codice, out int numTotPag, Page page)
         {
             numTotPag = 0;

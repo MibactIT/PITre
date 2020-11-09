@@ -10,6 +10,8 @@
 
 #pragma warning disable 1591
 
+using System;
+
 namespace DocsPAWA.dataSet {
     
     
@@ -466,7 +468,12 @@ namespace DocsPAWA.dataSet {
             public void Addelement1Row(element1Row row) {
                 this.Rows.Add(row);
             }
-            
+
+            internal void Addelement1RowInClassifica(string codice, string descrizioneFasc, string codiceGerarchia, int i, string v, string stato, string codiceRegistro, string idRegistro, string accessRights, string idTitolario, string systemID, string isFascPrimaria)
+            {
+                throw new NotImplementedException();
+            }
+
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
             public element1Row Addelement1Row(string codice, string descrizione, string vociClassificazione, int chiave, string descrizioneFolders, string stato, string descRegistro, string idRegistro, string accessRights, string idTitolario, string systemId, string fascPrimaria) {

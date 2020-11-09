@@ -14,7 +14,7 @@ namespace DocsPaVO.LibroFirma
         private string _descrizione;
         private string _tipoEvento;
         private string _gruppo;
-        private bool _automatico;
+
         #endregion
 
         #region public property
@@ -98,31 +98,6 @@ namespace DocsPaVO.LibroFirma
                 _gruppo = value;
             }
         }
-
-        public bool automatico
-        {
-            get
-            {
-                return _automatico;
-            }
-            set
-            {
-                _automatico = value;
-            }
-        }
         #endregion
-    }
-
-    public enum Azione
-    {
-        RECORD_PREDISPOSED,
-        DOC_VERIFIED,
-        DOC_SIGNATURE,
-        DOC_SIGNATURE_P,
-        DOC_STEP_OVER,
-        DOC_ADD_INFASC,
-        DOCUMENTO_REPERTORIATO,
-        DOCUMENTOSPEDISCI,
-        WAITING
     }
 }

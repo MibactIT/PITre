@@ -40,10 +40,10 @@ namespace BusinessLogic.Conservazione.PARER
             return c.UpdateStatoPolicy(lista, utente);
         }
 
-        public static bool UpdateStatoSingolaPolicy(string idPolicy, string attiva, string notifica)
+        public static bool UpdateStatoSingolaPolicy(string idPolicy, string attiva)
         {
             DocsPaDB.Query_DocsPAWS.Conservazione c = new DocsPaDB.Query_DocsPAWS.Conservazione();
-            return c.UpdateStatoSingolaPolicy(idPolicy, attiva, notifica);
+            return c.UpdateStatoSingolaPolicy(idPolicy, attiva);
         }
 
         public static bool InsertNewPolicy(DocsPaVO.Conservazione.PARER.PolicyPARER policy)
@@ -94,19 +94,14 @@ namespace BusinessLogic.Conservazione.PARER
                         {
                             logger.Debug(string.Format("{0} policy attive nell'amministrazione {1}", listaPolicy.Count, amm.codice));
 
-                            // Stato attivazione reportistica per l'amministrazione
-                            bool disableReport = (!string.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue(amm.systemId, "BE_ENABLE_REPORT_POLICY_PARER"))
-                                                    && DocsPaUtils.Configuration.InitConfigurationKeys.GetValue(amm.systemId, "BE_ENABLE_REPORT_POLICY_PARER").Equals("0"));
-
                             int limiteDoc;
 
                             foreach (DocsPaVO.Conservazione.PARER.EsecuzionePolicy info in listaPolicy)
                             {
-                                // Estraggo il dettaglio della policy
-                                DocsPaVO.Conservazione.PARER.PolicyPARER policy = GetPolicyById(info.idPolicy);
-
                                 try
                                 {
+                                    // Estraggo il dettaglio della policy
+                                    DocsPaVO.Conservazione.PARER.PolicyPARER policy = GetPolicyById(info.idPolicy);
 
                                     // limite massimo documenti versabili per l'amministrazione
                                     if (!string.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue(policy.idAmm, "FE_MAX_DOC_VERSAMENTO")))
@@ -144,10 +139,9 @@ namespace BusinessLogic.Conservazione.PARER
 
 
                                                 // Limite superato: la policy deve essere spenta
-                                                UpdateStatoSingolaPolicy(policy.id, "0", policy.notificaMail);
+                                                UpdateStatoSingolaPolicy(policy.id, "0");
 
                                                 // Produzione report di esecuzione
-
                                                 DocsPaVO.documento.FileDocumento report = CreateReportFailure(policy, infoUtResp, "SUP");
                                                 if (report != null)
                                                 {
@@ -156,51 +150,37 @@ namespace BusinessLogic.Conservazione.PARER
 
                                                     // Trasmissione al ruolo responsabile della conservazione
                                                     string note = string.Format("Report di mancata esecuzione della policy {0} (\"{1}\") del {2}", policy.codice, policy.descrizione, infoAgg.dataUltimaEsecuzione);
-
-                                                    //1
-                                                    if (!disableReport)
+                                                    DocsPaVO.trasmissione.Trasmissione trasm = new DocsPaVO.trasmissione.Trasmissione();
+                                                    if (!string.IsNullOrEmpty(policy.idGruppoRuoloResp))
                                                     {
-
-                                                        DocsPaVO.trasmissione.Trasmissione trasm = new DocsPaVO.trasmissione.Trasmissione();
-                                                        if (!string.IsNullOrEmpty(policy.idGruppoRuoloResp))
+                                                        InfoUtente respPolicy = new InfoUtente();
+                                                        respPolicy.idGruppo = policy.idGruppoRuoloResp;
+                                                        trasm = ExecuteTransmission(infoUtResp, respPolicy, docReport, note);
+                                                    }
+                                                    else
+                                                    {
+                                                        trasm = ExecuteTransmission(infoUtResp, null, docReport, note);
+                                                    }
+                                                    // Inserimento log
+                                                    if (trasm != null)
+                                                    {
+                                                        logger.Debug("INSERIMENTO LOG");
+                                                        if (trasm.infoDocumento != null && !string.IsNullOrEmpty(trasm.infoDocumento.idProfile))
                                                         {
-                                                            InfoUtente respPolicy = new InfoUtente();
-                                                            respPolicy.idGruppo = policy.idGruppoRuoloResp;
-                                                            trasm = ExecuteTransmission(infoUtResp, respPolicy, docReport, note);
-                                                        }
-                                                        else
-                                                        {
-                                                            trasm = ExecuteTransmission(infoUtResp, null, docReport, note);
-                                                        }
-                                                        // Inserimento log
-                                                        if (trasm != null)
-                                                        {
-                                                            logger.Debug("INSERIMENTO LOG");
-                                                            if (trasm.infoDocumento != null && !string.IsNullOrEmpty(trasm.infoDocumento.idProfile))
+                                                            foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in trasm.trasmissioniSingole)
                                                             {
-                                                                foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in trasm.trasmissioniSingole)
-                                                                {
-                                                                    string method = "TRASM_DOC_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
-                                                                    string desc = "Trasmesso Documento : " + trasm.infoDocumento.docNumber.ToString();
-                                                                    BusinessLogic.UserLog.UserLog.WriteLog(trasm.utente.userId, trasm.utente.idPeople, trasm.ruolo.idGruppo, infoUtResp.idAmministrazione,
-                                                                        method, trasm.infoDocumento.idProfile, desc, DocsPaVO.Logger.CodAzione.Esito.OK, null, "1", single.systemId);
-                                                                }
+                                                                string method = "TRASM_DOC_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
+                                                                string desc = "Trasmesso Documento : " + trasm.infoDocumento.docNumber.ToString();
+                                                                BusinessLogic.UserLog.UserLog.WriteLog(trasm.utente.userId, trasm.utente.idPeople, trasm.ruolo.idGruppo, infoUtResp.idAmministrazione,
+                                                                    method, trasm.infoDocumento.idProfile, desc, DocsPaVO.Logger.CodAzione.Esito.OK, null, "1", single.systemId);
                                                             }
                                                         }
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    //throw new Exception("Errore nella produzione del report di esecuzione della policy " + policy.codice);
-                                                    logger.Debug("Errore nella produzione del report di esecuzione della policy " + policy.codice);
+                                                    throw new Exception("Errore nella produzione del report di esecuzione della policy " + policy.codice);
                                                 }
-
-                                                if (policy.notificaMail == "1")
-                                                {
-                                                    logger.Debug("Invio mail di notifica mancata esecuzione");
-                                                    SendMailNotification(policy.idAmm, policy);
-                                                }
-
                                             }
                                             else
                                             {
@@ -216,7 +196,7 @@ namespace BusinessLogic.Conservazione.PARER
                                                     foreach (InfoDocumento doc in listaDoc)
                                                     {
                                                         // Inserimento doc in coda di versamento
-                                                        string esito = consManager.insertDocInCons(doc.idProfile, infoUtResp, policy.ente, policy.struttura);
+                                                        string esito = consManager.insertDocInCons(doc.idProfile, infoUtResp);
                                                         //logger.Debug(string.Format("EXECUTEPOLICY - {0}: {1}", doc.idProfile, esito));
 
                                                         if (esito.Equals("OK"))
@@ -251,7 +231,7 @@ namespace BusinessLogic.Conservazione.PARER
                                                     if (policy.periodicita.Equals("O"))
                                                     {
                                                         infoAgg.dataProssimaEsecuzione = string.Empty;
-                                                        UpdateStatoSingolaPolicy(policy.id, "0", policy.notificaMail);
+                                                        UpdateStatoSingolaPolicy(policy.id, "0");
                                                     }
 
                                                     if (!c.SetInfoEsecuzionePolicy(infoAgg))
@@ -259,7 +239,6 @@ namespace BusinessLogic.Conservazione.PARER
 
 
                                                     // Produzione report di esecuzione
-
                                                     DocsPaVO.documento.FileDocumento report = CreateReportSuccess(listaDoc, policy, infoAgg, infoUtResp);
 
                                                     if (report != null)
@@ -269,36 +248,32 @@ namespace BusinessLogic.Conservazione.PARER
                                                         if (string.IsNullOrEmpty(docReport.docNumber))
                                                             throw new Exception("Errore nella creazione del report di esecuzione della policy " + policy.codice);
 
-                                                        //2
-                                                        if (!disableReport)
+                                                        // Trasmissione al ruolo responsabile della conservazione
+                                                        string note = string.Format("Report di esecuzione della policy {0} (\"{1}\") del {2}", policy.codice, policy.descrizione, infoAgg.dataUltimaEsecuzione);
+                                                        DocsPaVO.trasmissione.Trasmissione trasm = new DocsPaVO.trasmissione.Trasmissione();
+                                                        if (!string.IsNullOrEmpty(policy.idGruppoRuoloResp))
                                                         {
-                                                            // Trasmissione al ruolo responsabile della conservazione
-                                                            string note = string.Format("Report di esecuzione della policy {0} (\"{1}\") del {2}", policy.codice, policy.descrizione, infoAgg.dataUltimaEsecuzione);
-                                                            DocsPaVO.trasmissione.Trasmissione trasm = new DocsPaVO.trasmissione.Trasmissione();
-                                                            if (!string.IsNullOrEmpty(policy.idGruppoRuoloResp))
-                                                            {
-                                                                InfoUtente respPolicy = new InfoUtente();
-                                                                respPolicy.idGruppo = policy.idGruppoRuoloResp;
-                                                                trasm = ExecuteTransmission(infoUtResp, respPolicy, docReport, note);
-                                                            }
-                                                            else
-                                                            {
-                                                                trasm = ExecuteTransmission(infoUtResp, null, docReport, note);
-                                                            }
+                                                            InfoUtente respPolicy = new InfoUtente();
+                                                            respPolicy.idGruppo = policy.idGruppoRuoloResp;
+                                                            trasm = ExecuteTransmission(infoUtResp, respPolicy, docReport, note);
+                                                        }
+                                                        else
+                                                        {
+                                                            trasm = ExecuteTransmission(infoUtResp, null, docReport, note);
+                                                        }
 
-                                                            // Inserimento log
-                                                            if (trasm != null)
+                                                        // Inserimento log
+                                                        if (trasm != null)
+                                                        {
+                                                            logger.Debug("INSERIMENTO LOG");
+                                                            if (trasm.infoDocumento != null && !string.IsNullOrEmpty(trasm.infoDocumento.idProfile))
                                                             {
-                                                                logger.Debug("INSERIMENTO LOG");
-                                                                if (trasm.infoDocumento != null && !string.IsNullOrEmpty(trasm.infoDocumento.idProfile))
+                                                                foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in trasm.trasmissioniSingole)
                                                                 {
-                                                                    foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in trasm.trasmissioniSingole)
-                                                                    {
-                                                                        string method = "TRASM_DOC_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
-                                                                        string desc = "Trasmesso Documento : " + trasm.infoDocumento.docNumber.ToString();
-                                                                        BusinessLogic.UserLog.UserLog.WriteLog(trasm.utente.userId, trasm.utente.idPeople, trasm.ruolo.idGruppo, infoUtResp.idAmministrazione,
-                                                                            method, trasm.infoDocumento.idProfile, desc, DocsPaVO.Logger.CodAzione.Esito.OK, null, "1", single.systemId);
-                                                                    }
+                                                                    string method = "TRASM_DOC_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
+                                                                    string desc = "Trasmesso Documento : " + trasm.infoDocumento.docNumber.ToString();
+                                                                    BusinessLogic.UserLog.UserLog.WriteLog(trasm.utente.userId, trasm.utente.idPeople, trasm.ruolo.idGruppo, infoUtResp.idAmministrazione,
+                                                                        method, trasm.infoDocumento.idProfile, desc, DocsPaVO.Logger.CodAzione.Esito.OK, null, "1", single.systemId);
                                                                 }
                                                             }
                                                         }
@@ -306,10 +281,8 @@ namespace BusinessLogic.Conservazione.PARER
                                                     }
                                                     else
                                                     {
-                                                        //throw new Exception("Errore nella produzione del report di esecuzione della policy " + policy.codice);
-                                                        logger.Debug("Errore nella produzione del report di esecuzione della policy " + policy.codice);
+                                                        throw new Exception("Errore nella produzione del report di esecuzione della policy " + policy.codice);
                                                     }
-
 
                                                     // Completamento transazione
                                                     transactionContext.Complete();
@@ -329,14 +302,13 @@ namespace BusinessLogic.Conservazione.PARER
                                             if (policy.periodicita.Equals("O"))
                                             {
                                                 infoAgg.dataProssimaEsecuzione = string.Empty;
-                                                UpdateStatoSingolaPolicy(policy.id, "0", policy.notificaMail);
+                                                UpdateStatoSingolaPolicy(policy.id, "0");
                                             }
 
                                             if (!c.SetInfoEsecuzionePolicy(infoAgg))
                                                 throw new Exception("Errore nell'aggiornamento del dettaglio di esecuzione della policy");
 
                                             // Produzione report di esecuzione
-
                                             if (!(policy.tipo == "S" && policy.statoVersamento != "N"))
                                             {
                                                 DocsPaVO.documento.FileDocumento report = CreateReportFailure(policy, infoUtResp, "NO_DATA");
@@ -345,80 +317,6 @@ namespace BusinessLogic.Conservazione.PARER
                                                     // Inserisco il report nel sistema
                                                     DocsPaVO.documento.SchedaDocumento docReport = SaveReportDocument(policy, infoAgg, infoUtResp, report);
 
-                                                    // Trasmissione al ruolo responsabile della conservazione
-                                                    //3
-                                                    if (!disableReport)
-                                                    {
-                                                        string note = string.Format("Report di mancata esecuzione della policy {0} (\"{1}\") del {2}", policy.codice, policy.descrizione, infoAgg.dataUltimaEsecuzione);
-                                                        DocsPaVO.trasmissione.Trasmissione trasm = new DocsPaVO.trasmissione.Trasmissione();
-                                                        if (!string.IsNullOrEmpty(policy.idGruppoRuoloResp))
-                                                        {
-                                                            InfoUtente respPolicy = new InfoUtente();
-                                                            respPolicy.idGruppo = policy.idGruppoRuoloResp;
-                                                            trasm = ExecuteTransmission(infoUtResp, respPolicy, docReport, note);
-                                                        }
-                                                        else
-                                                        {
-                                                            trasm = ExecuteTransmission(infoUtResp, null, docReport, note);
-                                                        }
-                                                        // Inserimento log
-                                                        if (trasm != null)
-                                                        {
-                                                            logger.Debug("INSERIMENTO LOG");
-                                                            if (trasm.infoDocumento != null && !string.IsNullOrEmpty(trasm.infoDocumento.idProfile))
-                                                            {
-                                                                foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in trasm.trasmissioniSingole)
-                                                                {
-                                                                    string method = "TRASM_DOC_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
-                                                                    string desc = "Trasmesso Documento : " + trasm.infoDocumento.docNumber.ToString();
-                                                                    BusinessLogic.UserLog.UserLog.WriteLog(trasm.utente.userId, trasm.utente.idPeople, trasm.ruolo.idGruppo, infoUtResp.idAmministrazione,
-                                                                        method, trasm.infoDocumento.idProfile, desc, DocsPaVO.Logger.CodAzione.Esito.OK, null, "1", single.systemId);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    //throw new Exception("Errore nella produzione del report di esecuzione della policy " + policy.codice);
-                                                    logger.Debug("Errore nella produzione del report di esecuzione della policy " + policy.codice);
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // listaDoc == null
-                                        // Non ho risultati dalla ricerca
-                                        DocsPaVO.Conservazione.PARER.EsecuzionePolicy infoAgg = new DocsPaVO.Conservazione.PARER.EsecuzionePolicy();
-                                        infoAgg.idPolicy = policy.id;
-                                        infoAgg.dataUltimaEsecuzione = DateTime.Today.ToString("dd/MM/yyyy");
-                                        infoAgg.dataProssimaEsecuzione = c.GetDataProssimaEsecuzione(policy);
-
-                                        // se la policy è configurata per l'esecuzione "Una Tantum", deve essere disattivata al termine dell'operazione
-                                        if (policy.periodicita.Equals("O"))
-                                        {
-                                            infoAgg.dataProssimaEsecuzione = string.Empty;
-                                            UpdateStatoSingolaPolicy(policy.id, "0", policy.notificaMail);
-                                        }
-
-                                        if (!c.SetInfoEsecuzionePolicy(infoAgg))
-                                            throw new Exception("Errore nell'aggiornamento del dettaglio di esecuzione della policy");
-
-                                        // Produzione report di esecuzione
-
-                                        if (!(policy.tipo == "S" && policy.statoVersamento != "N"))
-                                        {
-                                            DocsPaVO.documento.FileDocumento report = CreateReportFailure(policy, infoUtResp, "NO_DATA");
-                                            if (report != null)
-                                            {
-                                                // Inserisco il report nel sistema
-                                                DocsPaVO.documento.SchedaDocumento docReport = SaveReportDocument(policy, infoAgg, infoUtResp, report);
-
-                                                //4
-                                                if (!disableReport)
-                                                {
                                                     // Trasmissione al ruolo responsabile della conservazione
                                                     string note = string.Format("Report di mancata esecuzione della policy {0} (\"{1}\") del {2}", policy.codice, policy.descrizione, infoAgg.dataUltimaEsecuzione);
                                                     DocsPaVO.trasmissione.Trasmissione trasm = new DocsPaVO.trasmissione.Trasmissione();
@@ -451,19 +349,74 @@ namespace BusinessLogic.Conservazione.PARER
                                             }
                                             else
                                             {
-                                                //throw new Exception("Errore nella produzione del report di esecuzione della policy " + policy.codice);
-                                                logger.Debug("Errore nella produzione del report di esecuzione della policy " + policy.codice);
+                                                throw new Exception("Errore nella produzione del report di esecuzione della policy " + policy.codice);
                                             }
                                         }
                                     }
+                                    else
+                                    {
+                                        // listaDoc == null
+                                        // Non ho risultati dalla ricerca
+                                        DocsPaVO.Conservazione.PARER.EsecuzionePolicy infoAgg = new DocsPaVO.Conservazione.PARER.EsecuzionePolicy();
+                                        infoAgg.idPolicy = policy.id;
+                                        infoAgg.dataUltimaEsecuzione = DateTime.Today.ToString("dd/MM/yyyy");
+                                        infoAgg.dataProssimaEsecuzione = c.GetDataProssimaEsecuzione(policy);
+
+                                        // se la policy è configurata per l'esecuzione "Una Tantum", deve essere disattivata al termine dell'operazione
+                                        if (policy.periodicita.Equals("O"))
+                                        {
+                                            infoAgg.dataProssimaEsecuzione = string.Empty;
+                                            UpdateStatoSingolaPolicy(policy.id, "0");
+                                        }
+
+                                        if (!c.SetInfoEsecuzionePolicy(infoAgg))
+                                            throw new Exception("Errore nell'aggiornamento del dettaglio di esecuzione della policy");
+
+                                        // Produzione report di esecuzione
+                                        DocsPaVO.documento.FileDocumento report = CreateReportFailure(policy, infoUtResp, "NO_DATA");
+                                        if (report != null)
+                                        {
+                                            // Inserisco il report nel sistema
+                                            DocsPaVO.documento.SchedaDocumento docReport = SaveReportDocument(policy, infoAgg, infoUtResp, report);
+
+                                            // Trasmissione al ruolo responsabile della conservazione
+                                            string note = string.Format("Report di mancata esecuzione della policy {0} (\"{1}\") del {2}", policy.codice, policy.descrizione, infoAgg.dataUltimaEsecuzione);
+                                            DocsPaVO.trasmissione.Trasmissione trasm = new DocsPaVO.trasmissione.Trasmissione();
+                                            if (!string.IsNullOrEmpty(policy.idGruppoRuoloResp))
+                                            {
+                                                InfoUtente respPolicy = new InfoUtente();
+                                                respPolicy.idGruppo = policy.idGruppoRuoloResp;
+                                                trasm = ExecuteTransmission(infoUtResp, respPolicy, docReport, note);
+                                            }
+                                            else
+                                            {
+                                                trasm = ExecuteTransmission(infoUtResp, null, docReport, note);
+                                            }
+                                            // Inserimento log
+                                            if (trasm != null)
+                                            {
+                                                logger.Debug("INSERIMENTO LOG");
+                                                if (trasm.infoDocumento != null && !string.IsNullOrEmpty(trasm.infoDocumento.idProfile))
+                                                {
+                                                    foreach (DocsPaVO.trasmissione.TrasmissioneSingola single in trasm.trasmissioniSingole)
+                                                    {
+                                                        string method = "TRASM_DOC_" + single.ragione.descrizione.ToUpper().Replace(" ", "_");
+                                                        string desc = "Trasmesso Documento : " + trasm.infoDocumento.docNumber.ToString();
+                                                        BusinessLogic.UserLog.UserLog.WriteLog(trasm.utente.userId, trasm.utente.idPeople, trasm.ruolo.idGruppo, infoUtResp.idAmministrazione,
+                                                            method, trasm.infoDocumento.idProfile, desc, DocsPaVO.Logger.CodAzione.Esito.OK, null, "1", single.systemId);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            throw new Exception("Errore nella produzione del report di esecuzione della policy " + policy.codice);
+                                        }
+                                    }
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     logger.Debug("Errore nella lavorazione della policy " + info.idPolicy);
-                                    if(policy != null && policy.notificaMail == "1")
-                                    {
-                                        SendMailNotification(policy.idAmm, policy);
-                                    }
                                 }
                             }
                         }
@@ -585,23 +538,21 @@ namespace BusinessLogic.Conservazione.PARER
 
                 try
                 {
-
                     SchedaDocumento sd = BusinessLogic.Documenti.DocManager.getDettaglioNoSecurity(infoUtResp, listaDoc[i].idProfile);
 
-                    string codRF = string.Empty;
-                    if (listaDoc[i].tipoProto.Equals("C"))
-                        codRF = GetCodRF(listaDoc[i].idProfile);
-
-                    if (string.IsNullOrEmpty(codRF))
-                        row["TIPO REGISTRO (RF)"] = consMan.getChiaveVersamento(sd, consMan.getTipoDocumento(sd, amm.Codice)).tipoRegistro;
-                    else
-                        row["TIPO REGISTRO (RF)"] = consMan.getChiaveVersamento(sd, consMan.getTipoDocumento(sd, amm.Codice)).tipoRegistro + " " + codRF;
+                string codRF = string.Empty;
+                if(listaDoc[i].tipoProto.Equals("C"))
+                    codRF = GetCodRF(listaDoc[i].idProfile);
+                
+                if (string.IsNullOrEmpty(codRF))
+                    row["TIPO REGISTRO (RF)"] = consMan.getChiaveVersamento(sd, consMan.getTipoDocumento(sd, amm.Codice)).tipoRegistro;
+                else
+                    row["TIPO REGISTRO (RF)"] = consMan.getChiaveVersamento(sd, consMan.getTipoDocumento(sd, amm.Codice)).tipoRegistro + " " + codRF;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     row["TIPO REGISTRO (RF)"] = string.Empty;
                 }
-
                 dt.Rows.Add(row);
             }
 
@@ -631,7 +582,7 @@ namespace BusinessLogic.Conservazione.PARER
             {
                 infoPolicy = infoPolicy + "Stato conservazione: documenti rifiutati";
             }
-            else if (policy.statoVersamento.Equals("F"))
+            else if(policy.statoVersamento.Equals("F"))
             {
                 infoPolicy = infoPolicy + "Stato conservazione: versamento fallito";
             }
@@ -659,7 +610,7 @@ namespace BusinessLogic.Conservazione.PARER
             DocsPaVO.documento.FileDocumento fd = BusinessLogic.Reporting.ReportGeneratorCommand.GetReport(request).Document;
 
             return fd;
-
+            
         }
 
         private static DocsPaVO.documento.FileDocumento CreateReportFailure(DocsPaVO.Conservazione.PARER.PolicyPARER policy, InfoUtente infoUtResp, string type)
@@ -894,10 +845,11 @@ namespace BusinessLogic.Conservazione.PARER
                     #endregion
 
                     #region Trasmissione - disabilitato
-                    // MEV Reportistica 2017
+                    /* 11/02/19 Conservazione - MEV Reportistica */
                     // I report non sono più notificati
 
                     /*
+
                     // Trasmissione
                     DocsPaVO.documento.InfoDocumento infoDoc = new InfoDocumento();
                     infoDoc.idProfile = sd.systemId;
@@ -959,6 +911,7 @@ namespace BusinessLogic.Conservazione.PARER
                             }
                         }
                     }
+                    
                     */
                     #endregion
 
@@ -1059,7 +1012,7 @@ namespace BusinessLogic.Conservazione.PARER
                     #endregion
 
                     #region Trasmissione - disabilitato
-                    // MEV Reportistica 2017
+                    /* 11/02/19 Conservazione - MEV Reportistica */
                     // I report non sono più notificati
 
                     /*
@@ -1214,7 +1167,7 @@ namespace BusinessLogic.Conservazione.PARER
             logger.Debug("BEGIN");
 
             try
-            {
+            {                
                 // Ruolo responsabile della conservazione
                 Ruolo ruoloRespCons = BusinessLogic.Utenti.UserManager.getRuoloByIdGruppo(respCons.idGruppo);
 
@@ -1291,59 +1244,6 @@ namespace BusinessLogic.Conservazione.PARER
                 logger.Debug(ex.Message);
                 return null;
             }
-        }
-
-        private static void SendMailNotification(string idAmm, DocsPaVO.Conservazione.PARER.PolicyPARER policy)
-        {
-            logger.Debug("BEGIN");
-
-            DocsPaDB.Query_DocsPAWS.Conservazione cons = new DocsPaDB.Query_DocsPAWS.Conservazione();
-
-            try
-            {
-                DocsPaVO.Conservazione.PARER.ReportConfiguration config = cons.GetReportConfiguration(idAmm);
-                if (config == null)
-                {
-                    throw new Exception("Configurazione report conservazione assente o errata");
-                }
-                if (config.MailBoxConfiguration == null)
-                {
-                    throw new Exception("Configurazione casella mail conservazione assente o errata");
-                }
-
-                string body = config.PolicyBody;
-                body = body.Replace("#CODICE_POLICY#", policy.codice);
-                body = body.Replace("#DESCRIZIONE_POLICY#", policy.descrizione);
-                body = body.Replace("#DATA_ORA_POLICY#", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
-
-                string msgTo = string.Empty;
-                if(config.PolicyRecipients != null && config.PolicyRecipients.Count() > 0)
-                {
-                    for(int i=0; i<config.PolicyRecipients.Count(); i++)
-                    {
-                        if (!string.IsNullOrEmpty(msgTo))
-                            msgTo = msgTo + ",";
-
-                        msgTo = msgTo + config.PolicyRecipients[i];
-                    }
-                }
-
-                BusinessLogic.Interoperabilità.SvrPosta svr = new Interoperabilità.SvrPosta(config.MailBoxConfiguration.Server, config.MailBoxConfiguration.Username, config.MailBoxConfiguration.Password, config.MailBoxConfiguration.Port, System.IO.Path.GetTempPath(), BusinessLogic.Interoperabilità.CMClientType.SMTP, (config.MailBoxConfiguration.UseSSL ? "1" : "0"), string.Empty, "0");
-                svr.connect();
-                string error = string.Empty;
-                svr.sendMail(config.MailBoxConfiguration.From, msgTo, "", string.Empty, config.PolicySubject, body, BusinessLogic.Interoperabilità.CMMailFormat.HTML, null, out error);
-                if(!string.IsNullOrEmpty(error))
-                {
-                    logger.Debug("Mail non inviata: " + error);
-                }
-
-            }
-            catch(Exception ex)
-            {
-                logger.Debug("Errore nell'invio della mail - ", ex);
-            }
-
-            logger.Debug("END");
         }
     }
 }

@@ -49,7 +49,7 @@ namespace BusinessLogic.Documenti.DigitalSignature
         }
 
 
-        public bool externalClrCheckWS( string CLRWsUrl, string fileToverify,DateTime? dateVerifica, bool isPadesAndCades=false)
+        public bool externalClrCheckWS( string CLRWsUrl, string fileToverify,DateTime? dateVerifica)
         {
             logger.Debug("START");
             if (esito == null)
@@ -72,9 +72,9 @@ namespace BusinessLogic.Documenti.DigitalSignature
                     dateVerifica = null;
 
                 if (ver.FileLocale(fileToverify))  //Controllo l'sistenza del file locale al server
-                     retval = ver.VerificaCertificatoFileLocale(fileToverify, dateVerifica, false, isPadesAndCades);
+                     retval = ver.VerificaCertificatoFileLocale(fileToverify, dateVerifica, false);
                 else //nel caso non ci fosse lo mando...
-                     retval = ver.VerificaCertificato(System.IO.File.ReadAllBytes(fileToverify), dateVerifica, false, isPadesAndCades);
+                     retval = ver.VerificaCertificato(System.IO.File.ReadAllBytes(fileToverify), dateVerifica, false);
                
 
                 esito = DeserializeObject<EsitoVerifica>(retval);

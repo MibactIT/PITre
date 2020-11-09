@@ -105,8 +105,9 @@ namespace DocsPAWA.AdminTool.Gestione_Organigramma
                     ReportingUtils.PrintRequest = request;
                     if(esitoOperazione.Descrizione.Contains('*'))
                         esitoOperazione.Descrizione = esitoOperazione.Descrizione.Split('*')[0];
+                        ClientScript.RegisterStartupScript(this.GetType(), "esitoOperazione", "alert('" + esitoOperazione.Descrizione + "');", true);
+                    //ClientScript.RegisterStartupScript(this.GetType(), "esitoOperazione", "if (confirm('" + esitoOperazione.Descrizione + "\\n\\rEsportare il risultato?')) {" + ReportScript + "}", true);
 
-                    ClientScript.RegisterStartupScript(this.GetType(), "esitoOperazione", "if (confirm('" + esitoOperazione.Descrizione + "\\n\\rEsportare il risultato?')) {" + ReportScript + "}", true);
                 }
                 else {
                     ClientScript.RegisterStartupScript(this.GetType(), "esitoOperazione", "alert('"+esitoOperazione.Descrizione+"');", true);

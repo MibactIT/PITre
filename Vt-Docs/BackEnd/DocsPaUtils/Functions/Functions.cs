@@ -2,6 +2,8 @@ using System;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
+using System.Text;
 using log4net;
 
 namespace DocsPaUtils.Functions
@@ -109,11 +111,17 @@ namespace DocsPaUtils.Functions
 		/// <summary>
 		/// </summary>
 		/// <param name="nomeDirectory"></param>
-		public static void CancellaDirectory(string nomeDirectory)
+		public static void CancellaDirectory(string nomeDirectory, string fatherDir = "")
 		{
 			if(System.IO.Directory.Exists(nomeDirectory))
 			{				
 				System.IO.Directory.Delete(nomeDirectory,true);
+			}
+
+			//ABBATANGELI - MiBACT - Pulizia cartella temporanea da SendMail
+			if (!string.IsNullOrEmpty(fatherDir))
+            {
+				System.IO.Directory.Delete(nomeDirectory.Replace("\\" + fatherDir, ""), true);
 			}
 		
 		}
@@ -351,7 +359,7 @@ namespace DocsPaUtils.Functions
         }
 
         //#region Metodi per configurazione stampa Registro
-        
+
         ///// <summary>
         ///// aggiunge l'intrevallo di giorni alla data passata in input
         ///// </summary>
@@ -363,5 +371,58 @@ namespace DocsPaUtils.Functions
         //}
 
         //#endregion
+
+        public static string DisplayObjectInfo(Object o)
+        {
+            string result = String.Empty;
+            try
+            {
+                if (o == null)
+                {
+                    return "[ NULL ]";
+                }
+                StringBuilder sb = new StringBuilder();
+                // Include the type of the object
+                System.Type type = o.GetType();
+                sb.Append("Type: " + type.Name);
+
+                // Include information for each Field
+                sb.Append("\r\n\r\nFields:");
+                System.Reflection.FieldInfo[] fi = type.GetFields();
+                if (fi.Length > 0)
+                {
+                    foreach (FieldInfo f in fi)
+                    {
+                        sb.Append("\r\n " + f.ToString() + " = [ " + f.GetValue(o) + " ]");
+                    }
+                }
+                else
+                    sb.Append("\r\n None");
+
+                // Include information for each Property
+                sb.Append("\r\n\r\nProperties:");
+                System.Reflection.PropertyInfo[] pi = type.GetProperties();
+                if (pi.Length > 0)
+                {
+                    foreach (PropertyInfo p in pi)
+                    {
+                        sb.Append("\r\n " + p.ToString() + " = [ " +
+                                  p.GetValue(o) + " ]");
+                    }
+                }
+                else
+                    sb.Append("\r\n None");
+
+                result = sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                result = ex.Message;
+            }
+
+
+            return result;
+        }
     }
 }

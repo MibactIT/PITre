@@ -201,68 +201,53 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
         {
 
             // Worksheet da restituire
-            String sheetName = String.Empty;
-            if (!String.IsNullOrEmpty(report.SectionName))
-            {
-                sheetName = report.SectionName;
-            }
-            else
-            {
-                 sheetName = String.Format("Foglio {0}", book.Worksheets.Count);
-            }
+            String sheetName = String.Format("Foglio {0}", book.Worksheets.Count);
             Worksheet sheet = book.Worksheets.Add(sheetName);
 
             sheet.Options.PageSetup.Layout.Orientation = Orientation.NotSet;
 
-            if (report.ShowHeaderRow)
+            // Aggiunta del titolo
+            WorksheetRow titleRow = sheet.Table.Rows.Add();
+            if (report.ReportHeader.Count > 0)
+                titleRow.Cells.Add(new WorksheetCell(report.Title, DataType.String, StylesEnum.TitleStyle.ToString()) { MergeAcross = report.ReportHeader.Count - 1 });
+            else
             {
-                // Aggiunta del titolo
-                WorksheetRow titleRow = sheet.Table.Rows.Add();
+                titleRow.Cells.Add(new WorksheetCell(report.Title, DataType.String, StylesEnum.TitleStyle.ToString()) { MergeAcross = report.ReportHeader.Count });
+            }
+            WorksheetRow fooRow = sheet.Table.Rows.Add();
+            // Aggiunta del sottotitolo
+            WorksheetRow subTitleRow = sheet.Table.Rows.Add();
+            if (report.ReportHeader.Count > 0)
+                subTitleRow.Cells.Add(new WorksheetCell(report.Subtitle, DataType.String, StylesEnum.SubtitleStyle.ToString()) { MergeAcross = report.ReportHeader.Count - 1 });
+            else
+            {
+                subTitleRow.Cells.Add(new WorksheetCell(report.Subtitle, DataType.String, StylesEnum.SubtitleStyle.ToString()) { MergeAcross = report.ReportHeader.Count });
+            }
+            subTitleRow.Height = 30;
+            subTitleRow.AutoFitHeight = true;
+            WorksheetRow fooRow2 = sheet.Table.Rows.Add();
+            // Aggiunta del Informazioni aggiuntive
+            if (!string.IsNullOrEmpty(report.AdditionalInformation))
+            {
+                WorksheetRow addInfo = sheet.Table.Rows.Add();
                 if (report.ReportHeader.Count > 0)
-                    titleRow.Cells.Add(new WorksheetCell(report.Title, DataType.String, StylesEnum.TitleStyle.ToString()) { MergeAcross = report.ReportHeader.Count - 1 });
+                    addInfo.Cells.Add(new WorksheetCell(report.AdditionalInformation, DataType.String, StylesEnum.AdditionalInformation.ToString()) { MergeAcross = report.ReportHeader.Count - 1 });
                 else
                 {
-                    titleRow.Cells.Add(new WorksheetCell(report.Title, DataType.String, StylesEnum.TitleStyle.ToString()) { MergeAcross = report.ReportHeader.Count });
+                    addInfo.Cells.Add(new WorksheetCell(report.AdditionalInformation, DataType.String, StylesEnum.AdditionalInformation.ToString()) { MergeAcross = report.ReportHeader.Count });
                 }
-                WorksheetRow fooRow = sheet.Table.Rows.Add();
-                // Aggiunta del sottotitolo
-                WorksheetRow subTitleRow = sheet.Table.Rows.Add();
-                if (report.ReportHeader.Count > 0)
-                    subTitleRow.Cells.Add(new WorksheetCell(report.Subtitle, DataType.String, StylesEnum.SubtitleStyle.ToString()) { MergeAcross = report.ReportHeader.Count - 1 });
-                else
-                {
-                    subTitleRow.Cells.Add(new WorksheetCell(report.Subtitle, DataType.String, StylesEnum.SubtitleStyle.ToString()) { MergeAcross = report.ReportHeader.Count });
-                }
-                subTitleRow.Height = 30;
-                subTitleRow.AutoFitHeight = true;
-                WorksheetRow fooRow2 = sheet.Table.Rows.Add();
-                // Aggiunta del Informazioni aggiuntive
-                if (!string.IsNullOrEmpty(report.AdditionalInformation))
-                {
-                    WorksheetRow addInfo = sheet.Table.Rows.Add();
-                    if (report.ReportHeader.Count > 0)
-                        addInfo.Cells.Add(new WorksheetCell(report.AdditionalInformation, DataType.String, StylesEnum.AdditionalInformation.ToString()) { MergeAcross = report.ReportHeader.Count - 1 });
-                    else
-                    {
-                        addInfo.Cells.Add(new WorksheetCell(report.AdditionalInformation, DataType.String, StylesEnum.AdditionalInformation.ToString()) { MergeAcross = report.ReportHeader.Count });
-                    }
-                    addInfo.Height = 80;
-                    addInfo.AutoFitHeight = true;
-                }
+                addInfo.Height = 80;
+                addInfo.AutoFitHeight = true;
+            }
 
-                // Aggiunta del summary
-                WorksheetRow summaryRow = sheet.Table.Rows.Add();
-                summaryRow.Cells.Add(new WorksheetCell(report.Summary, DataType.String, StylesEnum.SummaryStyle.ToString()) { MergeAcross = report.ReportHeader.Count });
-            }
+            // Aggiunta del summary
+            WorksheetRow summaryRow = sheet.Table.Rows.Add();
+            summaryRow.Cells.Add(new WorksheetCell(report.Summary, DataType.String, StylesEnum.SummaryStyle.ToString()) { MergeAcross = report.ReportHeader.Count });
+
             // Aggiunta dell'header
-            if (report.ShowHeaderRow)
-            {
-                // Aggiunta di una riga vuota
-                sheet.Table.Rows.Add();
-            }
             this.AddHeader(sheet, report.ReportHeader);
 
-            if (string.IsNullOrEmpty(report.AdditionalInformation) && report.ShowHeaderRow)
+            if (string.IsNullOrEmpty(report.AdditionalInformation))
             {
                 // Impostazione dell'autofilter
                 sheet.AutoFilter.Range = String.Format("R7C1:R7C{0}", report.ReportHeader.Count);
@@ -279,6 +264,9 @@ namespace BusinessLogic.Reporting.Behaviors.ReportGenerator
         /// <param name="list">Lista delle colonne da aggiungere all'header</param>
         private void AddHeader(Worksheet sheet, HeaderColumnCollection headerColumns)
         {
+            // Aggiunta di una riga vuota
+            sheet.Table.Rows.Add();
+
             // Generazione della riga con l'header
             WorksheetRow headerRow = sheet.Table.Rows.Add();
             headerRow.AutoFitHeight = true;

@@ -109,7 +109,7 @@ function mmLoadMenus() {
   // Gestione Deleghe
   if(document.getElementById('MenuTendina_hd_abilita_gestione_deleghe').value=="1")
   {
-    mm_menu.addMenuItem("<b>Gestione Sostituzioni</b>","location='../Gestione_Deleghe/GestioneDeleghe.aspx?from=GD'");
+    mm_menu.addMenuItem("<b>Gestione Deleghe</b>","location='../Gestione_Deleghe/GestioneDeleghe.aspx?from=GD'");
   }
 
   if (document.getElementById('MenuTendina_hd_abilita_verifica_doc').value == "1") 
@@ -161,6 +161,15 @@ function mmLoadMenus() {
     // Visualizzazione informazioni documento(trasmesso, spedito, fascicolo)
   if (document.getElementById('MenuTendina_hd_gestione_struttura_sottofascicoli').value == "1") {
       mm_menu.addMenuItem("<b>Strutture Fascicoli</b>", "location='../Gestione_StrutturaSottofascicoli/StrutturaSottofascicoli.aspx'");
+  }
+
+    // Scarico RDE
+  if (document.getElementById('MenuTendina_hd_scarico_RDE').value == "1") {
+      //var urlRDE = "../Gestione_RDE/ScaricoRDE.aspx";
+      //var titleRDE = "Download tool RDE";
+      //var optionRDE = "width=400,height=200,scrollbars=no,toolbars=no,titlebar=yes,menubar=no";
+      //mm_menu.addMenuItem("<b>Scarico RDE</b>", "window.open('" + urlRDE + "','" + titleRDE + "','" + optionRDE + "')");
+      mm_menu.addMenuItem("<b>Scarico RDE</b>", "location='../Gestione_RDE/ScaricoRDE.aspx'");
   }
 
   mm_menu.hideOnMouseOut=true;

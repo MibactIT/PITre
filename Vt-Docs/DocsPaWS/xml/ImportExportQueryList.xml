@@ -400,8 +400,8 @@
 	<query>			
 		<name>GET_UO_PARENT</name>
 		<value>
-			SELECT Id_Parent FROM DPA_Corr_Globali WHERE System_Id=@param1@
-		</value>
+      SELECT Id_Parent FROM DPA_Corr_Globali WITH(NOLOCK) WHERE System_Id=@param1@
+    </value>
 	</query>
 	
 	<query>			
@@ -688,8 +688,7 @@
       ABILITATO_CENTRO_SERVIZI,
       MATRICOLA,
       CHA_TIPO_COMPONENTI,
-      ABILITATO_ESIBIZIONE,
-      CHA_AUTOMATICO
+      ABILITATO_ESIBIZIONE
       )
       VALUES
       (@param2@
@@ -720,8 +719,7 @@
       '@param23@',
       '@param24@',
       '@param25@',
-      '@param26@',
-      '@param27@'
+      '@param26@'
       )
     </value>
 	</query>

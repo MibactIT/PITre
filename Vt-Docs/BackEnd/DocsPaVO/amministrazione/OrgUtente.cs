@@ -43,8 +43,6 @@ namespace DocsPaVO.amministrazione
 
 		public string IDAmministrazione = string.Empty;
 
-		public bool Automatico = false;
-
         /// <summary>
         ///  Indica, se true, che l'utente è soggetto alla sincronizzazione da LDAP.
         ///  L'opzione è valida solo se:

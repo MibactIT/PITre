@@ -268,20 +268,6 @@ namespace BusinessLogic.ProfilazioneDinamica
             {
                 try
                 {
-                    //Verifico se il documento è in libro firma e se è prevista la repertoriazione del documento
-                    if (LibroFirma.LibroFirmaManager.IsDocInLibroFirma(docNumber))
-                    {
-                        bool daRepertoriare = false;
-                        if (template != null && !string.IsNullOrEmpty(template.ID_TIPO_ATTO) && template.ELENCO_OGGETTI != null && template.ELENCO_OGGETTI.Count > 0)
-                        {
-                            DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg = (from o in template.ELENCO_OGGETTI.Cast<DocsPaVO.ProfilazioneDinamica.OggettoCustom>()
-                                                                               where o.TIPO.DESCRIZIONE_TIPO.Equals("Contatore") && o.REPERTORIO.Equals("1")
-                                                                               && o.CONTATORE_DA_FAR_SCATTARE && string.IsNullOrEmpty(o.VALORE_DATABASE)
-                                                                               select o).FirstOrDefault();
-                            if (ogg != null && !LibroFirma.LibroFirmaManager.IsTitolarePassoInAttesa(docNumber, info, DocsPaVO.LibroFirma.Azione.DOCUMENTO_REPERTORIATO))
-                                throw new Exception("Non è possibile procedere con la repertoriazione poichè il documento è in Libro Firma");
-                        }
-                    }
                     DocsPaDB.Query_DocsPAWS.Model modelDB = new DocsPaDB.Query_DocsPAWS.Model();
                     modelDB.salvaInserimentoUtenteProfDim(template, docNumber);
                     transactionContext.Complete();
@@ -552,6 +538,23 @@ namespace BusinessLogic.ProfilazioneDinamica
                 catch (Exception ex)
                 {
                     logger.Debug("Errore in ProfilazioneDocumenti - metodo: UpdateConservaCampo", ex);
+                }
+            }
+        }
+
+        public static void UpdateProcedimentoTipoDoc(int systemId_template, string procedimentale)
+        {
+            using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
+            {
+                try
+                {
+                    DocsPaDB.Query_DocsPAWS.Model modelDB = new DocsPaDB.Query_DocsPAWS.Model();
+                    modelDB.UpdateProcedimentoTipoDoc(systemId_template, procedimentale);
+                    transactionContext.Complete();
+                }
+                catch (Exception ex)
+                {
+                    logger.Debug("Errore in ProfilazioneDocumenti - metodo: UpdateInvioConsTipoDoc", ex);
                 }
             }
         }
@@ -1205,21 +1208,17 @@ namespace BusinessLogic.ProfilazioneDinamica
 
         public static DocsPaVO.ProfilazioneDinamica.Templates getTemplateByDescrizione(string descrizioneTemplate, string idAmm)
         {
-            using (DocsPaDB.TransactionContext transactionContext = new DocsPaDB.TransactionContext())
+            try
             {
-                try
-                {
-                    DocsPaDB.Query_DocsPAWS.Model modelDB = new DocsPaDB.Query_DocsPAWS.Model();
-                    DocsPaVO.ProfilazioneDinamica.Templates template = modelDB.getTemplateByDescrizione(descrizioneTemplate, idAmm);
-                    transactionContext.Complete();
-                    return template;
+                DocsPaDB.Query_DocsPAWS.Model modelDB = new DocsPaDB.Query_DocsPAWS.Model();
+                DocsPaVO.ProfilazioneDinamica.Templates template = modelDB.getTemplateByDescrizione(descrizioneTemplate, idAmm);
+                return template;
 
-                }
-                catch (Exception e)
-                {
-                    logger.Debug("Errore in ProfilazioneDocumenti  - metodo: getTemplateByDescrizione", e);
-                    return null;
-                }
+            }
+            catch (Exception e)
+            {
+                logger.Debug("Errore in ProfilazioneDocumenti  - metodo: getTemplateByDescrizione", e);
+                return null;
             }
         }
         public static bool UpdateIsTypeInstance(DocsPaVO.ProfilazioneDinamica.Templates template, string idAmministrazione)
@@ -1244,13 +1243,79 @@ namespace BusinessLogic.ProfilazioneDinamica
             }
         }
 
-        public static ArrayList getIdDocByAssTemplates(string idOggetto, string valoreDB, string ordine, string idTemplate)
+        public static ArrayList getIdDocByAssTemplates(string idOggetto, string valoreDB, string ordine)
         {
             DocsPaDB.Query_DocsPAWS.Model modelDB = new DocsPaDB.Query_DocsPAWS.Model();
-            if (string.IsNullOrEmpty(idTemplate))
-                return modelDB.getIdDocByAssTemplates(idOggetto, valoreDB, ordine);
-            else
-                return modelDB.getIdDocByAssTemplates(idOggetto, valoreDB, ordine, idTemplate);
+            return modelDB.getIdDocByAssTemplates(idOggetto, valoreDB, ordine);
+        }
+
+        public static bool ReplicaTipoDocumento(string idTipoDoc, List<string> idAmministrazioni)
+        {
+            bool result = true;
+            string idNuovaTipologia;
+            DocsPaVO.ProfilazioneDinamica.Templates template = getTemplateById(idTipoDoc);
+            DocsPaVO.ProfilazioneDinamica.Templates templateNew;
+            string path;
+            string codiceAmm;
+            try
+            {
+                // Carico i modelli se presenti
+                byte[] modello1 = null;
+                byte[] modello2 = null;
+                byte[] allegato = null;
+
+                if (!string.IsNullOrEmpty(template.PATH_MODELLO_1))
+                    modello1 = BusinessLogic.Modelli.ModelliManager.GetFileFromPath(template.PATH_MODELLO_1);
+
+                if (!string.IsNullOrEmpty(template.PATH_MODELLO_2))
+                    modello2 = BusinessLogic.Modelli.ModelliManager.GetFileFromPath(template.PATH_MODELLO_2);
+
+                if (!string.IsNullOrEmpty(template.PATH_ALLEGATO_1))
+                    allegato = BusinessLogic.Modelli.ModelliManager.GetFileFromPath(template.PATH_ALLEGATO_1);
+
+                DocsPaDB.Query_DocsPAWS.Model tipoAtto = new Model();
+                foreach (string idAmm in idAmministrazioni)
+                {
+                    idNuovaTipologia = string.Empty;
+                    if (!tipoAtto.ReplicaTipoDocumento(idTipoDoc, idAmm, out idNuovaTipologia))
+                        result = false;
+                    else if (!string.IsNullOrEmpty(idNuovaTipologia))
+                    {
+                        // Se presento associo il modello alla nuova tipologia
+                        templateNew = getTemplateById(idNuovaTipologia);
+                        if (templateNew != null)
+                        {
+                            string serverPath = System.Configuration.ConfigurationManager.AppSettings["MODELS_ROOT_PATH"];
+                            using (DocsPaDB.Query_Utils.Utils dbUtils = new DocsPaDB.Query_Utils.Utils())
+                                codiceAmm = dbUtils.getCodAmm(idAmm);
+
+                            if (modello1 != null)
+                            {
+                                templateNew.PATH_MODELLO_1 = "Modelli\\" + codiceAmm + "\\" + templateNew.DESCRIZIONE + "\\Modello1." + template.PATH_MODELLO_1_EXT;
+                                templateNew.PATH_MODELLO_1_EXT = template.PATH_MODELLO_1_EXT;
+                                BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.salvaModelli(modello1, templateNew.DESCRIZIONE, codiceAmm, "Modello1.rtf", templateNew.PATH_MODELLO_1_EXT, serverPath, templateNew);
+                            }
+                            if (modello2 != null)
+                            {
+                                templateNew.PATH_MODELLO_2 = "Modelli\\" + codiceAmm + "\\" + templateNew.DESCRIZIONE + "\\Modello2.rtf";
+                                BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.salvaModelli(modello2, templateNew.DESCRIZIONE, codiceAmm, "Modello2.rtf", "doc", serverPath, templateNew);
+                            }
+                            if (allegato != null)
+                            {
+                                templateNew.PATH_ALLEGATO_1 = "Modelli\\" + codiceAmm + "\\" + templateNew.DESCRIZIONE + "\\Allegato1.rtf";
+                                BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.salvaModelli(modello2, templateNew.DESCRIZIONE, codiceAmm, "Allegato1.rtf", "doc", serverPath, templateNew);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("Errore in ReplicaTipoDocumento: " + e.Message);
+                result = false;
+            }
+
+            return result;
         }
 
     }

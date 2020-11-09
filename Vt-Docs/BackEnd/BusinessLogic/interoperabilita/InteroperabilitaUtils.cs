@@ -210,7 +210,7 @@ namespace BusinessLogic.Interoperabilità
         /// <summary></summary>
         /// <param name="qco"></param>
         /// <returns></returns>
-        public static string getMailAddress(DocsPaVO.addressbook.QueryCorrispondente qco, string idProfile)
+        public static string getMailAddress(DocsPaVO.addressbook.QueryCorrispondente qco)
         {
             logger.Debug("getMailAddress");
             string mailMitt = "";
@@ -238,20 +238,6 @@ namespace BusinessLogic.Interoperabilità
                 logger.Debug("Utente");
                 mailMitt = ((DocsPaVO.utente.Ruolo)((DocsPaVO.utente.Utente)mittArr[0]).ruoli[0]).uo.email;
             }
-
-            if (qco.tipoUtente == DocsPaVO.addressbook.TipoUtente.ESTERNO)
-            {
-                //Invio la ricevuta di protocollazione all'indirizzo Email da cui ho ricevuto il documento.
-                DocsPaDB.Query_DocsPAWS.Documenti doc = new DocsPaDB.Query_DocsPAWS.Documenti();
-                string mailMittProfile = doc.GetEmailAddressDocument(idProfile);
-                if (!string.IsNullOrEmpty(mailMittProfile))
-                {
-                    List<DocsPaVO.utente.MailCorrispondente> emails = BusinessLogic.Utenti.addressBookManager.GetMailCorrispondente((mittArr[0] as DocsPaVO.utente.Corrispondente).systemId);
-                    if ((from e in emails where e.Email.Equals(mailMittProfile) select e).FirstOrDefault() != null)
-                        mailMitt = mailMittProfile;
-                }
-            }
-
             logger.Debug(mailMitt);
             return mailMitt;
         }

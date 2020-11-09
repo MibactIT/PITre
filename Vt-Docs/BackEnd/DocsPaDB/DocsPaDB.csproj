@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
@@ -32,7 +32,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <PublishUrl>http://localhost/DocsPaDB/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -48,6 +48,7 @@
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -73,6 +74,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -97,8 +99,35 @@
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <FileAlignment>4096</FileAlignment>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="adodb, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\..\DLL_TERZE_PARTI\log4net.dll</HintPath>
     </Reference>
@@ -206,7 +235,6 @@
     <Compile Include="Query_DocsPAWS\Reporting\AmmExportMacroFunzioniReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\AmmExportMicroFunzioniReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\AmmExportPolicyPARERReport.cs" />
-    <Compile Include="Query_DocsPAWS\Reporting\AmmMonitoraggioPolicyReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\CertificazioneIstanzaEsibizioneReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\ConsistenzaOrganigrammaReport.cs">
       <SubType>Code</SubType>
@@ -228,15 +256,12 @@
     <Compile Include="Query_DocsPAWS\Reporting\ElencoDecretiSCCLARepostSucc.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\ElencoDecretiSRCReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\EsportaLogConservazioneReport.cs" />
-    <Compile Include="Query_DocsPAWS\Reporting\ExportProcessiDiFirmaReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\ExportRubricaReport.cs" />
-    <Compile Include="Query_DocsPAWS\Reporting\ExportTrasmissioniPendentiReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\ModelliTrasmissioneReport.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Query_DocsPAWS\Reporting\NotifichePecReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\NotificheRifiutoReport.cs" />
-    <Compile Include="Query_DocsPAWS\Reporting\RegistroAccessiExportReport.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\ReportIstanzeDiConservazione.cs" />
     <Compile Include="Query_DocsPAWS\Reporting\ReportMethodFinder.cs">
       <SubType>Code</SubType>
@@ -300,6 +325,7 @@
     <Compile Include="Query_DocsPAWS\Rubrica.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Query_DocsPAWS\Segnatura.cs" />
     <Compile Include="Query_DocsPAWS\SimplifiedInteroperabilityRegistryAndLogDbManager.cs" />
     <Compile Include="Query_DocsPAWS\SmartClient.cs" />
     <Compile Include="Query_DocsPAWS\StruttureSottoFascicoli.cs" />
@@ -334,7 +360,6 @@
     <Compile Include="Query_DocsPAWS\Utenti.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="RegistroAccessi.cs" />
     <Compile Include="TransactionContext.cs" />
     <Compile Include="Utils\Gerarchia.cs">
       <SubType>Code</SubType>
@@ -379,7 +404,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

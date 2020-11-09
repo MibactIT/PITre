@@ -187,13 +187,6 @@ namespace BusinessLogic.Import.ImportDocuments.DocumentType
             // Prelevamento della tipologia di fascicolo
             toReturn.ProjectTipology = row["Tipologia fascicolo"].ToString().Trim().ToUpper();
 
-            //Prelevamento del valore che indica se il documento deve essere un predisposto
-            if (colonne.Contains("Predisposto"))
-            {
-                toReturn.Predisposto = !String.IsNullOrEmpty(row["Predisposto"].ToString()) &&
-                row["Predisposto"].ToString().Trim().ToUpper() == "SI";
-            }
-
             // Restituzione dell'oggetto con i dati prelevati dalla riga
             return toReturn;
 

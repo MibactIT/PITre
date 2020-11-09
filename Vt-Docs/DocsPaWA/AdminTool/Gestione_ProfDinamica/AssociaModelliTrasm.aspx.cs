@@ -327,7 +327,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
             string[] amministrazione = ((string)Session["AMMDATASET"]).Split('@');
             string codiceAmministrazione = amministrazione[0];
             idAmministrazione = Utils.getIdAmmByCod(codiceAmministrazione, this);
-            modelliTrasmissioneApp = new ArrayList(ModelliTrasmManager.getModelliByAmmLite(idAmministrazione, this));
+            modelliTrasmissioneApp = new ArrayList(ModelliTrasmManager.getModelliByAmm(idAmministrazione, this));
             modelliTrasmissione = new ArrayList();
             for (int i = 0; i < modelliTrasmissioneApp.Count; i++)
             {

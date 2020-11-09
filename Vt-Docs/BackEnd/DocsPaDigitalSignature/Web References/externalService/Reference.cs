@@ -23,7 +23,7 @@ namespace externalService {
     
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="ClrVerificationSoap", Namespace="http://nttdata.com/2013/CRLSvc")]
@@ -292,30 +292,28 @@ namespace externalService {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://nttdata.com/2013/CRLSvc/VerificaCertificatoFileLocale", RequestNamespace="http://nttdata.com/2013/CRLSvc", ResponseNamespace="http://nttdata.com/2013/CRLSvc", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string VerificaCertificatoFileLocale(string file, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dataverificaDT, bool ancheFile, bool isCadesPades) {
+        public string VerificaCertificatoFileLocale(string file, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dataverificaDT, bool ancheFile) {
             object[] results = this.Invoke("VerificaCertificatoFileLocale", new object[] {
                         file,
                         dataverificaDT,
-                        ancheFile,
-                        isCadesPades});
+                        ancheFile});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void VerificaCertificatoFileLocaleAsync(string file, System.Nullable<System.DateTime> dataverificaDT, bool ancheFile, bool isCadesPades) {
-            this.VerificaCertificatoFileLocaleAsync(file, dataverificaDT, ancheFile, isCadesPades, null);
+        public void VerificaCertificatoFileLocaleAsync(string file, System.Nullable<System.DateTime> dataverificaDT, bool ancheFile) {
+            this.VerificaCertificatoFileLocaleAsync(file, dataverificaDT, ancheFile, null);
         }
         
         /// <remarks/>
-        public void VerificaCertificatoFileLocaleAsync(string file, System.Nullable<System.DateTime> dataverificaDT, bool ancheFile, bool isCadesPades, object userState) {
+        public void VerificaCertificatoFileLocaleAsync(string file, System.Nullable<System.DateTime> dataverificaDT, bool ancheFile, object userState) {
             if ((this.VerificaCertificatoFileLocaleOperationCompleted == null)) {
                 this.VerificaCertificatoFileLocaleOperationCompleted = new System.Threading.SendOrPostCallback(this.OnVerificaCertificatoFileLocaleOperationCompleted);
             }
             this.InvokeAsync("VerificaCertificatoFileLocale", new object[] {
                         file,
                         dataverificaDT,
-                        ancheFile,
-                        isCadesPades}, this.VerificaCertificatoFileLocaleOperationCompleted, userState);
+                        ancheFile}, this.VerificaCertificatoFileLocaleOperationCompleted, userState);
         }
         
         private void OnVerificaCertificatoFileLocaleOperationCompleted(object arg) {
@@ -327,30 +325,28 @@ namespace externalService {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://nttdata.com/2013/CRLSvc/VerificaCertificato", RequestNamespace="http://nttdata.com/2013/CRLSvc", ResponseNamespace="http://nttdata.com/2013/CRLSvc", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string VerificaCertificato([System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")] byte[] content, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dataverificaDT, bool ancheFile, bool isCadesPades) {
+        public string VerificaCertificato([System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")] byte[] content, [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)] System.Nullable<System.DateTime> dataverificaDT, bool ancheFile) {
             object[] results = this.Invoke("VerificaCertificato", new object[] {
                         content,
                         dataverificaDT,
-                        ancheFile,
-                        isCadesPades});
+                        ancheFile});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void VerificaCertificatoAsync(byte[] content, System.Nullable<System.DateTime> dataverificaDT, bool ancheFile, bool isCadesPades) {
-            this.VerificaCertificatoAsync(content, dataverificaDT, ancheFile, isCadesPades, null);
+        public void VerificaCertificatoAsync(byte[] content, System.Nullable<System.DateTime> dataverificaDT, bool ancheFile) {
+            this.VerificaCertificatoAsync(content, dataverificaDT, ancheFile, null);
         }
         
         /// <remarks/>
-        public void VerificaCertificatoAsync(byte[] content, System.Nullable<System.DateTime> dataverificaDT, bool ancheFile, bool isCadesPades, object userState) {
+        public void VerificaCertificatoAsync(byte[] content, System.Nullable<System.DateTime> dataverificaDT, bool ancheFile, object userState) {
             if ((this.VerificaCertificatoOperationCompleted == null)) {
                 this.VerificaCertificatoOperationCompleted = new System.Threading.SendOrPostCallback(this.OnVerificaCertificatoOperationCompleted);
             }
             this.InvokeAsync("VerificaCertificato", new object[] {
                         content,
                         dataverificaDT,
-                        ancheFile,
-                        isCadesPades}, this.VerificaCertificatoOperationCompleted, userState);
+                        ancheFile}, this.VerificaCertificatoOperationCompleted, userState);
         }
         
         private void OnVerificaCertificatoOperationCompleted(object arg) {
@@ -407,11 +403,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void BatchDettaglioCertificatoCompletedEventHandler(object sender, BatchDettaglioCertificatoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class BatchDettaglioCertificatoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -433,11 +429,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void FileLocaleCompletedEventHandler(object sender, FileLocaleCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class FileLocaleCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -459,11 +455,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ProvaServizioCompletedEventHandler(object sender, ProvaServizioCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ProvaServizioCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -485,11 +481,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ProvaServizioCERTCompletedEventHandler(object sender, ProvaServizioCERTCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ProvaServizioCERTCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -511,11 +507,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void DettaglioCertificatoCompletedEventHandler(object sender, DettaglioCertificatoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class DettaglioCertificatoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -537,11 +533,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void VerificaCertificatoConFileOriginaleCompletedEventHandler(object sender, VerificaCertificatoConFileOriginaleCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class VerificaCertificatoConFileOriginaleCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -563,11 +559,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void VerificaCertificatoFileLocaleCompletedEventHandler(object sender, VerificaCertificatoFileLocaleCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class VerificaCertificatoFileLocaleCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -589,11 +585,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void VerificaCertificatoCompletedEventHandler(object sender, VerificaCertificatoCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class VerificaCertificatoCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
@@ -615,11 +611,11 @@ namespace externalService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     public delegate void ConnessioneServizioCompletedEventHandler(object sender, ConnessioneServizioCompletedEventArgs e);
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.7.2053.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.8.3752.0")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class ConnessioneServizioCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {

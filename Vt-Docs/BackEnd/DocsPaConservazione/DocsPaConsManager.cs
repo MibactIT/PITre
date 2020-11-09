@@ -846,7 +846,6 @@ namespace DocsPaConservazione
         /// <returns></returns>
         public ItemsConservazione[] getItemsConservazioneById(string idConservazione, DocsPaVO.utente.InfoUtente infoUtente, bool verificaContenutoFile)
         {
-            logger.Debug("BEGIN");
             string err = string.Empty;
             ArrayList retValue = new ArrayList();
             DocsPaUtils.Query queryDef1 = DocsPaUtils.InitQuery.getInstance().getQuery("S_CONSERVAZIONE1");
@@ -922,7 +921,6 @@ namespace DocsPaConservazione
                             itemsCons.Check_Firma = reader.GetValue(reader.GetOrdinal("ESITO_FIRMA")).ToString();
                             itemsCons.Check_Marcatura = reader.GetValue(reader.GetOrdinal("VALIDAZIONE_MARCA")).ToString();
                             itemsCons.Check_Formato = reader.GetValue(reader.GetOrdinal("VALIDAZIONE_FORMATO")).ToString();
-                            logger.Debug("Lettura info ID=" + itemsCons.SystemID);
 
                             string validazioneFirma = "0";
                             validazioneFirma = reader.GetValue(reader.GetOrdinal("VALIDAZIONE_FIRMA")).ToString();
@@ -1235,7 +1233,6 @@ namespace DocsPaConservazione
 
 
             }
-            logger.Debug("END");
             return (ItemsConservazione[])retValue.ToArray(typeof(ItemsConservazione));
         }
 
@@ -3681,7 +3678,6 @@ namespace DocsPaConservazione
         /// <returns></returns>
         public ItemsConservazione[] getItemsConservazioneByIdLite(string idConservazione, DocsPaVO.utente.InfoUtente infoUtente)
         {
-            logger.Debug("BEGIN");
             string err = string.Empty;
             ArrayList retValue = new ArrayList();
             DocsPaUtils.Query queryDef1 = DocsPaUtils.InitQuery.getInstance().getQuery("S_CONSERVAZIONE1");
@@ -3711,19 +3707,12 @@ namespace DocsPaConservazione
             {
                 string _objDBType = dbProvider.DBType.ToUpper().ToString();
 
-                //if (_objDBType.ToUpper().Equals("SQL"))
-                //    fields_itemsCons = fields_itemsCons +
-                //        DocsPaDbManagement.Functions.Functions.GetDbUserSession() + "." +
-                //        "getaccessrights(" + infoUtente.idGruppo + "," + infoUtente.idPeople + ",ID_PROFILE) AS DIRITTI, POLICY_VALIDA, VALIDAZIONE_FIRMA, ";
-                //else
-                //    fields_itemsCons = fields_itemsCons + "getaccessrights(" + infoUtente.idGruppo + "," + infoUtente.idPeople + ",ID_PROFILE) AS DIRITTI, POLICY_VALIDA, VALIDAZIONE_FIRMA, ";
-
                 if (_objDBType.ToUpper().Equals("SQL"))
                     fields_itemsCons = fields_itemsCons +
                         DocsPaDbManagement.Functions.Functions.GetDbUserSession() + "." +
-                        "getaccessrights(" + infoUtente.idGruppo + "," + infoUtente.idPeople + "," + infoUtente.idGruppo + ",ID_PROFILE) AS DIRITTI, POLICY_VALIDA, VALIDAZIONE_FIRMA, ";
+                        "getaccessrights(" + infoUtente.idGruppo + "," + infoUtente.idPeople + ",ID_PROFILE) AS DIRITTI, POLICY_VALIDA, VALIDAZIONE_FIRMA, ";
                 else
-                    fields_itemsCons = fields_itemsCons + "getaccessrights(" + infoUtente.idGruppo + "," + infoUtente.idPeople + "," + infoUtente.idGruppo + ",ID_PROFILE) AS DIRITTI, POLICY_VALIDA, VALIDAZIONE_FIRMA, ";
+                    fields_itemsCons = fields_itemsCons + "getaccessrights(" + infoUtente.idGruppo + "," + infoUtente.idPeople + ",ID_PROFILE) AS DIRITTI, POLICY_VALIDA, VALIDAZIONE_FIRMA, ";
             }
 
             //"getaccessrights(" + infoUtente.idGruppo + "," + infoUtente.idPeople + ",ID_PROFILE) AS DIRITTI, POLICY_VALIDA, VALIDAZIONE_FIRMA, ";
@@ -3770,7 +3759,6 @@ namespace DocsPaConservazione
                             itemsCons.tipo_atto = reader.GetValue(reader.GetOrdinal("TIPO_ATTO")).ToString();
                             itemsCons.dirittiDocumento = reader.GetValue(reader.GetOrdinal("DIRITTI")).ToString();
                             itemsCons.policyValida = reader.GetValue(reader.GetOrdinal("POLICY_VALIDA")).ToString();
-                            logger.Debug("Item ID=" + itemsCons.SystemID);
 
                             // Determina se il formato è valido per la conservazione
                             int count = types.Count(e => e.FileExtension.ToLowerInvariant() == itemsCons.immagineAcquisita.ToLowerInvariant() && e.FileTypeUsed && e.FileTypePreservation);
@@ -3796,7 +3784,6 @@ namespace DocsPaConservazione
                 err = exc.Message;
                 logger.Debug(err);
             }
-            logger.Debug("END");
             return (ItemsConservazione[])retValue.ToArray(typeof(ItemsConservazione));
         }
 
@@ -10772,7 +10759,7 @@ namespace DocsPaConservazione
             string strBase64Signed = "";
             bool retValue = false;
 
-            byte[] byteBase64Signed = BusinessLogic.Documenti.FileManager.HSM_AutomaticSignature(infoUtente, inputPath, outputPath, true);
+            byte[] byteBase64Signed = BusinessLogic.Documenti.FileManager.HSM_AutomaticSignature(infoUtente, inputPath, outputPath);
 
             if (byteBase64Signed != null)
             {

@@ -207,12 +207,6 @@ namespace BusinessLogic.Report
 
                             if (pdfFileName != "")
                             {
-                                // Fix per bug su numprotostart > numprotoend in caso di stampe contenenti solo variazioni
-                                if (hasVariazioni && protStart > protEnd)
-                                {
-                                    protStart = protEnd;
-                                }
-
                                 //si inserisce il file generato nel documentale
                                 stampaRegRes.docNumber = insertDocumentale(idReg, anno, protStart, protEnd, infoUtente, objRuolo, pdfFileName, hasProtocolli, hasVariazioni, dataUltimaStampa);
 
@@ -222,6 +216,7 @@ namespace BusinessLogic.Report
                                 //si aggiorna la tabella PROFILE
                                 aggiornaProfile(idReg, anno, protStart, protEnd);
 
+                                /* 11/02/19 Conservazione */
                                 //invio in conservazione
                                 try
                                 {

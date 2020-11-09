@@ -35,7 +35,7 @@ namespace DocsPAWA.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost/pitre/BE/DocsPaWS.asmx")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost/Giada1.1v4.5/DocsPaWS/DocsPaWS.asmx")]
         public string DocsPaWA_DocsPaWR_DocsPaWebService {
             get {
                 return ((string)(this["DocsPaWA_DocsPaWR_DocsPaWebService"]));

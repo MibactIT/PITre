@@ -8,36 +8,36 @@ using DocsPaUtils.Data;
 
 namespace DocsPaDB.Query_DocsPAWS
 {
-	public class DiagrammiStato : DBProvider
-	{
+    public class DiagrammiStato : DBProvider
+    {
         private ILog logger = LogManager.GetLogger(typeof(DiagrammiStato));
 
-		public DiagrammiStato(){}
+        public DiagrammiStato() { }
 
-		public void salvaDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg, string idAmm)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public void salvaDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg, string idAmm)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				//Inserimento nella DPA_DIAGRAMMI_STATO
-				dg.DESCRIZIONE = dg.DESCRIZIONE.Replace("'","''");
-				string system_id = string.Empty;
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_DIAGRAMMI_STATO");		
-				queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-				queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DIAGRAMMI_STATO"));
-				queryMng.setParam("idAmm",idAmm);
-				queryMng.setParam("descrizione",dg.DESCRIZIONE);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
+            try
+            {
+                //Inserimento nella DPA_DIAGRAMMI_STATO
+                dg.DESCRIZIONE = dg.DESCRIZIONE.Replace("'", "''");
+                string system_id = string.Empty;
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_DIAGRAMMI_STATO");
+                queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DIAGRAMMI_STATO"));
+                queryMng.setParam("idAmm", idAmm);
+                queryMng.setParam("descrizione", dg.DESCRIZIONE);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
 
-				bool retValue=false;
-				dbProvider.BeginTransaction();
-				int rowsAffected;
-				if (dbProvider.ExecuteNonQuery(commandText,out rowsAffected))
-				{
-					retValue=(rowsAffected>0);
+                bool retValue = false;
+                dbProvider.BeginTransaction();
+                int rowsAffected;
+                if (dbProvider.ExecuteNonQuery(commandText, out rowsAffected))
+                {
+                    retValue = (rowsAffected > 0);
                     if (retValue)
                     {
                         // Reperimento systemid
@@ -49,183 +49,182 @@ namespace DocsPaDB.Query_DocsPAWS
                         dbProvider.RollbackTransaction();
                         return;
                     }
-				}
+                }
 
-				//Inserimento nella DPA_STATI degli stati 
-				for(int i=0; i<dg.STATI.Count; i++)
-				{
-					DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) dg.STATI[i];
-					st.DESCRIZIONE = st.DESCRIZIONE.Replace("'","''");
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_STATI");		
-					queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-					queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_STATI"));
-					queryMng.setParam("ID_DIAGRAMMA",system_id);
-					queryMng.setParam("Var_descrizione",st.DESCRIZIONE);
+                //Inserimento nella DPA_STATI degli stati 
+                for (int i = 0; i < dg.STATI.Count; i++)
+                {
+                    DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)dg.STATI[i];
+                    st.DESCRIZIONE = st.DESCRIZIONE.Replace("'", "''");
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_STATI");
+                    queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                    queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_STATI"));
+                    queryMng.setParam("ID_DIAGRAMMA", system_id);
+                    queryMng.setParam("Var_descrizione", st.DESCRIZIONE);
                     queryMng.setParam("statoConsolidamento", ((int)st.STATO_CONSOLIDAMENTO).ToString());
-                    queryMng.setParam("id_processo_firma", string.IsNullOrEmpty(st.ID_PROCESSO_FIRMA) ? "null" : st.ID_PROCESSO_FIRMA);
+
                     if (st.STATO_INIZIALE)
-					{
-						queryMng.setParam("Stato_iniziale","1");
-						queryMng.setParam("Stato_finale","0");
-					}
-					if(st.STATO_FINALE)
-					{
-						queryMng.setParam("Stato_iniziale","0");
-						queryMng.setParam("Stato_finale","1");
-					}
-					if(!st.STATO_FINALE && !st.STATO_INIZIALE)
-					{
-						queryMng.setParam("Stato_iniziale","0");
-						queryMng.setParam("Stato_finale","0");
-					}
+                    {
+                        queryMng.setParam("Stato_iniziale", "1");
+                        queryMng.setParam("Stato_finale", "0");
+                    }
+                    if (st.STATO_FINALE)
+                    {
+                        queryMng.setParam("Stato_iniziale", "0");
+                        queryMng.setParam("Stato_finale", "1");
+                    }
+                    if (!st.STATO_FINALE && !st.STATO_INIZIALE)
+                    {
+                        queryMng.setParam("Stato_iniziale", "0");
+                        queryMng.setParam("Stato_finale", "0");
+                    }
 
                     if (st.CONVERSIONE_PDF)
                         queryMng.setParam("conversionePdf", "1");
                     else
                         queryMng.setParam("conversionePdf", "0");
 
-                    if(st.NON_RICERCABILE)
+                    if (st.NON_RICERCABILE)
                         queryMng.setParam("nonRicercabile", "1");
                     else
                         queryMng.setParam("nonRicercabile", "0");
-                    
+
                     if (st.STATO_SISTEMA)
                         queryMng.setParam("statoSistema", "1");
                     else
                         queryMng.setParam("statoSistema", "0");
-					commandText=queryMng.getSQL();
-					System.Diagnostics.Debug.WriteLine("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
+                    commandText = queryMng.getSQL();
+                    System.Diagnostics.Debug.WriteLine("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                     logger.Debug("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                     dbProvider.ExecuteNonQuery(commandText);
-				}
+                }
 
-				//Inserimento nella DPA_PASSI dei passi
-				for(int i=0; i<dg.PASSI.Count; i++)
-				{
-					DocsPaVO.DiagrammaStato.Passo step = (DocsPaVO.DiagrammaStato.Passo) dg.PASSI[i];
-					int id_stato_padre = 0;
-					int id_stato_automatico = 0;
-					string desc_stato_automatico = "";
+                //Inserimento nella DPA_PASSI dei passi
+                for (int i = 0; i < dg.PASSI.Count; i++)
+                {
+                    DocsPaVO.DiagrammaStato.Passo step = (DocsPaVO.DiagrammaStato.Passo)dg.PASSI[i];
+                    int id_stato_padre = 0;
+                    int id_stato_automatico = 0;
+                    string desc_stato_automatico = "";
 
-					for(int j=0; j<step.SUCCESSIVI.Count; j++)
-					{
-						DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) step.SUCCESSIVI[j];
-						int system_id_st_padre	= 0;
-						int system_id_st		= 0;
-						step.STATO_PADRE.DESCRIZIONE = step.STATO_PADRE.DESCRIZIONE.Replace("'","''");
-						st.DESCRIZIONE = st.DESCRIZIONE.Replace("'","''");
+                    for (int j = 0; j < step.SUCCESSIVI.Count; j++)
+                    {
+                        DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[j];
+                        int system_id_st_padre = 0;
+                        int system_id_st = 0;
+                        step.STATO_PADRE.DESCRIZIONE = step.STATO_PADRE.DESCRIZIONE.Replace("'", "''");
+                        st.DESCRIZIONE = st.DESCRIZIONE.Replace("'", "''");
 
-						queryMng =DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI");	
-						queryMng.setParam("idDiagramma",system_id);
-						queryMng.setParam("descrizione",step.STATO_PADRE.DESCRIZIONE);
-						commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : "+commandText);
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI");
+                        queryMng.setParam("idDiagramma", system_id);
+                        queryMng.setParam("descrizione", step.STATO_PADRE.DESCRIZIONE);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
                         DataSet ds = new DataSet();
-						dbProvider.ExecuteQuery(ds,commandText);
-						system_id_st_padre = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
+                        dbProvider.ExecuteQuery(ds, commandText);
+                        system_id_st_padre = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
 
-						queryMng =DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI");	
-						queryMng.setParam("idDiagramma",system_id);
-						queryMng.setParam("descrizione",st.DESCRIZIONE);
-						commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : "+commandText);
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI");
+                        queryMng.setParam("idDiagramma", system_id);
+                        queryMng.setParam("descrizione", st.DESCRIZIONE);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
 
-						ds = new DataSet();
-						dbProvider.ExecuteQuery(ds,commandText);
-						system_id_st = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
-						
-						//Verifico se il passo che si vuole inserire ha uno stato automatico
-						//in caso affermativo mi salvo il SystemId e la Descrizione dello stato automatico
-						//e a fine ciclo effettuo l'inserimento in tabella DPA_PASSI
-						if( ((DocsPaVO.DiagrammaStato.Stato) step.SUCCESSIVI[j]).DESCRIZIONE == step.DESCRIZIONE_STATO_AUTOMATICO)
-						{
-							id_stato_padre = system_id_st_padre;
-							id_stato_automatico = system_id_st;
-							desc_stato_automatico = st.DESCRIZIONE;
-						}	
+                        ds = new DataSet();
+                        dbProvider.ExecuteQuery(ds, commandText);
+                        system_id_st = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
 
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_PASSI");		
-						queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-						queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_PASSI"));
-						queryMng.setParam("id_stato",Convert.ToString(system_id_st_padre));
-						queryMng.setParam("next_stato",Convert.ToString(system_id_st));
-						queryMng.setParam("id_diagramma",system_id);
-                        queryMng.setParam("stato_automatico_lf", system_id_st.ToString().Equals(step.ID_STATO_AUTOMATICO_LF)? "1" : "0");
-                        commandText =queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
+                        //Verifico se il passo che si vuole inserire ha uno stato automatico
+                        //in caso affermativo mi salvo il SystemId e la Descrizione dello stato automatico
+                        //e a fine ciclo effettuo l'inserimento in tabella DPA_PASSI
+                        if (((DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[j]).DESCRIZIONE == step.DESCRIZIONE_STATO_AUTOMATICO)
+                        {
+                            id_stato_padre = system_id_st_padre;
+                            id_stato_automatico = system_id_st;
+                            desc_stato_automatico = st.DESCRIZIONE;
+                        }
+
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_PASSI");
+                        queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                        queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_PASSI"));
+                        queryMng.setParam("id_stato", Convert.ToString(system_id_st_padre));
+                        queryMng.setParam("next_stato", Convert.ToString(system_id_st));
+                        queryMng.setParam("id_diagramma", system_id);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
-					}
+                    }
 
-					//Faccio l'UPDATE per inserire l'eventuale stato automatico
-					if( id_stato_padre != 0)
-					{
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_STATI_AUTOMATICI");		
-						queryMng.setParam("id_stato_padre",Convert.ToString(id_stato_padre));
-						queryMng.setParam("id_stato_automatico",Convert.ToString(id_stato_automatico));
-						queryMng.setParam("desc_stato_automatico",desc_stato_automatico);
-						commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
+                    //Faccio l'UPDATE per inserire l'eventuale stato automatico
+                    if (id_stato_padre != 0)
+                    {
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_STATI_AUTOMATICI");
+                        queryMng.setParam("id_stato_padre", Convert.ToString(id_stato_padre));
+                        queryMng.setParam("id_stato_automatico", Convert.ToString(id_stato_automatico));
+                        queryMng.setParam("desc_stato_automatico", desc_stato_automatico);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
-					}					
-				}			
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}				
-		}
+                    }
+                }
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public DocsPaVO.DiagrammaStato.DiagrammaStato getDiagrammaById(string idDiagramma)
-		{
-			DocsPaVO.DiagrammaStato.DiagrammaStato dg =  new DocsPaVO.DiagrammaStato.DiagrammaStato();
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			
-			try
-			{
-				//Selezione i diagrammi della specifica amministrazione
-				DocsPaUtils.Query queryMng =DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMI_STATO");	
-				queryMng.setParam("system_id",idDiagramma);
-				string commandText=queryMng.getSQL();
-				logger.Debug("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
+        public DocsPaVO.DiagrammaStato.DiagrammaStato getDiagrammaById(string idDiagramma)
+        {
+            DocsPaVO.DiagrammaStato.DiagrammaStato dg = new DocsPaVO.DiagrammaStato.DiagrammaStato();
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
+            try
+            {
+                //Selezione i diagrammi della specifica amministrazione
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMI_STATO");
+                queryMng.setParam("system_id", idDiagramma);
+                string commandText = queryMng.getSQL();
+                logger.Debug("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
                 DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
-	
-				//Seleziono gli stati per lo specifico diagramma
-				dg.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
-				dg.ID_AMM = Convert.ToInt32(ds.Tables[0].Rows[0]["Id_Amm"].ToString());
-				dg.DESCRIZIONE = ds.Tables[0].Rows[0]["Var_descrizione"].ToString();
+                dbProvider.ExecuteQuery(ds, commandText);
 
-				queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATI");	
-				queryMng.setParam("id_diagramma",Convert.ToString(dg.SYSTEM_ID));
-				commandText=queryMng.getSQL();
-				logger.Debug("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
+                //Seleziono gli stati per lo specifico diagramma
+                dg.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
+                dg.ID_AMM = Convert.ToInt32(ds.Tables[0].Rows[0]["Id_Amm"].ToString());
+                dg.DESCRIZIONE = ds.Tables[0].Rows[0]["Var_descrizione"].ToString();
+
+                queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATI");
+                queryMng.setParam("id_diagramma", Convert.ToString(dg.SYSTEM_ID));
+                commandText = queryMng.getSQL();
+                logger.Debug("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
                 DataSet ds_1 = new DataSet();
-				dbProvider.ExecuteQuery(ds_1,commandText);
-				
-				for(int j=0; j<ds_1.Tables[0].Rows.Count; j++)
-				{
-					DocsPaVO.DiagrammaStato.Stato st = new DocsPaVO.DiagrammaStato.Stato();
-					st.SYSTEM_ID = Convert.ToInt32(ds_1.Tables[0].Rows[j]["SYSTEM_ID"].ToString());
-					st.ID_DIAGRAMMA = Convert.ToInt32(ds_1.Tables[0].Rows[j]["ID_DIAGRAMMA"].ToString());
-					st.DESCRIZIONE = ds_1.Tables[0].Rows[j]["Var_descrizione"].ToString();
-					if(ds_1.Tables[0].Rows[j]["Stato_iniziale"].ToString() == "0")
-						st.STATO_INIZIALE = false;
-					else
-						st.STATO_INIZIALE = true;
+                dbProvider.ExecuteQuery(ds_1, commandText);
 
-					if(ds_1.Tables[0].Rows[j]["Stato_finale"].ToString() == "0")
-						st.STATO_FINALE = false;
-					else
-						st.STATO_FINALE = true;
+                for (int j = 0; j < ds_1.Tables[0].Rows.Count; j++)
+                {
+                    DocsPaVO.DiagrammaStato.Stato st = new DocsPaVO.DiagrammaStato.Stato();
+                    st.SYSTEM_ID = Convert.ToInt32(ds_1.Tables[0].Rows[j]["SYSTEM_ID"].ToString());
+                    st.ID_DIAGRAMMA = Convert.ToInt32(ds_1.Tables[0].Rows[j]["ID_DIAGRAMMA"].ToString());
+                    st.DESCRIZIONE = ds_1.Tables[0].Rows[j]["Var_descrizione"].ToString();
+                    if (ds_1.Tables[0].Rows[j]["Stato_iniziale"].ToString() == "0")
+                        st.STATO_INIZIALE = false;
+                    else
+                        st.STATO_INIZIALE = true;
+
+                    if (ds_1.Tables[0].Rows[j]["Stato_finale"].ToString() == "0")
+                        st.STATO_FINALE = false;
+                    else
+                        st.STATO_FINALE = true;
 
                     if (ds_1.Tables[0].Rows[j]["Conv_Pdf"].ToString() == "1")
                         st.CONVERSIONE_PDF = true;
@@ -244,26 +243,21 @@ namespace DocsPaDB.Query_DocsPAWS
                     else
                         st.NON_RICERCABILE = false;
 
-                    if (ds_1.Tables[0].Rows[j]["ID_PROCESSO_FIRMA"] != DBNull.Value)
-                    {
-                        st.ID_PROCESSO_FIRMA = ds_1.Tables[0].Rows[j]["ID_PROCESSO_FIRMA"].ToString();
-                    }
-
                     dg.STATI.Add(st);
-				}
+                }
 
-				//Seleziono i passi per lo specifico stato 
-				for(int k=0; k<dg.STATI.Count; k++)
-				{
-					DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) dg.STATI[k];
-					
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_PASSI");	
-					queryMng.setParam("id_stato",Convert.ToString(st.SYSTEM_ID));
-					commandText=queryMng.getSQL();
-					logger.Debug("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
+                //Seleziono i passi per lo specifico stato 
+                for (int k = 0; k < dg.STATI.Count; k++)
+                {
+                    DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)dg.STATI[k];
 
-					DataSet ds_2 = new DataSet();
-					dbProvider.ExecuteQuery(ds_2,commandText);
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_PASSI");
+                    queryMng.setParam("id_stato", Convert.ToString(st.SYSTEM_ID));
+                    commandText = queryMng.getSQL();
+                    logger.Debug("SQL - getDiagrammaById - DiagrammiStato.cs - QUERY : " + commandText);
+
+                    DataSet ds_2 = new DataSet();
+                    dbProvider.ExecuteQuery(ds_2, commandText);
 
                     DocsPaVO.DiagrammaStato.Passo step = new DocsPaVO.DiagrammaStato.Passo();
                     if (ds_2.Tables[0].Rows.Count != 0)
@@ -316,9 +310,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                 st_2.CONVERSIONE_PDF = true;
                             else
                                 st_2.CONVERSIONE_PDF = false;
-
-                            if (ds_2.Tables[0].Rows[y]["CHA_STATO_AUTOMATICO_LF"].ToString() == "1")
-                                step.ID_STATO_AUTOMATICO_LF = st_2.SYSTEM_ID.ToString();
 
                             step.SUCCESSIVI.Add(st_2);
                         }
@@ -398,69 +389,69 @@ namespace DocsPaDB.Query_DocsPAWS
                     #endregion VECCHIA GESTIONE CON QUERY MULTIPLE
 
                     if (step.STATO_PADRE != null)
-						dg.PASSI.Add(step);
-				}
-			}
-			catch 
-			{
-				return null;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-			return dg;
-		}
+                        dg.PASSI.Add(step);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+            return dg;
+        }
 
 
-		public ArrayList getDiagrammi(string idAmm)
-		{
-			ArrayList diagrammi = new ArrayList();
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();	
+        public ArrayList getDiagrammi(string idAmm)
+        {
+            ArrayList diagrammi = new ArrayList();
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				//Selezione i diagrammi della specifica amministrazione
-				DocsPaUtils.Query queryMng =DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMI_BY_ID_AMM");	
-				queryMng.setParam("idAmm",idAmm);
-				string commandText=queryMng.getSQL();
-				logger.Debug("SQL - getDiagrammi - DiagrammiStato.cs - QUERY : " + commandText);
+            try
+            {
+                //Selezione i diagrammi della specifica amministrazione
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMI_BY_ID_AMM");
+                queryMng.setParam("idAmm", idAmm);
+                string commandText = queryMng.getSQL();
+                logger.Debug("SQL - getDiagrammi - DiagrammiStato.cs - QUERY : " + commandText);
 
-				DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
-	
-				for(int i=0; i<ds.Tables[0].Rows.Count; i++)
-				{
-					//Seleziono gli stati per lo specifico diagramma
-					DocsPaVO.DiagrammaStato.DiagrammaStato dg =  new DocsPaVO.DiagrammaStato.DiagrammaStato();
+                DataSet ds = new DataSet();
+                dbProvider.ExecuteQuery(ds, commandText);
 
-					dg.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[i]["SYSTEM_ID"].ToString());
-					dg.ID_AMM = Convert.ToInt32(ds.Tables[0].Rows[i]["Id_amm"].ToString());
-					dg.DESCRIZIONE = ds.Tables[0].Rows[i]["Var_descrizione"].ToString();
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    //Seleziono gli stati per lo specifico diagramma
+                    DocsPaVO.DiagrammaStato.DiagrammaStato dg = new DocsPaVO.DiagrammaStato.DiagrammaStato();
 
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATI");	
-					queryMng.setParam("id_diagramma",Convert.ToString(dg.SYSTEM_ID));
-					commandText=queryMng.getSQL();
-					logger.Debug("SQL - getDiagrammi - DiagrammiStato.cs - QUERY : " + commandText);
+                    dg.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[i]["SYSTEM_ID"].ToString());
+                    dg.ID_AMM = Convert.ToInt32(ds.Tables[0].Rows[i]["Id_amm"].ToString());
+                    dg.DESCRIZIONE = ds.Tables[0].Rows[i]["Var_descrizione"].ToString();
 
-					DataSet ds_1 = new DataSet();
-					dbProvider.ExecuteQuery(ds_1,commandText);
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATI");
+                    queryMng.setParam("id_diagramma", Convert.ToString(dg.SYSTEM_ID));
+                    commandText = queryMng.getSQL();
+                    logger.Debug("SQL - getDiagrammi - DiagrammiStato.cs - QUERY : " + commandText);
 
-					for(int j=0; j<ds_1.Tables[0].Rows.Count; j++)
-					{
-						DocsPaVO.DiagrammaStato.Stato st = new DocsPaVO.DiagrammaStato.Stato();
-						st.SYSTEM_ID = Convert.ToInt32(ds_1.Tables[0].Rows[j]["SYSTEM_ID"].ToString());
-						st.ID_DIAGRAMMA = Convert.ToInt32(ds_1.Tables[0].Rows[j]["ID_DIAGRAMMA"].ToString());
-						st.DESCRIZIONE = ds_1.Tables[0].Rows[j]["Var_descrizione"].ToString();
-						if(ds_1.Tables[0].Rows[j]["Stato_iniziale"].ToString() == "0")
-							st.STATO_INIZIALE = false;
-						else
-							st.STATO_INIZIALE = true;
+                    DataSet ds_1 = new DataSet();
+                    dbProvider.ExecuteQuery(ds_1, commandText);
 
-						if(ds_1.Tables[0].Rows[j]["Stato_finale"].ToString() == "0")
-							st.STATO_FINALE = false;
-						else
-							st.STATO_FINALE = true;
+                    for (int j = 0; j < ds_1.Tables[0].Rows.Count; j++)
+                    {
+                        DocsPaVO.DiagrammaStato.Stato st = new DocsPaVO.DiagrammaStato.Stato();
+                        st.SYSTEM_ID = Convert.ToInt32(ds_1.Tables[0].Rows[j]["SYSTEM_ID"].ToString());
+                        st.ID_DIAGRAMMA = Convert.ToInt32(ds_1.Tables[0].Rows[j]["ID_DIAGRAMMA"].ToString());
+                        st.DESCRIZIONE = ds_1.Tables[0].Rows[j]["Var_descrizione"].ToString();
+                        if (ds_1.Tables[0].Rows[j]["Stato_iniziale"].ToString() == "0")
+                            st.STATO_INIZIALE = false;
+                        else
+                            st.STATO_INIZIALE = true;
+
+                        if (ds_1.Tables[0].Rows[j]["Stato_finale"].ToString() == "0")
+                            st.STATO_FINALE = false;
+                        else
+                            st.STATO_FINALE = true;
 
                         if (ds_1.Tables[0].Rows[j]["Conv_Pdf"].ToString() == "1")
                             st.CONVERSIONE_PDF = true;
@@ -482,24 +473,20 @@ namespace DocsPaDB.Query_DocsPAWS
                             st.STATO_SISTEMA = true;
                         else
                             st.STATO_SISTEMA = false;
-                        if (ds_1.Tables[0].Rows[j]["ID_PROCESSO_FIRMA"] != DBNull.Value)
-                        {
-                            st.ID_PROCESSO_FIRMA = ds_1.Tables[0].Rows[j]["ID_PROCESSO_FIRMA"].ToString();
-                        }
                         dg.STATI.Add(st);
-					}
+                    }
 
-					//Seleziono i passi per lo specifico stato 
-					for(int k=0; k<dg.STATI.Count; k++)
-					{
-						DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) dg.STATI[k];
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_PASSI");	
-						queryMng.setParam("id_stato",Convert.ToString(st.SYSTEM_ID));
-						commandText=queryMng.getSQL();
-						logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+                    //Seleziono i passi per lo specifico stato 
+                    for (int k = 0; k < dg.STATI.Count; k++)
+                    {
+                        DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)dg.STATI[k];
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_PASSI");
+                        queryMng.setParam("id_stato", Convert.ToString(st.SYSTEM_ID));
+                        commandText = queryMng.getSQL();
+                        logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
 
-						DataSet ds_2 = new DataSet();
-						dbProvider.ExecuteQuery(ds_2,commandText);
+                        DataSet ds_2 = new DataSet();
+                        dbProvider.ExecuteQuery(ds_2, commandText);
 
                         DocsPaVO.DiagrammaStato.Passo step = new DocsPaVO.DiagrammaStato.Passo();
                         if (ds_2.Tables[0].Rows.Count != 0)
@@ -528,10 +515,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 st_1.CONVERSIONE_PDF = true;
                             else
                                 st_1.CONVERSIONE_PDF = false;
-                            if (ds_2.Tables[0].Rows[0]["ID_PROCESSO_FIRMA"] != DBNull.Value)
-                            {
-                                st_1.ID_PROCESSO_FIRMA = ds_2.Tables[0].Rows[0]["ID_PROCESSO_FIRMA"].ToString();
-                            }
+
                             step.STATO_PADRE = st_1;
 
                             //Stati successivi del passo
@@ -555,9 +539,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                     st_2.CONVERSIONE_PDF = true;
                                 else
                                     st_2.CONVERSIONE_PDF = false;
-
-                                if (ds_2.Tables[0].Rows[y]["CHA_STATO_AUTOMATICO_LF"].ToString() == "1")
-                                    step.ID_STATO_AUTOMATICO_LF = st_2.SYSTEM_ID.ToString();
 
                                 step.SUCCESSIVI.Add(st_2);
                             }
@@ -636,204 +617,158 @@ namespace DocsPaDB.Query_DocsPAWS
                         #endregion VECCHIA GESTIONE CON QUERY MULTIPLE
 
                         if (step.STATO_PADRE != null)
-							dg.PASSI.Add(step);
-					}
-					diagrammi.Add(dg);
-				}
-			}
-			catch 
-			{
-				return null;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-			return diagrammi;
-		}
+                            dg.PASSI.Add(step);
+                    }
+                    diagrammi.Add(dg);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+            return diagrammi;
+        }
 
 
-		public bool isUniqueNameDiagramma(string nomeDiagramma)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_IS_UNIQUE_NOME_DIAGRAMMA");	
-				queryMng.setParam("nomeDiagramma",nomeDiagramma);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - isUniqueNameDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
+        public bool isUniqueNameDiagramma(string nomeDiagramma)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_IS_UNIQUE_NOME_DIAGRAMMA");
+                queryMng.setParam("nomeDiagramma", nomeDiagramma);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - isUniqueNameDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - isUniqueNameDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                 DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
-				
-				if(ds.Tables[0].Rows.Count != 0)
-					return false;
-				else
-					return true;
-			}
-			catch 
-			{
-				return false;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}						
-		}
+                dbProvider.ExecuteQuery(ds, commandText);
+
+                if (ds.Tables[0].Rows.Count != 0)
+                    return false;
+                else
+                    return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public void delDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public void delDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				DocsPaUtils.Query queryMng;
-				string commandText;
-								
-				for(int i=0; i<dg.STATI.Count; i++)
-				{
-					DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) dg.STATI[i];
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_PASSI");		
-					queryMng.setParam("id_passo",Convert.ToString(st.SYSTEM_ID));
-					commandText=queryMng.getSQL();
-					System.Diagnostics.Debug.WriteLine("SQL - delDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
-                    logger.Debug("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                    dbProvider.ExecuteNonQuery(commandText);
-					
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_STATI");		
-					queryMng.setParam("id_stato",Convert.ToString(st.SYSTEM_ID));
-					commandText=queryMng.getSQL();
-					System.Diagnostics.Debug.WriteLine("SQL - delDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
-                    logger.Debug("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                    dbProvider.ExecuteNonQuery(commandText);
-					
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_DIAGRAMMI_DOC");		
-					queryMng.setParam("id_stato",Convert.ToString(st.SYSTEM_ID));
-					commandText=queryMng.getSQL();
-					System.Diagnostics.Debug.WriteLine("SQL - delDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
-					dbProvider.ExecuteNonQuery(commandText);
-				}
+            try
+            {
+                DocsPaUtils.Query queryMng;
+                string commandText;
 
-				queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_DIAGRAMMI_STATO");		
-				queryMng.setParam("system_id",Convert.ToString(dg.SYSTEM_ID));
-				commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - delDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
-                logger.Debug("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                dbProvider.ExecuteNonQuery(commandText);				
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}			
-		}
-
-
-		public void updateDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-
-			try
-			{
-				//Aggiorno il nome del Diagramma
-				dg.DESCRIZIONE = dg.DESCRIZIONE.Replace("'","''");
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_DPA_DIAGRAMMI_STATO");		
-				queryMng.setParam("descrizione",dg.DESCRIZIONE);
-				queryMng.setParam("system_id",Convert.ToString(dg.SYSTEM_ID));
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : "+commandText);
-                logger.Debug("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
-				dbProvider.ExecuteNonQuery(commandText);
-
-				//Aggiorno gli stati del diagramma, faccio un UPDATE se esistono già
-				//altrimenti effettuo un inserimento
-				for(int i=0; i<dg.STATI.Count; i++)
+                for (int i = 0; i < dg.STATI.Count; i++)
                 {
-					DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) dg.STATI[i];
-					st.DESCRIZIONE = st.DESCRIZIONE.Replace("'","''");
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI_1");		
-					queryMng.setParam("system_id",Convert.ToString(st.SYSTEM_ID));
-					commandText=queryMng.getSQL();
-					System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : "+commandText);
+                    DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)dg.STATI[i];
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_PASSI");
+                    queryMng.setParam("id_passo", Convert.ToString(st.SYSTEM_ID));
+                    commandText = queryMng.getSQL();
+                    System.Diagnostics.Debug.WriteLine("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                    logger.Debug("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                    dbProvider.ExecuteNonQuery(commandText);
+
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_STATI");
+                    queryMng.setParam("id_stato", Convert.ToString(st.SYSTEM_ID));
+                    commandText = queryMng.getSQL();
+                    System.Diagnostics.Debug.WriteLine("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                    logger.Debug("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                    dbProvider.ExecuteNonQuery(commandText);
+
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_DIAGRAMMI_DOC");
+                    queryMng.setParam("id_stato", Convert.ToString(st.SYSTEM_ID));
+                    commandText = queryMng.getSQL();
+                    System.Diagnostics.Debug.WriteLine("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                    dbProvider.ExecuteNonQuery(commandText);
+                }
+
+                queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_DIAGRAMMI_STATO");
+                queryMng.setParam("system_id", Convert.ToString(dg.SYSTEM_ID));
+                commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                logger.Debug("SQL - delDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                dbProvider.ExecuteNonQuery(commandText);
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
+
+
+        public void updateDiagramma(DocsPaVO.DiagrammaStato.DiagrammaStato dg)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
+            try
+            {
+                //Aggiorno il nome del Diagramma
+                dg.DESCRIZIONE = dg.DESCRIZIONE.Replace("'", "''");
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_DPA_DIAGRAMMI_STATO");
+                queryMng.setParam("descrizione", dg.DESCRIZIONE);
+                queryMng.setParam("system_id", Convert.ToString(dg.SYSTEM_ID));
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                logger.Debug("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                dbProvider.ExecuteNonQuery(commandText);
+
+                //Aggiorno gli stati del diagramma, faccio un UPDATE se esistono già
+                //altrimenti effettuo un inserimento
+                for (int i = 0; i < dg.STATI.Count; i++)
+                {
+                    DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)dg.STATI[i];
+                    st.DESCRIZIONE = st.DESCRIZIONE.Replace("'", "''");
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI_1");
+                    queryMng.setParam("system_id", Convert.ToString(st.SYSTEM_ID));
+                    commandText = queryMng.getSQL();
+                    System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                     logger.Debug("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                     DataSet ds = new DataSet();
-					dbProvider.ExecuteQuery(ds,commandText);
+                    dbProvider.ExecuteQuery(ds, commandText);
 
-					//Faccio un UPDATE
-					if(ds.Tables[0].Rows.Count != 0)
-					{
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_DPA_STATI");		
-						queryMng.setParam("descrizione",st.DESCRIZIONE);
-						queryMng.setParam("system_id",Convert.ToString(st.SYSTEM_ID));
-						
-						if(st.STATO_INIZIALE)
-						{
-							queryMng.setParam("stato_iniziale","1");
-							queryMng.setParam("stato_finale","0");							
-						}
+                    //Faccio un UPDATE
+                    if (ds.Tables[0].Rows.Count != 0)
+                    {
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_DPA_STATI");
+                        queryMng.setParam("descrizione", st.DESCRIZIONE);
+                        queryMng.setParam("system_id", Convert.ToString(st.SYSTEM_ID));
 
-						if(st.STATO_FINALE)
-						{
-							queryMng.setParam("stato_iniziale","0");
-							queryMng.setParam("stato_finale","1");							
-						}	
-
-						if(!st.STATO_FINALE && !st.STATO_INIZIALE)
-						{
-							queryMng.setParam("stato_iniziale","0");
-							queryMng.setParam("stato_finale","0");							
-						}
-
-                        if (st.CONVERSIONE_PDF)
-                            queryMng.setParam("conversionePdf", "1");
-                        else
-                            queryMng.setParam("conversionePdf", "0");
-
-                        if (st.NON_RICERCABILE)
-                            queryMng.setParam("nonRicercabile", "1");
-                        else
-                            queryMng.setParam("nonRicercabile", "0");
-
-                        queryMng.setParam("statoConsolidamento", ((int)st.STATO_CONSOLIDAMENTO).ToString());
-                        if(st.STATO_SISTEMA)
-                            queryMng.setParam("statoSistema", "1");
-                        else
-                            queryMng.setParam("statoSistema", "0");
-                        queryMng.setParam("id_processo_firma", string.IsNullOrEmpty(st.ID_PROCESSO_FIRMA) ? "null" : st.ID_PROCESSO_FIRMA);
-                        commandText = queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : "+commandText);
-                        logger.Debug("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
-                        dbProvider.ExecuteNonQuery(commandText);
-					}
-					//Faccio un INSERIMENTO
-					else
-					{
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_STATI");		
-						queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-						queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_STATI"));
-						queryMng.setParam("ID_DIAGRAMMA",Convert.ToString(dg.SYSTEM_ID));
-						queryMng.setParam("Var_descrizione",st.DESCRIZIONE);
-                        queryMng.setParam("id_processo_firma", string.IsNullOrEmpty(st.ID_PROCESSO_FIRMA) ? "null" : st.ID_PROCESSO_FIRMA);
                         if (st.STATO_INIZIALE)
-						{
-							queryMng.setParam("Stato_iniziale","1");
-							queryMng.setParam("Stato_finale","0");
-						}
-						if(st.STATO_FINALE)
-						{
-							queryMng.setParam("Stato_iniziale","0");
-							queryMng.setParam("Stato_finale","1");
-						}
-						if(!st.STATO_FINALE && !st.STATO_INIZIALE)
-						{
-							queryMng.setParam("Stato_iniziale","0");
-							queryMng.setParam("Stato_finale","0");
-						}
+                        {
+                            queryMng.setParam("stato_iniziale", "1");
+                            queryMng.setParam("stato_finale", "0");
+                        }
+
+                        if (st.STATO_FINALE)
+                        {
+                            queryMng.setParam("stato_iniziale", "0");
+                            queryMng.setParam("stato_finale", "1");
+                        }
+
+                        if (!st.STATO_FINALE && !st.STATO_INIZIALE)
+                        {
+                            queryMng.setParam("stato_iniziale", "0");
+                            queryMng.setParam("stato_finale", "0");
+                        }
 
                         if (st.CONVERSIONE_PDF)
                             queryMng.setParam("conversionePdf", "1");
@@ -850,429 +785,473 @@ namespace DocsPaDB.Query_DocsPAWS
                             queryMng.setParam("statoSistema", "1");
                         else
                             queryMng.setParam("statoSistema", "0");
-						commandText=queryMng.getSQL();
-                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
+                        logger.Debug("SQL - updateDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
-					}
-				}
+                    }
+                    //Faccio un INSERIMENTO
+                    else
+                    {
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_STATI");
+                        queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                        queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_STATI"));
+                        queryMng.setParam("ID_DIAGRAMMA", Convert.ToString(dg.SYSTEM_ID));
+                        queryMng.setParam("Var_descrizione", st.DESCRIZIONE);
 
-				//In questo caso non distinguo se fare un UPDATE o un INSERIMENTO
-				//cancello e reinserisco i passi legati allo specifico diagramma
-				queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_PASSI_1");		
-				queryMng.setParam("idDiagramma",Convert.ToString(dg.SYSTEM_ID));
-				commandText=queryMng.getSQL();
-                System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                dbProvider.ExecuteNonQuery(commandText);
-				
-				for(int j=0; j<dg.PASSI.Count; j++)
-				{
-					DocsPaVO.DiagrammaStato.Passo step = (DocsPaVO.DiagrammaStato.Passo) dg.PASSI[j];
-					step.STATO_PADRE.DESCRIZIONE = step.STATO_PADRE.DESCRIZIONE.Replace("'","''");
-					int id_stato_padre = 0;
-					int id_stato_automatico = 0;
-					string desc_stato_automatico = "";
+                        if (st.STATO_INIZIALE)
+                        {
+                            queryMng.setParam("Stato_iniziale", "1");
+                            queryMng.setParam("Stato_finale", "0");
+                        }
+                        if (st.STATO_FINALE)
+                        {
+                            queryMng.setParam("Stato_iniziale", "0");
+                            queryMng.setParam("Stato_finale", "1");
+                        }
+                        if (!st.STATO_FINALE && !st.STATO_INIZIALE)
+                        {
+                            queryMng.setParam("Stato_iniziale", "0");
+                            queryMng.setParam("Stato_finale", "0");
+                        }
 
-					for(int k=0; k<step.SUCCESSIVI.Count; k++)
-					{
-						DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) step.SUCCESSIVI[k];
-						st.DESCRIZIONE = st.DESCRIZIONE.Replace("'","''");
+                        if (st.CONVERSIONE_PDF)
+                            queryMng.setParam("conversionePdf", "1");
+                        else
+                            queryMng.setParam("conversionePdf", "0");
 
-						int system_id_st_padre	= 0;
-						int system_id_st		= 0;
+                        if (st.NON_RICERCABILE)
+                            queryMng.setParam("nonRicercabile", "1");
+                        else
+                            queryMng.setParam("nonRicercabile", "0");
 
-						queryMng =DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI");	
-						queryMng.setParam("idDiagramma",Convert.ToString(dg.SYSTEM_ID));
-						queryMng.setParam("descrizione",step.STATO_PADRE.DESCRIZIONE);
-						commandText=queryMng.getSQL();
-                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        DataSet ds = new DataSet();
-						dbProvider.ExecuteQuery(ds,commandText);
-						system_id_st_padre = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
-
-						queryMng =DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI");	
-						queryMng.setParam("idDiagramma",Convert.ToString(dg.SYSTEM_ID));
-						queryMng.setParam("descrizione",st.DESCRIZIONE);
-						commandText=queryMng.getSQL();
-                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        ds = new DataSet();
-						dbProvider.ExecuteQuery(ds,commandText);
-						system_id_st = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
-
-						//Verifico se il passo che si vuole inserire ha uno stato automatico
-						//in caso affermativo mi salvo il SystemId e la Descrizione dello stato automatico
-						//e a fine ciclo effettuo l'inserimento in tabella DPA_PASSI
-						if( ((DocsPaVO.DiagrammaStato.Stato) step.SUCCESSIVI[k]).DESCRIZIONE == step.DESCRIZIONE_STATO_AUTOMATICO)
-						{
-							id_stato_padre = system_id_st_padre;
-							id_stato_automatico = system_id_st;
-							desc_stato_automatico = st.DESCRIZIONE;
-						}	
-
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_PASSI");		
-						queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-						queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_PASSI"));
-						queryMng.setParam("id_stato",Convert.ToString(system_id_st_padre));
-						queryMng.setParam("next_stato",Convert.ToString(system_id_st));
-						queryMng.setParam("id_diagramma",Convert.ToString(dg.SYSTEM_ID));
-                        queryMng.setParam("stato_automatico_lf", system_id_st.ToString().Equals(step.ID_STATO_AUTOMATICO_LF) ? "1" : "0");
-                        commandText =queryMng.getSQL();
-                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        dbProvider.ExecuteNonQuery(commandText);
-					}
-
-					//Faccio l'UPDATE per inserire l'eventuale stato automatico
-					if( id_stato_padre != 0)
-					{
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_STATI_AUTOMATICI");		
-						queryMng.setParam("id_stato_padre",Convert.ToString(id_stato_padre));
-						queryMng.setParam("id_stato_automatico",Convert.ToString(id_stato_automatico));
-						queryMng.setParam("desc_stato_automatico",desc_stato_automatico);
-						commandText=queryMng.getSQL();
-                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                        dbProvider.ExecuteNonQuery(commandText);
-					}					
-				}
-
-				//Controllo se ci sono degli stati da cancellare
-				queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATI");	
-				queryMng.setParam("id_diagramma",Convert.ToString(dg.SYSTEM_ID));
-				commandText=queryMng.getSQL();
-                System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-                logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
-
-				DataSet ds_2 = new DataSet();
-				dbProvider.ExecuteQuery(ds_2,commandText);
-
-				if(ds_2.Tables[0].Rows.Count != dg.STATI.Count)
-				{
-					for(int i=0; i<dg.STATI.Count; i++)
-					{
-						DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) dg.STATI[i];
-						for(int j=0; j<ds_2.Tables[0].Rows.Count; j++)
-						{
-							if( st.SYSTEM_ID == Convert.ToInt32(ds_2.Tables[0].Rows[j]["SYSTEM_ID"].ToString()) ||
-                                st.DESCRIZIONE.ToUpper() == ds_2.Tables[0].Rows[j]["VAR_DESCRIZIONE"].ToString().ToUpper()
-                               )
-							{
-								ds_2.Tables[0].Rows[j].Delete();
-								ds_2.AcceptChanges();
-							}
-						}
-					}
-					for(int k=0; k<ds_2.Tables[0].Rows.Count; k++)
-					{
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_STATI");		
-						queryMng.setParam("id_stato",ds_2.Tables[0].Rows[k]["SYSTEM_ID"].ToString());
-						commandText=queryMng.getSQL();
+                        queryMng.setParam("statoConsolidamento", ((int)st.STATO_CONSOLIDAMENTO).ToString());
+                        if (st.STATO_SISTEMA)
+                            queryMng.setParam("statoSistema", "1");
+                        else
+                            queryMng.setParam("statoSistema", "0");
+                        commandText = queryMng.getSQL();
                         System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
                     }
-				}
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}			
-		}
+                }
+
+                //In questo caso non distinguo se fare un UPDATE o un INSERIMENTO
+                //cancello e reinserisco i passi legati allo specifico diagramma
+                queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_PASSI_1");
+                queryMng.setParam("idDiagramma", Convert.ToString(dg.SYSTEM_ID));
+                commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                dbProvider.ExecuteNonQuery(commandText);
+
+                for (int j = 0; j < dg.PASSI.Count; j++)
+                {
+                    DocsPaVO.DiagrammaStato.Passo step = (DocsPaVO.DiagrammaStato.Passo)dg.PASSI[j];
+                    step.STATO_PADRE.DESCRIZIONE = step.STATO_PADRE.DESCRIZIONE.Replace("'", "''");
+                    int id_stato_padre = 0;
+                    int id_stato_automatico = 0;
+                    string desc_stato_automatico = "";
+
+                    for (int k = 0; k < step.SUCCESSIVI.Count; k++)
+                    {
+                        DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[k];
+                        st.DESCRIZIONE = st.DESCRIZIONE.Replace("'", "''");
+
+                        int system_id_st_padre = 0;
+                        int system_id_st = 0;
+
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI");
+                        queryMng.setParam("idDiagramma", Convert.ToString(dg.SYSTEM_ID));
+                        queryMng.setParam("descrizione", step.STATO_PADRE.DESCRIZIONE);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        DataSet ds = new DataSet();
+                        dbProvider.ExecuteQuery(ds, commandText);
+                        system_id_st_padre = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
+
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_SYSTEM_ID_DPA_STATI");
+                        queryMng.setParam("idDiagramma", Convert.ToString(dg.SYSTEM_ID));
+                        queryMng.setParam("descrizione", st.DESCRIZIONE);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        ds = new DataSet();
+                        dbProvider.ExecuteQuery(ds, commandText);
+                        system_id_st = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
+
+                        //Verifico se il passo che si vuole inserire ha uno stato automatico
+                        //in caso affermativo mi salvo il SystemId e la Descrizione dello stato automatico
+                        //e a fine ciclo effettuo l'inserimento in tabella DPA_PASSI
+                        if (((DocsPaVO.DiagrammaStato.Stato)step.SUCCESSIVI[k]).DESCRIZIONE == step.DESCRIZIONE_STATO_AUTOMATICO)
+                        {
+                            id_stato_padre = system_id_st_padre;
+                            id_stato_automatico = system_id_st;
+                            desc_stato_automatico = st.DESCRIZIONE;
+                        }
+
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_PASSI");
+                        queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                        queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_PASSI"));
+                        queryMng.setParam("id_stato", Convert.ToString(system_id_st_padre));
+                        queryMng.setParam("next_stato", Convert.ToString(system_id_st));
+                        queryMng.setParam("id_diagramma", Convert.ToString(dg.SYSTEM_ID));
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        dbProvider.ExecuteNonQuery(commandText);
+                    }
+
+                    //Faccio l'UPDATE per inserire l'eventuale stato automatico
+                    if (id_stato_padre != 0)
+                    {
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_STATI_AUTOMATICI");
+                        queryMng.setParam("id_stato_padre", Convert.ToString(id_stato_padre));
+                        queryMng.setParam("id_stato_automatico", Convert.ToString(id_stato_automatico));
+                        queryMng.setParam("desc_stato_automatico", desc_stato_automatico);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        dbProvider.ExecuteNonQuery(commandText);
+                    }
+                }
+
+                //Controllo se ci sono degli stati da cancellare
+                queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATI");
+                queryMng.setParam("id_diagramma", Convert.ToString(dg.SYSTEM_ID));
+                commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+
+                DataSet ds_2 = new DataSet();
+                dbProvider.ExecuteQuery(ds_2, commandText);
+
+                if (ds_2.Tables[0].Rows.Count != dg.STATI.Count)
+                {
+                    for (int i = 0; i < dg.STATI.Count; i++)
+                    {
+                        DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)dg.STATI[i];
+                        for (int j = 0; j < ds_2.Tables[0].Rows.Count; j++)
+                        {
+                            if (st.SYSTEM_ID == Convert.ToInt32(ds_2.Tables[0].Rows[j]["SYSTEM_ID"].ToString()) ||
+                                st.DESCRIZIONE.ToUpper() == ds_2.Tables[0].Rows[j]["VAR_DESCRIZIONE"].ToString().ToUpper()
+                               )
+                            {
+                                ds_2.Tables[0].Rows[j].Delete();
+                                ds_2.AcceptChanges();
+                            }
+                        }
+                    }
+                    for (int k = 0; k < ds_2.Tables[0].Rows.Count; k++)
+                    {
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_DELETE_DPA_STATI");
+                        queryMng.setParam("id_stato", ds_2.Tables[0].Rows[k]["SYSTEM_ID"].ToString());
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        logger.Debug("SQL - updateDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
+                        dbProvider.ExecuteNonQuery(commandText);
+                    }
+                }
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public bool associaTipoDocDiagramma(string idTipoDoc, string idDiagramma)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public bool associaTipoDocDiagramma(string idTipoDoc, string idDiagramma)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				//Verifico se esiste già un'associazione per lo specifico tipo di documento
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_ASSOCIA_TIPO_DOC_DIAGRAMMA");	
-				queryMng.setParam("idTipoDoc",idTipoDoc);
-				queryMng.setParam("idDiagramma",idDiagramma);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - associaTipoDocDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
+            try
+            {
+                //Verifico se esiste già un'associazione per lo specifico tipo di documento
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_ASSOCIA_TIPO_DOC_DIAGRAMMA");
+                queryMng.setParam("idTipoDoc", idTipoDoc);
+                queryMng.setParam("idDiagramma", idDiagramma);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - associaTipoDocDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - associaTipoDocDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                 DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
+                dbProvider.ExecuteQuery(ds, commandText);
 
-				//Effettuo un UPDATE
-				if(ds.Tables[0].Rows.Count != 0)
-				{
-					return true;
-				}
-				//Effettuo in INSERT
-				else
-				{
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_ASSOCIA_TIPO_DOC_DIAGRAMMA");		
-					queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-					queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_ASS_DIAGRAMMI"));
-					queryMng.setParam("idTipoDoc",idTipoDoc);
-					queryMng.setParam("idDiagramma",idDiagramma);
-					commandText=queryMng.getSQL();
-					System.Diagnostics.Debug.WriteLine("SQL - associaTipoDocDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : "+commandText);
+                //Effettuo un UPDATE
+                if (ds.Tables[0].Rows.Count != 0)
+                {
+                    return true;
+                }
+                //Effettuo in INSERT
+                else
+                {
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_ASSOCIA_TIPO_DOC_DIAGRAMMA");
+                    queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                    queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_ASS_DIAGRAMMI"));
+                    queryMng.setParam("idTipoDoc", idTipoDoc);
+                    queryMng.setParam("idDiagramma", idDiagramma);
+                    commandText = queryMng.getSQL();
+                    System.Diagnostics.Debug.WriteLine("SQL - associaTipoDocDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
                     logger.Debug("SQL - associaTipoDocDiagramma - ProfilazioneDinamica/Database/model.cs - QUERY : " + commandText);
-					dbProvider.ExecuteNonQuery(commandText);
-				}
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-			return false;
-		}
+                    dbProvider.ExecuteNonQuery(commandText);
+                }
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+            return false;
+        }
 
 
         public bool getDocOrFascInStato(string idStato)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				//Verifico se esistono documenti nello specifico stato
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DOC_FASC_IN_STATO");	
-				queryMng.setParam("idStato",idStato);
-				string commandText=queryMng.getSQL();
+            try
+            {
+                //Verifico se esistono documenti nello specifico stato
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DOC_FASC_IN_STATO");
+                queryMng.setParam("idStato", idStato);
+                string commandText = queryMng.getSQL();
                 System.Diagnostics.Debug.WriteLine("SQL - getDocOrFascInStato - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - getDocOrFascInStato - DiagrammiStato.cs - QUERY : " + commandText);
                 DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);	
-				if(ds.Tables[0].Rows.Count != 0)
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			catch 
-			{
-				return false;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}						
-		}
+                dbProvider.ExecuteQuery(ds, commandText);
+                if (ds.Tables[0].Rows.Count != 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public void disassociaTipoDocDiagramma(string idTipoDoc)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public void disassociaTipoDocDiagramma(string idTipoDoc)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_DISASSOCIA_TIPO_DOC_DIAGRAMMA");		
-				queryMng.setParam("idTipoDoc",idTipoDoc);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - disassociaTipoDocDiagramma - DiagrammiStato.cs - QUERY : "+commandText);
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_DISASSOCIA_TIPO_DOC_DIAGRAMMA");
+                queryMng.setParam("idTipoDoc", idTipoDoc);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - disassociaTipoDocDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - disassociaTipoDocDiagramma - DiagrammiStato.cs - QUERY : " + commandText);
                 dbProvider.ExecuteNonQuery(commandText);
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-			}
-			finally
-			{
-				dbProvider.Dispose();				
-			}			
-		}
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public int getDiagrammaAssociato(string idTipoDoc)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			int result = 0;
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMA_ASSOCIATO");	
-				queryMng.setParam("idTipoDoc",idTipoDoc);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - getDiagrammaAssociato - DiagrammiStato.cs - QUERY : "+commandText);
+        public int getDiagrammaAssociato(string idTipoDoc)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+            int result = 0;
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMA_ASSOCIATO");
+                queryMng.setParam("idTipoDoc", idTipoDoc);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - getDiagrammaAssociato - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - getDiagrammaAssociato - DiagrammiStato.cs - QUERY : " + commandText);
                 DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);	
-				if(ds.Tables[0].Rows.Count != 0)
-					result = Convert.ToInt32(ds.Tables[0].Rows[0]["ID_DIAGRAMMA"].ToString());				
-			}
-			catch 
-			{
-				return result;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}	
-			return result;
-		}
+                dbProvider.ExecuteQuery(ds, commandText);
+                if (ds.Tables[0].Rows.Count != 0)
+                    result = Convert.ToInt32(ds.Tables[0].Rows[0]["ID_DIAGRAMMA"].ToString());
+            }
+            catch
+            {
+                return result;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+            return result;
+        }
 
 
-		public bool isModificabile(int systemIdDiagramma)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public bool isModificabile(int systemIdDiagramma)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_IS_MODIFICABILE");	
-				queryMng.setParam("systemIdDiagramma",Convert.ToString(systemIdDiagramma));
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - isModificabile - DiagrammiStato.cs - QUERY : "+commandText);
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_IS_MODIFICABILE");
+                queryMng.setParam("systemIdDiagramma", Convert.ToString(systemIdDiagramma));
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - isModificabile - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - isModificabile - DiagrammiStato.cs - QUERY : " + commandText);
 
-				DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);	
-				if(ds.Tables[0].Rows.Count != 0)
-					return false;
-				else
-					return true;
-			}
-			catch 
-			{
-				return false;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}				
-		}
+                DataSet ds = new DataSet();
+                dbProvider.ExecuteQuery(ds, commandText);
+                if (ds.Tables[0].Rows.Count != 0)
+                    return false;
+                else
+                    return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public ArrayList isStatoTrasmAuto(string idAmm, string idStato, string idTemplate)
-		{
+        public ArrayList isStatoTrasmAuto(string idAmm, string idStato, string idTemplate)
+        {
             ArrayList modelli = new ArrayList();
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			if(idStato == "")
+            if (idStato == "")
                 return modelli;
 
             try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_IS_STATO_TRASM_AUTO");	
-				queryMng.setParam("idStato",idStato);
-				queryMng.setParam("idTemplate",idTemplate);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - isStatoTrasmAuto - DiagrammiStato.cs - QUERY : "+commandText);
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_IS_STATO_TRASM_AUTO");
+                queryMng.setParam("idStato", idStato);
+                queryMng.setParam("idTemplate", idTemplate);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - isStatoTrasmAuto - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - isStatoTrasmAuto - DiagrammiStato.cs - QUERY : " + commandText);
 
-				DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);	
-				if(ds.Tables[0].Rows.Count != 0)
-				{
+                DataSet ds = new DataSet();
+                dbProvider.ExecuteQuery(ds, commandText);
+                if (ds.Tables[0].Rows.Count != 0)
+                {
                     ModTrasmissioni modTrasm = new ModTrasmissioni();
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
                         if (ds.Tables[0].Rows[i]["TRASM_AUT"].ToString() == "1")
-                           modelli.Add(modTrasm.getModelloByID(idAmm, ds.Tables[0].Rows[i]["ID_MOD_TRASM"].ToString()));
+                            modelli.Add(modTrasm.getModelloByID(idAmm, ds.Tables[0].Rows[i]["ID_MOD_TRASM"].ToString()));
                     }
-                    return modelli;                    
-				}
+                    return modelli;
+                }
                 return modelli;
-			}
-			catch 
-			{
+            }
+            catch
+            {
                 return modelli;
-			}
-			finally
-			{
-				dbProvider.Dispose();				
-			}			
-		}
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public bool isStatoAuto(string idStato, string idDiagramma)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public bool isStatoAuto(string idStato, string idDiagramma)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = getDiagrammaById(idDiagramma);
-				for(int i=0; i<diagramma.PASSI.Count; i++)
-				{
-					DocsPaVO.DiagrammaStato.Passo passo = (DocsPaVO.DiagrammaStato.Passo) diagramma.PASSI[i];
-					if(passo.ID_STATO_AUTOMATICO == idStato)
-						return true;
-				}
-				return false;
-			}
-			catch 
-			{
-				return false;
-			}
-			finally
-			{
-				dbProvider.Dispose();				
-			}				
-		}
+            try
+            {
+                DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = getDiagrammaById(idDiagramma);
+                for (int i = 0; i < diagramma.PASSI.Count; i++)
+                {
+                    DocsPaVO.DiagrammaStato.Passo passo = (DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[i];
+                    if (passo.ID_STATO_AUTOMATICO == idStato)
+                        return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public DocsPaVO.DiagrammaStato.DiagrammaStato getDgByIdTipoDoc(string systemIdTipoDoc, string idAmm)
-		{
-			DocsPaVO.DiagrammaStato.DiagrammaStato dg = null;
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			
-			try
-			{
-				
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_BY_ID_TIPO_DOC");	
-				queryMng.setParam("id_tipo_atto",systemIdTipoDoc);
-                queryMng.setParam("id_amm",idAmm);
-				string commandText=queryMng.getSQL();
-				logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+        public DocsPaVO.DiagrammaStato.DiagrammaStato getDgByIdTipoDoc(string systemIdTipoDoc, string idAmm)
+        {
+            DocsPaVO.DiagrammaStato.DiagrammaStato dg = null;
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-				DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
-				if(ds.Tables[0].Rows.Count != 0)
-				{
-					dg = new DocsPaVO.DiagrammaStato.DiagrammaStato();
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMI_STATO");	
-					queryMng.setParam("system_id",ds.Tables[0].Rows[0]["ID_DIAGRAMMA"].ToString());
-					commandText=queryMng.getSQL();
-					logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+            try
+            {
 
-					ds = new DataSet();
-					dbProvider.ExecuteQuery(ds,commandText);
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_BY_ID_TIPO_DOC");
+                queryMng.setParam("id_tipo_atto", systemIdTipoDoc);
+                queryMng.setParam("id_amm", idAmm);
+                string commandText = queryMng.getSQL();
+                logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
 
-					dg.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
-					dg.ID_AMM = Convert.ToInt32(ds.Tables[0].Rows[0]["Id_amm"].ToString());
-					dg.DESCRIZIONE = ds.Tables[0].Rows[0]["Var_descrizione"].ToString();
-					
-					//Seleziono gli stati per lo specifico diagramma
-					queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATI");	
-					queryMng.setParam("id_diagramma",Convert.ToString(dg.SYSTEM_ID));
-					commandText=queryMng.getSQL();
-					logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+                DataSet ds = new DataSet();
+                dbProvider.ExecuteQuery(ds, commandText);
+                if (ds.Tables[0].Rows.Count != 0)
+                {
+                    dg = new DocsPaVO.DiagrammaStato.DiagrammaStato();
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMI_STATO");
+                    queryMng.setParam("system_id", ds.Tables[0].Rows[0]["ID_DIAGRAMMA"].ToString());
+                    commandText = queryMng.getSQL();
+                    logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
 
-					DataSet ds_1 = new DataSet();
-					dbProvider.ExecuteQuery(ds_1,commandText);
+                    ds = new DataSet();
+                    dbProvider.ExecuteQuery(ds, commandText);
 
-					for(int j=0; j<ds_1.Tables[0].Rows.Count; j++)
-					{
-						DocsPaVO.DiagrammaStato.Stato st = new DocsPaVO.DiagrammaStato.Stato();
-						st.SYSTEM_ID = Convert.ToInt32(ds_1.Tables[0].Rows[j]["SYSTEM_ID"].ToString());
-						st.ID_DIAGRAMMA = Convert.ToInt32(ds_1.Tables[0].Rows[j]["ID_DIAGRAMMA"].ToString());
-						st.DESCRIZIONE = ds_1.Tables[0].Rows[j]["Var_descrizione"].ToString();
-						if(ds_1.Tables[0].Rows[j]["Stato_iniziale"].ToString() == "0")
-							st.STATO_INIZIALE = false;
-						else
-							st.STATO_INIZIALE = true;
+                    dg.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
+                    dg.ID_AMM = Convert.ToInt32(ds.Tables[0].Rows[0]["Id_amm"].ToString());
+                    dg.DESCRIZIONE = ds.Tables[0].Rows[0]["Var_descrizione"].ToString();
 
-						if(ds_1.Tables[0].Rows[j]["Stato_finale"].ToString() == "0")
-							st.STATO_FINALE = false;
-						else
-							st.STATO_FINALE = true;
+                    //Seleziono gli stati per lo specifico diagramma
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATI");
+                    queryMng.setParam("id_diagramma", Convert.ToString(dg.SYSTEM_ID));
+                    commandText = queryMng.getSQL();
+                    logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+
+                    DataSet ds_1 = new DataSet();
+                    dbProvider.ExecuteQuery(ds_1, commandText);
+
+                    for (int j = 0; j < ds_1.Tables[0].Rows.Count; j++)
+                    {
+                        DocsPaVO.DiagrammaStato.Stato st = new DocsPaVO.DiagrammaStato.Stato();
+                        st.SYSTEM_ID = Convert.ToInt32(ds_1.Tables[0].Rows[j]["SYSTEM_ID"].ToString());
+                        st.ID_DIAGRAMMA = Convert.ToInt32(ds_1.Tables[0].Rows[j]["ID_DIAGRAMMA"].ToString());
+                        st.DESCRIZIONE = ds_1.Tables[0].Rows[j]["Var_descrizione"].ToString();
+                        if (ds_1.Tables[0].Rows[j]["Stato_iniziale"].ToString() == "0")
+                            st.STATO_INIZIALE = false;
+                        else
+                            st.STATO_INIZIALE = true;
+
+                        if (ds_1.Tables[0].Rows[j]["Stato_finale"].ToString() == "0")
+                            st.STATO_FINALE = false;
+                        else
+                            st.STATO_FINALE = true;
 
                         if (ds_1.Tables[0].Rows[j]["Conv_Pdf"].ToString() == "1")
                             st.CONVERSIONE_PDF = true;
@@ -1294,24 +1273,20 @@ namespace DocsPaDB.Query_DocsPAWS
                             st.STATO_SISTEMA = true;
                         else
                             st.STATO_SISTEMA = false;
-                        if (ds_1.Tables[0].Rows[j]["ID_PROCESSO_FIRMA"] != DBNull.Value)
-                        {
-                            st.ID_PROCESSO_FIRMA = ds_1.Tables[0].Rows[j]["ID_PROCESSO_FIRMA"].ToString();
-                        }
                         dg.STATI.Add(st);
-					}
+                    }
 
-					//Seleziono i passi per lo specifico stato 
-					for(int k=0; k<dg.STATI.Count; k++)
-					{
-						DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato) dg.STATI[k];
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_PASSI");	
-						queryMng.setParam("id_stato",Convert.ToString(st.SYSTEM_ID));
-						commandText=queryMng.getSQL();
-						logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+                    //Seleziono i passi per lo specifico stato 
+                    for (int k = 0; k < dg.STATI.Count; k++)
+                    {
+                        DocsPaVO.DiagrammaStato.Stato st = (DocsPaVO.DiagrammaStato.Stato)dg.STATI[k];
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_PASSI");
+                        queryMng.setParam("id_stato", Convert.ToString(st.SYSTEM_ID));
+                        commandText = queryMng.getSQL();
+                        logger.Debug("SQL - getDgByIdTipoDoc - DiagrammiStato.cs - QUERY : " + commandText);
 
-						DataSet ds_2 = new DataSet();
-						dbProvider.ExecuteQuery(ds_2,commandText);
+                        DataSet ds_2 = new DataSet();
+                        dbProvider.ExecuteQuery(ds_2, commandText);
 
                         DocsPaVO.DiagrammaStato.Passo step = new DocsPaVO.DiagrammaStato.Passo();
                         if (ds_2.Tables[0].Rows.Count != 0)
@@ -1347,10 +1322,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                     Enum.Parse(typeof(DocsPaVO.documento.DocumentConsolidationStateEnum),
                                     ds_2.Tables[0].Rows[0]["STATO_CONS_STATO_PADRE"].ToString(), true);
                             }
-                            if (ds_2.Tables[0].Rows[0]["ID_PROCESSO_FIRMA"] != DBNull.Value)
-                            {
-                                st_1.ID_PROCESSO_FIRMA = ds_2.Tables[0].Rows[0]["ID_PROCESSO_FIRMA"].ToString();
-                            }
+
                             step.STATO_PADRE = st_1;
 
                             //Stati successivi del passo
@@ -1385,11 +1357,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                     st_2.STATO_SISTEMA = true;
                                 else
                                     st_2.STATO_SISTEMA = false;
-
-                                if (ds_2.Tables[0].Rows[y]["CHA_STATO_AUTOMATICO_LF"].ToString() == "1")
-                                    step.ID_STATO_AUTOMATICO_LF = st_2.SYSTEM_ID.ToString();
-
-                                step.SUCCESSIVI.Add(st_2);			
+                                step.SUCCESSIVI.Add(st_2);
                             }
                         }
 
@@ -1465,151 +1433,149 @@ namespace DocsPaDB.Query_DocsPAWS
 						}
                         */
                         #endregion VECCHIA GESTIONE CON QUERY MULTIPLE
-                        
+
                         if (step.STATO_PADRE != null)
-							dg.PASSI.Add(step);
-					}
-				}
-				else
-				{
-					return null;
-				}
-			}
-			catch 
-			{
-				return null;
-			}
-			finally
-			{
-				dbProvider.Dispose();				
-			}
-			return dg;
-		}
+                            dg.PASSI.Add(step);
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+            return dg;
+        }
 
 
-		public void salvaModificaStato(string docNumber, string idStato, DocsPaVO.DiagrammaStato.DiagrammaStato diagramma, string idUtente, DocsPaVO.utente.InfoUtente user,string dataScadenza)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public void salvaModificaStato(string docNumber, string idStato, DocsPaVO.DiagrammaStato.DiagrammaStato diagramma, string idUtente, DocsPaVO.utente.InfoUtente user, string dataScadenza)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				
-				//In ogni caso poichè è stata effettuata una modifica dello stato, elimino lo storico delle trasmissioni
-				//che mi serviva per verificare le accettazioni per il passaggio di stato in automatico.
-				DocsPaVO.DiagrammaStato.Stato statoOld = getStatoDoc (docNumber);
-				if(statoOld != null)
-					deleteStoricoTrasmDiagrammi(docNumber,Convert.ToString(statoOld.SYSTEM_ID));
+            try
+            {
 
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_DOC_1");	
-				queryMng.setParam("docNumber",docNumber);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : "+commandText);
+                //In ogni caso poichè è stata effettuata una modifica dello stato, elimino lo storico delle trasmissioni
+                //che mi serviva per verificare le accettazioni per il passaggio di stato in automatico.
+                DocsPaVO.DiagrammaStato.Stato statoOld = getStatoDoc(docNumber);
+                if (statoOld != null)
+                    deleteStoricoTrasmDiagrammi(docNumber, Convert.ToString(statoOld.SYSTEM_ID));
+
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_DOC_1");
+                queryMng.setParam("docNumber", docNumber);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
 
-				DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
-				
-				//Faccio un update
-				if(ds.Tables[0].Rows.Count != 0)
-				{
-					if(ds.Tables[0].Rows[0]["Id_stato"].ToString() != idStato)
-					{
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_DPA_DIAGRAMMI_DOC");		
-						queryMng.setParam("idStato",idStato);
-						queryMng.setParam("docNumber",docNumber);
-						commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : "+commandText);
+                DataSet ds = new DataSet();
+                dbProvider.ExecuteQuery(ds, commandText);
+
+                //Faccio un update
+                if (ds.Tables[0].Rows.Count != 0)
+                {
+                    if (ds.Tables[0].Rows[0]["Id_stato"].ToString() != idStato)
+                    {
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_UPDATE_DPA_DIAGRAMMI_DOC");
+                        queryMng.setParam("idStato", idStato);
+                        queryMng.setParam("docNumber", docNumber);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
-						
-						//Per lo storico
-                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");	
-						queryMng.setParam("system_id",ds.Tables[0].Rows[0][2].ToString());
-						commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : "+commandText);
+
+                        //Per lo storico
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");
+                        queryMng.setParam("system_id", ds.Tables[0].Rows[0][2].ToString());
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                         DataSet oldStato = new DataSet();
-						dbProvider.ExecuteQuery(oldStato,commandText);
+                        dbProvider.ExecuteQuery(oldStato, commandText);
 
-                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");	
-						queryMng.setParam("system_id",idStato);
-						commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : "+commandText);
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");
+                        queryMng.setParam("system_id", idStato);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                         DataSet newStato = new DataSet();
-						dbProvider.ExecuteQuery(newStato,commandText);
+                        dbProvider.ExecuteQuery(newStato, commandText);
 
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_DIAGRAMMI_STO");		
-						queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-						queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DIAGRAMMI_STO"));
-						queryMng.setParam("idUtente",idUtente);
-						queryMng.setParam("docNumber",docNumber);
-						queryMng.setParam("oldStato",oldStato.Tables[0].Rows[0]["Var_descrizione"].ToString().Replace("'","''"));
-						queryMng.setParam("newStato",newStato.Tables[0].Rows[0]["Var_descrizione"].ToString().Replace("'","''"));
-						queryMng.setParam("idPeople",user.idPeople);
-
-                        //Se non c'è l'idGruppo stò facendo il cambio stato da amministrazione.
-						queryMng.setParam("idRuolo",string.IsNullOrEmpty(user.idGruppo) ? "0" : user.idCorrGlobali);
-
-                        string idPeopleDelegato = "0";
-                        if (user.delegato!=null)
-                            idPeopleDelegato = user.delegato.idPeople;
-                        queryMng.setParam("idPeopleDelegato", idPeopleDelegato);
-
-						commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs  - QUERY : "+commandText);
-                        logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs  - QUERY : " + commandText);
-                        dbProvider.ExecuteNonQuery(commandText);
-					}
-				}
-				//Faccio un inserimento
-				else
-				{
-                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");	
-					queryMng.setParam("system_id",idStato);
-					commandText=queryMng.getSQL();
-					System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : "+commandText);
-                    logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
-                    DataSet stato = new DataSet();
-					dbProvider.ExecuteQuery(stato,commandText);
-
-					if(stato.Tables[0].Rows.Count != 0)
-					{
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_DIAGRAMMI_DOC");		
-						queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-						queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DIAGRAMMI_DOC"));
-						queryMng.setParam("docNumber",docNumber);
-						queryMng.setParam("idStato",idStato);
-						queryMng.setParam("idDiagramma",Convert.ToString(diagramma.SYSTEM_ID));
-
-                        
-
-						commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs  - QUERY : "+commandText);
-                        logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs  - QUERY : " + commandText);
-                        dbProvider.ExecuteNonQuery(commandText);
-						
-						//Per lo storico
-						queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_DIAGRAMMI_STO");		
-						queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-						queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DIAGRAMMI_STO"));
-						queryMng.setParam("idUtente",idUtente);
-						queryMng.setParam("docNumber",docNumber);
-						queryMng.setParam("oldStato",stato.Tables[0].Rows[0]["Var_descrizione"].ToString().Replace("'","''"));
-						queryMng.setParam("newStato",stato.Tables[0].Rows[0]["Var_descrizione"].ToString().Replace("'","''"));
-						queryMng.setParam("idPeople",user.idPeople);
-						queryMng.setParam("idRuolo",user.idCorrGlobali);
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_DIAGRAMMI_STO");
+                        queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                        queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DIAGRAMMI_STO"));
+                        queryMng.setParam("idUtente", idUtente);
+                        queryMng.setParam("docNumber", docNumber);
+                        queryMng.setParam("oldStato", oldStato.Tables[0].Rows[0]["Var_descrizione"].ToString().Replace("'", "''"));
+                        queryMng.setParam("newStato", newStato.Tables[0].Rows[0]["Var_descrizione"].ToString().Replace("'", "''"));
+                        queryMng.setParam("idPeople", user.idPeople);
+                        queryMng.setParam("idRuolo", user.idCorrGlobali);
 
                         string idPeopleDelegato = "0";
                         if (user.delegato != null)
                             idPeopleDelegato = user.delegato.idPeople;
                         queryMng.setParam("idPeopleDelegato", idPeopleDelegato);
 
-                        commandText=queryMng.getSQL();
-						System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : "+commandText);
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs  - QUERY : " + commandText);
+                        logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs  - QUERY : " + commandText);
+                        dbProvider.ExecuteNonQuery(commandText);
+                    }
+                }
+                //Faccio un inserimento
+                else
+                {
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");
+                    queryMng.setParam("system_id", idStato);
+                    commandText = queryMng.getSQL();
+                    System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
+                    logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
+                    DataSet stato = new DataSet();
+                    dbProvider.ExecuteQuery(stato, commandText);
+
+                    if (stato.Tables[0].Rows.Count != 0)
+                    {
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_DIAGRAMMI_DOC");
+                        queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                        queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DIAGRAMMI_DOC"));
+                        queryMng.setParam("docNumber", docNumber);
+                        queryMng.setParam("idStato", idStato);
+                        queryMng.setParam("idDiagramma", Convert.ToString(diagramma.SYSTEM_ID));
+
+
+
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs  - QUERY : " + commandText);
+                        logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs  - QUERY : " + commandText);
+                        dbProvider.ExecuteNonQuery(commandText);
+
+                        //Per lo storico
+                        queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_DPA_DIAGRAMMI_STO");
+                        queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                        queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_DIAGRAMMI_STO"));
+                        queryMng.setParam("idUtente", idUtente);
+                        queryMng.setParam("docNumber", docNumber);
+                        queryMng.setParam("oldStato", stato.Tables[0].Rows[0]["Var_descrizione"].ToString().Replace("'", "''"));
+                        queryMng.setParam("newStato", stato.Tables[0].Rows[0]["Var_descrizione"].ToString().Replace("'", "''"));
+                        queryMng.setParam("idPeople", user.idPeople);
+                        queryMng.setParam("idRuolo", user.idCorrGlobali);
+
+                        string idPeopleDelegato = "0";
+                        if (user.delegato != null)
+                            idPeopleDelegato = user.delegato.idPeople;
+                        queryMng.setParam("idPeopleDelegato", idPeopleDelegato);
+
+                        commandText = queryMng.getSQL();
+                        System.Diagnostics.Debug.WriteLine("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                         logger.Debug("SQL - salvaModificaStato - DiagrammiStato.cs - QUERY : " + commandText);
                         dbProvider.ExecuteNonQuery(commandText);
-						
+
                         //Controllo che sia effettivamente uno stato iniziale
                         //In questo caso devo effettuare l'UPDATE della DT_SCADENZA nella PROFILE
                         //in funzione dei giorni impostati per il ciclo di vita di questo tipo di documento
@@ -1650,108 +1616,54 @@ namespace DocsPaDB.Query_DocsPAWS
                                             commandText = queryMng.getSQL();
                                             dbProvider.ExecuteNonQuery(commandText);
                                         }
-                                    }                                    
+                                    }
                                 }
                             }
                         }
-					}
-				}
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-		}
-
-
-		public DocsPaVO.DiagrammaStato.Stato getStatoDoc(string docNumber)
-		{
-			DocsPaVO.DiagrammaStato.Stato stato = null;
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_DOC_1");	
-				queryMng.setParam("docNumber",docNumber);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - getStatoDoc - DiagrammiStato.cs - QUERY : "+commandText);
-                logger.Debug("SQL - getStatoDoc - DiagrammiStato.cs - QUERY : " + commandText);
-                DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
-				
-				if(ds.Tables[0].Rows.Count != 0)
-				{
-					stato = new DocsPaVO.DiagrammaStato.Stato();
-					stato.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[0]["Id_stato"].ToString());
-					stato.ID_DIAGRAMMA = Convert.ToInt32(ds.Tables[0].Rows[0]["Id_diagramma"].ToString());
-
-                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");	
-					queryMng.setParam("system_id",ds.Tables[0].Rows[0]["Id_stato"].ToString());
-					commandText=queryMng.getSQL();
-					System.Diagnostics.Debug.WriteLine("SQL - getStatoDoc - DiagrammiStato.cs - QUERY : "+commandText);
-                    logger.Debug("SQL - getStatoDoc - DiagrammiStato.cs - QUERY : " + commandText);
-
-					DataSet ds_1 = new DataSet();
-					dbProvider.ExecuteQuery(ds_1,commandText);
-
-					stato.DESCRIZIONE = ds_1.Tables[0].Rows[0]["Var_descrizione"].ToString();
-					if(ds_1.Tables[0].Rows[0]["Stato_iniziale"].ToString()== "1")
-						stato.STATO_INIZIALE = true;
-					else
-						stato.STATO_INIZIALE = false;
-
-					if(ds_1.Tables[0].Rows[0]["Stato_finale"].ToString() == "1")
-						stato.STATO_FINALE = true;
-					else
-						stato.STATO_FINALE = false;
-
-                    if (ds_1.Tables[0].Rows[0]["Conv_Pdf"].ToString() == "1")
-                        stato.CONVERSIONE_PDF = true;
-                    else
-                        stato.CONVERSIONE_PDF = false;
-
-                    if (ds_1.Tables[0].Rows[0]["NON_RICERCABILE"].ToString() == "1")
-                        stato.NON_RICERCABILE = true;
-                    else
-                        stato.NON_RICERCABILE = false;
-
-                    if (ds_1.Tables[0].Rows[0]["ID_PROCESSO_FIRMA"] != DBNull.Value)
-                    {
-                        stato.ID_PROCESSO_FIRMA = ds_1.Tables[0].Rows[0]["ID_PROCESSO_FIRMA"].ToString();
                     }
-                }				
-			}
-			catch 
-			{
-				return null;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-			return stato;				
-		}
+                }
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
-        public DocsPaVO.DiagrammaStato.Stato GetStatoDocPrecedente(string docnumber)
+
+        public DocsPaVO.DiagrammaStato.Stato getStatoDoc(string docNumber)
         {
-            DocsPaVO.DiagrammaStato.Stato stato = new DocsPaVO.DiagrammaStato.Stato();
+            DocsPaVO.DiagrammaStato.Stato stato = null;
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
             try
             {
-                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_PRECEDENTE");
-                queryMng.setParam("docnumber", docnumber);
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_DOC_1");
+                queryMng.setParam("docNumber", docNumber);
                 string commandText = queryMng.getSQL();
-                System.Diagnostics.Debug.WriteLine("SQL - GetStatoDocPrecedente - DiagrammiStato.cs - QUERY : " + commandText);
-                logger.Debug("SQL - GetStatoDocPrecedente - DiagrammiStato.cs - QUERY : " + commandText);
+                System.Diagnostics.Debug.WriteLine("SQL - getStatoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+                logger.Debug("SQL - getStatoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+                DataSet ds = new DataSet();
+                dbProvider.ExecuteQuery(ds, commandText);
 
-                DataSet ds_1 = new DataSet();
-                if(this.ExecuteQuery(ds_1, commandText) && ds_1.Tables[0].Rows.Count != 0)
+                if (ds.Tables[0].Rows.Count != 0)
                 {
-                    stato.SYSTEM_ID = Convert.ToInt32(ds_1.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
-                    stato.ID_DIAGRAMMA = Convert.ToInt32(ds_1.Tables[0].Rows[0]["ID_DIAGRAMMA"].ToString());
+                    stato = new DocsPaVO.DiagrammaStato.Stato();
+                    stato.SYSTEM_ID = Convert.ToInt32(ds.Tables[0].Rows[0]["Id_stato"].ToString());
+                    stato.ID_DIAGRAMMA = Convert.ToInt32(ds.Tables[0].Rows[0]["Id_diagramma"].ToString());
+
+                    queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");
+                    queryMng.setParam("system_id", ds.Tables[0].Rows[0]["Id_stato"].ToString());
+                    commandText = queryMng.getSQL();
+                    System.Diagnostics.Debug.WriteLine("SQL - getStatoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+                    logger.Debug("SQL - getStatoDoc - DiagrammiStato.cs - QUERY : " + commandText);
+
+                    DataSet ds_1 = new DataSet();
+                    dbProvider.ExecuteQuery(ds_1, commandText);
+
                     stato.DESCRIZIONE = ds_1.Tables[0].Rows[0]["Var_descrizione"].ToString();
                     if (ds_1.Tables[0].Rows[0]["Stato_iniziale"].ToString() == "1")
                         stato.STATO_INIZIALE = true;
@@ -1772,83 +1684,79 @@ namespace DocsPaDB.Query_DocsPAWS
                         stato.NON_RICERCABILE = true;
                     else
                         stato.NON_RICERCABILE = false;
-
-                    if (ds_1.Tables[0].Rows[0]["ID_PROCESSO_FIRMA"] != DBNull.Value)
-                    {
-                        stato.ID_PROCESSO_FIRMA = ds_1.Tables[0].Rows[0]["ID_PROCESSO_FIRMA"].ToString();
-                    }
                 }
             }
-            catch(Exception e)
+            catch
             {
-                logger.Error("Errore in GetStatoDocPrecedente " + e);
+                return null;
+            }
+            finally
+            {
+                dbProvider.Dispose();
             }
             return stato;
         }
 
 
         public string getStatoDocStorico(string docNumber)
-		{
-			string stato = "";
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_DOC_STORICO");	
-				queryMng.setParam("docNumber",docNumber);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - getStatoDocStorico - DiagrammiStato.cs - QUERY : "+commandText);
+        {
+            string stato = "";
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_DOC_STORICO");
+                queryMng.setParam("docNumber", docNumber);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - getStatoDocStorico - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - getStatoDocStorico - DiagrammiStato.cs - QUERY : " + commandText);
                 DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
-				if(ds.Tables[0].Rows.Count != 0)
-				{
-					stato = ds.Tables[0].Rows[0]["Var_desc_new_stato"].ToString();
-				}
-			}
-			catch 
-			{
-				return null;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-			return stato;	
-		}
+                dbProvider.ExecuteQuery(ds, commandText);
+                if (ds.Tables[0].Rows.Count != 0)
+                {
+                    stato = ds.Tables[0].Rows[0]["Var_desc_new_stato"].ToString();
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+            return stato;
+        }
 
 
-		public DataSet getDiagrammaStoricoDoc(string docNumber)
-		{
-			DataSet storico = new DataSet();
-			DataTable dt = new DataTable();
-			DataSet storico_1 = new DataSet();
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMA_STORICO_DOC");	
-				queryMng.setParam("docNumber",docNumber);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - getDiagrammaStoricoDoc - DiagrammiStato.cs - QUERY : "+commandText);
+        public DataSet getDiagrammaStoricoDoc(string docNumber)
+        {
+            DataSet storico = new DataSet();
+            DataTable dt = new DataTable();
+            DataSet storico_1 = new DataSet();
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DIAGRAMMA_STORICO_DOC");
+                queryMng.setParam("docNumber", docNumber);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - getDiagrammaStoricoDoc - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - getDiagrammaStoricoDoc - DiagrammiStato.cs - QUERY : " + commandText);
-                dbProvider.ExecuteQuery(storico,commandText);
+                dbProvider.ExecuteQuery(storico, commandText);
 
-				dt.Columns.Add("Ruolo");
-				dt.Columns.Add("Utente");
-				dt.Columns.Add("Data");
-				dt.Columns.Add("Vecchio stato");
-				dt.Columns.Add("Nuovo Stato");
-                			
-				for(int i=0; i<storico.Tables[0].Rows.Count; i++)
-				{
-					DataRow dr = dt.NewRow();
-					Utenti ut = new Utenti();
+                dt.Columns.Add("Ruolo");
+                dt.Columns.Add("Utente");
+                dt.Columns.Add("Data");
+                dt.Columns.Add("Vecchio stato");
+                dt.Columns.Add("Nuovo Stato");
+
+                for (int i = 0; i < storico.Tables[0].Rows.Count; i++)
+                {
+                    DataRow dr = dt.NewRow();
+                    Utenti ut = new Utenti();
                     if (storico.Tables[0].Rows[i]["ID_RUOLO"].ToString() != null && storico.Tables[0].Rows[i]["ID_RUOLO"].ToString() != "")
-                    {
-                        DocsPaVO.utente.Ruolo ruolo = ut.GetRuoloEnabledAndDisabled(storico.Tables[0].Rows[i]["ID_RUOLO"].ToString());
-                        dr["Ruolo"] = ruolo != null ? ruolo.descrizione : string.Empty;
-                    }
+                        dr["Ruolo"] = (ut.GetRuoloEnabledAndDisabled(storico.Tables[0].Rows[i]["ID_RUOLO"].ToString())).descrizione;
                     else
                         dr["Ruolo"] = "";
 
@@ -1861,146 +1769,138 @@ namespace DocsPaDB.Query_DocsPAWS
                     if (storico.Tables[0].Rows[i]["ID_PEOPLE"].ToString() != null && storico.Tables[0].Rows[i]["ID_PEOPLE"].ToString() != "")
                     {
                         if (string.IsNullOrEmpty(delegato))
-                        {
-                            DocsPaVO.utente.Utente user = ut.GetUtenteNoFiltroDisabled(storico.Tables[0].Rows[i]["ID_PEOPLE"].ToString());
-                            dr["Utente"] = !string.IsNullOrEmpty(user.descrizione.Trim()) ? user.descrizione : user.userId;
-                        }
+                            dr["Utente"] = (ut.GetUtenteNoFiltroDisabled(storico.Tables[0].Rows[i]["ID_PEOPLE"].ToString())).descrizione;
                         else
-                            dr["Utente"] = delegato + "<br>Sostituto di " + (ut.GetUtenteNoFiltroDisabled(storico.Tables[0].Rows[i]["ID_PEOPLE"].ToString())).descrizione;
+                            dr["Utente"] = delegato + "<br>Delegato da " + (ut.GetUtenteNoFiltroDisabled(storico.Tables[0].Rows[i]["ID_PEOPLE"].ToString())).descrizione;
                     }
                     else
                         dr["Utente"] = "";
 
-                    //Se l'id del ruolo è 0, ho inserito lo storico come amministratore
-                    if (storico.Tables[0].Rows[i]["ID_RUOLO"].ToString() != null && storico.Tables[0].Rows[i]["ID_RUOLO"].ToString().Equals("0"))
-                        dr["Utente"] = "Amministratore di sistema";
-
                     dr["Data"] = storico.Tables[0].Rows[i]["DTA_DATE"].ToString();
-					dr["Vecchio stato"] = storico.Tables[0].Rows[i]["VAR_DESC_OLD_STATO"].ToString();
-					dr["Nuovo Stato"] = storico.Tables[0].Rows[i]["VAR_DESC_NEW_STATO"].ToString();
-
-                    
-  				    dt.Rows.Add(dr);
-
-				}
-
-                storico_1.Tables.Add(dt);				
-			}
-			catch(Exception e) 
-			{
-				return null;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-			return storico_1;					
-		}
+                    dr["Vecchio stato"] = storico.Tables[0].Rows[i]["VAR_DESC_OLD_STATO"].ToString();
+                    dr["Nuovo Stato"] = storico.Tables[0].Rows[i]["VAR_DESC_NEW_STATO"].ToString();
 
 
-		public void salvaStoricoTrasmDiagrammi(string idTrasm, string docNumber, string idStato)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			
-			try
-			{
-				
-				//Verifico se esiste già una trasmissione da controllare nella DPA_TRASM_DIAGR
-				//In caso affermativo non effettuo nessuna operazione
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_ID_TRASM_DIAGR");		
-				queryMng.setParam("docNumber",docNumber);
-				queryMng.setParam("idStato",idStato);
-				string commandText=queryMng.getSQL();
-				DataSet trasm = new DataSet();
-				dbProvider.ExecuteQuery(trasm,commandText);
-				if(trasm.Tables[0].Rows.Count != 0)
-					return;
+                    dt.Rows.Add(dr);
 
-				//Inserisco l'associazione stato-documento-tramissione
-				queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_TRASM_STORICO");		
-				queryMng.setParam("colID",DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
-				queryMng.setParam("id",DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_TRASM_DIAGR"));
-				queryMng.setParam("idTrasm",idTrasm);
-				queryMng.setParam("docNumber",docNumber);
-				queryMng.setParam("idStato",idStato);
-				commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - salvaStoricoTrasmDiagrammi - DiagrammiStato.cs - QUERY : "+commandText);
+                }
+                storico_1.Tables.Add(dt);
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+            return storico_1;
+        }
+
+
+        public void salvaStoricoTrasmDiagrammi(string idTrasm, string docNumber, string idStato)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
+            try
+            {
+
+                //Verifico se esiste già una trasmissione da controllare nella DPA_TRASM_DIAGR
+                //In caso affermativo non effettuo nessuna operazione
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_ID_TRASM_DIAGR");
+                queryMng.setParam("docNumber", docNumber);
+                queryMng.setParam("idStato", idStato);
+                string commandText = queryMng.getSQL();
+                DataSet trasm = new DataSet();
+                dbProvider.ExecuteQuery(trasm, commandText);
+                if (trasm.Tables[0].Rows.Count != 0)
+                    return;
+
+                //Inserisco l'associazione stato-documento-tramissione
+                queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_INS_TRASM_STORICO");
+                queryMng.setParam("colID", DocsPaDbManagement.Functions.Functions.GetSystemIdColName());
+                queryMng.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_TRASM_DIAGR"));
+                queryMng.setParam("idTrasm", idTrasm);
+                queryMng.setParam("docNumber", docNumber);
+                queryMng.setParam("idStato", idStato);
+                commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - salvaStoricoTrasmDiagrammi - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - salvaStoricoTrasmDiagrammi - DiagrammiStato.cs - QUERY : " + commandText);
                 dbProvider.ExecuteNonQuery(commandText);
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-		}
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public void deleteStoricoTrasmDiagrammi(string docNumber, string idStato)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			
-			try
-			{
-				//Elimini eventuali associazioni presenti per lo specifico stato individuato dal system_id
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_DEL_TRASM_STORICO");	
-				queryMng.setParam("idStato",idStato);
-				queryMng.setParam("docNumber",docNumber);
-				string commandText=queryMng.getSQL();
+        public void deleteStoricoTrasmDiagrammi(string docNumber, string idStato)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+
+            try
+            {
+                //Elimini eventuali associazioni presenti per lo specifico stato individuato dal system_id
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_DEL_TRASM_STORICO");
+                queryMng.setParam("idStato", idStato);
+                queryMng.setParam("docNumber", docNumber);
+                string commandText = queryMng.getSQL();
                 System.Diagnostics.Debug.WriteLine("SQL - deleteStoricoTrasmDiagrammi - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - deleteStoricoTrasmDiagrammi - DiagrammiStato.cs - QUERY : " + commandText);
                 dbProvider.ExecuteNonQuery(commandText);
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-		}
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public DocsPaVO.DiagrammaStato.Stato getStatoSuccessivoAutomatico(string docNumber)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
-			try
-			{
-				//Recupero lo stato del documento e il diagramma a cui appartiene
-				DocsPaVO.DiagrammaStato.Stato statoDoc = getStatoDoc(docNumber);
-				DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = getDiagrammaById(Convert.ToString(statoDoc.ID_DIAGRAMMA));
-				for(int k=0; k<diagramma.PASSI.Count; k++)
-				{
-					if( ((DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[k]).STATO_PADRE.SYSTEM_ID == statoDoc.SYSTEM_ID)
-					{
-						if( ((DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[k]).ID_STATO_AUTOMATICO != null || ((DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[k]).ID_STATO_AUTOMATICO != "")
-						{
-							//Recupero i dati dello stato automatico
-                            DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");	
-							queryMng.setParam("system_id",((DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[k]).ID_STATO_AUTOMATICO);
-							string commandText=queryMng.getSQL();
+        public DocsPaVO.DiagrammaStato.Stato getStatoSuccessivoAutomatico(string docNumber)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
+            try
+            {
+                //Recupero lo stato del documento e il diagramma a cui appartiene
+                DocsPaVO.DiagrammaStato.Stato statoDoc = getStatoDoc(docNumber);
+                DocsPaVO.DiagrammaStato.DiagrammaStato diagramma = getDiagrammaById(Convert.ToString(statoDoc.ID_DIAGRAMMA));
+                for (int k = 0; k < diagramma.PASSI.Count; k++)
+                {
+                    if (((DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[k]).STATO_PADRE.SYSTEM_ID == statoDoc.SYSTEM_ID)
+                    {
+                        if (((DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[k]).ID_STATO_AUTOMATICO != null || ((DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[k]).ID_STATO_AUTOMATICO != "")
+                        {
+                            //Recupero i dati dello stato automatico
+                            DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_STATO_BY_ID");
+                            queryMng.setParam("system_id", ((DocsPaVO.DiagrammaStato.Passo)diagramma.PASSI[k]).ID_STATO_AUTOMATICO);
+                            string commandText = queryMng.getSQL();
                             System.Diagnostics.Debug.WriteLine("SQL - getStatoSuccessivoAutomatico - DiagrammiStato.cs - QUERY : " + commandText);
                             logger.Debug("SQL - getStatoSuccessivoAutomatico - DiagrammiStato.cs - QUERY : " + commandText);
                             DataSet ds_4 = new DataSet();
-							dbProvider.ExecuteQuery(ds_4,commandText);
+                            dbProvider.ExecuteQuery(ds_4, commandText);
 
-							DocsPaVO.DiagrammaStato.Stato st_auto = new DocsPaVO.DiagrammaStato.Stato();
-							st_auto.SYSTEM_ID = Convert.ToInt32(ds_4.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
-							st_auto.ID_DIAGRAMMA = Convert.ToInt32(ds_4.Tables[0].Rows[0]["ID_DIAGRAMMA"].ToString());
-							st_auto.DESCRIZIONE = ds_4.Tables[0].Rows[0]["Var_descrizione"].ToString();
-							if(ds_4.Tables[0].Rows[0]["Stato_iniziale"].ToString() == "0")
-								st_auto.STATO_INIZIALE = false;
-							else
-								st_auto.STATO_INIZIALE = true;
+                            DocsPaVO.DiagrammaStato.Stato st_auto = new DocsPaVO.DiagrammaStato.Stato();
+                            st_auto.SYSTEM_ID = Convert.ToInt32(ds_4.Tables[0].Rows[0]["SYSTEM_ID"].ToString());
+                            st_auto.ID_DIAGRAMMA = Convert.ToInt32(ds_4.Tables[0].Rows[0]["ID_DIAGRAMMA"].ToString());
+                            st_auto.DESCRIZIONE = ds_4.Tables[0].Rows[0]["Var_descrizione"].ToString();
+                            if (ds_4.Tables[0].Rows[0]["Stato_iniziale"].ToString() == "0")
+                                st_auto.STATO_INIZIALE = false;
+                            else
+                                st_auto.STATO_INIZIALE = true;
 
-							if(ds_4.Tables[0].Rows[0]["Stato_finale"].ToString() == "0")
-								st_auto.STATO_FINALE = false;
-							else
-								st_auto.STATO_FINALE = true;
+                            if (ds_4.Tables[0].Rows[0]["Stato_finale"].ToString() == "0")
+                                st_auto.STATO_FINALE = false;
+                            else
+                                st_auto.STATO_FINALE = true;
 
                             if (ds_4.Tables[0].Rows[0]["Conv_Pdf"].ToString() == "1")
                                 st_auto.CONVERSIONE_PDF = true;
@@ -2012,34 +1912,34 @@ namespace DocsPaDB.Query_DocsPAWS
                             else
                                 st_auto.NON_RICERCABILE = false;
 
-							return st_auto;
-						}
-					}
-				}
-				return null;		
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-				return null;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}
-		}
+                            return st_auto;
+                        }
+                    }
+                }
+                return null;
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+                return null;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public bool isUltimaDaAccettare(string idTrasmissione)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public bool isUltimaDaAccettare(string idTrasmissione)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_TRASM_DIAGR_AR_1");	
-				queryMng.setParam("idTrasmissione",idTrasmissione);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - isUltimaDaAccettare - DiagrammiStato.cs - QUERY : "+commandText);
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_TRASM_DIAGR_AR_1");
+                queryMng.setParam("idTrasmissione", idTrasmissione);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - isUltimaDaAccettare - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - isUltimaDaAccettare - DiagrammiStato.cs - QUERY : " + commandText);
                 DataSet ds_daAccettare = new DataSet();
                 dbProvider.ExecuteQuery(ds_daAccettare, commandText);
@@ -2053,54 +1953,54 @@ namespace DocsPaDB.Query_DocsPAWS
                 dbProvider.ExecuteQuery(ds_Rifiutate, commandText);
 
                 if (ds_daAccettare.Tables[0].Rows.Count == 0 && ds_Rifiutate.Tables[0].Rows.Count == 0)
-					return true;
-				else
-					return false;
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-				return false;
-			}
-			finally
-			{
-				dbProvider.Dispose();				
-			}		
-		}
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+                return false;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
 
 
-		public bool isDocumentiInStatoFinale(string idDiagramma, string idTemplate)
-		{
-			DocsPaDB.DBProvider dbProvider=new DocsPaDB.DBProvider();
+        public bool isDocumentiInStatoFinale(string idDiagramma, string idTemplate)
+        {
+            DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
 
-			try
-			{
-				DocsPaUtils.Query queryMng=DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DPA_DIAGRAMMI_DOC");	
-				queryMng.setParam("idTemplate",idTemplate);
-				queryMng.setParam("idDiagramma",idDiagramma);
-				string commandText=queryMng.getSQL();
-				System.Diagnostics.Debug.WriteLine("SQL - isDocumentiInStatoFinale - DiagrammiStato.cs - QUERY : "+commandText);
+            try
+            {
+                DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("DS_GET_DPA_DIAGRAMMI_DOC");
+                queryMng.setParam("idTemplate", idTemplate);
+                queryMng.setParam("idDiagramma", idDiagramma);
+                string commandText = queryMng.getSQL();
+                System.Diagnostics.Debug.WriteLine("SQL - isDocumentiInStatoFinale - DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - isDocumentiInStatoFinale - DiagrammiStato.cs - QUERY : " + commandText);
 
-				DataSet ds = new DataSet();
-				dbProvider.ExecuteQuery(ds,commandText);
+                DataSet ds = new DataSet();
+                dbProvider.ExecuteQuery(ds, commandText);
                 if (ds.Tables[0].Rows.Count != 0)
                     return false;
-                
-                return true;
-			}
-			catch 
-			{
-				dbProvider.RollbackTransaction();
-				return false;
-			}
-			finally
-			{
-				dbProvider.Dispose();
-			}		
-		}
 
-        
+                return true;
+            }
+            catch
+            {
+                dbProvider.RollbackTransaction();
+                return false;
+            }
+            finally
+            {
+                dbProvider.Dispose();
+            }
+        }
+
+
         public int getDiagrammaAssociatoFasc(string idTipoFasc)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
@@ -2162,7 +2062,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     System.Diagnostics.Debug.WriteLine("SQL - associaTipoFascDiagramma -  DiagrammiStato.cs - QUERY : " + commandText);
                     logger.Debug("SQL - associaTipoFascDiagramma -  DiagrammiStato.cs - QUERY : " + commandText);
                     dbProvider.ExecuteNonQuery(commandText);
-                }                
+                }
             }
             catch
             {
@@ -2175,7 +2075,7 @@ namespace DocsPaDB.Query_DocsPAWS
             return false;
         }
 
-       
+
         public bool isFascicoliInStatoFinale(string idDiagramma, string idTemplate)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
@@ -2231,7 +2131,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-        
+
         public DocsPaVO.DiagrammaStato.DiagrammaStato getDgByIdTipoFasc(string systemIdTipoFasc, string idAmm)
         {
             DocsPaVO.DiagrammaStato.DiagrammaStato dg = null;
@@ -2632,12 +2532,12 @@ namespace DocsPaDB.Query_DocsPAWS
                                             commandText = queryMng.getSQL();
                                             dbProvider.ExecuteNonQuery(commandText);
                                         }
-                                    }                                    
+                                    }
                                 }
                             }
                         }
                     }
-                }                               
+                }
             }
             catch
             {
@@ -2649,7 +2549,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-       
+
         public DocsPaVO.DiagrammaStato.Stato getStatoFasc(string idProject)
         {
             DocsPaVO.DiagrammaStato.Stato stato = null;
@@ -2713,7 +2613,7 @@ namespace DocsPaDB.Query_DocsPAWS
             return stato;
         }
 
-       
+
         public void deleteStoricoTrasmDiagrammiFasc(string idProject, string idStato)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
@@ -2739,7 +2639,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-        
+
         public ArrayList isStatoTrasmAutoFasc(string idAmm, string idStato, string idTipoFasc)
         {
             ArrayList modelli = new ArrayList();
@@ -2781,7 +2681,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-        
+
         public void salvaStoricoTrasmDiagrammiFasc(string idTrasm, string idProject, string idStato)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
@@ -2822,7 +2722,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-        
+
         public void salvaDataScadenzaFasc(string idProject, string dataScadenza, string idTipoFasc)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
@@ -2871,7 +2771,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-        
+
         public void salvaDataScadenzaDoc(string docNumber, string dataScadenza, string idTipoAtto)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
@@ -2920,7 +2820,7 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
-        
+
         public DataSet getDiagrammaStoricoFasc(string idProject)
         {
             DataSet storico = new DataSet();
@@ -2975,7 +2875,7 @@ namespace DocsPaDB.Query_DocsPAWS
             return storico_1;
         }
 
-        
+
         public DocsPaVO.DiagrammaStato.Stato getStatoSuccessivoAutomaticoFasc(string idProject)
         {
             DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
@@ -3049,9 +2949,9 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 DocsPaUtils.Query queryMng = DocsPaUtils.InitQuery.getInstance().getQuery("GET_STATI_DG_PER_RICERCA");
                 queryMng.setParam("idDiagramma", idDiagramma);
-                if(docOrFasc.ToUpper().Equals("D"))
+                if (docOrFasc.ToUpper().Equals("D"))
                     queryMng.setParam("docOrFasc", " and dpa_diagrammi.doc_number is not null ");
-                if(docOrFasc.ToUpper().Equals("F"))
+                if (docOrFasc.ToUpper().Equals("F"))
                     queryMng.setParam("docOrFasc", " and dpa_diagrammi.id_project is not null ");
 
                 string commandText = queryMng.getSQL();
@@ -3091,7 +2991,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
                 DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_ASS_RUOLI_STATI_DIAGRAMMA");
-                query.setParam("idDiagramma",idDiagramma.ToString());
+                query.setParam("idDiagramma", idDiagramma.ToString());
                 string commandText = query.getSQL();
                 System.Diagnostics.Debug.WriteLine("SQL - Select Associazione Ruoli diagramma di stato - DocsPaDB.Query_DocsPAWS.DiagrammiStato.cs - QUERY : " + commandText);
                 logger.Debug("SQL - GetRuoliStatiDiagramma - DocsPaDB.Query_DocsPAWS.DiagrammiStato.cs - QUERY : " + commandText);
@@ -3101,7 +3001,8 @@ namespace DocsPaDB.Query_DocsPAWS
                 {
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-                        listAssRuoloStatiDiag.Add(new DocsPaVO.DiagrammaStato.Visibility.AssRuoloStatiDiagramma{
+                        listAssRuoloStatiDiag.Add(new DocsPaVO.DiagrammaStato.Visibility.AssRuoloStatiDiagramma
+                        {
                             ID_GRUPPO = ds.Tables[0].Rows[i]["ID_GRUPPO"].ToString(),
                             ID_DIAGRAMMA = ds.Tables[0].Rows[i]["ID_DIAGRAMMA"].ToString(),
                             ID_STATO = ds.Tables[0].Rows[i]["ID_STATO"].ToString(),
@@ -3130,7 +3031,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 if (databaseProvider.DBType.ToUpper().Equals("ORACLE"))
                 {
-                   
+
                     foreach (DocsPaVO.DiagrammaStato.Visibility.AssRuoloStatiDiagramma assRoleStatoDia in ListAssRoliStatiDiagramma)
                     {
                         // Creazione parametri per la Store Procedure
@@ -3145,8 +3046,8 @@ namespace DocsPaDB.Query_DocsPAWS
                         //parameters.Add(new ParameterSP("idDiagramma", Convert.ToInt32(assRoleStatoDia.ID_DIAGRAMMA), 0, DirectionParameter.ParamInput, DbType.Int32));
                         //parameters.Add(new ParameterSP("chaNotVis", Convert.ToInt32(assRoleStatoDia.CHA_NOT_VIS), 0, DirectionParameter.ParamInput, DbType.Int32));
                         //parameters.Add(new ParameterSP("result", 0, DirectionParameter.ParamOutput));
-                       //retProc = this.ExecuteStoreProcedure("MODIFYASSRUOLOSTATODIAGRAMMA", parameters);
-                       //retProc = this.ExecuteStoredProcedure("MODIFYASSRUOLOSTATODIAGRAMMA", parameters, null);
+                        //retProc = this.ExecuteStoreProcedure("MODIFYASSRUOLOSTATODIAGRAMMA", parameters);
+                        //retProc = this.ExecuteStoredProcedure("MODIFYASSRUOLOSTATODIAGRAMMA", parameters, null);
 
                         DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider();
                         DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("COUNT_DIAGRAMMI");
@@ -3205,7 +3106,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     }
                 }
                 this.CommitTransaction();
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -3286,6 +3187,8 @@ namespace DocsPaDB.Query_DocsPAWS
             }
         }
 
+        #region FASI
+
         public List<DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma> GetFasiStatiDiagramma(string idDiagramma, DocsPaVO.utente.InfoUtente infoUtente)
         {
             List<DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma> faseStatiDiagramma = new List<DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma>();
@@ -3310,9 +3213,10 @@ namespace DocsPaDB.Query_DocsPAWS
                                 faseStato = new DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma();
                                 faseStato.INTERMEDIATE_PHASE = row["CHA_INTERMEDIATE_PHASE"].ToString() == "0" ? false : true;
                                 faseStato.POSITION_PHASE = row["POSITION_PHASE"].ToString();
+                                faseStato.ID_TIPO_DOC = row["ID_TIPO_ATTO"].ToString();
                                 faseStato.STATO = new DocsPaVO.DiagrammaStato.Stato()
                                 {
-                                    SYSTEM_ID =Convert.ToInt32(row["ID_STATO"].ToString()),
+                                    SYSTEM_ID = Convert.ToInt32(row["ID_STATO"].ToString()),
                                     STATO_INIZIALE = row["STATO_INIZIALE"].ToString() == "0" ? false : true
                                 };
                                 faseStato.PHASE = new DocsPaVO.DiagrammaStato.Phases()
@@ -3393,6 +3297,479 @@ namespace DocsPaDB.Query_DocsPAWS
 
             return faseStatiDiagramma;
         }
+
+        public List<DocsPaVO.DiagrammaStato.Phases> GetFasi()
+        {
+            logger.Debug("BEGIN");
+            List<DocsPaVO.DiagrammaStato.Phases> list = new List<DocsPaVO.DiagrammaStato.Phases>();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_ALL_FASI");
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                DataSet ds;
+
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds != null && ds.Tables[0] != null)
+                {
+                    foreach(DataRow row in ds.Tables[0].Rows)
+                    {
+                        DocsPaVO.DiagrammaStato.Phases phase = new DocsPaVO.DiagrammaStato.Phases()
+                        {
+                            SYSTEM_ID = row["ID_FASE"].ToString(),
+                            DESCRIZIONE = row["DESCRIZIONE"].ToString()
+                        };
+                        list.Add(phase);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                list = null;
+                logger.Debug("Errore in GetFasi - ", ex);
+            }
+
+            logger.Debug("END");
+            return list;
+        }
+
+        public bool SetFasiStatiDiagramma(List<DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma> list, string idDiagramma)
+        {
+            logger.Debug("BEGIN");
+            bool result = false;
+            string command = string.Empty;
+
+            if (list != null && list.Count > 0)
+            {
+                try
+                {
+                    this.BeginTransaction();
+                    DocsPaUtils.Query queryDel = DocsPaUtils.InitQuery.getInstance().getQuery("D_ASS_FASI_STATI");
+                    queryDel.setParam("id_diagramma", idDiagramma);
+                    command = queryDel.getSQL();
+
+                    logger.Debug("1 - QUERY - DEL - " + command);
+                    if (!this.ExecuteNonQuery(command))
+                        throw new Exception(this.LastExceptionMessage);
+
+                    logger.Debug("Associazione precedente rimossa");
+                    foreach (DocsPaVO.DiagrammaStato.AvanzamentoDiagramma.AssPhaseStatoDiagramma item in list)
+                    {
+                        if (item.STATO != null && item.PHASE != null && item.STATO.SYSTEM_ID != 0 && !string.IsNullOrEmpty(item.PHASE.SYSTEM_ID) && item.PHASE.SYSTEM_ID != "0")
+                        {
+                            DocsPaUtils.Query queryIns = DocsPaUtils.InitQuery.getInstance().getQuery("I_ASS_FASI_STATI");
+                            queryIns.setParam("id_stato", item.STATO.SYSTEM_ID.ToString());
+                            queryIns.setParam("id_diagramma", idDiagramma);
+                            queryIns.setParam("id_fase", item.PHASE.SYSTEM_ID);
+                            queryIns.setParam("id_tipo_doc", (!string.IsNullOrEmpty(item.ID_TIPO_DOC) && item.ID_TIPO_DOC != "0") ? string.Format("'{0}'", item.ID_TIPO_DOC) : "NULL");
+                            command = queryIns.getSQL();
+                            logger.Debug("2 - QUERY - INS - " + command);
+
+                            if (!this.ExecuteNonQuery(command))
+                                throw new Exception(this.LastExceptionMessage);
+                        }
+                    }
+
+                    this.CommitTransaction();
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+                    logger.Debug("Errore in SetFasiStatiDiagramma - ", ex);
+                    this.RollbackTransaction();
+                    result = false;
+                }
+                finally
+                {
+                    this.Dispose();
+                }
+            }
+
+            logger.Debug("END");
+            return result;
+        }
+
+        public List<DocsPaVO.DiagrammaStato.AssStatoScadenza> GetAssociazioneStatoScadenza(string idDiagramma)
+        {
+            logger.Debug("BEGIN");
+            List<DocsPaVO.DiagrammaStato.AssStatoScadenza> list = new List<DocsPaVO.DiagrammaStato.AssStatoScadenza>();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_STATI_SCADENZE");
+                query.setParam("id_diagramma", idDiagramma);
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                DataSet ds;
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds != null && ds.Tables[0] != null)
+                {
+                    foreach(DataRow row in ds.Tables[0].Rows)
+                    {
+                        DocsPaVO.DiagrammaStato.AssStatoScadenza item = new DocsPaVO.DiagrammaStato.AssStatoScadenza();
+                        item.IdStato = row["ID_STATO"].ToString();
+                        item.TerminiScadenza = row["CHA_TERMINI"].ToString();
+
+                        string tipo = row["CHA_TIPO_STATO"].ToString();
+                        if (tipo == "S")
+                            item.Tipo = DocsPaVO.DiagrammaStato.TipoStato.SOSPENSIVO;
+                        else if (tipo == "I")
+                            item.Tipo = DocsPaVO.DiagrammaStato.TipoStato.INTERRUTTIVO;
+
+                        list.Add(item);                         
+                    }
+                }
+
+            }
+            catch(Exception ex)
+            {
+                list = null;
+                logger.Debug("Errore in GetAssociazioneStatoScadenza - ", ex);
+            }
+
+            logger.Debug("END");
+            return list;
+        }
+
+        public bool SetAssociazioneStatoScadenza(string idDiagramma, List<DocsPaVO.DiagrammaStato.AssStatoScadenza> list)
+        {
+            logger.Debug("BEGIN");
+            bool result = false;
+            string command = string.Empty;
+
+            try
+            {
+                this.BeginTransaction();
+
+                DocsPaUtils.Query queryDel = DocsPaUtils.InitQuery.getInstance().getQuery("D_STATI_SCADENZE");
+                queryDel.setParam("id_diagramma", idDiagramma);
+                command = queryDel.getSQL();
+
+                logger.Debug("QUERY - 1 - DEL - " + command);
+
+                if (!this.ExecuteNonQuery(command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                foreach(DocsPaVO.DiagrammaStato.AssStatoScadenza item in list)
+                {
+                    DocsPaUtils.Query queryIns = DocsPaUtils.InitQuery.getInstance().getQuery("I_STATI_SCADENZE");
+                    queryIns.setParam("id_diagramma", idDiagramma);
+                    queryIns.setParam("id_stato", item.IdStato);
+                    queryIns.setParam("termini", item.TerminiScadenza);
+                    queryIns.setParam("tipo_stato", item.Tipo);
+
+                    command = queryIns.getSQL();
+                    logger.Debug("QUERY - 2 - INS - " + command);
+
+                    if (!this.ExecuteNonQuery(command))
+                        throw new Exception(this.LastExceptionMessage);
+                }
+
+                this.CommitTransaction();
+                result = true;
+            }
+            catch(Exception ex)
+            {
+                this.RollbackTransaction();
+                result = false;
+                logger.Debug("Errore in SetAssociazioneStatoScadenza - ", ex);
+            }
+            finally
+            {
+                this.Dispose();
+            }
+
+            logger.Debug("END");
+            return result;
+        }
+
+        public DocsPaVO.DiagrammaStato.AssStatoScadenza GetTipoStatoProcedimento(string idStato)
+        {
+            logger.Debug("BEGIN");
+            DocsPaVO.DiagrammaStato.AssStatoScadenza result = new DocsPaVO.DiagrammaStato.AssStatoScadenza();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_TIPO_STATO_PROCEDIMENTO");
+                query.setParam("id_stato", idStato);
+                string command = query.getSQL();
+
+                logger.Debug("QUERY - " + command);
+                DataSet ds;
+
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds != null && ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow row = ds.Tables[0].Rows[0];
+                    result.IdStato = row["ID_STATO"].ToString();
+                    result.TerminiScadenza = row["CHA_TERMINI"].ToString();
+                    result.Tipo = row["CHA_TIPO_STATO"].ToString();
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetTipoStatoProcedimento - ", ex);
+                result = null;
+            }
+
+            logger.Debug("END");
+            return result;
+        }
+
+        public string GetDataUltimoCambioStato(string idProject)
+        {
+            logger.Debug("BEGIN");
+            string retVal = string.Empty;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_DATA_ULTIMO_CAMBIO_STATO");
+                query.setParam("id_project", idProject);
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                if (!this.ExecuteScalar(out retVal, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetDataUltimoCambioStato - ", ex);
+                return string.Empty;
+            }
+
+            logger.Debug("END");
+            return retVal;
+        }
+
+        #endregion
+
+        #region Automatismi per cambio stato
+        public List<DocsPaVO.DiagrammaStato.EventoCambioStato> GetEventiCambioStatoAutomatico()
+        {
+            logger.Debug("BEGIN");
+            List<DocsPaVO.DiagrammaStato.EventoCambioStato> list = new List<DocsPaVO.DiagrammaStato.EventoCambioStato>();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_EVENTI_CAMBIO_STATO_AUTOMATICO");
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+                DataSet ds;
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if (ds != null && ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow row in ds.Tables[0].Rows)
+                    {
+                        DocsPaVO.DiagrammaStato.EventoCambioStato item = new DocsPaVO.DiagrammaStato.EventoCambioStato();
+                        item.Id = row["SYSTEM_ID"].ToString();
+                        item.Codice = row["VAR_CODICE"].ToString();
+                        item.Descrizione = row["VAR_DESCRIZIONE"].ToString();
+                        list.Add(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Debug("Errore in GetEventiCambioStatoAutomatico - ", ex);
+                list = null;
+            }
+
+            logger.Debug("END");
+            return list;
+        }
+
+        public bool CreaCambioStatoAutomatico(DocsPaVO.DiagrammaStato.CambioStatoAutomatico item)
+        {
+            logger.Debug("BEGIN");
+            bool result = false;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("I_CAMBIO_STATO_AUTOMATICO");
+                query.setParam("id_stato_iniziale", item.IdStatoIniziale);
+                query.setParam("id_stato_finale", item.IdStatoFinale);
+                query.setParam("id_amm", item.IdAmm);
+                query.setParam("id_tipo_evento", item.TipoEvento.Id);
+
+                if(item.Tipologia != null)
+                    query.setParam("id_tipo_doc", item.Tipologia.SYSTEM_ID.ToString());
+                else
+                    query.setParam("id_tipo_doc", "NULL");
+
+                if(item.Ragione != null)
+                    query.setParam("id_ragione", item.Ragione.systemId);
+                else
+                    query.setParam("id_ragione", "NULL");
+
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                if (!this.ExecuteNonQuery(command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                result = true;
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in CreCambioStatoAutomatico - ", ex);
+                result = false;
+            }
+
+            logger.Debug("END");
+            return result;
+        }
+
+        public bool EliminaCambioStatoAutomatico(DocsPaVO.DiagrammaStato.CambioStatoAutomatico item)
+        {
+            logger.Debug("BEGIN");
+            bool result = false;
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("D_CAMBIO_STATO_AUTOMATICO");
+                query.setParam("id_stato_iniziale", item.IdStatoIniziale);
+                query.setParam("id_stato_finale", item.IdStatoFinale);
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                if (!this.ExecuteNonQuery(command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                result = true;
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in EliminaCambioStatoAutomatico - ", ex);
+                result = false;
+            }
+
+            logger.Debug("END");
+            return result;
+        }
+
+        public List<DocsPaVO.DiagrammaStato.CambioStatoAutomatico> GetCambiAutomaticiStato(string idStato)
+        {
+            logger.Debug("BEGIN");
+            List<DocsPaVO.DiagrammaStato.CambioStatoAutomatico> list = new List<DocsPaVO.DiagrammaStato.CambioStatoAutomatico>();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_CAMBI_STATO_BY_STATO");
+                query.setParam("id_stato", idStato);
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                DataSet ds;
+
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds != null && ds.Tables != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    foreach(DataRow row in ds.Tables[0].Rows)
+                    {
+                        DocsPaVO.DiagrammaStato.CambioStatoAutomatico item = new DocsPaVO.DiagrammaStato.CambioStatoAutomatico();
+                        item.IdStatoFinale = row["ID_STATO_FINALE"].ToString();
+                        item.TipoEvento = new DocsPaVO.DiagrammaStato.EventoCambioStato()
+                        {
+                            Id = row["ID_TIPO_EVENTO"].ToString(),
+                            Codice = row["CODICE_EVENTO"].ToString(),
+                            Descrizione = row["DESC_EVENTO"].ToString()
+                        };
+
+                        string idRagione = row["ID_RAGIONE"].ToString();
+                        string idTipologia = row["ID_TIPO_DOC"].ToString();
+
+                        if(!string.IsNullOrEmpty(idRagione))
+                        {
+                            item.Ragione = new DocsPaVO.trasmissione.RagioneTrasmissione()
+                            {
+                                systemId = idRagione,
+                                descrizione = row["VAR_DESC_RAGIONE"].ToString()
+                            };
+                        }
+                        if(!string.IsNullOrEmpty(idTipologia))
+                        {
+                            item.Tipologia = new DocsPaVO.ProfilazioneDinamica.Templates()
+                            {
+                                ID_TIPO_ATTO = idTipologia,
+                                DESCRIZIONE = row["TIPOLOGIA"].ToString()
+                            };
+                        }
+                        list.Add(item);
+                    }
+                    
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Debug("Errore in GetCambiAutomaticiStato - ", ex);
+                list = null;
+            }
+
+            logger.Debug("END");
+            return list;
+        }
+
+        public DocsPaVO.DiagrammaStato.CambioStatoAutomatico GetCambioAutomaticoStatoFasc(string idFascicolo)
+        {
+            logger.Debug("BEGIN");
+            DocsPaVO.DiagrammaStato.CambioStatoAutomatico item = new DocsPaVO.DiagrammaStato.CambioStatoAutomatico();
+
+            try
+            {
+                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_CAMBIO_STATO_BY_ID_FASC");
+                query.setParam("id_project", idFascicolo);
+                string command = query.getSQL();
+                logger.Debug("QUERY - " + command);
+
+                DataSet ds;
+                if (!this.ExecuteQuery(out ds, command))
+                    throw new Exception(this.LastExceptionMessage);
+
+                if(ds !=null && ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow row = ds.Tables[0].Rows[0];
+                    item.IdStatoFinale = row["ID_STATO_FINALE"].ToString();
+                    item.TipoEvento = new DocsPaVO.DiagrammaStato.EventoCambioStato() { Codice = row["VAR_CODICE"].ToString() };
+
+                    string idTipoDoc = row["ID_TIPO_DOC"].ToString();
+                    string idRagione = row["ID_RAGIONE"].ToString();
+
+                    if (!string.IsNullOrEmpty(idTipoDoc))
+                        item.Tipologia = new DocsPaVO.ProfilazioneDinamica.Templates() { ID_TIPO_ATTO = idTipoDoc };
+                    else
+                        item.Tipologia = null;
+
+                    if (!string.IsNullOrEmpty(idRagione))
+                        item.Ragione = new DocsPaVO.trasmissione.RagioneTrasmissione() { systemId = idRagione };
+                    else
+                        item.Ragione = null;
+                }
+    
+            }
+            catch(Exception ex)
+            {
+                item = null;
+                logger.Debug("Errore in GetCambioAutomaticoStato", ex);
+            }
+
+            logger.Debug("END");
+            return item;
+        }
+        #endregion
 
         public DocsPaVO.DiagrammaStato.Stato GetStatoById(string idStato, DocsPaVO.utente.InfoUtente infoUtente)
         {
@@ -3499,40 +3876,5 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Debug("END");
             return result;
         }
-
-        public ArrayList GetIdDocsByDiagramStatus(string descStato, string descDiagramma, string codAmm) 
-        {
-            ArrayList retVal = new ArrayList();
-            try
-            {
-                using (DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider())
-                {
-                    DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_IDDOCS_BY_DIAGRAMSTATUS");
-                    query.setParam("descStato", descStato.Replace("'","''"));
-                    query.setParam("descDiagramma",descDiagramma);
-                    query.setParam("codAmm", codAmm);
-                    string command = query.getSQL();
-                    logger.Debug(command);
-                    DataSet ds = new DataSet();
-                    dbProvider.ExecuteQuery(ds, command);
-
-                    if (ds.Tables[0].Rows.Count != 0)
-                    {
-                        foreach (DataRow row in ds.Tables[0].Rows)
-                        {
-                            retVal.Add(row["DOC_NUMBER"].ToString());
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex);
-                return null;
-            }
-
-            return retVal;
-        }
-
     }
 }

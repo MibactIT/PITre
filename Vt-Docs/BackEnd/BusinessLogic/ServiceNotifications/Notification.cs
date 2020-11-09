@@ -121,7 +121,7 @@ namespace BusinessLogic.ServiceNotifications
                 DocsPaDB.Query_DocsPAWS.NotificationDB notificationDB = new DocsPaDB.Query_DocsPAWS.NotificationDB();
                 if (notification.MULTIPLICITY.Equals(DocsPaVO.Notification.Multiplicity.ONE))
                 {
-                    res = notificationDB.CheckNotification(notification.ID_EVENT, string.Empty, notification.ID_GROUP);
+                    res = notificationDB.CheckNotification(notification.ID_EVENT);
                 }
                 else
                 {

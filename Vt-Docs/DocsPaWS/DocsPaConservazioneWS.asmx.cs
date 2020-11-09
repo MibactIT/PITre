@@ -248,19 +248,6 @@ namespace DocsPaWS
             return consManager.getItemsConservazioneByIdWithSecurity(IdConservazione, infoUtente, idGruppo);
         }
 
-        [WebMethod]
-        public ItemsConservazione[] getItemsConservazioneLite(string IdConservazione, InfoUtente infoUtente)
-        {
-            if (infoUtente == null)
-            {
-                logger.Debug("InfoUtente nullo o non valido.");
-                return null;
-            }
-
-            DocsPaConsManager consManager = new DocsPaConsManager();
-            return consManager.getItemsConservazioneByIdLite(IdConservazione, infoUtente);
-        }
-
         /// <summary>
         /// Validazione di un'istanza di conservazione
         /// </summary>

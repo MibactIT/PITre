@@ -22,7 +22,6 @@ namespace DocsPaVO.LibroFirma
         private string _destinatario;
         private int _numAllegato;
         private int _numVersione;
-        private string _idRegistro;
 
         #endregion
 
@@ -181,19 +180,6 @@ namespace DocsPaVO.LibroFirma
             set
             {
                 _numVersione = value;
-            }
-        }
-
-        public string IdRegistro
-        {
-            get
-            {
-                return _idRegistro;
-            }
-
-            set
-            {
-                _idRegistro = value;
             }
         }
         #endregion

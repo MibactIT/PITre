@@ -14,31 +14,15 @@
 			function apriPopup() {
 				window.open('../help.aspx?from=EUR','','width=450,height=500,scrollbars=YES');
 			}			
-			function AvvisoRuoloConTX(utente, idPeople, idCorrGlobali)
+			function AvvisoRuoloConTX(utente) 
 			{
-			    var myUrl = "AvvisoRuoloConTrasm.aspx?utente=" + utente + "&idPeople=" + idPeople + "&idCorrGlobali=" + idCorrGlobali;
+				var myUrl = "AvvisoRuoloConTrasm.aspx?utente="+utente;
 				rtnValue = window.showModalDialog(myUrl,"","dialogWidth:410px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;"); 				
 				
 				frm_gestioneUtenti.hd_returnValueModal.value = rtnValue;
 								
 				window.document.frm_gestioneUtenti.submit();				
-			}
-			function AvvisoRuoloConLF(tipoTitolare, idRuolo, idUtente, numProcessi, numIstanze) {
-			    var myUrl = "AvvisoRuoloConLF.aspx?tipoTitolare=" + tipoTitolare + "&idRuolo=" + idRuolo + "&idUtente=" + idUtente + "&numProcessi=" + numProcessi + "&numIstanze=" + numIstanze;
-			    rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:450px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;");
-
-			    frm_gestioneUtenti.hd_returnValueModalLF.value = rtnValue;
-
-			    window.document.frm_gestioneUtenti.submit();
-			}
-			function AvvisoUtenteConTrasm(idPeople, idCorrGlobali) {
-			    var myUrl = "AvvisoUtenteConTrasm.aspx?idPeople=" + idPeople + "&idCorrGlobali=" + idCorrGlobali;
-			    rtnValue = window.showModalDialog(myUrl, "", "dialogWidth:450px;dialogHeight:350px;status:no;resizable:no;scroll:no;center:yes;help:no;");
-
-			    frm_gestioneUtenti.hd_returnValueModalUtenteConTrasm.value = rtnValue;
-
-			    window.document.frm_gestioneUtenti.submit();
-			}
+			}					
 		</SCRIPT>
 		<script language="javascript" id="btn_find_click" event="onclick()" for="btn_find">
 			window.document.body.style.cursor='wait';
@@ -48,8 +32,6 @@
 		<form id="frm_gestioneUtenti" method="post" runat="server">
             <uct:AppTitleProvider ID="appTitleProvider" runat="server" PageName = "AMMINISTRAZIONE > Gestione utenti nel ruolo" />	
 			<input id="hd_returnValueModal" type="hidden" name="hd_returnValueModal" runat="server">
-            <input id="hd_returnValueModalLF" type="hidden" name="hd_returnValueModalLF" runat="server">
-             <input id="hd_returnValueModalUtenteConTrasm" type="hidden" name="hd_returnValueModalUtenteConTrasm" runat="server">
 			<table width="740" align="center">
 				<tr>
 					<!-- OPZIONI DI TESTA -->
@@ -161,10 +143,6 @@
 												<asp:BoundColumn Visible="False" DataField="IDAmministrazione" ReadOnly="True"></asp:BoundColumn>
 												<asp:BoundColumn Visible="False" DataField="IDPeople" ReadOnly="True"></asp:BoundColumn>
 												<asp:ButtonColumn Text="&lt;img src=../Images/cestino.gif border=0 alt='Elimina'&gt;" CommandName="Eliminazione">
-													<HeaderStyle Width="5%"></HeaderStyle>
-													<ItemStyle HorizontalAlign="Center"></ItemStyle>
-												</asp:ButtonColumn>
-                                                <asp:ButtonColumn Text="&lt;img src=../Images/ico_scan_ruota.gif border=0 alt='Sostituisci'&gt;" CommandName="Sostituzione">
 													<HeaderStyle Width="5%"></HeaderStyle>
 													<ItemStyle HorizontalAlign="Center"></ItemStyle>
 												</asp:ButtonColumn>

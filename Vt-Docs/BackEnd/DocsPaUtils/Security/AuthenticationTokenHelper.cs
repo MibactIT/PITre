@@ -103,6 +103,8 @@ namespace DocsPaUtils.Security
         public static string CtrlAuthToken(string token, string username, string tknDuration)
         {
             string retval = "OK";
+            if (!string.IsNullOrEmpty(username) && username.Length > 16) username = username.Substring(0, 16);
+                
             CryptoString crypto = new CryptoString(username.ToUpper());
             string encodedValue = token.Substring(TOKEN_PREFIX.Length);
             try
@@ -140,8 +142,9 @@ namespace DocsPaUtils.Security
         {
             try
             {
-                CryptoString crypto = new CryptoString(userId);
-                string encodedValue = crypto.Encrypt(string.Format(ENCRYPTED_VALUE_FORMAT, userId, GetSessionId(), DateTime.Now));
+                if (!string.IsNullOrEmpty(userId) && userId.Length > 16) userId = userId.Substring(0, 16);
+                CryptoString crypto = new CryptoString(userId.ToUpper());
+                string encodedValue = crypto.Encrypt(string.Format(ENCRYPTED_VALUE_FORMAT, userId.ToUpper(), GetSessionId(), DateTime.Now));
 
                 return string.Format("{0}{1}", TOKEN_PREFIX, encodedValue);
             }
@@ -161,8 +164,11 @@ namespace DocsPaUtils.Security
         {
             if (IsAuthToken(token))
             {
-                CryptoString crypto = new CryptoString(userId);
+                if (!string.IsNullOrEmpty(userId) && userId.Length > 16) userId = userId.Substring(0, 16);
+                
+                CryptoString crypto = new CryptoString(userId.ToUpper());
                 string decryptedValue = string.Empty;
+                
 
                 try
                 {
@@ -175,7 +181,7 @@ namespace DocsPaUtils.Security
 
                 Dictionary<string, string> keyValuePairs = GetTokenKeyValuePairs(decryptedValue);
 
-                if (string.Compare(userId, keyValuePairs[UID], true) == 0)
+                if (string.Compare(userId.ToUpper(), keyValuePairs[UID], true) == 0)
                 {
                     string sessionId = keyValuePairs[SESSIONID];
 

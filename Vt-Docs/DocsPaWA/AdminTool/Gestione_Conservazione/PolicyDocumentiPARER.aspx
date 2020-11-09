@@ -234,13 +234,6 @@
                                                                 <asp:CheckBox runat="server" ID="chk_attiva_policy" Checked="<%# this.GetStatoAttivazionePolicy((DocsPAWA.DocsPaWR.PolicyPARER)Container.DataItem) %>" />
                                                             </ItemTemplate>
                                                         </asp:TemplateColumn>
-
-                                                        <asp:TemplateColumn ItemStyle-Width="8%" HeaderText="NOTIFICA MAIL" ItemStyle-CssClass="tab_sx2" HeaderStyle-HorizontalAlign="left" HeaderStyle-CssClass="head_tab">
-                                                            <ItemTemplate>
-                                                                <asp:CheckBox runat="server" ID="chk_notifica_mail" Checked="<%# this.GetStatoNotificaMail((DocsPAWA.DocsPaWR.PolicyPARER)Container.DataItem) %>" />
-                                                            </ItemTemplate>
-                                                        </asp:TemplateColumn>
-
                                                         <asp:TemplateColumn ItemStyle-Width="8%" HeaderText="ELIMINA" ItemStyle-CssClass="tab_sx2" HeaderStyle-CssClass="head_tab">
                                                             <ItemTemplate>
                                                                 <asp:ImageButton ID="btn_Rimuovi" runat="server" CssClass="testo_grigio" CommandName="Rimuovi"

@@ -8,6 +8,7 @@ using log4net;
 using DocsPaVO.utente;
 using System.Collections;
 using DocsPaVO.Validations;
+using DocsPaVO.addressbook;
 
 namespace BusinessLogic.Amministrazione
 {
@@ -333,7 +334,11 @@ namespace BusinessLogic.Amministrazione
                     }
                     else
                     {
+                        
                         UnitaOrganizzativa uoPadre = (UnitaOrganizzativa)Utenti.UserManager.getCorrispondenteByCodRubrica(dr["COD_UO_PADRE"].ToString().ToUpper(), infoUtenteAmm);
+                        //ABBATANGELI GIANLUIGI - MiBACT - Se sbaglia il padre nel caso esista stesso codice rubrica per altri corrispondenti esterni commentare sopra e decommentare sotto
+                        //UnitaOrganizzativa uoPadre = (UnitaOrganizzativa)Utenti.UserManager.getCorrispondenteByCodRubrica(dr["COD_UO_PADRE"].ToString().ToUpper(), TipoUtente.INTERNO, infoUtenteAmm);
+                        
                         if (uoPadre != null)
                         {
                             uo.IDParent = uoPadre.systemId;

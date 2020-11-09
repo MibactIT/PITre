@@ -38,6 +38,8 @@
 <input type="hidden" name="hd_info_documento" id="hd_info_documento" runat="server" value="1" />
 <input type="hidden" name="hd_sblocca_doc_stato_finale" id="hd_sblocca_doc_stato_finale" runat="server" value="1" />
 <input type="hidden" name="hd_gestione_pregressi" id="hd_gestione_pregressi" runat="server" value="1" />
+<!-- ??? -->
+<input type="hidden" name="hd_scarico_RDE" id="hd_scarico_RDE" runat="server" value="1" />
 <!--
 	NOTA 2:	
 	questi campi nascosti servono a visualizzare alcune voci del menù a tendina.
@@ -59,7 +61,7 @@
 <input type="hidden" name="hd_gestione_news" id="hd_gestione_news" runat="server" />
 <input type="hidden" name="hd_gestione_Docum_Stato_Finale" id="hd_gestione_Docum_Stato_Finale" runat="server" />
 <input type="hidden" name="hd_gestione_indisponibilita" id="hd_gestione_indisponibilita" runat="server"  />
-<input type="hidden" name="hd_gestione_struttura_sottofascicoli" id="hd_gestione_struttura_sottofascicoli" runat="server" />
+<input type="hidden" name="hd_gestione_struttura_sottofascicoli" id="hd_gestione_struttura_sottofascicoli" runat="server" value="1" />
 
 <!-- Autenticazione Sistemi Esterni R.1 -->
 <input type="hidden" name="hd_gestione_sistemi_esterni" id="hd_gestione_sistemi_esterni" runat="server" value="1"/>

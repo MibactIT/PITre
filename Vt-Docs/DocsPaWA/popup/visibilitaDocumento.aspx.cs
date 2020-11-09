@@ -108,21 +108,7 @@ namespace DocsPAWA.popup
                     string descrSoggetto = UserManager.getDecrizioneCorrispondente(this, ListaDocDir[i].soggetto);
                     string Corr = GetTipoCorr(ListaDocDir[i]);
                     //Mev Editing ACL
-                    this.dS_Visibilit1.element1.Addelement1Row(
-                        setTipoDiritto(ListaDocDir[i]),
-                        descrSoggetto, 
-                        ListaDocDir[i].soggetto.codiceRubrica,
-                        Corr, 
-                        ListaDocDir[i].soggetto.dta_fine,
-                        "0", 
-                        "",
-                        ListaDocDir[i].personorgroup, 
-                        ListaDocDir[i].dtaInsSecurity,
-                        ListaDocDir[i].noteSecurity, 
-                        ListaDocDir[i].soggetto.tipoCorrispondente == "R" ? !String.IsNullOrEmpty(((DocsPAWA.DocsPaWR.Ruolo)ListaDocDir[i].soggetto).ShowHistory) && ((DocsPAWA.DocsPaWR.Ruolo)ListaDocDir[i].soggetto).ShowHistory != "0" : false,
-                        ListaDocDir[i].soggetto.systemId, 
-                        this.GetRightDescription(ListaDocDir[i].accessRights)
-                        );
+                    this.dS_Visibilit1.element1.Addelement1Row(setTipoDiritto(ListaDocDir[i]), descrSoggetto, ListaDocDir[i].soggetto.codiceRubrica, Corr, ListaDocDir[i].soggetto.dta_fine, "0", "", ListaDocDir[i].personorgroup, ListaDocDir[i].dtaInsSecurity, ListaDocDir[i].noteSecurity, ListaDocDir[i].soggetto.tipoCorrispondente == "R" ? !String.IsNullOrEmpty(((DocsPAWA.DocsPaWR.Ruolo)ListaDocDir[i].soggetto).ShowHistory) && ((DocsPAWA.DocsPaWR.Ruolo)ListaDocDir[i].soggetto).ShowHistory != "0" : false, ListaDocDir[i].soggetto.systemId, this.GetRightDescription(ListaDocDir[i].accessRights));
                 }
                 
                 Session["Dg_visibilita"] = this.dS_Visibilit1.Tables[0];
@@ -187,21 +173,7 @@ namespace DocsPAWA.popup
                     else rimosso = "0";
                     string note = ListaDocDir[i].note;
                     //Mev editing ACL
-                    this.dS_Visibilit1.element1.Addelement1Row(
-                        setTipoDiritto(ListaDocDir[i]), 
-                        descrSoggetto, 
-                        ListaDocDir[i].soggetto.codiceRubrica,
-                        Corr, 
-                        ListaDocDir[i].soggetto.dta_fine,
-                        rimosso, 
-                        note,
-                        ListaDocDir[i].personorgroup,
-                        ListaDocDir[i].dtaInsSecurity, 
-                        ListaDocDir[i].noteSecurity,
-                        ListaDocDir[i].soggetto.tipoCorrispondente == "R" ? !String.IsNullOrEmpty(((DocsPAWA.DocsPaWR.Ruolo)ListaDocDir[i].soggetto).ShowHistory) && ((DocsPAWA.DocsPaWR.Ruolo)ListaDocDir[i].soggetto).ShowHistory != "0" : false,
-                        ListaDocDir[i].soggetto.systemId, 
-                        this.GetRightDescription(ListaDocDir[i].accessRights)
-                        );
+                    this.dS_Visibilit1.element1.Addelement1Row(setTipoDiritto(ListaDocDir[i]), descrSoggetto, ListaDocDir[i].soggetto.codiceRubrica, Corr, ListaDocDir[i].soggetto.dta_fine, rimosso, note, ListaDocDir[i].personorgroup, ListaDocDir[i].dtaInsSecurity, ListaDocDir[i].noteSecurity, ListaDocDir[i].soggetto.tipoCorrispondente == "R" ? !String.IsNullOrEmpty(((DocsPAWA.DocsPaWR.Ruolo)ListaDocDir[i].soggetto).ShowHistory) && ((DocsPAWA.DocsPaWR.Ruolo)ListaDocDir[i].soggetto).ShowHistory != "0" : false, ListaDocDir[i].soggetto.systemId, this.GetRightDescription(ListaDocDir[i].accessRights));
                 }
                 Session["ListaDocDir"] = this.ListaDocDir;
                 Session["Dg_visibilita"] = this.dS_Visibilit1.Tables[0];

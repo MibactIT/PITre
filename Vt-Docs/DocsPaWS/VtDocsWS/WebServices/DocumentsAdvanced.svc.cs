@@ -107,33 +107,7 @@ namespace VtDocsWS.WebServices
             bool response = Manager.DocumentsAdvancedManager.BachecaCircolarePubblicata(request);
 
             logger.Info("END");
-
-            return response;
-        }
-
-        public Services.DocumentsAdvanced.NuovaFattura.NuovaFatturaResponse NuovaFatturaAttiva(Services.DocumentsAdvanced.NuovaFattura.NuovaFatturaRequest request)
-        {
-            logger.Info("BEGIN");
-
-            Services.DocumentsAdvanced.NuovaFattura.NuovaFatturaResponse response = VtDocsWS.Manager.DocumentsAdvancedManager.NuovaFatturaAttiva(request);
-
-            logger.Info("END");
-
-            Utils.CheckFaultException(response);
-
-            return response;
-        }
-
-        public Services.DocumentsAdvanced.CaricaLottoInPi3.CaricaLottoInPi3Response NuovoLottoAttivo(Services.DocumentsAdvanced.CaricaLottoInPi3.CaricaLottoInPi3Request request)
-        {
-            logger.Info("BEGIN");
-
-            Services.DocumentsAdvanced.CaricaLottoInPi3.CaricaLottoInPi3Response response = VtDocsWS.Manager.DocumentsAdvancedManager.NuovoLottoAttivo(request);
-
-            logger.Info("END");
-
-            Utils.CheckFaultException(response);
-
+                        
             return response;
         }
     }

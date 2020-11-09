@@ -596,8 +596,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                 policy.periodicita = "O";
                 policy.dataEsecuzione = this.lbl_cal_once.Text;
             }
-            policy.ente = this.txt_custom_ente.Text;
-            policy.struttura = this.txt_custom_struttura.Text;
 
             policy.idGruppoRuoloResp = this.id_corr_resp.Value;
 
@@ -677,10 +675,6 @@ namespace DocsPAWA.AdminTool.Gestione_Conservazione
                     this.lbl_dataStampaDa.Text = policy.dataStampaDa;
                 if (!string.IsNullOrEmpty(policy.dataStampaA))
                     this.lbl_dataStampaA.Text = policy.dataStampaA;
-
-                // ENTE E STRUTTURA
-                this.txt_custom_ente.Text = policy.ente;
-                this.txt_custom_struttura.Text = policy.struttura;
 
                 // PERIODICITA'
                 switch (policy.periodicita)

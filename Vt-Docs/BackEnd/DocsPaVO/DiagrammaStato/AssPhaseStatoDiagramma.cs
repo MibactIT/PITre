@@ -12,6 +12,8 @@ namespace DocsPaVO.DiagrammaStato.AvanzamentoDiagramma
 
         public string POSITION_PHASE;
         public bool INTERMEDIATE_PHASE;
+
+        public string ID_TIPO_DOC;
  
     }
 }

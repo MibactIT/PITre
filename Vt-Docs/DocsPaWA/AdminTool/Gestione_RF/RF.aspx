@@ -145,24 +145,10 @@
             // Apertura della rubrica
             var res = r.Apri();
         }
-        function AvvisoPresenzaProcessiFirmaEmail() {
-            if (window.confirm('Attenzione! Sono presenti processi di firma in cui la casella di posta è coinvolta. Se si decide di proseguire verranno invalidati i processi coinvolti. Procedere?')) {
-                Form1.hd_ReturnValueProcessiFirmaRegistroRF.value = 'true';
-                Form1.submit();
-            }
-        }
-        function AvvisoPresenzaProcessiFirmaRegistro() {
-            if (window.confirm('Attenzione! Sono presenti processi di firma in cui il registro è coinvolto. Se si decide di proseguire verranno invalidati i processi coinvolti. Procedere?')) {
-                Form1.hd_ReturnValueProcessiFirmaRegistroRF.value = 'true';
-                Form1.submit();
-            }
-        }
         </script>
 </head>
 <body bottommargin="0" leftmargin="0" topmargin="0" rightmargin="0" onunload="ClosePopUp()">
     <form id="Form1" method="post" runat="server">
-        <input id="hd_ReturnValueProcessiFirmaRegistroRF" type="hidden" name="hd_ReturnValueProcessiFirmaRegistroRF" runat="server">
-        <input id="hd_ReturnValueProcessiFirmaRegistro" type="hidden" name="hd_ReturnValueProcessiFirmaRegistro" runat="server">
     <asp:ScriptManager ID="scrManager" runat="server">
     </asp:ScriptManager>
     <uct:AppTitleProvider ID="appTitleProvider" runat="server" PageName="AMMINISTRAZIONE > Raggruppamenti funzionali" />
@@ -313,7 +299,7 @@
                                                                     Descrizione *&nbsp;
                                                                 </td>
                                                                 <td>
-                                                                    <asp:TextBox ID="txt_descrizione" runat="server" CssClass="testo" Width="250px" MaxLength="128"></asp:TextBox>
+                                                                    <asp:TextBox ID="txt_descrizione" runat="server" CssClass="testo" Width="250px" MaxLength="500"></asp:TextBox>
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -435,24 +421,6 @@
                                                                                             <asp:ListItem Value="B">Breve</asp:ListItem>
                                                                                             <asp:ListItem Value="S">Sintetica</asp:ListItem>
                                                                                         </asp:DropDownList>
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <td class="testo_grigio_scuro" align="left" colspan="2">
-                                                                                        <div id="contMess">
-                                                                                            <div id="message" style="margin-bottom:-10px; float:left">
-                                                                                            <asp:Label ID="lblMessUscita" Text="Messaggio posta in uscita" runat="server"></asp:Label>
-                                                                                                </div>
-                                                                                            <div id="txtBox">
-                                                                                            <asp:TextBox ID="txt_msg_posta_in_uscita" runat="server" CssClass="testo" Width="200px"
-                                                                                                MaxLength="2000" TextMode="MultiLine"></asp:TextBox>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </td>
-                                                                                    <td class="testo_grigio_scuro" align="left" width="40%" colspan="1">
-                                                                                        <div id="contCbxMess" style="margin-bottom:15px;"">
-                                                                                            <asp:CheckBox ID="cbx_sovrascrivi_messaggio" runat="server" CssClass="testo" Width="3"></asp:CheckBox>&nbsp;Sovrascrivi messaggio di amministrazione&nbsp;&nbsp;&nbsp;
-                                                                                        </div>
                                                                                     </td>
                                                                                 </tr>
                                                                             </table>
@@ -593,8 +561,8 @@
                                                                     </asp:Button>&nbsp;&nbsp;&nbsp;
                                                                     <asp:Button ID="btn_test" runat="server" CssClass="testo_btn" Text="Test Connessione"
                                                                         Visible="False"></asp:Button>&#160;&#160;
-                                                                    <asp:Button ID="btn_SbloccaCasella" runat="server" CssClass="testo_btn" Visible="false" Text="Sblocca casella">
-                                                                        </asp:Button>&#160;&#160;
+                                                                     <asp:Button ID="btn_SbloccaCasella" runat="server" CssClass="testo_btn" Text="Sblocca casella" Visible="false">
+                                                                    </asp:Button>&nbsp;&nbsp;&nbsp;
                                                                     <asp:Button ID="btn_aggiungi" runat="server" CssClass="testo_btn" Text="Aggiungi">
                                                                     </asp:Button>&nbsp;
                                                                 </td>

@@ -60,11 +60,6 @@ namespace DocsPaVO.rubrica
 
 
         public bool isRubricaComune;
-
-        /// <summary>
-        /// se true l'utente è di disabilitato e di Rubrica Comune(inserito perchè per i corr di RC storicizzati "isRubricaComune" è false)
-        /// </summary>
-        public bool isDisbledAndRC;
         /// <summary>
         /// Mantiene le informazioni di rubrica comune qualora
         /// il corrispondente sia proveniente da rubrica comune

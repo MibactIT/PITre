@@ -36,7 +36,12 @@ namespace DocsPaDB.Query_DocsPAWS
            
             string queryString = q.getSQL();
             logger.Debug(queryString);
-            this.ExecuteQuery(out ds, "RUOLI", queryString);
+
+            using (DBProvider dbProvider = new DBProvider())
+            {
+                dbProvider.ExecuteQuery(out ds, "RUOLI", queryString);
+            }
+            
         }
     }
 }

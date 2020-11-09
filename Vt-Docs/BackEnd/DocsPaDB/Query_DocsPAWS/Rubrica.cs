@@ -961,11 +961,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         qc.calltype == DocsPaVO.rubrica.ParametriRicercaRubrica.CallType.CALLTYPE_CORR_EST_CON_DISABILITATI
                         )
                     {
-                        if(qc.doRubricaComune)
-                            qry += "(" + DocsPaDbManagement.Functions.Functions.getNVL("a.cha_tipo_corr", "'X'") + " != 'C' OR (" + DocsPaDbManagement.Functions.Functions.getNVL("a.cha_tipo_corr", "'X'") + " = 'C' AND DTA_FINE IS NOT NULL))" + "AND ( (a.id_amm=" + _user.idAmministrazione + ") OR a.id_amm is null) AND ";
-                        else
-                            qry += DocsPaDbManagement.Functions.Functions.getNVL("a.cha_tipo_corr", "'X'") + " != 'C' AND ( (a.id_amm=" + _user.idAmministrazione + ") OR a.id_amm is null) AND ";
-
+                        qry += "(" + DocsPaDbManagement.Functions.Functions.getNVL("a.cha_tipo_corr", "'X'") + " != 'C' OR (" + DocsPaDbManagement.Functions.Functions.getNVL("a.cha_tipo_corr", "'X'") + " = 'C' AND DTA_FINE IS NOT NULL))" + "AND ( (a.id_amm=" + _user.idAmministrazione + ") OR a.id_amm is null) AND ";
                     }
                     else
                     {
@@ -1048,7 +1044,6 @@ namespace DocsPaDB.Query_DocsPAWS
                     //                    if (qc.doUo || qc.doRuoli || qc.doUtenti || qc.doListe || qc.doRF)
                     if (qc.doUo || qc.doRuoli || qc.doUtenti || qc.doRF)
                     {
-                        qry += "(";
                         qry += "a.cha_tipo_urp in (";
                         if (qc.doUo)
                             qry += "'U',";
@@ -1067,15 +1062,9 @@ namespace DocsPaDB.Query_DocsPAWS
 
                         if (qry.EndsWith(","))
                             qry = qry.Substring(0, qry.Length - 1) + ")";
-                        qry += " OR " + DocsPaDbManagement.Functions.Functions.getNVL("a.cha_tipo_corr", "'X'") + " = 'C' )";
-                    }
-                    else if (qc.doRubricaComune)
-                    {
-                        qry += DocsPaDbManagement.Functions.Functions.getNVL("a.cha_tipo_corr", "'X'") + " = 'C' ";
                     }
                     else
                     {
-
                         if (!qc.doListe)
                         {
                             //Laura 22 Febbraio 2013
@@ -1365,7 +1354,7 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //Laura 25 Febbraio 2013
                                 " " +
                                 "a.var_desc_corr, " +
-                                "(CASE WHEN a.cha_tipo_ie = 'I' THEN 1 ELSE 0 END) AS interno, (CASE WHEN NVL(a.cha_tipo_corr,'X') = 'C' THEN 1 ELSE 0 END) AS isRubricaComune, a.cha_tipo_urp, a.system_id, " + userDb + "getcodreg (a.id_registro) cod_reg_rf, a.id_registro, a.CHA_DISABLED_TRASM, a.DTA_FINE, a.VAR_NOME, a.VAR_COGNOME, dett.var_cod_fisc as VAR_COD_FISC, dett.var_cod_pi as VAR_COD_PI,a.ID_PEOPLE, a.ID_PEOPLE_LISTE, a.ID_GRUPPO_LISTE " + rn +
+                                "(CASE WHEN a.cha_tipo_ie = 'I' THEN 1 ELSE 0 END) AS interno, a.cha_tipo_urp, a.system_id, " + userDb + "getcodreg (a.id_registro) cod_reg_rf, a.id_registro, a.CHA_DISABLED_TRASM, a.DTA_FINE, a.VAR_NOME, a.VAR_COGNOME, dett.var_cod_fisc as VAR_COD_FISC, dett.var_cod_pi as VAR_COD_PI,a.ID_PEOPLE, a.ID_PEOPLE_LISTE, a.ID_GRUPPO_LISTE " + rn +
                                 "FROM dpa_corr_globali a LEFT JOIN dpa_dett_globali dett ON dett.id_corr_globali = a.system_id " +
                                 "LEFT JOIN DPA_T_CANALE_CORR ON a.system_id = DPA_T_CANALE_CORR.ID_CORR_GLOBALE " +
                                 "LEFT JOIN DOCUMENTTYPES ON DPA_T_CANALE_CORR.ID_DOCUMENTTYPE = DOCUMENTTYPES.SYSTEM_ID " +
@@ -1457,7 +1446,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             qry += " SELECT a.var_cod_rubrica, DOCUMENTTYPES.DESCRIPTION AS canale, " +
                                 " " +
                                 "a.var_desc_corr, " +
-                                "(CASE WHEN a.cha_tipo_ie = 'I' THEN 1 ELSE 0 END) AS interno, (CASE WHEN NVL(a.cha_tipo_corr,'X') = 'C' THEN 1 ELSE 0 END) AS isRubricaComune, a.cha_tipo_urp, a.system_id , " + userDb + "getcodreg (a.id_registro) cod_reg_rf, a.id_registro, a.CHA_DISABLED_TRASM, a.DTA_FINE, a.VAR_NOME, a.VAR_COGNOME, dett.var_cod_fisc as VAR_COD_FISC, dett.var_cod_pi as VAR_COD_PI, a.ID_PEOPLE, a.ID_PEOPLE_LISTE, a.ID_GRUPPO_LISTE, ROWNUM RN " +
+                                "(CASE WHEN a.cha_tipo_ie = 'I' THEN 1 ELSE 0 END) AS interno, a.cha_tipo_urp, a.system_id , " + userDb + "getcodreg (a.id_registro) cod_reg_rf, a.id_registro, a.CHA_DISABLED_TRASM, a.DTA_FINE, a.VAR_NOME, a.VAR_COGNOME, dett.var_cod_fisc as VAR_COD_FISC, dett.var_cod_pi as VAR_COD_PI, a.ID_PEOPLE, a.ID_PEOPLE_LISTE, a.ID_GRUPPO_LISTE, ROWNUM RN " +
                                 "FROM dpa_corr_globali a LEFT JOIN dpa_dett_globali dett ON dett.id_corr_globali = a.system_id " +
                                 "LEFT JOIN DPA_T_CANALE_CORR ON a.system_id = DPA_T_CANALE_CORR.ID_CORR_GLOBALE " +
                                 "LEFT JOIN DOCUMENTTYPES ON DPA_T_CANALE_CORR.ID_DOCUMENTTYPE = DOCUMENTTYPES.SYSTEM_ID " +
@@ -1574,12 +1563,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         q.setParam("orderby", orderby);
                     }
                     else
-                    {
-                        if (qc.calltype == DocsPaVO.rubrica.ParametriRicercaRubrica.CallType.CALLTYPE_RICERCA_TRASM_SOTTOPOSTO)
-                            qry += " order by cha_tipo_urp desc, var_desc_corr, system_id";
-                        else
-                            qry += " order by cha_tipo_urp desc, var_desc_corr";
-                    }
+                        qry += " order by cha_tipo_urp desc, var_desc_corr";
 
                     q.setParam("param1", qry);
 
@@ -1649,7 +1633,6 @@ namespace DocsPaDB.Query_DocsPAWS
                             er.disabled = true;
                         }
                     }
-                    er.isDisbledAndRC = (Convert.ToDecimal(dr["isRubricaComune"]) == 1 && er.disabled);
                     //************************
                     //IACOZZILLI GIORDANO:
                     //FINE
@@ -1954,11 +1937,8 @@ namespace DocsPaDB.Query_DocsPAWS
                 string query = string.Empty;
                 if (dbType.ToUpper() == "SQL")
                 {
-                   
-                    query = "SELECT "+ DocsPaDbManagement.Functions.Functions.GetDbUserSession() + ".get_hierarchy(" + _user.idAmministrazione + ", '" + codice.Replace("'", "''") + "', '" + cha_tipo_ie + "','" + string.Empty + "' ) AS GERARCHIA ";
-                    
+                    query = "SELECT " + DocsPaDbManagement.Functions.Functions.GetDbUserSession() + ".get_hierarchy(" + _user.idAmministrazione + ", '" + codice.Replace("'", "''") + "', '" + cha_tipo_ie + "','" + string.Empty + "' ) AS GERARCHIA ";
                 }
-
                 else
                     query = "SELECT get_hierarchy(" + _user.idAmministrazione + ", '" + codice.Replace("'", "''") + "', '" + cha_tipo_ie + "','" + string.Empty + "' ) AS GERARCHIA FROM DUAL ";
                 DataSet ds = new DataSet();

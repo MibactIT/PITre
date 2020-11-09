@@ -24,5 +24,11 @@ namespace VtDocsWS.Services
         [OperationContract]
         VtDocsWS.Services.Proceedings.SetReadNotifications.SetReadNotificationsResponse SetReadNotifications(VtDocsWS.Services.Proceedings.SetReadNotifications.SetReadNotificationsRequest request);
 
+        [OperationContract]
+        VtDocsWS.Services.Proceedings.GetAOO.GetAOOResponse GetAOO(VtDocsWS.Services.Proceedings.GetAOO.GetAOORequest request);
+
+        [OperationContract]
+        VtDocsWS.Services.Proceedings.GetTipologies.GetTipologiesResponse GetTipologies(VtDocsWS.Services.Proceedings.GetTipologies.GetTipologiesRequest request);
+
     }
 }

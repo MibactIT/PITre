@@ -88,7 +88,14 @@ namespace BusinessLogic.FormatiDocumento
                     DocumentModelsManager.RemoveFileTypeDocumentModel(fileType.IdAmministrazione, fileType.FileExtension);
 
                 // 3. reperimento formati predefiniti
-                SupportedFileType[] defaultFileTypes = GetDefaultFileTypes();
+                string idAmmRiferimento = string.Empty;
+                //Se esiste la chiave di seguito prendo i formati dell'amministrazione di default
+                string valoreChiave = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ID_AMM_DEFAULT");
+                if (!string.IsNullOrEmpty(valoreChiave) && !valoreChiave.ToString().Equals("0"))
+                {
+                    idAmmRiferimento = valoreChiave;
+                }
+                SupportedFileType[] defaultFileTypes = GetDefaultFileTypes(idAmmRiferimento);
 
                 using (DBProvider provider = new DBProvider())
                 {
@@ -155,7 +162,7 @@ namespace BusinessLogic.FormatiDocumento
         /// Reperimento dei tipi di file predefiniti
         /// </summary>
         /// <returns></returns>
-        public static SupportedFileType[] GetDefaultFileTypes()
+        public static SupportedFileType[] GetDefaultFileTypes(string idAmmRiferimento)
         {
             // Verifica se la funzionalità di gestione formati file è abilitata o meno
             CheckServiceEnabled();
@@ -165,6 +172,7 @@ namespace BusinessLogic.FormatiDocumento
 
             // Reperimento tipi documento per l'amministrazione
             DocsPaUtils.Query queryDef = DocsPaUtils.InitQuery.getInstance().getQuery("S_GET_DEFAULT_SUPPORTED_FILE_TYPES");
+            queryDef.setParam("param1", (!string.IsNullOrEmpty(idAmmRiferimento) ? " SF.ID_AMMINISTRAZIONE=" + idAmmRiferimento : " SF.ID_AMMINISTRAZIONE is null"));
 
             string commandText = queryDef.getSQL();
             logger.Debug(commandText);

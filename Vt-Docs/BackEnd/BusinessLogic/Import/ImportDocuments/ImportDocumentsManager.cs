@@ -328,7 +328,7 @@ namespace BusinessLogic.Import.ImportDocuments
                         ftpUsername,
                         ftpPassword,
                         isEnabledPregressi,
-                        AcquireFileFromModel, true);
+                        AcquireFileFromModel);
                     break;
             }
 

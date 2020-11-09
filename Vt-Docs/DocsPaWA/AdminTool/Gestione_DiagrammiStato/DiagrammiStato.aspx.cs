@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -9,7 +8,6 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using System.Linq;
 
 namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 {
@@ -23,7 +21,9 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 		protected System.Web.UI.WebControls.Panel Panel_ListaDiagrammi;
 		protected System.Web.UI.WebControls.Panel Panel_GestioneStati;
 		protected System.Web.UI.WebControls.Panel Panel_ListaPassi;
-		protected System.Web.UI.WebControls.Button btn_addStato;
+        protected System.Web.UI.WebControls.Panel pnlStatoAutomatico;
+        protected System.Web.UI.WebControls.Panel pnlAutomatismi;
+        protected System.Web.UI.WebControls.Button btn_addStato;
 		protected System.Web.UI.WebControls.Button btn_delStato;
 		protected System.Web.UI.WebControls.DropDownList ddl_stati;
 		protected System.Web.UI.WebControls.ListBox lbox_stati1;
@@ -45,13 +45,12 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 		protected System.Web.UI.WebControls.Button btn_modPasso;
         protected System.Web.UI.WebControls.Button btn_vis;
 		protected System.Web.UI.WebControls.Label lbl_titolo;
-		private string idAmministrazione;
+        private string idAmministrazione;
 		protected System.Web.UI.WebControls.DataGrid dg_listaDiagrammi;
 		protected System.Web.UI.HtmlControls.HtmlGenericControl DivGgListaDiagrammi;
 		protected System.Web.UI.WebControls.Label lbl_statoAuto;
 		protected System.Web.UI.WebControls.DropDownList ddl_statiAutomatici;
-        protected System.Web.UI.WebControls.DropDownList ddl_statiAutomaticiProcessoFirma;
-        protected System.Web.UI.WebControls.Panel PnlStatoAutoProcesso;
+        protected System.Web.UI.WebControls.Button btn_cambioStatoAutomatico;
         private ArrayList listaDiagrammi;
 			
 		private void Page_Load(object sender, System.EventArgs e)
@@ -87,6 +86,7 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 						
 			if(!IsPostBack)
 			{
+                this.InitializePage();
 				Panel_ListaDiagrammi.Visible = true;
 				Panel_GestioneStati.Visible = false;
 				Panel_ListaPassi.Visible = false;
@@ -112,6 +112,20 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
                 Session.Remove("statoModificatoSalvato");
             }
 		}
+
+        protected void InitializePage()
+        {
+            if (!string.IsNullOrEmpty(utils.InitConfigurationKeys.GetValue("0", "BE_ENABLE_PORTALE_PROCEDIMENTI")) && utils.InitConfigurationKeys.GetValue("0", "BE_ENABLE_PORTALE_PROCEDIMENTI") == "1")
+            {
+                this.pnlStatoAutomatico.Visible = false;
+                this.pnlAutomatismi.Visible = true;
+            }
+            else
+            {
+                this.pnlStatoAutomatico.Visible = true;
+                this.pnlAutomatismi.Visible = false;
+            }
+        }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
@@ -147,7 +161,9 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			this.btn_moveStato2.Click += new System.EventHandler(this.btn_moveStato2_Click);
 			this.btn_addStep.Click += new System.EventHandler(this.btn_addStep_Click);
 			this.btn_modPasso.Click += new System.EventHandler(this.btn_modPasso_Click);
-			this.Load += new System.EventHandler(this.Page_Load);
+            this.btn_cambioStatoAutomatico.Click += new System.EventHandler(this.btn_cambioStatoAutomatico_Click);
+
+            this.Load += new System.EventHandler(this.Page_Load);
 
 		}
 		#endregion
@@ -299,33 +315,7 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			}
 		}
 
-        private void setDdlStatiAutomaticiProcessoFirma(DocsPAWA.DocsPaWR.Passo step)
-        {
-            PnlStatoAutoProcesso.Visible = false;
-
-            DocsPAWA.DocsPaWR.DiagrammaStato diagramma = (DocsPAWA.DocsPaWR.DiagrammaStato)Session["DiagrammaStato"];
-            string idProcessoFirma = (from s in diagramma.STATI
-                                        where s.DESCRIZIONE.Equals(ddl_stati.SelectedItem.Text)
-                                        select s.ID_PROCESSO_FIRMA).FirstOrDefault();
-            if (!string.IsNullOrEmpty(idProcessoFirma))
-            {
-                PnlStatoAutoProcesso.Visible = true;
-                if (!string.IsNullOrEmpty(step.ID_STATO_AUTOMATICO_LF))
-                {
-                    DocsPAWA.DocsPaWR.Stato statoAutomaticoLf = (from s in diagramma.STATI
-                                                                 where s.SYSTEM_ID.ToString().Equals(step.ID_STATO_AUTOMATICO_LF)
-                                                                 select s).FirstOrDefault();
-                    string descrizioneStatoLf = statoAutomaticoLf.DESCRIZIONE;
-                    for (int i = 0; i < ddl_statiAutomaticiProcessoFirma.Items.Count; i++)
-                    {
-                        if (descrizioneStatoLf == ddl_statiAutomaticiProcessoFirma.Items[i].Text)
-                            ddl_statiAutomaticiProcessoFirma.SelectedIndex = i;
-                    }
-                }
-            }
-        }
-
-        private void setDllStati(DocsPAWA.DocsPaWR.Stato st)
+		private void setDllStati(DocsPAWA.DocsPaWR.Stato st)
 		{
 			for(int i=0; i<ddl_stati.Items.Count; i++)
 			{
@@ -374,18 +364,14 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 		{
 			lbox_stati2.Items.Clear();
 			ddl_statiAutomatici.Items.Clear();
-            ddl_statiAutomaticiProcessoFirma.Items.Clear();
 			if(successivi != null)
 			{
 				ddl_statiAutomatici.Items.Add("");
-                ddl_statiAutomaticiProcessoFirma.Items.Add("");
 				for(int i=0; i<successivi.Length; i++)
 				{				
 					lbox_stati2.Items.Add( ((DocsPAWA.DocsPaWR.Stato) successivi[i]).DESCRIZIONE);
 					ddl_statiAutomatici.Items.Add( ((DocsPAWA.DocsPaWR.Stato) successivi[i]).DESCRIZIONE);
-                    ddl_statiAutomaticiProcessoFirma.Items.Add(((DocsPAWA.DocsPaWR.Stato)successivi[i]).DESCRIZIONE);
-
-                }
+				}
 			}
 		}
 
@@ -480,97 +466,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
             return false;
         }
 
-        private bool controllaStatiEProcessiFirma(DocsPaWR.DiagrammaStato diagramma, out string msg)
-        {
-            bool result = false;
-            msg = string.Empty;
-            //Controllo che non ci sia un solo processo di firma associato al diagramma di stato
-            if ((from s in diagramma.STATI where !string.IsNullOrEmpty(s.ID_PROCESSO_FIRMA) select s).ToList().Count > 1)
-            {
-                msg = "Attenzione, non è possibile associare più di un processo di firma all'interno di un diagramma";
-                result = true;
-                return result;
-            }
-            for (int i = 0; i < diagramma.STATI.Length; i++)
-            {
-                DocsPaWR.Stato st = (DocsPaWR.Stato)diagramma.STATI[i];
-                if(!string.IsNullOrEmpty(st.ID_PROCESSO_FIRMA))
-                {
-                    if (st.STATO_FINALE)
-                    {
-                        msg = "Attenzione, non è possibile associare un processo di firma ad uno stato finale";
-                        result = true;
-                        break;
-                    }
-
-                    //Controllo che lo stato con processo non sia stato automatico per qualche passo
-                    if ((from p in diagramma.PASSI where p.ID_STATO_AUTOMATICO != null &&
-                         p.ID_STATO_AUTOMATICO.Equals(st.SYSTEM_ID.ToString()) select p).FirstOrDefault() != null)
-                    {
-                        msg = "Attenzione, non è possibile associare un processo di firma ad uno stato automatico";
-                        result = true;
-                        break;
-                    }
-
-                    //Controllo stati precedenti, un passo con processo di firma non può essere preceduto da uno di consolidamento
-                    DocsPaWR.Stato statoSel = (from s1 in diagramma.STATI where s1.SYSTEM_ID.Equals(st.SYSTEM_ID) select s1).FirstOrDefault();
-                    if (!statoSel.STATO_CONSOLIDAMENTO.Equals(DocsPaWR.DocumentConsolidationStateEnum.None))
-                    {
-                        msg = "Attenzione, un stato con avvio processo di firma non può essere uno stato con consolidamento.";
-                        return true;
-                        break;
-                    }
-                    Session.Add("StatiPrecendenti", new List<string>());
-                    if (ControllaEsistenzaStatoPrecedenteConCosolidamento(st, diagramma))
-                    {
-                        msg = "Attenzione, un stato con avvio processo di firma non può segure uno di consolidamento.";
-                        result = true;
-                        break;
-                    }
-                }
-            }
-            return result;
-        }
-
-        public bool ControllaPresensaStato(DocsPaWR.Stato[] successivi, DocsPaWR.Stato stato)
-        {
-            bool result = true;
-
-            result = (from s in successivi where s.SYSTEM_ID.Equals(stato.SYSTEM_ID) select s).FirstOrDefault() != null;
-
-            return result;
-        }
-
-        public bool ControllaEsistenzaStatoPrecedenteConCosolidamento(DocsPaWR.Stato stato, DocsPaWR.DiagrammaStato diagramma)
-        {
-            bool result = false;
-            (Session["StatiPrecendenti"] as List<string>).Add(stato.SYSTEM_ID.ToString());
-            
-            //Estraggo tutti gli stati per cui lo stato in input è il successivo e controllo che non contenga il consolidamento
-            DocsPaWR.Stato[] statoPrec = (from p in diagramma.PASSI where ControllaPresensaStato(p.SUCCESSIVI, stato)
-                                          select p.STATO_PADRE).ToArray();
-            foreach (DocsPaWR.Stato s in statoPrec)
-            {
-                if (!(Session["StatiPrecendenti"] as List<string>).Contains(s.SYSTEM_ID.ToString()))
-                {
-                    DocsPaWR.Stato statoSel = (from s1 in diagramma.STATI where s1.SYSTEM_ID.Equals(s.SYSTEM_ID) select s1).FirstOrDefault();
-                    if (!statoSel.STATO_CONSOLIDAMENTO.Equals(DocsPaWR.DocumentConsolidationStateEnum.None))
-                    {
-                        return true;
-                    }
-                    else if (!statoSel.STATO_INIZIALE)
-                    {
-                        if (ControllaEsistenzaStatoPrecedenteConCosolidamento(statoSel, diagramma))
-                        {
-                            result = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            return result;
-        }
-
         private void caricaDdlStati()
         {
             if (Session["DiagrammaStato"] != null)
@@ -639,7 +534,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 				lbox_stati1.Items.Clear();
 				lbox_stati2.Items.Clear();
 				ddl_statiAutomatici.Items.Clear();
-                ddl_statiAutomaticiProcessoFirma.Items.Clear();
 			}
 
 			//Imposta le label che indicano istantaneamente quali sono gli stati iniziali e finali
@@ -653,11 +547,8 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 
 		private void btn_moveStato1_Click(object sender, System.EventArgs e)
 		{
-            if (ddl_statiAutomatici.Items.Count == 0 || ddl_statiAutomatici.Items[0].Text != "")
-            {
-                ddl_statiAutomatici.Items.Add("");
-                ddl_statiAutomaticiProcessoFirma.Items.Add("");
-            }
+			if(ddl_statiAutomatici.Items.Count == 0 || ddl_statiAutomatici.Items[0].Text != "")
+				ddl_statiAutomatici.Items.Add("");
 
 
 			for(int i=0; i<lbox_stati1.Items.Count; i++)
@@ -666,8 +557,7 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 				{
 					lbox_stati2.Items.Add(lbox_stati1.Items[i]);
 					ddl_statiAutomatici.Items.Add(lbox_stati1.Items[i]);
-                    ddl_statiAutomaticiProcessoFirma.Items.Add(lbox_stati1.Items[i]);
-                }
+				}
 			}
 			
 			for(int i=0; i<lbox_stati1.Items.Count; i++)
@@ -698,7 +588,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 				{
 					lbox_stati2.Items.RemoveAt(i);
 					ddl_statiAutomatici.Items.RemoveAt(i+1);
-                    ddl_statiAutomaticiProcessoFirma.Items.RemoveAt(i+1);
 					i--;
 				}
 			}
@@ -736,7 +625,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			btn_addStep.Visible = true;
 			btn_salva.Visible = true;
 			ddl_statiAutomatici.Items.Clear();
-            ddl_statiAutomaticiProcessoFirma.Items.Clear();
 			SetFocus(txt_descrizione);			
 		}
 
@@ -758,8 +646,7 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			DocsPaWR.Passo step	= new DocsPAWA.DocsPaWR.Passo();
 			st_1.DESCRIZIONE = ddl_stati.SelectedItem.Text;
 			step.STATO_PADRE = st_1;
-            DocsPAWA.DocsPaWR.DiagrammaStato diagramma = (DocsPAWA.DocsPaWR.DiagrammaStato)Session["DiagrammaStato"];
-            if (ddl_statiAutomatici.SelectedItem.Text != "")
+			if(ddl_statiAutomatici.SelectedItem.Text != "")
 			{
 				step.DESCRIZIONE_STATO_AUTOMATICO = ddl_statiAutomatici.SelectedItem.Text;	
 			}
@@ -768,18 +655,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 				step.DESCRIZIONE_STATO_AUTOMATICO = "";
 				step.ID_STATO_AUTOMATICO = "";
 			}
-            if (ddl_statiAutomaticiProcessoFirma.SelectedItem.Text != "")
-            {
-                string idStatoAutomaticoSel = (from s in diagramma.STATI
-                                               where s.DESCRIZIONE.Equals(ddl_statiAutomaticiProcessoFirma.SelectedItem.Text)
-                                               select s.SYSTEM_ID.ToString()).FirstOrDefault();
-
-                step.ID_STATO_AUTOMATICO_LF = idStatoAutomaticoSel;
-            }
-            else
-            {
-                step.ID_STATO_AUTOMATICO_LF = string.Empty;
-            }
 
 			ArrayList successivi = new ArrayList();
 			for(int i=0; i<lbox_stati2.Items.Count; i++)
@@ -796,17 +671,8 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			
 			lbox_stati1.Items.Clear();
 			lbox_stati2.Items.Clear();
-
-            ddl_stati.SelectedIndex = -1;
-            PnlStatoAutoProcesso.Visible = false;
-            string idProcessoFirma = (from s in diagramma.STATI
-                                      where s.DESCRIZIONE.Equals(ddl_stati.SelectedItem.Text)
-                                      select s.ID_PROCESSO_FIRMA).FirstOrDefault();
-            if (!string.IsNullOrEmpty(idProcessoFirma))
-                PnlStatoAutoProcesso.Visible = true;
-
-            ddl_statiAutomatici.Items.Clear();
-            ddl_statiAutomaticiProcessoFirma.Items.Clear();
+			ddl_stati.SelectedIndex = -1;
+			ddl_statiAutomatici.Items.Clear();
 
 			caricaDgListaPassi();
 			dg_listaPassi.Columns[2].Visible = true;
@@ -857,9 +723,7 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			DocsPaWR.Stato st_1 = new DocsPAWA.DocsPaWR.Stato();
 			st_1.DESCRIZIONE = ddl_stati.SelectedItem.Text;
 			newStep.STATO_PADRE = st_1;
-
-            DocsPAWA.DocsPaWR.DiagrammaStato diagramma = (DocsPAWA.DocsPaWR.DiagrammaStato)Session["DiagrammaStato"];
-            if (ddl_statiAutomatici.SelectedItem.Text != "")
+			if(ddl_statiAutomatici.SelectedItem.Text != "")
 			{
 				newStep.DESCRIZIONE_STATO_AUTOMATICO = ddl_statiAutomatici.SelectedItem.Text;	
 			}
@@ -868,18 +732,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 				newStep.DESCRIZIONE_STATO_AUTOMATICO = "";
 				newStep.ID_STATO_AUTOMATICO = "";
 			}
-            if (ddl_statiAutomaticiProcessoFirma.SelectedItem.Text != "")
-            {
-                string idStatoAutomaticoSel = (from s in diagramma.STATI
-                                                            where s.DESCRIZIONE.Equals(ddl_statiAutomaticiProcessoFirma.SelectedItem.Text)
-                                                            select s.SYSTEM_ID.ToString()).FirstOrDefault();
-
-                newStep.ID_STATO_AUTOMATICO_LF = idStatoAutomaticoSel;
-            }
-            else
-            {
-                newStep.ID_STATO_AUTOMATICO_LF = string.Empty;
-            }
 
 			ArrayList successivi = new ArrayList();
 			for(int i=0; i<lbox_stati2.Items.Count; i++)
@@ -905,20 +757,14 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			lbox_stati1.Items.Clear();
 			lbox_stati2.Items.Clear();
 			ddl_statiAutomatici.Items.Clear();
-            ddl_statiAutomaticiProcessoFirma.Items.Clear();
 			ddl_stati.SelectedIndex = -1;
 
-            PnlStatoAutoProcesso.Visible = false;
-            string idProcessoFirma = (from s in diagramma.STATI
-                                      where s.DESCRIZIONE.Equals(ddl_stati.SelectedItem.Text)
-                                      select s.ID_PROCESSO_FIRMA).FirstOrDefault();
-            if (!string.IsNullOrEmpty(idProcessoFirma))
-                PnlStatoAutoProcesso.Visible = true;
-            //Imposta le label che indicano istantaneamente quali sono gli stati iniziali e finali
-            //del diagramma che si sta costruendo, avvalendosi delle funzioni:
-            //"trovaStatoIniziale" - "trovaStatoFinale"
 
-            settaStatiFinali(trovaStatiFinali());
+			//Imposta le label che indicano istantaneamente quali sono gli stati iniziali e finali
+			//del diagramma che si sta costruendo, avvalendosi delle funzioni:
+			//"trovaStatoIniziale" - "trovaStatoFinale"
+			
+			settaStatiFinali(trovaStatiFinali());
 		}
 
 		private void btn_salva_Click(object sender, System.EventArgs e)
@@ -949,12 +795,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
                 //RegisterStartupScript("passi", "<script>alert('Stati INIZIALI e stati FINALI non possono coincidere !');</script>");
                 ClientScript.RegisterStartupScript(this.GetType(), "statiInizialiFinali", "<script>alert('Stati INIZIALI e stati FINALI non possono coincidere !');</script>");
                 return;						
-            }
-            string msg = string.Empty;
-            if (controllaStatiEProcessiFirma((DocsPAWA.DocsPaWR.DiagrammaStato)Session["DiagrammaStato"], out msg))
-            {
-                ClientScript.RegisterStartupScript(this.GetType(), "statiInizialiFinali", "<script>alert('" + msg.Replace("'", "\\'") + "');</script>");
-                return;
             }
 
 			//Verifico se è da effettuare una modifica di diagramma o un salvatagggio di un nuovo diagramma
@@ -1023,6 +863,34 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 
 		}
 
+        private void btn_cambioStatoAutomatico_Click(object sender, System.EventArgs e)
+        {
+            if (Session["DiagrammaStato"] != null)
+            {
+                DocsPaWR.DiagrammaStato dg = (DocsPAWA.DocsPaWR.DiagrammaStato)Session["DiagrammaStato"];
+                
+                foreach (DocsPAWA.DocsPaWR.Stato st in dg.STATI)
+                {
+                    if ((st.SYSTEM_ID.ToString() == ddl_stati.SelectedValue) || (st.DESCRIZIONE == ddl_stati.SelectedItem.Text))
+                    {
+                        Session.Add("statoPerAutomatismi", st);
+                        if (Session["statiSuccessiviAutomatismi"] != null)
+                            Session.Remove("statiSuccessiviAutomatismi");
+
+                        foreach (DocsPaWR.Passo step in dg.PASSI)
+                        {
+                            if(step.STATO_PADRE.SYSTEM_ID == st.SYSTEM_ID)
+                            {
+                                Session.Add("statiSuccessiviAutomatismi", step.SUCCESSIVI);
+                                break;
+                            }
+                        }
+                        ClientScript.RegisterStartupScript(this.GetType(), "gestioneAutomatismi", "ApriPopupGestioneAutomatismi();", true);
+                    }
+                }
+            }
+        }
+
         private void ddl_stati_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             lbox_stati1.Items.Clear();
@@ -1030,23 +898,7 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
             ddl_statiAutomatici.Items.Clear();
             ddl_statiAutomatici.Items.Add("");
 
-            ddl_statiAutomaticiProcessoFirma.Items.Clear();
-            ddl_statiAutomaticiProcessoFirma.Items.Add("");
-
             int elSelezionato = ddl_stati.SelectedIndex;
-
-            DocsPAWA.DocsPaWR.DiagrammaStato diagramma = (DocsPAWA.DocsPaWR.DiagrammaStato)Session["DiagrammaStato"];
-            DocsPAWA.DocsPaWR.Stato statoSelezionato = (from s in diagramma.STATI where s.DESCRIZIONE.Equals(ddl_stati.SelectedItem.Text)
-                                                        select s).FirstOrDefault();
-            if(!string.IsNullOrEmpty(statoSelezionato.ID_PROCESSO_FIRMA))
-            {
-                PnlStatoAutoProcesso.Visible = true;
-            }
-            else
-            {
-                PnlStatoAutoProcesso.Visible = false;
-            }
-
             for (int i = 0; i < ddl_stati.Items.Count; i++)
             {
                 if (i != elSelezionato)
@@ -1165,9 +1017,7 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			setLbxStati1(step.STATO_PADRE,step.SUCCESSIVI);		
 			setLbxStati2(step.SUCCESSIVI);
 			setDdlStatiAutomatici(step);
-            setDdlStatiAutomaticiProcessoFirma(step);
-
-        }
+		}
 		#endregion
 
 		#region DataGrid ListaDiagrammi
@@ -1208,7 +1058,6 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
 			lbox_stati1.Items.Clear();
 			lbox_stati2.Items.Clear();
 			ddl_statiAutomatici.Items.Clear();
-            ddl_statiAutomaticiProcessoFirma.Items.Clear();
             /*
             ddl_stati.Items.Clear();
 			for(int i=0; i<dg.STATI.Length; i++)
@@ -1242,6 +1091,22 @@ namespace DocsPAWA.AdminTool.Gestione_DiagrammiStato
                 Session.Add("DiagrammaStato", dg);
                 string s = "<SCRIPT language='javascript'>ApriPopupVisibilita(); </SCRIPT>";
                 RegisterStartupScript("popupVis", s);
+            }
+            else if(e.CommandName.ToUpper().Equals("FASI"))
+            {
+                int elSelezionato = (dg_listaDiagrammi.CurrentPageIndex * dg_listaDiagrammi.PageSize) + e.Item.ItemIndex;
+                DocsPaWR.DiagrammaStato dg = (DocsPAWA.DocsPaWR.DiagrammaStato)listaDiagrammi[elSelezionato];
+                Session.Add("DiagrammaStato", dg);
+                string s = "<SCRIPT language='javascript'>ApriPopupAssFasi(); </SCRIPT>";
+                RegisterStartupScript("popupAssFasi", s);
+            }
+            else if(e.CommandName.ToUpper().Equals("SCADENZE"))
+            {
+                int elSelezionato = (dg_listaDiagrammi.CurrentPageIndex * dg_listaDiagrammi.PageSize) + e.Item.ItemIndex;
+                DocsPaWR.DiagrammaStato dg = (DocsPAWA.DocsPaWR.DiagrammaStato)listaDiagrammi[elSelezionato];
+                Session.Add("DiagrammaStato", dg);
+                string s = "<SCRIPT language='javascript'>ApriPopupStatiScadenze(); </SCRIPT>";
+                RegisterStartupScript("popupStatiScadenze", s);
             }
         }
 

@@ -70,16 +70,7 @@
 		        <td>
 		            <asp:CheckBox ID="cb_statoNonRicercabile" runat="server" />
 		        </td>
-		    </tr>
-            <asp:Panel ID="PnlProcessiFirma" runat="server" Visible ="false">
-                <tr>
-                    <td class="testo_grigio_scuro">Processo firma</td>
-                    <td>
-                        <asp:DropDownList ID="DdlProcessoFirma" runat="server" CssClass="testo" Width="97%">
-                        </asp:DropDownList>
-                    </td>
-                </tr>
-            </asp:Panel>
+		    </tr>   
 		</table>
     </form>
 </body>

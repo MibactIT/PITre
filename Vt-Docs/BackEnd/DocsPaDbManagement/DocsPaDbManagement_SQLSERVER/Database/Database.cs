@@ -162,9 +162,13 @@ namespace DocsPaDbManagement.Database.SqlServer
 		/// </summary>
 		public Database()
 		{
-			string connectionString = ConfigurationManager.AppSettings["connectionString"];
+            string connectionString = string.Empty;
+            if (ConfigurationManager.AppSettings["connectionString"] != null)
+                connectionString = ConfigurationManager.AppSettings["connectionString"].ToString();
+            if (string.IsNullOrEmpty(connectionString))  // altrimenti verifico che sia passata come sezione del webconfig
+                connectionString = ConfigurationManager.ConnectionStrings["DBconnection"].ToString();
 
-            if (TransactionContext.HasTransactionalContext)
+            if (TransactionContext.HasTransactionalContext && ((SqlTransactionContext)TransactionContext.Current) != null && ((SqlTransactionContext)TransactionContext.Current).GetCurrentTransaction() != null)
                 AcquireTransaction(((SqlTransactionContext)TransactionContext.Current).GetCurrentTransaction());
             else
                 InstantiateConnection(connectionString);
@@ -175,7 +179,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 		/// </summary>
 		public Database(string dbConnectionString)
         {
-            if (TransactionContext.HasTransactionalContext)
+            if (TransactionContext.HasTransactionalContext && ((SqlTransactionContext)TransactionContext.Current) != null && ((SqlTransactionContext)TransactionContext.Current).GetCurrentTransaction() != null)
                 AcquireTransaction(((SqlTransactionContext)TransactionContext.Current).GetCurrentTransaction());
             else
                 InstantiateConnection(dbConnectionString);
@@ -198,7 +202,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 			{
 				// Impossibile instanziare una connessione
 				this.LastException = exception.ToString();
-				logger.Debug("Errore durante la connessione al DB.", exception);
+				logger.Error("Errore durante la connessione al DB.", exception);
 			}
 		}
 		#endregion
@@ -342,7 +346,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 				result = false;
 				dataSet = null;
 				this.LastException = exception.ToString();
-				logger.Debug("Errore SQL: " + command, exception);
+				logger.Error("Errore SQL: " + command, exception);
 			}
 			finally
 			{
@@ -379,14 +383,70 @@ namespace DocsPaDbManagement.Database.SqlServer
 			return result;
 		}
 
-		/// <summary>
-		/// Esegue una query sul database aggiungendo una tabella ad un DataSet esistente.
-		/// </summary>
-		/// <param name="dataSet">Oggetto DataSet sul quale aggiungere una tabella.</param>
-		/// <param name="command">Query da eseguire sul database.</param>
-		/// <param name="tableName">Nome della tabella da creare nel DataSet</param>
-		/// <returns>true = OK; false = Errore durante l'esecuzione della query o il popolamento del DataSet</returns>
-		public bool ExecuteQuery(DataSet dataSet, string tableName, string command)
+        public bool ExecuteQueryNewConn(out DataSet dataSet, string tableName, string command)
+        {
+            bool result = true; // Presume successo
+            DocsPaCommand docsPaCommand = null;
+            DocsPaDataAdapter docsPaDataAdapter = null;
+            dataSet = new DataSet();
+
+            //Esegui il comando
+            try
+            {
+                OpenConnection();
+
+                docsPaCommand = new DocsPaCommand(command, conn, transaction);
+                docsPaDataAdapter = new DocsPaDataAdapter();
+                docsPaDataAdapter.SelectCommand = docsPaCommand;
+
+                if (System.Configuration.ConfigurationManager.AppSettings["sqlCommandTimeOut"] != null)
+                {
+                    docsPaCommand.CommandTimeout = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["sqlCommandTimeOut"]);
+                }
+#if TRACE_DB
+				DocsPaUtils.LogsManagement.PerformaceTracer pt = new DocsPaUtils.LogsManagement.PerformaceTracer("TRACE_DB");
+#endif
+                docsPaDataAdapter.Fill(dataSet, tableName);
+#if TRACE_DB
+				pt.WriteLogTracer(command);
+#endif
+
+            }
+            catch (Exception exception)
+            {
+                result = false;
+                this.LastException = exception.ToString();
+                logger.Debug("Errore SQL: " + command, exception);
+            }
+            finally
+            {
+                if (docsPaCommand != null)
+                {
+                    docsPaCommand.Dispose();
+                }
+                if (docsPaDataAdapter != null)
+                {
+                    docsPaDataAdapter.Dispose();
+                }
+
+                // Non chiudere la connessione se si è all'interno di una transazione
+                if (!TransactionExists)
+                {
+                    CloseConnection();
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Esegue una query sul database aggiungendo una tabella ad un DataSet esistente.
+        /// </summary>
+        /// <param name="dataSet">Oggetto DataSet sul quale aggiungere una tabella.</param>
+        /// <param name="command">Query da eseguire sul database.</param>
+        /// <param name="tableName">Nome della tabella da creare nel DataSet</param>
+        /// <returns>true = OK; false = Errore durante l'esecuzione della query o il popolamento del DataSet</returns>
+        public bool ExecuteQuery(DataSet dataSet, string tableName, string command)
 		{
 			bool result = true; // Presume successo
 
@@ -416,7 +476,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 			{				
 				result = false;
 				this.LastException = exception.ToString();
-				logger.Debug("Errore SQL: " + command, exception);
+				logger.Error("Errore SQL: " + command, exception);
 			}
 			finally
 			{
@@ -470,7 +530,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 				result = false;
 				dataSet = null;
 				this.LastException = exception.ToString();
-				logger.Debug("Errore durante il paging lato server.", exception);
+				logger.Error("Errore durante il paging lato server.", exception);
 			}
 			finally
 			{
@@ -522,7 +582,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 			{
 				result = -1;
 				this.LastException = exception.ToString();
-				logger.Debug("Errore SQL: " + command, exception);
+				logger.Error("Errore SQL: " + command, exception);
 			}
 			finally
 			{
@@ -683,7 +743,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 			{
 				result = false;
 				this.LastException = exception.ToString();
-				logger.Debug("Errore SQL: " + command, exception);
+				logger.Error("Errore SQL: " + command, exception);
 			}
 			finally
 			{
@@ -737,7 +797,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 			{
 				result = false;
 				this.LastException = exception.ToString();
-				logger.Debug("Errore SQL: " + command, exception);
+				logger.Error("Errore SQL: " + command, exception);
 			}
 			finally
 			{
@@ -796,7 +856,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 				result = false;
 				RollbackTransaction();
 				this.LastException = exception.ToString();
-				logger.Debug("Errore SQL: " + command, exception);
+				logger.Error("Errore SQL: " + command, exception);
 			}
 			
 			return result;
@@ -851,7 +911,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 				result = false;
 				RollbackTransaction();
 				this.LastException = exception.ToString();
-				logger.Debug("Errore SQL: " + command, exception);
+				logger.Error("Errore SQL: " + command, exception);
 			}
 			finally
 			{
@@ -1215,7 +1275,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 			}
 			catch(Exception ex)
 			{
-                logger.Debug(ex.Message);
+                logger.Error(ex.Message);
 
 				return null;
 			}
@@ -1236,9 +1296,36 @@ namespace DocsPaDbManagement.Database.SqlServer
 			{
                 if (TransactionContext.HasTransactionalContext)
                 {
-                    // Se esiste un contesto transazionale, viene fatto l'acquire
-                    // della transaction
-                    this.AcquireTransaction((SqlTransaction)((SqlTransactionContext)TransactionContext.Current).GetCurrentTransaction());
+                    if (((SqlTransactionContext)TransactionContext.Current) != null && ((SqlTransactionContext)TransactionContext.Current).GetCurrentTransaction() != null)
+                        AcquireTransaction(((SqlTransactionContext)TransactionContext.Current).GetCurrentTransaction());
+                    else
+                    {
+                        string connectionString = string.Empty;
+                        if (ConfigurationManager.AppSettings["connectionString"] != null)
+                            connectionString = ConfigurationManager.AppSettings["connectionString"].ToString();
+                        if (string.IsNullOrEmpty(connectionString)) // altrimenti verifico che sia passata come sezione del webconfig
+                            connectionString = ConfigurationManager.ConnectionStrings["DBconnection"].ToString();
+
+                        InstantiateConnection(connectionString);
+                        if (conn.State != ConnectionState.Open)
+                        {
+                            try
+                            {
+                                conn.Open();
+                            }
+                            catch (Exception exception)
+                            {
+                                // Impossibilie aprire la connesione
+                                result = false;
+                                this.LastException = exception.ToString();
+                                logger.Error("ERRORE: impossibile aprire la connessione con il DataBase, controllare i parametri inseriti nella stringa di connessione." + exception);
+                            }
+                        }
+                    }
+
+                    
+
+                    //this.AcquireTransaction((SqlTransaction)((SqlTransactionContext)TransactionContext.Current).GetCurrentTransaction());
                 }
                 else
                 {
@@ -1316,7 +1403,7 @@ namespace DocsPaDbManagement.Database.SqlServer
 				// Impossibile acquisire una transazione
 				result = false;
 				this.LastException = exception.ToString();
-				logger.Debug("Errore nell'acquisizione della transazione SQL.", exception);
+				logger.Error("Errore nell'acquisizione della transazione SQL.", exception);
 			}
 
 			return result;
@@ -1435,7 +1522,7 @@ namespace DocsPaDbManagement.Database.SqlServer
             }
             catch (Exception ex)
             {
-                logger.Debug(String.Format("Errore nella query della SP \"{0}\" ({1})", sp_name, ex.Message));
+                logger.Error(String.Format("Errore nella query della SP \"{0}\" ({1})", sp_name, ex.Message));
                 return null;
             }
 

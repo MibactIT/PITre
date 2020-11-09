@@ -141,13 +141,13 @@ namespace BusinessLogic.Stampe
                             throw new Exception(String.Format("Errore assegnazione visiblità al ruolo {0}", r.codice));
                 }
 
+                /* 11/02/19 Conservazione */
                 // Invio in conservazione
                 Conservazione.ConservazioneManager cons = new Conservazione.ConservazioneManager();
                 if (cons.GetStatoAttivazione(userInfo.idAmministrazione) && this.IsStampaRepDaConservare(counterId))
                 {
                     this.InviaInConservazione(docNumber, userInfo.idAmministrazione);
                 }
-
                 // Completamento transazione
                 transactionContext.Complete();
 
@@ -652,6 +652,7 @@ namespace BusinessLogic.Stampe
             return retVal;
         }
 
+        /* 11/02/19 Conservazione */
         private void InviaInConservazione(string idProfile, string idAmm)
         {
             try
@@ -672,7 +673,7 @@ namespace BusinessLogic.Stampe
             try
             {
                 DocsPaVO.ProfilazioneDinamica.OggettoCustom ogg = BusinessLogic.ProfilazioneDinamica.ProfilazioneDocumenti.getOggettoById(idContatore);
-                if(ogg != null)
+                if (ogg != null)
                 {
                     if (!string.IsNullOrEmpty(ogg.CONS_REPERTORIO) && ogg.CONS_REPERTORIO == "1")
                         result = true;
@@ -680,7 +681,7 @@ namespace BusinessLogic.Stampe
                         result = false;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(ex.Message);
                 result = true;

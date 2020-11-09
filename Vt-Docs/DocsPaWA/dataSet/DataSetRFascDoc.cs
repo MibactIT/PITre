@@ -1,6 +1,8 @@
-﻿namespace DocsPAWA.dataSet {
-    
-    
-    public partial class DataSetRFascDoc {
+﻿namespace DocsPAWA.dataSet
+{
+
+
+    public partial class DataSetRFascDoc
+    {
     }
 }

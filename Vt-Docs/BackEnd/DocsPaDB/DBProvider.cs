@@ -74,7 +74,12 @@ namespace DocsPaDB
 			return databaseProvider.ExecuteQuery(out dataSet, tableName, command);
 		}
 
-		public bool ExecuteQuery(DataSet dataSet, string command)
+        public bool ExecuteQueryNewConn(out DataSet dataSet, string tableName, string command)
+        {
+            return databaseProvider.ExecuteQueryNewConn(out dataSet, tableName, command);
+        }
+
+        public bool ExecuteQuery(DataSet dataSet, string command)
 		{
 			return databaseProvider.ExecuteQuery(dataSet, command);
 		}

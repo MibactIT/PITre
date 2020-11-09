@@ -404,7 +404,7 @@
                             <tr>
                                 <td colspan="2">
                                     <asp:CheckBox runat="server" ID="chk_doc_digitali" CssClass="testo_chk" Text="includi solo documenti digitali" />&nbsp;
-                                    <asp:CheckBox runat="server" ID="chk_fatture" CssClass="testo_chk" Text="escludi fatture e lotti di fatture" Checked="true" />
+                                    <asp:CheckBox runat="server" ID="chk_fatture" CssClass="testo_chk" Text="escludi fatture e lotti di fatture"  Checked="true" />
                                 </td>
                             </tr>
                             <!-- FORMATO -->
@@ -419,17 +419,6 @@
                                             <asp:Label id="lbl_documents_format" runat="server"></asp:Label>
                                         </div>
                                     </div>
-                                </td>
-                            </tr>
-                            <!-- DIMENSIONI -->
-                            <tr>
-                                <td class="legend">File di grandi dimensioni</td>
-                                <td>
-                                    <asp:RadioButtonList ID="rbl_bigFiles" runat="server" TextAlign="Right" CssClass="testo_grigio" RepeatDirection="Horizontal">
-                                        <asp:ListItem Value="0" Text="Nessun filtro" runat="server" Selected="True"></asp:ListItem>
-                                        <asp:ListItem Value="1" Text="Escludi big files" runat="server"></asp:ListItem>
-                                        <asp:ListItem Value="2" Text="Includi solo big files" runat="server"></asp:ListItem>
-                                    </asp:RadioButtonList>
                                 </td>
                             </tr>
                             <!-- FIRMA -->
@@ -517,7 +506,7 @@
                             </tr>
                             <!-- DATA FIRMA DIGITALE -->
                             <tr>
-                                <td class="legend">Data firma in P.I.Tre.</td>
+                                <td class="legend">Data firma</td>
                                 <td>
                                     <asp:Label ID="lblDaysSign" runat="server" CssClass="testo_grigio">Numero giorni</asp:Label>
                                     <asp:TextBox runat="server" CssClass="testo_grigio" ID="txt_days_sign" MaxLength="4" Width="10%"></asp:TextBox>
@@ -528,27 +517,6 @@
                 </div>
                     </ContentTemplate>
                 </asp:UpdatePanel>
-                <asp:Panel ID="PanelStructure" runat="server">
-                    <div class="contenitore_box_due">
-                        <fieldset>
-                            <legend>Configurazione custom SACER</legend>
-                            <table class="tabInput">
-                                <tr>
-                                    <td class="legend">Ente</td>
-                                    <td>
-                                        <asp:TextBox ID="txt_custom_ente" runat="server" Width="60%" CssClass="testo_grigio" MaxLength="64"></asp:TextBox>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="legend">Struttura</td>
-                                    <td>
-                                        <asp:TextBox ID="txt_custom_struttura" runat="server" Width="60%" CssClass="testo_grigio" MaxLength="64"></asp:TextBox>
-                                    </td>
-                                </tr>
-                            </table>
-                        </fieldset>
-                    </div>
-                </asp:Panel>
                 <asp:UpdatePanel ID="UpdatePanelPeriodicity" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
                         <div class="contenitore_box_due">

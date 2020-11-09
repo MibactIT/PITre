@@ -81,7 +81,7 @@ namespace BusinessLogic.Interoperabilità
 
                 if (!(DST != null && DST != ""))
                 {
-                    ut = BusinessLogic.Utenti.Login.loginMethod(login, out lr, true, "127.0.0.1", out  ipAddress);
+                    ut = BusinessLogic.Utenti.Login.loginMethod(login, out lr, true, "127.0.0.1", out ipAddress);
                 }
                 else
                 {
@@ -167,8 +167,8 @@ namespace BusinessLogic.Interoperabilità
                         result = BusinessLogic.Interoperabilità.InteroperabilitaSegnatura.eseguiSegnaturaNoMail(infoUtente, infoutenteInterOp.urlWA, reg, infoutenteInterOp, ruolo, schedaDocumento, out err, out dia, string.Empty, corr);
 
                         //result = BusinessLogic.Interoperabilità.InteroperabilitaSegnatura.eseguiSegnaturaNoMail(infoUtente, infoutenteInterOp.urlWA, reg, infoutenteInterOp, ruolo, schedaDocumento, out err, out dia, string.Empty);
-                        
-                        
+
+
                         //
                         //OLD CODE:
                         //  result = BusinessLogic.Interoperabilità.InteroperabilitaSegnatura.eseguiSegnaturaNoMail(infoutenteInterOp.urlWA, reg, infoutenteInterOp, ruolo, schedaDocumento, out err, out dia, string.Empty);
@@ -197,15 +197,6 @@ namespace BusinessLogic.Interoperabilità
                             return false;
                         }
 
-
-
-
-
-
-
-
-
-
                     }
                     if (ut != null)
                     {
@@ -231,7 +222,7 @@ namespace BusinessLogic.Interoperabilità
                             //OLD CODE:
                             //  result = BusinessLogic.Interoperabilità.InteroperabilitaSegnatura.eseguiSegnaturaNoMail(infoutenteInterOp.urlWA, reg, infoutenteInterOp, ruolo, schedaDocumento, out err, out dia, string.Empty);
                             //*****************************************************************************************************//
-           
+
                             //effettuo la trasmissione dei documenti creati su registro automatico
                             // Trasmissioni.
                         }
@@ -673,8 +664,8 @@ namespace BusinessLogic.Interoperabilità
                 //}
                 else
                 {
-                   
-                    SendDocumentResponse.SendDocumentMailResponse retmail =SendDocumentMail(schedaDocumento, registroMittente, mailAddress, listDestinatari, infoUtente, confermaRicezione);
+
+                    SendDocumentResponse.SendDocumentMailResponse retmail = SendDocumentMail(schedaDocumento, registroMittente, mailAddress, listDestinatari, infoUtente, confermaRicezione);
                     retValue.SendDocumentMailResponseList.Add(retmail);
                     // PEC 4 - requisito 5 - storico spedizioni
                     //string esito = "";
@@ -688,12 +679,12 @@ namespace BusinessLogic.Interoperabilità
                     //}
                     //DocsPaDB.Query_DocsPAWS.Interoperabilita interop = new DocsPaDB.Query_DocsPAWS.Interoperabilita();
                     //interop.InsertInStoricoSpedizioni(schedaDocumento.systemId, corr.systemId, esito, mailAddress);
-            
+
 
                     //retValue.SendDocumentMailResponseList.Add(SendDocumentMail(schedaDocumento, registroMittente, mailAddress, listDestinatari, infoUtente, confermaRicezione));
                 }
             }
-            
+
             return retValue;
         }
 
@@ -733,10 +724,10 @@ namespace BusinessLogic.Interoperabilità
                 List<Corrispondente> corrs = new List<Corrispondente>();
                 foreach (DocsPaVO.Spedizione.DestinatarioEsterno c in recs)
                     corrs.AddRange(c.DatiDestinatari);
-               
-                InsertStatoInvioDestinatari(schedaDocumento, corrs, mailResponse);                
+
+                InsertStatoInvioDestinatari(schedaDocumento, corrs, mailResponse);
             }
-            
+
             return retValue;
         }
 
@@ -847,7 +838,7 @@ namespace BusinessLogic.Interoperabilità
                 return null;
 
             DocsPaDB.Query_DocsPAWS.Interoperabilita obj = new DocsPaDB.Query_DocsPAWS.Interoperabilita();
-            DocsPaVO.amministrazione.CasellaRegistro [] caselle =  BusinessLogic.Amministrazione.RegistroManager.GetMailRegistro(registroMittente.systemId);
+            DocsPaVO.amministrazione.CasellaRegistro[] caselle = BusinessLogic.Amministrazione.RegistroManager.GetMailRegistro(registroMittente.systemId);
             if (!string.IsNullOrEmpty(registroMittente.email))
             {
                 foreach (DocsPaVO.amministrazione.CasellaRegistro c in caselle)
@@ -886,7 +877,7 @@ namespace BusinessLogic.Interoperabilità
             //cancellazione della directory
             try
             {
-                DocsPaUtils.Functions.Functions.CancellaDirectory(pathAttatchments);
+                DocsPaUtils.Functions.Functions.CancellaDirectory(pathAttatchments, schedaDocumento.registro.codRegistro);
             }
             catch { }
 
@@ -915,76 +906,76 @@ namespace BusinessLogic.Interoperabilità
                 }
                 else
                     if (destintario.tipoIE == "E")
+                {
+                    // Destinatario esterno
+                    canalePref = destintario.canalePref;
+                }
+                else if (destintario.tipoIE == "I")
+                {
+                    // Destinatario interno
+
+                    if (destintario.GetType() == typeof(DocsPaVO.utente.Ruolo))
                     {
-                        // Destinatario esterno
-                        canalePref = destintario.canalePref;
+                        // Se Ruolo prende il canale preferenziale dell'UO
+                        canalePref = ((DocsPaVO.utente.Ruolo)destintario).uo.canalePref;
                     }
-                    else if (destintario.tipoIE == "I")
+                    else if (destintario.GetType() == typeof(DocsPaVO.utente.UnitaOrganizzativa))
                     {
-                        // Destinatario interno
+                        canalePref = ((DocsPaVO.utente.UnitaOrganizzativa)destintario).canalePref;
+                    }
+                    else
+                    {
+                        // Se utente, cerca il ruolo preferito (se non c'è, prende il primo della lista),
+                        // quindi prende il canale preferenziale dell'UO di tale utente
+                        DocsPaVO.utente.Utente utente = (DocsPaVO.utente.Utente)destintario;
 
-                        if (destintario.GetType() == typeof(DocsPaVO.utente.Ruolo))
-                        {
-                            // Se Ruolo prende il canale preferenziale dell'UO
-                            canalePref = ((DocsPaVO.utente.Ruolo)destintario).uo.canalePref;
-                        }
-                        else if (destintario.GetType() == typeof(DocsPaVO.utente.UnitaOrganizzativa))
-                        {
-                            canalePref = ((DocsPaVO.utente.UnitaOrganizzativa)destintario).canalePref;
-                        }
+                        DocsPaVO.utente.Ruolo[] ruoliUtente = null;
+
+                        // Cerca il ruolo preferito (se non c'è, prende il primo ruolo disponibile)
+                        if (utente.ruoli == null || (utente.ruoli != null && utente.ruoli.Count == 0))
+                            ruoliUtente = (DocsPaVO.utente.Ruolo[])BusinessLogic.Utenti.UserManager.getRuoliUtente(utente.idPeople).ToArray(typeof(DocsPaVO.utente.Ruolo));
                         else
+                            ruoliUtente = (DocsPaVO.utente.Ruolo[])utente.ruoli.ToArray(typeof(DocsPaVO.utente.Ruolo));
+
+                        if (ruoliUtente != null && ruoliUtente.Length > 0)
                         {
-                            // Se utente, cerca il ruolo preferito (se non c'è, prende il primo della lista),
-                            // quindi prende il canale preferenziale dell'UO di tale utente
-                            DocsPaVO.utente.Utente utente = (DocsPaVO.utente.Utente)destintario;
+                            DocsPaVO.utente.Ruolo ruoloPreferito = ruoliUtente.Where(e => e.selezionato).FirstOrDefault();
 
-                            DocsPaVO.utente.Ruolo[] ruoliUtente = null;
+                            if (ruoloPreferito == null)
+                                // Ruolo preferito non disponibile, reperimento del primo ruolo della lista
+                                ruoloPreferito = ruoliUtente[0];
 
-                            // Cerca il ruolo preferito (se non c'è, prende il primo ruolo disponibile)
-                            if (utente.ruoli == null || (utente.ruoli != null && utente.ruoli.Count == 0))
-                                ruoliUtente = (DocsPaVO.utente.Ruolo[])BusinessLogic.Utenti.UserManager.getRuoliUtente(utente.idPeople).ToArray(typeof(DocsPaVO.utente.Ruolo));
-                            else
-                                ruoliUtente = (DocsPaVO.utente.Ruolo[])utente.ruoli.ToArray(typeof(DocsPaVO.utente.Ruolo));
-
-                            if (ruoliUtente != null && ruoliUtente.Length > 0)
+                            if (ruoloPreferito != null)
                             {
-                                DocsPaVO.utente.Ruolo ruoloPreferito = ruoliUtente.Where(e => e.selezionato).FirstOrDefault();
-
-                                if (ruoloPreferito == null)
-                                    // Ruolo preferito non disponibile, reperimento del primo ruolo della lista
-                                    ruoloPreferito = ruoliUtente[0];
-
-                                if (ruoloPreferito != null)
+                                if (ruoloPreferito.uo == null)
+                                    logger.Debug("GetCanalePreferenzialeDestinatario - UO non definita per il ruolo preferito");
+                                else
                                 {
-                                    if (ruoloPreferito.uo == null)
-                                        logger.Debug("GetCanalePreferenzialeDestinatario - UO non definita per il ruolo preferito");
+                                    if (ruoloPreferito.uo != null && ruoloPreferito.uo.canalePref == null)
+                                    {
+                                        // Reperimento del canale associato all'UO del Ruolo
+                                        using (DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione())
+                                            canalePref = amm.GetDatiCanPref(ruoloPreferito.uo);
+                                    }
                                     else
                                     {
-                                        if (ruoloPreferito.uo != null && ruoloPreferito.uo.canalePref == null)
-                                        {
-                                            // Reperimento del canale associato all'UO del Ruolo
-                                            using (DocsPaDB.Query_DocsPAWS.Amministrazione amm = new DocsPaDB.Query_DocsPAWS.Amministrazione())
-                                                canalePref = amm.GetDatiCanPref(ruoloPreferito.uo);
-                                        }
-                                        else
-                                        {
-                                            // Reperimento del canale associato all'UO del Ruolo
-                                            canalePref = ruoloPreferito.uo.canalePref;
-                                        }
+                                        // Reperimento del canale associato all'UO del Ruolo
+                                        canalePref = ruoloPreferito.uo.canalePref;
                                     }
                                 }
                             }
                         }
-                        //modifica
-                        if (canalePref == null &&
-                            destintario.tipoIE.Contains('I'))
-                        {
-                            canalePref = new DocsPaVO.utente.Canale();
-                            canalePref.tipoCanale = "INTEROPERABILITA";
-                            canalePref.descrizione = "INTEROPERABILITA";
-                        }
-                        //fine modifica
                     }
+                    //modifica
+                    if (canalePref == null &&
+                        destintario.tipoIE.Contains('I'))
+                    {
+                        canalePref = new DocsPaVO.utente.Canale();
+                        canalePref.tipoCanale = "INTEROPERABILITA";
+                        canalePref.descrizione = "INTEROPERABILITA";
+                    }
+                    //fine modifica
+                }
             }
             catch (Exception ex)
             {
@@ -1029,6 +1020,8 @@ namespace BusinessLogic.Interoperabilità
                                             Dictionary<string, string> CoppiaNomeFileENomeOriginale,
                                             bool confermaRicevuta)
         {
+            bool proseguiInvio = true;
+
             SendDocumentResponse.SendDocumentMailResponse singleResponse = new DocsPaVO.Interoperabilita.SendDocumentResponse.SendDocumentMailResponse();
             singleResponse.SendSucceded = true;
             singleResponse.Destinatari.AddRange(listDestinatari);
@@ -1053,8 +1046,8 @@ namespace BusinessLogic.Interoperabilità
             }
             else
             {
-                if (canalePref.descrizione.Equals("INTEROPERABILITA"))
-                    creaSegnatura(mittente, schedaDocumento.registro, registroMittente, schedaDocumento, mailAddress, listDestinatari, pathFiles,CoppiaNomeFileENomeOriginale ,confermaRicevuta);
+                if (canalePref.descrizione.Equals("INTEROPERABILITA")) //ABBATANGELI - MiBACT - Interrompo invio se non riesce a creare segnatura.xml
+                    proseguiInvio = creaSegnatura(mittente, schedaDocumento.registro, registroMittente, schedaDocumento, mailAddress, listDestinatari, pathFiles, CoppiaNomeFileENomeOriginale, confermaRicevuta);
 
                 //creazione ed invio mail
                 string porta = null;
@@ -1063,7 +1056,7 @@ namespace BusinessLogic.Interoperabilità
                     porta = casellaMittente.PortaSMTP.ToString();
 
                 string smtp_user = (!string.IsNullOrEmpty(casellaMittente.UserSMTP)) ? casellaMittente.UserSMTP : null;
-                string smtp_pwd = (!string.IsNullOrEmpty(casellaMittente.PwdSMTP)) ?  casellaMittente.PwdSMTP : null;
+                string smtp_pwd = (!string.IsNullOrEmpty(casellaMittente.PwdSMTP)) ? casellaMittente.PwdSMTP : null;
 
                 string ricevutaPec = string.Empty;
                 ricevutaPec = (!string.IsNullOrEmpty(casellaMittente.RicevutaPEC)) ? casellaMittente.RicevutaPEC : null;
@@ -1121,8 +1114,11 @@ namespace BusinessLogic.Interoperabilità
 
                 try
                 {
+                    if (!proseguiInvio)
+                        throw new Exception("Impossibile creare il file segnatura!");
+
                     if (!string.IsNullOrEmpty(DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ENABLE_PORTALE_PROCEDIMENTI")) &&
-                        !DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ENABLE_PORTALE_PROCEDIMENTI").Equals("0") && 
+                        !DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ENABLE_PORTALE_PROCEDIMENTI").Equals("0") &&
                         canalePref.descrizione.Equals("PORTALE"))
                         creaMailNotificaPortale(schedaDocumento,
                             casellaMittente.ServerSMTP,
@@ -1149,9 +1145,7 @@ namespace BusinessLogic.Interoperabilità
                             casellaMittente.SmtpSSL.ToString(),
                             casellaMittente.PopSSL.ToString(),
                             casellaMittente.SmtpSta.ToString(),
-                            X_TipoRicevuta,
-                            casellaMittente.MessageSendMail,
-                            casellaMittente.OverwriteMessageAmm
+                            X_TipoRicevuta
                             );
                 }
                 catch (Exception ex)
@@ -1171,7 +1165,7 @@ namespace BusinessLogic.Interoperabilità
 
 
         private static string ExtractDocumentFilesToPath(DocsPaVO.documento.SchedaDocumento schedaDocumento,
-                                                         DocsPaVO.utente.InfoUtente infoUtente, 
+                                                         DocsPaVO.utente.InfoUtente infoUtente,
                                                         out Dictionary<string, string> CoppiaNomeFileENomeOriginale)
         {
             string pathFiles = string.Empty;
@@ -1199,7 +1193,7 @@ namespace BusinessLogic.Interoperabilità
 
             logger.Debug("Estrazione dei file da inviare");
 
-            
+
             if (!estrazioneFiles(infoUtente, schedaDocumento, pathFiles, out CoppiaNomeFileENomeOriginale))
             {
                 DocsPaUtils.Functions.Functions.CancellaDirectory(pathFiles);
@@ -1225,7 +1219,7 @@ namespace BusinessLogic.Interoperabilità
         /// <param name="logger"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
-        private static bool estrazioneFiles(DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.documento.SchedaDocumento schedaDoc, string path, out Dictionary<string,string> CoppiaNomeFileENomeOriginale)
+        private static bool estrazioneFiles(DocsPaVO.utente.InfoUtente infoUtente, DocsPaVO.documento.SchedaDocumento schedaDoc, string path, out Dictionary<string, string> CoppiaNomeFileENomeOriginale)
         {
             System.IO.FileStream fs = null;
             System.IO.FileStream fsAll = null;
@@ -1233,6 +1227,12 @@ namespace BusinessLogic.Interoperabilità
             byte[] content = null;
             DocsPaDocumentale.Documentale.DocumentManager documentManager = new DocsPaDocumentale.Documentale.DocumentManager(infoUtente);
             string docPrincipaleName = "";
+            string docPrincipaleAlternativeName = (schedaDoc.protocollo != null ? schedaDoc.protocollo.segnatura : "");
+
+            string regexSearch = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+            Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+            docPrincipaleAlternativeName = r.Replace(docPrincipaleAlternativeName, "-");
+
             try
             {
                 //estrazione documento principale
@@ -1251,6 +1251,7 @@ namespace BusinessLogic.Interoperabilità
                         parts = doc.fileName.Split(dot);
                         suffix = parts[parts.Length - 1];
                         docPrincipaleName = "Documento_principale." + suffix;
+                        docPrincipaleAlternativeName = docPrincipaleAlternativeName + "." + suffix;
                     }
                     else
                     {
@@ -1268,6 +1269,7 @@ namespace BusinessLogic.Interoperabilità
                         suffix = parts[parts.Length - cont - 1] + suffix;
                         appodocPrincipaleName = appodocPrincipaleName.Substring(appodocPrincipaleName.ToUpper().LastIndexOf(suffix.ToUpper()));
                         docPrincipaleName = "Documento_principale." + appodocPrincipaleName;
+                        docPrincipaleAlternativeName = docPrincipaleAlternativeName + "." + appodocPrincipaleName;
                     }
                     //fine modifica
                     fs = new System.IO.FileStream(path + "\\" + docPrincipaleName, System.IO.FileMode.Create);
@@ -1285,8 +1287,12 @@ namespace BusinessLogic.Interoperabilità
                     else
                         NomeOriginale = fd.nomeOriginale;
 
-                    CoppiaNomeFileENomeOriginale.Add(String.Format ( path + "\\" + docPrincipaleName).ToLowerInvariant(), NomeOriginale);
-                    //content =documentManager.GetFile(doc.docNumber, doc.version, doc.versionId, doc.versionLabel);
+                    //ABBATANGELI - Rinomina file richiesta da MIBACT -- ORA DISATTIVATA
+                    CoppiaNomeFileENomeOriginale.Add(String.Format(path + "\\" + docPrincipaleName).ToLowerInvariant(), NomeOriginale);
+                    //if (schedaDoc.protocollo != null)
+                    //{
+                    //    CoppiaNomeFileENomeOriginale.Add(String.Format(path + "\\" + docPrincipaleName).ToLowerInvariant(), docPrincipaleAlternativeName);
+                    //}
 
                     if (content == null)
                     {
@@ -1307,11 +1313,11 @@ namespace BusinessLogic.Interoperabilità
                 }
                 if (fs != null)
                     fs.Close();
-                
+
                 //gestione TSR
                 if (content != null)
                 {
-                    DocsPaVO.documento.FileRequest fr = new DocsPaVO.documento.FileRequest { docNumber = doc.docNumber, versionId = doc.versionId};
+                    DocsPaVO.documento.FileRequest fr = new DocsPaVO.documento.FileRequest { docNumber = doc.docNumber, versionId = doc.versionId };
                     byte[] tsr = InteroperabilitaUtils.GetTSRForDocument(infoUtente, fr);
                     if (tsr != null)
                     {
@@ -1329,7 +1335,7 @@ namespace BusinessLogic.Interoperabilità
                         }
                     }
                 }
-                
+
 
                 //estrazione degli allegati	
                 byte[] all_content = null;
@@ -1341,7 +1347,7 @@ namespace BusinessLogic.Interoperabilità
                 DocsPaDB.Query_DocsPAWS.Documenti docWs = new DocsPaDB.Query_DocsPAWS.Documenti();
                 foreach (DocsPaVO.documento.Allegato allegato in ((DocsPaVO.documento.Allegato[])schedaDoc.allegati.ToArray(typeof(DocsPaVO.documento.Allegato))).Where(
                 a => BusinessLogic.Documenti.AllegatiManager.getIsAllegatoIS(a.versionId) == "0" && BusinessLogic.Documenti.AllegatiManager.getIsAllegatoPEC(a.versionId) == "0"
-                 && docWs.GetTipologiaAllegato(a.versionId)!="D")
+                 && docWs.GetTipologiaAllegato(a.versionId) != "D")
             )
                 {
                     //DocsPaVO.documento.Allegato all = (DocsPaVO.documento.Allegato)schedaDoc.allegati[i];
@@ -1354,6 +1360,8 @@ namespace BusinessLogic.Interoperabilità
                     //string fileExt = getEstensione(((DocsPaVO.documento.Allegato)schedaDoc.allegati[i]).fileName);
                     if (fileExt != "")
                     {
+                        string alternativaNomeAllegato = allegatoName + "." + fileExt;
+
                         fsAll = new System.IO.FileStream(path + "\\" + allegatoName + "." + fileExt, System.IO.FileMode.Create);
 
 
@@ -1376,19 +1384,21 @@ namespace BusinessLogic.Interoperabilità
                         else
                             NomeOriginale = fd.nomeOriginale;
 
-                        CoppiaNomeFileENomeOriginale.Add(String.Format (path + "\\" + allegatoName + "." + fileExt).ToLowerInvariant(), NomeOriginale);
+                        //ABBATANGELI - Sostituzione nome in allegoto richiesta da MIBACT -- ORA DISATTIVATA
+                        CoppiaNomeFileENomeOriginale.Add(String.Format(path + "\\" + allegatoName + "." + fileExt).ToLowerInvariant(), NomeOriginale);
+                        //CoppiaNomeFileENomeOriginale.Add(String.Format(path + "\\" + allegatoName + "." + fileExt).ToLowerInvariant(), alternativaNomeAllegato); 
                     }
                     else
                     {
                         fsAll = new System.IO.FileStream(path + "\\" + allegatoName + ".TXT", System.IO.FileMode.Create);
-                        CoppiaNomeFileENomeOriginale.Add(String.Format(path + "\\" + allegatoName + ".TXT").ToLowerInvariant (), allegatoName + ".TXT");
+                        CoppiaNomeFileENomeOriginale.Add(String.Format(path + "\\" + allegatoName + ".TXT").ToLowerInvariant(), allegatoName + ".TXT");
                     }
 
                     if (all_content != null)
                         fsAll.Write(all_content, 0, all_content.Length);
 
 
-                    
+
                     //gestione TSR
                     if (all_content != null)
                     {
@@ -1411,7 +1421,7 @@ namespace BusinessLogic.Interoperabilità
                             }
                         }
                     }
-                    
+
                     fsAll.Close();
                 }
 
@@ -1458,7 +1468,7 @@ namespace BusinessLogic.Interoperabilità
                 xdoc.XmlResolver = null;
                 XmlDeclaration dec = xdoc.CreateXmlDeclaration("1.0", "ISO-8859-1", null);
                 xdoc.AppendChild(dec);
-                
+
                 //NON VALIDIAMO PIù CON LA DTD MA CON L'XSD
                 //XmlDocumentType dtd = xdoc.CreateDocumentType("Segnatura", null, "Segnatura.dtd", null);
                 //xdoc.AppendChild(dtd);
@@ -1466,7 +1476,7 @@ namespace BusinessLogic.Interoperabilità
 
                 //Creazione della root
                 XmlElement root = xdoc.CreateElement("Segnatura");
-                root.SetAttribute("xmlns", "http://www.digitPa.gov.it/protocollo/");  
+                root.SetAttribute("xmlns", "http://www.digitPa.gov.it/protocollo/");
                 xdoc.AppendChild(root);
 
                 //Creazione dell'intestazione
@@ -1503,7 +1513,7 @@ namespace BusinessLogic.Interoperabilità
                 codiceRegistro.InnerText = reg.codRegistro;
                 XmlElement numeroReg = xdoc.CreateElement("NumeroRegistrazione");
                 identificatore.AppendChild(numeroReg);
-                
+
                 int MAX_LENGTH = 7;
                 string zeroes = "";
                 string numProto = schedaDoc.protocollo.numero;
@@ -1558,7 +1568,7 @@ namespace BusinessLogic.Interoperabilità
                 //il secondo è quello ufficiale
                 XmlElement riferimenti = xdoc.CreateElement("Riferimenti");
                 root.AppendChild(riferimenti);
-                
+
                 //Primo Contesto Procedurale
                 XmlElement contestoProceduraleUno = xdoc.CreateElement("ContestoProcedurale");
 
@@ -1616,19 +1626,19 @@ namespace BusinessLogic.Interoperabilità
 
                 riferimenti.AppendChild(contestoProceduraleUno);
                 riferimenti.AppendChild(contestoProceduraleDue);
-                
+
                 #region Contesto procedurale RGS
 
                 if (schedaDoc.template != null && !string.IsNullOrEmpty(schedaDoc.template.ID_CONTESTO_PROCEDURALE)
-                    && schedaDoc.spedizioneDocumento != null && 
-                    schedaDoc.spedizioneDocumento.tipoMessaggio != null && 
+                    && schedaDoc.spedizioneDocumento != null &&
+                    schedaDoc.spedizioneDocumento.tipoMessaggio != null &&
                     !string.IsNullOrEmpty(schedaDoc.spedizioneDocumento.tipoMessaggio.ID)
                     )
                 {
                     //Verifico se è interoperante RGS
 
                     bool interoperanteRGS = false;
-                    interoperanteRGS =  BusinessLogic.FlussoAutomatico.FlussoAutomaticoManager.CheckIsInteroperanteRGS(((DocsPaVO.utente.Corrispondente)destinatari[0]).systemId);
+                    interoperanteRGS = BusinessLogic.FlussoAutomatico.FlussoAutomaticoManager.CheckIsInteroperanteRGS(((DocsPaVO.utente.Corrispondente)destinatari[0]).systemId);
                     if (interoperanteRGS)
                     {
                         isInteropRGS = true;
@@ -1661,7 +1671,7 @@ namespace BusinessLogic.Interoperabilità
                         piuInfoRGS.SetAttribute("XMLSchema", "AttributiEstesi.xsd");
 
                         XmlElement metadatiInterniRGS = xdoc.CreateElement("MetadatiInterni");
-                        
+
                         //XmlCDataSection cDataRGS;
                         string dataRGS = "<![CDATA[<TIPOLOGIA><NOME>" + contestoProceduraleRGS.NOME + "</NOME><FAMIGLIA>" + contestoProceduraleRGS.FAMIGLIA + "</FAMIGLIA><VERSIONE>" + contestoProceduraleRGS.VERSIONE + "</VERSIONE>METADATOASSOCIATO</TIPOLOGIA>]]>";
                         string metadatoAssociato = string.Empty;
@@ -1683,23 +1693,23 @@ namespace BusinessLogic.Interoperabilità
                                         valore = ogg.VALORE_DATABASE.Split(new string[] { "||||" }, StringSplitOptions.RemoveEmptyEntries)[0];
                                         break;
                                     case "Corrispondente":
-                                       // XmlCDataSection cDataCorr;
+                                        // XmlCDataSection cDataCorr;
                                         Corrispondente corr = BusinessLogic.Utenti.UserManager.getCorrispondenteBySystemIDDisabled(ogg.VALORE_DATABASE);
                                         DocsPaVO.addressbook.CorrespondentDetails corrDett = null;
-                                        if(corr.dettagli)
+                                        if (corr.dettagli)
                                         {
                                             corrDett = new DocsPaDB.Query_DocsPAWS.Utenti().getCorrespondentDetails(ogg.VALORE_DATABASE);
                                         }
                                         if (corr != null)
                                         {
                                             string dataCorr = "<![CDATA[<AnagraficaDipendente><NomeDipendente>" + corr.nome + "</NomeDipendente><CognomeDipendente>" + corr.cognome + "</CognomeDipendente>";
-                                            if(corrDett != null )
+                                            if (corrDett != null)
                                             {
                                                 dataCorr += "<DataNascitaDipendente>" + corrDett.BirthDay + "</DataNascitaDipendente>";
 
                                                 string sessoDipendente = string.Empty;
                                                 if (!string.IsNullOrEmpty(corrDett.TaxId))
-                                                { 
+                                                {
                                                     sessoDipendente = Convert.ToInt32(corrDett.TaxId.Substring(9, 2)) > 40 ? "F" : "M";
                                                 }
                                                 dataCorr += "<SessoDipendente>" + sessoDipendente + "</SessoDipendente>";
@@ -1721,7 +1731,7 @@ namespace BusinessLogic.Interoperabilità
                                                 valore += "<Valore>" + val + "</valore>";
                                         }
                                         break;
-                                    case "Data" :
+                                    case "Data":
                                         valore = Convert.ToDateTime(ogg.VALORE_DATABASE).ToString("dd/MM/yyyy");
                                         break;
                                     default:
@@ -1759,11 +1769,11 @@ namespace BusinessLogic.Interoperabilità
                 root.AppendChild(descrizione);
                 XmlElement docPrinc = xdoc.CreateElement("Documento");
 
-                
+
                 string estensioneFile = getEstensione(getDocumentoPrincipale(schedaDoc).fileName);
-                string nomefile="Documento_principale." + estensioneFile;
-                if (CoppiaNomeFileENomeOriginale.ContainsKey(String.Format (pathFiles + @"\" + nomefile).ToLowerInvariant ()))
-                    nomefile = CoppiaNomeFileENomeOriginale[String.Format ( pathFiles + @"\"+nomefile).ToLowerInvariant()];
+                string nomefile = "Documento_principale." + estensioneFile;
+                if (CoppiaNomeFileENomeOriginale.ContainsKey(String.Format(pathFiles + @"\" + nomefile).ToLowerInvariant()))
+                    nomefile = CoppiaNomeFileENomeOriginale[String.Format(pathFiles + @"\" + nomefile).ToLowerInvariant()];
 
                 if (estensioneFile != "")
                 {
@@ -1784,16 +1794,16 @@ namespace BusinessLogic.Interoperabilità
                 oggetto.InnerText = schedaDoc.oggetto.descrizione;
                 docPrinc.AppendChild(oggetto);
                 descrizione.AppendChild(docPrinc);
-                
+
                 foreach (string tsrVal in CoppiaNomeFileENomeOriginale.Values)
                 {
-                    if (Path.GetExtension(tsrVal).ToLowerInvariant()==".tsr")
+                    if (Path.GetExtension(tsrVal).ToLowerInvariant() == ".tsr")
                     {
-                        DocsPaVO.documento.Allegato all = new DocsPaVO.documento.Allegato { fileName = tsrVal, descrizione = "Marca Temporale TSR", versionId ="1" };
-                        schedaDoc.allegati.Add (all);
+                        DocsPaVO.documento.Allegato all = new DocsPaVO.documento.Allegato { fileName = tsrVal, descrizione = "Marca Temporale TSR", versionId = "1" };
+                        schedaDoc.allegati.Add(all);
                     }
                 }
-                
+
 
                 //si aggiungono gli allegati
                 if (schedaDoc.allegati != null && schedaDoc.allegati.Count > 0)
@@ -1860,32 +1870,36 @@ namespace BusinessLogic.Interoperabilità
 
 
                 //NOTE (Augusto 30/08/2011)
-                 string valorechiave = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_NOTE_IN_SEGNATURA");
-                 if (!string.IsNullOrEmpty(valorechiave) && valorechiave.Equals("1"))
-                 {
-                     DocsPaDB.Query_DocsPAWS.Documenti queryDoc = new DocsPaDB.Query_DocsPAWS.Documenti();
-                     string ultimaNotaVisibileTutti = queryDoc.GetUltimaNotaVisibileTuttiDocumento(schedaDoc.systemId);
-                     if (!string.IsNullOrEmpty(ultimaNotaVisibileTutti))
-                     {
-                         XmlElement noteDescrizione = xdoc.CreateElement("Note");
-                         noteDescrizione.InnerText = ultimaNotaVisibileTutti;
-                         //descrizione.SetAttribute("Note", ultimaNotaVisibileTutti);
-                         descrizione.AppendChild(noteDescrizione);
-                     }
-                 }
+                string valorechiave = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_NOTE_IN_SEGNATURA");
+                if (!string.IsNullOrEmpty(valorechiave) && valorechiave.Equals("1"))
+                {
+                    DocsPaDB.Query_DocsPAWS.Documenti queryDoc = new DocsPaDB.Query_DocsPAWS.Documenti();
+                    string ultimaNotaVisibileTutti = queryDoc.GetUltimaNotaVisibileTuttiDocumento(schedaDoc.systemId);
+                    if (!string.IsNullOrEmpty(ultimaNotaVisibileTutti))
+                    {
+                        XmlElement noteDescrizione = xdoc.CreateElement("Note");
+                        noteDescrizione.InnerText = ultimaNotaVisibileTutti;
+                        //descrizione.SetAttribute("Note", ultimaNotaVisibileTutti);
+                        descrizione.AppendChild(noteDescrizione);
+                    }
+                }
 
                 //Salvataggio
-                 if (isInteropRGS)
-                 {
-                     string xmlString = HttpContext.Current.Server.HtmlDecode(xdoc.InnerXml);
-                     File.WriteAllText(pathFiles + "\\segnatura.xml", xmlString);
-                 }
-                 else
-                 {
-                     System.IO.FileStream fs = new System.IO.FileStream(pathFiles + "\\segnatura.xml", System.IO.FileMode.Create);
-                     xdoc.Save(fs);
-                     fs.Close();
-                 }
+                if (isInteropRGS)
+                {
+                    logger.Debug("INTEROPERANTE RGS - GENERO :" + pathFiles + "\\segnatura.xml");
+                    string xmlString = HttpContext.Current.Server.HtmlDecode(xdoc.InnerXml);
+                    File.WriteAllText(pathFiles + "\\segnatura.xml", xmlString);
+                    logger.Debug("Segnatura generata correttamente.");
+                }
+                else
+                {
+                    logger.Debug("INTEROPERANTE - GENERO :" + pathFiles + "\\segnatura.xml");
+                    System.IO.FileStream fs = new System.IO.FileStream(pathFiles + "\\segnatura.xml", System.IO.FileMode.Create);
+                    xdoc.Save(fs);
+                    fs.Close();
+                    logger.Debug("Segnatura generata correttamente.");
+                }
 
                 return true;
             }
@@ -2551,7 +2565,7 @@ namespace BusinessLogic.Interoperabilità
 		}*/
         #endregion
 
-        private static bool creaMail(DocsPaVO.documento.SchedaDocumento schedaDoc, string server, string mailMitt, string smtp_user, string smtp_pwd, string mailDest, string pathFiles, Dictionary<string, string> CoppiaNomeFileENomeOriginale, string port, string SmtpSsl, string PopSsl, string smtpSTA, string X_TipoRicevuta, string msgMailReg, bool overwriteMsgAmm)
+        private static bool creaMail(DocsPaVO.documento.SchedaDocumento schedaDoc, string server, string mailMitt, string smtp_user, string smtp_pwd, string mailDest, string pathFiles, Dictionary<string, string> CoppiaNomeFileENomeOriginale, string port, string SmtpSsl, string PopSsl, string smtpSTA, string X_TipoRicevuta)
         {
             bool retValue = false;
 
@@ -2573,20 +2587,6 @@ namespace BusinessLogic.Interoperabilità
                 bodyMail = bodyMail + "Data protocollazione: " + schedaDoc.protocollo.dataProtocollazione + "<br>";
                 bodyMail = bodyMail + "Segnatura: " + schedaDoc.protocollo.segnatura + "<br>";
 
-                //Aggiungo al body messaggi configurati in amministrazione con chiave o sulla singola pec
-                string bodyMailMsgPec = string.Empty;
-                if (!string.IsNullOrEmpty(msgMailReg))
-                    bodyMailMsgPec += "<br>" + msgMailReg.Replace("\n", "<br>") + "<br>";
-                if (!overwriteMsgAmm)
-                {
-                    //Aggiungo al body del testo configurabile via chiave di configurazione
-                    string bodyMailConfig = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue(schedaDoc.registro.idAmministrazione, "BE_MESSAGE_SEND_PEC");
-                    if (!string.IsNullOrEmpty(bodyMailConfig) && !bodyMailConfig.ToString().Equals("0"))
-                    {
-                        bodyMail += "<br>" + bodyMailConfig.Replace("\n", "<br>") + "<br>";
-                    }
-                }
-                bodyMail += bodyMailMsgPec;
 
                 string subject = string.Empty;
 
@@ -2693,17 +2693,17 @@ namespace BusinessLogic.Interoperabilità
                 }
 
                 // Corpo della mail
-                string rootUrl = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ROOT_URL_PORTALE");
+                //string rootUrl = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_ROOT_URL_PORTALE");
                 string bodyMail = string.Format("E' stato ricevuto un nuovo documento relativo al procedimento \"{0}\".<br>", proc.Descrizione);
                 bodyMail = bodyMail + "Il documento è consultabile nella sezione 'I miei procedimenti' del Portale dei Procedimenti MiBACT";
 
-                if (!string.IsNullOrEmpty(rootUrl))
-                {
-                    string linkUrl = rootUrl + "/Procedimenti/DettaglioProcedimento.aspx?i=" + proc.IdEsterno + "&r=1";
-                    bodyMail = bodyMail + " o selezionando il seguente link.<br>";
-                    bodyMail = bodyMail + "<a href='" + linkUrl + "' >Vai al dettaglio del procedimento</a>";
-                }
-                
+                //if (!string.IsNullOrEmpty(rootUrl))
+                //{
+                //    string linkUrl = rootUrl + "/Procedimenti/DettaglioProcedimento.aspx?i=" + proc.IdEsterno + "&r=1";
+                //    bodyMail = bodyMail + " o selezionando il seguente link.<br>";
+                //    bodyMail = bodyMail + "<a href='" + linkUrl + "' >Vai al dettaglio del procedimento</a>";
+                //}
+
                 string subject = string.Empty;
 
                 if (!string.IsNullOrEmpty(ConfigurationSettings.AppSettings["SEGNATURA_NEL_SUBJECT"]) &&
@@ -2737,9 +2737,13 @@ namespace BusinessLogic.Interoperabilità
                 BusinessLogic.Procedimenti.ProcedimentiManager.InsertDoc(proc.Id, schedaDoc.docNumber, proc.Autore, false, proc.IdEsterno, false);
 
                 // Automatismo CABLATO per cambio stato
-                if (schedaDoc.template != null)
+                //if (schedaDoc.template != null)
+                //{
+                //    BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoProcedimento(proc.Id, "SPEDIZIONE", schedaDoc.template.ID_TIPO_ATTO, infoUtente);
+                //}
+                if(schedaDoc.template != null)
                 {
-                    BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoProcedimento(proc.Id, "SPEDIZIONE", schedaDoc.template.ID_TIPO_ATTO, infoUtente);
+                    BusinessLogic.Procedimenti.ProcedimentiManager.CambioStatoAutomatico(proc.Id, "SPEDIZIONE", infoUtente, schedaDoc.template.ID_TIPO_ATTO, string.Empty);
                 }
 
                 // Consolidamento del documento - SPOSTATO ALLA RICEZIONE DELLA NOTIFICA DI LETTURA
@@ -2768,6 +2772,7 @@ namespace BusinessLogic.Interoperabilità
 
             return retValue;
         }
+
 
         /// <summary>
         /// </summary>
@@ -2843,7 +2848,7 @@ namespace BusinessLogic.Interoperabilità
                         DocsPaVO.utente.UnitaOrganizzativa uo = null;
                         DocsPaVO.utente.RaggruppamentoFunzionale rf = null;
                         string tipoIE = string.Empty;
-                        
+
                         // Booleano utilizzato per indicare se bisogna spedire per interoperabilità semplificata
                         bool isSimpInterop = false;
                         String varUrl = String.Empty;
@@ -2929,7 +2934,7 @@ namespace BusinessLogic.Interoperabilità
                             emailCorr = ((DocsPaVO.utente.UnitaOrganizzativa)dest[i]).email;
                             varCodiceAOO = ((DocsPaVO.utente.UnitaOrganizzativa)dest[i]).codiceAOO;
                             varCodiceAMM = ((DocsPaVO.utente.UnitaOrganizzativa)dest[i]).codiceAmm;
-                            
+
                             // Verifica se utilizzare l'interoperabilità semplificata
                             DocsPaVO.utente.UnitaOrganizzativa c = ((DocsPaVO.utente.UnitaOrganizzativa)dest[i]);
                             isSimpInterop = c.canalePref != null && (c.canalePref.tipoCanale == InteroperabilitaSemplificataManager.InteroperabilityCode || c.canalePref.typeId == InteroperabilitaSemplificataManager.InteroperabilityCode) && c.Url != null && c.Url.Count > 0 && !String.IsNullOrEmpty(c.Url[0].Url) && Uri.IsWellFormedUriString(c.Url[0].Url, UriKind.Absolute);
@@ -2938,7 +2943,7 @@ namespace BusinessLogic.Interoperabilità
 
                         if (dest[i].GetType() == typeof(DocsPaVO.utente.RaggruppamentoFunzionale))
                         {
-                            tipoIE = ((DocsPaVO.utente.RaggruppamentoFunzionale)dest[i]).tipoIE; 
+                            tipoIE = ((DocsPaVO.utente.RaggruppamentoFunzionale)dest[i]).tipoIE;
 
                             logger.Debug("Destinatario " + i + ": unita' organizzativa");
 
@@ -2950,7 +2955,7 @@ namespace BusinessLogic.Interoperabilità
 
                             // Verifica se utilizzare l'interoperabilità semplificata per l'RF
                             DocsPaVO.utente.RaggruppamentoFunzionale c = ((DocsPaVO.utente.RaggruppamentoFunzionale)dest[i]);
-                            isSimpInterop = c.canalePref != null && 
+                            isSimpInterop = c.canalePref != null &&
                                 (c.canalePref.tipoCanale == InteroperabilitaSemplificataManager.InteroperabilityCode || c.canalePref.typeId == InteroperabilitaSemplificataManager.InteroperabilityCode)
                                 && c.Url != null && c.Url.Count > 0 && !String.IsNullOrEmpty(c.Url[0].Url) && Uri.IsWellFormedUriString(c.Url[0].Url, UriKind.Absolute);
                             varUrl = c.Url != null && c.Url.Count > 0 ? c.Url[0].Url : String.Empty;
@@ -2972,9 +2977,9 @@ namespace BusinessLogic.Interoperabilità
                             if (!isMailPref && dest[i].GetType() != typeof(DocsPaVO.utente.Utente))
                             {
                                 //se canale preferenziale non interop, verifico il mezzo di spedizione
-                                if(uo != null)
+                                if (uo != null)
                                     isMailPref = (uo.canalePref.descrizione.ToUpper().Equals("MAIL") || uo.canalePref.descrizione.ToUpper().Equals("INTEROPERABILITA")) ? true : false;
-                                else if(rf != null)
+                                else if (rf != null)
                                     isMailPref = (rf.canalePref.descrizione.ToUpper().Equals("MAIL") || rf.canalePref.descrizione.ToUpper().Equals("INTEROPERABILITA")) ? true : false;
                             }
                             isMailPrefCorr = isMailPreferred((DocsPaVO.utente.Corrispondente)dest[i]);
@@ -3037,7 +3042,7 @@ namespace BusinessLogic.Interoperabilità
                             }
                         }
 
-                        
+
                         //aggiunta condizione per spedire solamente a quei destinatari che appartengono ad AOO differenti da quella del mittente
                         //MAC_INPS 3749
                         if ((!string.IsNullOrEmpty(varCodiceAOO) && varCodiceAOO != codRegistroMitt && tipoIE == "I") || (
@@ -3134,7 +3139,7 @@ namespace BusinessLogic.Interoperabilità
                                     r.SendErrorMessage = "Destinatario Non Interoperante, poichè appartenente alla stessa AOO";
                                 else
                                     if (emailReg != null && emailReg == "")
-                                        r.SendErrorMessage = "Attenzione, AOO mittente non ha alcuna mail associata.";
+                                    r.SendErrorMessage = "Attenzione, AOO mittente non ha alcuna mail associata.";
                                 r.SendSucceded = false;
                                 r.MailNonInteroperante = true;
                             }
@@ -3872,62 +3877,62 @@ namespace BusinessLogic.Interoperabilità
                 // un problema
                 response.ElaborateNewInteroperabilityMessageResult.SingleRequestErrors.ForEach(request =>
                     request.Receivers.ForEach(receiver =>
+                    {
+                        SimplifiedInteroperabilityMessageUndeliveredProofManager.GenerateProof(
+                                convertedRequest,
+                                response.ElaborateNewInteroperabilityMessageResult.MessageId,
+                                request.ErrorMessage,
+                                receiver);
+
+                        // Inserimento di un item nel centro notifiche
+                        // Recupero dell'id dell'utente cui rendere visibile l'item
+                        String userId = BusinessLogic.Utenti.UserManager.GetInternalCorrAttributeByCorrCode(
+                            convertedRequest.Sender.UserId,
+                            DocsPaDB.Query_DocsPAWS.Utenti.CorrAttribute.id_people,
+                            convertedRequest.Sender.AdministrationId);
+
+                        if (NotificationCenterHelper.IsEnabled(convertedRequest.Sender.AdministrationId))
+                            NotificationCenterHelper.InsertItem(
+                                receiver.Code,
+                                request.ErrorMessage,
+                                "Notifica di mancata consegna",
+                                Convert.ToInt32(userId),
+                                "IS",
+                                Int32.Parse(convertedRequest.MainDocument.DocumentNumber),
+                                Int32.Parse(convertedRequest.Record.RecordNumber),
+                                convertedRequest.Record.AdministrationCode);
+
+
+                        using (DocsPaDB.Query_DocsPAWS.InteroperabilitaSemplificata dbInterop = new DocsPaDB.Query_DocsPAWS.InteroperabilitaSemplificata())
                         {
-                            SimplifiedInteroperabilityMessageUndeliveredProofManager.GenerateProof(
-                                    convertedRequest,
-                                    response.ElaborateNewInteroperabilityMessageResult.MessageId,
-                                    request.ErrorMessage,
-                                    receiver);
+                            string authorId = string.Empty;
+                            string creatorRole = string.Empty;
+                            dbInterop.LoadDataForDeliveredProof(convertedRequest.MainDocument.DocumentNumber, out authorId, out creatorRole);
 
-                            // Inserimento di un item nel centro notifiche
-                            // Recupero dell'id dell'utente cui rendere visibile l'item
-                            String userId = BusinessLogic.Utenti.UserManager.GetInternalCorrAttributeByCorrCode(
-                                convertedRequest.Sender.UserId,
-                                DocsPaDB.Query_DocsPAWS.Utenti.CorrAttribute.id_people,
-                                convertedRequest.Sender.AdministrationId);
-                            
-                            if(NotificationCenterHelper.IsEnabled(convertedRequest.Sender.AdministrationId))
-                                NotificationCenterHelper.InsertItem(
-                                    receiver.Code,
-                                    request.ErrorMessage,
-                                    "Notifica di mancata consegna",
-                                    Convert.ToInt32(userId),
-                                    "IS",
-                                    Int32.Parse(convertedRequest.MainDocument.DocumentNumber),
-                                    Int32.Parse(convertedRequest.Record.RecordNumber),
-                                    convertedRequest.Record.AdministrationCode);
-
-
-                            using (DocsPaDB.Query_DocsPAWS.InteroperabilitaSemplificata dbInterop = new DocsPaDB.Query_DocsPAWS.InteroperabilitaSemplificata())
+                            // Recupero il ruolo che ha effettuato l'ultima spedizione IS, dallo storico delle spedizioni. 
+                            ArrayList listHistorySendDoc = SpedizioneManager.GetElementiStoricoSpedizione(convertedRequest.MainDocument.DocumentNumber);
+                            if (listHistorySendDoc != null && listHistorySendDoc.Count > 0)
                             {
-                                string authorId = string.Empty;
-                                string creatorRole = string.Empty;
-                                dbInterop.LoadDataForDeliveredProof(convertedRequest.MainDocument.DocumentNumber, out authorId, out creatorRole);
+                                Object lastSendIs = (from record in listHistorySendDoc.ToArray()
+                                                     where ((ElStoricoSpedizioni)record).Mail_mittente.Equals("N.A.")
+                                                     select record).ToList().OrderBy(z => ((ElStoricoSpedizioni)z).Id).LastOrDefault();
 
-                                // Recupero il ruolo che ha effettuato l'ultima spedizione IS, dallo storico delle spedizioni. 
-                               ArrayList listHistorySendDoc = SpedizioneManager.GetElementiStoricoSpedizione(convertedRequest.MainDocument.DocumentNumber);
-                               if (listHistorySendDoc != null && listHistorySendDoc.Count > 0)
-                               {
-                                   Object lastSendIs = (from record in listHistorySendDoc.ToArray() 
-                                                            where ((ElStoricoSpedizioni)record).Mail_mittente.Equals("N.A.") 
-                                                            select record).ToList().OrderBy(z => ((ElStoricoSpedizioni)z).Id).LastOrDefault();
-
-                                   Ruolo role = UserManager.getRuoloByIdGruppo(((ElStoricoSpedizioni)lastSendIs).IdGroupSender);
-                                   Utente user = UserManager.getUtenteByCodice(convertedRequest.Sender.UserId,
-                                                        AmministraManager.AmmGetInfoAmmCorrente(convertedRequest.Sender.AdministrationId).Codice);
-                                   user.dst = UserManager.getSuperUserAuthenticationToken();
-                                   InfoUtente userInfo = UserManager.GetInfoUtente(user, role);
-                                   // LOG per documento
-                                   string desc = "Ricevuta di mancata consegna IS: " + request.ErrorMessage + ".<br/>Destinatario spedizione: " +
-                                       receiver.Code;
-                                   BusinessLogic.UserLog.UserLog.WriteLog(user.userId, user.idPeople, role.idGruppo,
-                                       user.idAmministrazione, "NO_DELIVERY_SEND_SIMPLIFIED_INTEROPERABILITY",
-                                       convertedRequest.MainDocument.DocumentNumber, desc, DocsPaVO.Logger.CodAzione.Esito.OK,
-                                       (userInfo != null && userInfo.delegato != null ? userInfo.delegato : null), "1");
-                               }
+                                Ruolo role = UserManager.getRuoloByIdGruppo(((ElStoricoSpedizioni)lastSendIs).IdGroupSender);
+                                Utente user = UserManager.getUtenteByCodice(convertedRequest.Sender.UserId,
+                                                     AmministraManager.AmmGetInfoAmmCorrente(convertedRequest.Sender.AdministrationId).Codice);
+                                user.dst = UserManager.getSuperUserAuthenticationToken();
+                                InfoUtente userInfo = UserManager.GetInfoUtente(user, role);
+                                // LOG per documento
+                                string desc = "Ricevuta di mancata consegna IS: " + request.ErrorMessage + ".<br/>Destinatario spedizione: " +
+                                    receiver.Code;
+                                BusinessLogic.UserLog.UserLog.WriteLog(user.userId, user.idPeople, role.idGruppo,
+                                    user.idAmministrazione, "NO_DELIVERY_SEND_SIMPLIFIED_INTEROPERABILITY",
+                                    convertedRequest.MainDocument.DocumentNumber, desc, DocsPaVO.Logger.CodAzione.Esito.OK,
+                                    (userInfo != null && userInfo.delegato != null ? userInfo.delegato : null), "1");
                             }
-                        
-                        }));
+                        }
+
+                    }));
 
                 // Associazione della ricevuta di avvenuta consegna per tutti quelli a cui non è già stata associata una
                 // ricevuta di mancata consegna
@@ -3936,16 +3941,16 @@ namespace BusinessLogic.Interoperabilità
                     receiverWithErrors.AddRange(request.Receivers);
 
                 convertedRequest.Receivers.ForEach(receiver =>
+                {
+                    if (!receiverWithErrors.Contains(receiver))
                     {
-                        if (!receiverWithErrors.Contains(receiver))
-                        {
-                            SimplifiedInteroperabilityMessageDeliveredProofManager.GenerateProof(
-                                    convertedRequest,
-                                    response.ElaborateNewInteroperabilityMessageResult.MessageId,
-                                    receiver,
-                                    response.ElaborateNewInteroperabilityMessageResult.DocumentDelivered);
-                        }
-                    });
+                        SimplifiedInteroperabilityMessageDeliveredProofManager.GenerateProof(
+                                convertedRequest,
+                                response.ElaborateNewInteroperabilityMessageResult.MessageId,
+                                receiver,
+                                response.ElaborateNewInteroperabilityMessageResult.DocumentDelivered);
+                    }
+                });
 
             }
             catch (EndpointNotFoundException endpointNotFoundException)
@@ -3954,7 +3959,7 @@ namespace BusinessLogic.Interoperabilità
                 SimplifiedInteroperabilityLogAndRegistryManager.InsertItemInLog(convertedRequest.MainDocument.DocumentNumber,
                     true,
                     String.Format("Impossibile contattare il destinatario: {0}", endpointNotFoundException.Message));
-                
+
                 // Associazione di una ricevuta di mancata consegna al documento per tutti i destinatari
                 convertedRequest.Receivers.ForEach(receiver =>
                 {
@@ -4076,7 +4081,7 @@ namespace BusinessLogic.Interoperabilità
 
                 });
             }
-            
+
         }
 
         #endregion

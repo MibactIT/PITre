@@ -2737,67 +2737,8 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-        public List<ItemsVersamento> getListaDocByStato(string[] stati)
-        {
-            List<ItemsVersamento> list = new List<ItemsVersamento>();
-            logger.Debug("BEGIN");
 
-            try
-            {
-                Query query = InitQuery.getInstance().getQuery("S_VERSAMENTO_GET_DOC_BY_STATO");
-                if(stati.Length == 1)
-                {
-                    query.setParam("stato_filter", string.Format(" = '{0}'", stati[0]));
-                }
-                else
-                {
-                    string statiString = string.Empty;
-                    foreach(string statoItem in stati)
-                    {
-                        if (!string.IsNullOrEmpty(statiString))
-                            statiString += ",";
-
-                        statiString += string.Format("'{0}'", statoItem);
-                    }
-                    query.setParam("stato_filter", string.Format(" IN ({0})", statiString));
-                }
-
-                string command = query.getSQL();
-                logger.Debug("QUERY - " + command);
-
-                using(DBProvider dbProvider = new DBProvider())
-                {
-                    using(IDataReader reader = dbProvider.ExecuteReader(command))
-                    {
-                        while(reader.Read())
-                        {
-                            ItemsVersamento item = new ItemsVersamento();
-                            item.idProfile = reader.GetValue(reader.GetOrdinal("ID_PROFILE")).ToString();
-                            item.idPeople = reader.GetValue(reader.GetOrdinal("ID_PEOPLE")).ToString();
-                            item.idGruppo = reader.GetValue(reader.GetOrdinal("ID_RUOLO")).ToString();
-                            item.idAmm = reader.GetValue(reader.GetOrdinal("ID_AMM")).ToString();
-                            item.tentativiInvio = reader.GetValue(reader.GetOrdinal("NUM_TENTATIVI_INVIO")).ToString();
-                            item.stato = reader.GetValue(reader.GetOrdinal("CHA_STATO")).ToString();
-                            list.Add(item);
-                        }
-
-                        reader.Close();
-                    }
-                }
-
-            }
-            catch(Exception ex)
-            {
-                list = null;
-                logger.Debug("Errore in getListaDocByStato");
-                logger.Debug(ex);
-            }
-
-            logger.Debug("END");
-            return list;
-        }
-
-        public bool addDocToQueueCons(string idDoc, InfoUtente infoUtente, string ente, string struttura)
+        public bool addDocToQueueCons(string idDoc, InfoUtente infoUtente)
         {
             bool result = false;
 
@@ -2816,8 +2757,6 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("idPeople", infoUtente.idPeople);
                     q.setParam("idRuolo", infoUtente.idGruppo);
                     q.setParam("idAmm", infoUtente.idAmministrazione);
-                    q.setParam("ente", !string.IsNullOrEmpty(ente) ? ente : string.Empty);
-                    q.setParam("struttura", !string.IsNullOrEmpty(struttura) ? struttura : string.Empty);
 
                     string commandText = q.getSQL();
 
@@ -2913,39 +2852,6 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-        public bool updateQueueConsSetCustomParams(string idDoc, string ente, string struttura)
-        {
-            bool result = false;
-            logger.Debug("BEGIN");
-
-            try
-            {
-                Query query = InitQuery.getInstance().getQuery("U_VERSAMENTO_CUSTOM_PARAMS");
-                query.setParam("ente", ente);
-                query.setParam("struttura", struttura);
-                query.setParam("id_profile", idDoc);
-
-                string command = query.getSQL();
-                logger.Debug("QUERY - " + command);
-
-                using(DBProvider dbProvider = new DBProvider())
-                {
-                    if (!dbProvider.ExecuteNonQuery(command))
-                        throw new Exception(dbProvider.LastExceptionMessage);
-
-                    result = true;
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Debug("Errore in updateQueueConsSetCustomParams - ", ex);
-                result = false;
-            }
-
-            logger.Debug("END");
-            return result;
-        }
-
         public bool updateQueueConsList(ArrayList lista, string stato)
         {
             bool result = false;
@@ -3012,51 +2918,6 @@ namespace DocsPaDB.Query_DocsPAWS
                     result = false;
                     logger.Debug(ex);
                 }
-            }
-
-            logger.Debug("END");
-            return result;
-        }
-
-        public bool getCustomParamsSacer(string idProfile, out string ente, out string struttura)
-        {
-            bool result = false;
-            logger.Debug("BEGIN");
-
-            ente = string.Empty;
-            struttura = string.Empty;
-
-            try
-            {
-                Query query = InitQuery.getInstance().getQuery("S_VERSAMENTO_GET_CUSTOM_ENTE");
-                query.setParam("id_profile", idProfile);
-
-                string command = query.getSQL();
-                logger.Debug("QUERY - " + command);
-
-                using (DBProvider dbProvider = new DBProvider())
-                {
-                    using(IDataReader reader = dbProvider.ExecuteReader(command))
-                    {
-                        while(reader.Read())
-                        {
-                            ente = reader.GetValue(reader.GetOrdinal("VAR_CUSTOM_ENTE")).ToString();
-                            struttura = reader.GetValue(reader.GetOrdinal("VAR_CUSTOM_STRUTTURA")).ToString();
-                        }
-
-                        reader.Close();
-                    }
-                }
-
-                result = true;
-
-            }
-            catch(Exception ex)
-            {
-                logger.Debug("Errore in getCustomParamsSacer - ", ex);
-                ente = string.Empty;
-                struttura = string.Empty;
-                result = false;
             }
 
             logger.Debug("END");
@@ -3677,7 +3538,6 @@ namespace DocsPaDB.Query_DocsPAWS
                             p.codice = reader.GetValue(reader.GetOrdinal("VAR_CODICE")).ToString();
                             p.descrizione = reader.GetValue(reader.GetOrdinal("VAR_DESCRIZIONE")).ToString();
                             p.isAttiva = reader.GetValue(reader.GetOrdinal("CHA_ATTIVA")).ToString();
-                            p.notificaMail = reader.GetValue(reader.GetOrdinal("CHA_ATTIVA_NOTIFICA")).ToString();
 
                             lista.Add(p);
                         }
@@ -3800,11 +3660,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             policy.numGiorniStampa = reader.GetValue(reader.GetOrdinal("NUM_GIORNI_DATA_STAMPA")).ToString();
                             policy.escludiFatture = reader.GetValue(reader.GetOrdinal("CHA_ESCLUDI_FATTURE")).ToString();
                             policy.numGiorniFirma = reader.GetValue(reader.GetOrdinal("NUM_GIORNI_FIRMA")).ToString();
-                            policy.notificaMail = reader.GetValue(reader.GetOrdinal("CHA_ATTIVA_NOTIFICA")).ToString();
-                            policy.bigFiles = reader.GetValue(reader.GetOrdinal("CHA_BIG_FILES")).ToString();
-                            policy.ente = reader.GetValue(reader.GetOrdinal("VAR_ENTE")).ToString();
-                            policy.struttura = reader.GetValue(reader.GetOrdinal("VAR_STRUTTURA")).ToString();
-                            
+
                         }
 
                         reader.Close();
@@ -3991,9 +3847,10 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("uosp", policy.UOsottoposte);
                     q.setParam("isfirmato", policy.firmati);
                     q.setParam("ismarcato", policy.marcati);
+                    /* 11/02/19 Conservazione */
                     q.setParam("docDigitali", policy.digitali);
                     q.setParam("escludiFatture", policy.escludiFatture);
-                    q.setParam("bigFiles", policy.bigFiles);
+
                     q.setParam("scadMarca", policy.scadenzaMarca);
                     q.setParam("dataCr", policy.filtroDataCreazione);
                     if (!string.IsNullOrEmpty(policy.dataCreazioneDa))
@@ -4032,9 +3889,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("numGiorniDataStampa", policy.numGiorniStampa);
 
                     q.setParam("numGiorniFirma", policy.numGiorniFirma);
-                    q.setParam("ente", policy.ente);
-                    q.setParam("struttura", policy.struttura);
-                        
+
 
                     string command = q.getSQL();
                     logger.Debug(command);
@@ -4212,8 +4067,10 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("idFasc", policy.idFascicolo);
                     q.setParam("tipoClass", policy.tipoClassificazione);
                     q.setParam("docDigitali", policy.digitali);
+
+                    /* 11/02/19 Conservazione */
                     q.setParam("escludiFatture", policy.escludiFatture);
-                    q.setParam("bigFiles", policy.bigFiles);
+
                     q.setParam("isFirmato", policy.firmati);
                     q.setParam("isMarcato", policy.marcati);
                     q.setParam("scadMarca", policy.scadenzaMarca);
@@ -4240,8 +4097,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("numGiorniDataCreazione", policy.numGiorniCreazione);
                     q.setParam("numGiorniDataProto", policy.numGiorniProtocollazione);
                     q.setParam("numGiorniFirma", policy.numGiorniFirma);
-                    q.setParam("ente", policy.ente);
-                    q.setParam("struttura", policy.struttura);
+
 
                     if (policy.tipo.Equals("S"))
                     {
@@ -4466,7 +4322,6 @@ namespace DocsPaDB.Query_DocsPAWS
                         Query q = InitQuery.getInstance().getQuery("U_STATO_POLICY_PARER");
                         q.setParam("id", policy.id);
                         q.setParam("attiva", policy.isAttiva);
-                        q.setParam("notifica", policy.notificaMail);
                         string command = q.getSQL();
                         logger.Debug(command);
 
@@ -4512,7 +4367,7 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-        public bool UpdateStatoSingolaPolicy(string idPolicy, string attiva, string notifica)
+        public bool UpdateStatoSingolaPolicy(string idPolicy, string attiva)
         {
             logger.Debug("BEGIN");
             bool result = false;
@@ -4526,7 +4381,6 @@ namespace DocsPaDB.Query_DocsPAWS
                     Query q = InitQuery.getInstance().getQuery("U_STATO_POLICY_PARER");
                     q.setParam("id", idPolicy);
                     q.setParam("attiva", attiva);
-                    q.setParam("notifica", notifica);
                     string command = q.getSQL();
                     logger.Debug(command);
 
@@ -5041,20 +4895,26 @@ namespace DocsPaDB.Query_DocsPAWS
                 if (dbType.ToUpper().Equals("SQL"))
                 {
                     //result = result + " AND @dbuser@.AtLeastOneCartaceo(A.DOCNUMBER) != '1'";
+
+                    /* 11/02/19 Conservazione - MEV Reportistica */
                     result = result + " AND @dbuser@.IsDocCartaceo(A.DOCNUMBER) != '1' ";
                 }
                 else
                 {
                     //result = result + " AND AtLeastOneCartaceo(A.DOCNUMBER) != '1'";
+
+                    /* 11/02/19 Conservazione - MEV Reportistica */
                     result = result + " AND IsDocCartaceo(A.DOCNUMBER) != '1' ";
                 }
             }
             #endregion
 
+            /* 11/02/19 Conservazione */
             #region Escludi fatture
             if (!string.IsNullOrEmpty(policy.escludiFatture) && policy.escludiFatture.Equals("1"))
             {
-                result = result + " AND NVL(A.ID_TIPO_ATTO,'0') NOT IN (SELECT F.SYSTEM_ID FROM DPA_TIPO_ATTO F WHERE (UPPER(F.VAR_DESC_ATTO)='FATTURA ELETTRONICA' OR UPPER(F.VAR_DESC_ATTO)='LOTTO DI FATTURE' OR UPPER(F.VAR_DESC_ATTO) = 'FATTURA ELETTRONICA ATTIVA' OR UPPER(F.VAR_DESC_ATTO) = 'LOTTO DI FATTURE ATTIVE'))";
+                //result = result + " AND A.ID_TIPO_ATTO NOT IN (SELECT F.SYSTEM_ID FROM DPA_TIPO_ATTO F WHERE (UPPER(F.VAR_DESC_ATTO)='FATTURA ELETTRONICA' OR UPPER(F.VAR_DESC_ATTO)='LOTTO DI FATTURE'))";
+                result = result + " AND NVL(A.ID_TIPO_ATTO,'0') NOT IN (SELECT F.SYSTEM_ID FROM DPA_TIPO_ATTO F WHERE (UPPER(F.VAR_DESC_ATTO)='FATTURA ELETTRONICA' OR UPPER(F.VAR_DESC_ATTO)='LOTTO DI FATTURE'))";
             }
             #endregion
 
@@ -5098,28 +4958,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 //result = result + ") ";
                 #endregion
             }
-            #endregion
-
-            #region Dimensioni documenti
-            if(!string.IsNullOrEmpty(policy.bigFiles) && !(policy.bigFiles == "0"))
-            {
-                string maxFileSize = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "BE_VERSAMENTO_MAX_FILE_SIZE");
-                if (!string.IsNullOrEmpty(maxFileSize))
-                {
-                    // Escludi big files
-                    if (policy.bigFiles == "1")
-                    {
-                        //result = result + " AND ((SELECT SUM (CC.FILE_SIZE) FROM PROFILE PP JOIN COMPONENTS CC ON PP.SYSTEM_ID=CC.DOCNUMBER WHERE (PP.SYSTEM_ID=A.SYSTEM_ID OR PP.ID_DOCUMENTO_PRINCIPALE=A.SYSTEM_ID) AND CC.VERSION_ID=(SELECT MAX(VERSION_ID) FROM VERSIONS VV WHERE VV.DOCNUMBER=A.SYSTEM_ID)) <=  " + maxFileSize + " )";
-                        result = result + " AND ((SELECT SUM(CC.FILE_SIZE) FROM PROFILE PP JOIN COMPONENTS CC ON PP.SYSTEM_ID = CC.DOCNUMBER WHERE(PP.ID_DOCUMENTO_PRINCIPALE=A.SYSTEM_ID AND CC.VERSION_ID = (SELECT MAX(VERSION_ID) FROM VERSIONS VV WHERE VV.DOCNUMBER = PP.SYSTEM_ID)) OR (PP.SYSTEM_ID = A.SYSTEM_ID AND CC.VERSION_ID = (SELECT MAX(VERSION_ID) FROM VERSIONS VV WHERE VV.DOCNUMBER = A.SYSTEM_ID) )) <= " + maxFileSize + ") ";
-                    }
-                    // Includi solo big files
-                    else if (policy.bigFiles == "2")
-                    {
-                        result = result + " AND ((SELECT SUM(CC.FILE_SIZE) FROM PROFILE PP JOIN COMPONENTS CC ON PP.SYSTEM_ID = CC.DOCNUMBER WHERE(PP.ID_DOCUMENTO_PRINCIPALE=A.SYSTEM_ID AND CC.VERSION_ID = (SELECT MAX(VERSION_ID) FROM VERSIONS VV WHERE VV.DOCNUMBER = PP.SYSTEM_ID)) OR (PP.SYSTEM_ID = A.SYSTEM_ID AND CC.VERSION_ID = (SELECT MAX(VERSION_ID) FROM VERSIONS VV WHERE VV.DOCNUMBER = A.SYSTEM_ID) )) > " + maxFileSize + ") ";
-                    }
-                }
-            }
-
             #endregion
 
             #region Documenti firmati
@@ -5462,9 +5300,9 @@ namespace DocsPaDB.Query_DocsPAWS
             #endregion
 
             #region Data firma
-            if(!string.IsNullOrEmpty(policy.numGiorniFirma))
+            if (!string.IsNullOrEmpty(policy.numGiorniFirma))
             {
-                if(dbType.ToUpper() == "SQL")
+                if (dbType.ToUpper() == "SQL")
                 {
 
                 }
@@ -5815,6 +5653,11 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
+        #endregion
+
+        #endregion
+
+        #region /* 11/02/19 Conservazione - MEV Reportistica */
         public ReportConfiguration GetReportConfiguration(string idAmm)
         {
             ReportConfiguration conf = new ReportConfiguration();
@@ -5840,16 +5683,13 @@ namespace DocsPaDB.Query_DocsPAWS
                             conf.idAmm = idAmm;
                             conf.Subject = ds.Tables[0].Rows[0]["MAIL_SUBJECT"] != DBNull.Value ? ds.Tables[0].Rows[0]["MAIL_SUBJECT"].ToString() : string.Empty;
                             conf.Body = ds.Tables[0].Rows[0]["MAIL_BODY"] != DBNull.Value ? ds.Tables[0].Rows[0]["MAIL_BODY"].ToString() : string.Empty;
-                            conf.PolicySubject = ds.Tables[0].Rows[0]["VAR_POLICY_MAIL_SUBJECT"] != DBNull.Value ? ds.Tables[0].Rows[0]["VAR_POLICY_MAIL_SUBJECT"].ToString() : string.Empty;
-                            conf.PolicyBody = ds.Tables[0].Rows[0]["VAR_POLICY_MAIL_BODY"] != DBNull.Value ? ds.Tables[0].Rows[0]["VAR_POLICY_MAIL_BODY"].ToString() : string.Empty;
 
                             ArrayList recipients = new ArrayList();
                             ArrayList hiddenRecipients = new ArrayList();
-                            ArrayList policyRecipients = new ArrayList();
                             if (ds.Tables[0].Rows[0]["VAR_FIXED_RECIPIENTS"] != DBNull.Value)
                             {
                                 string[] fixedRecipients = ds.Tables[0].Rows[0]["VAR_FIXED_RECIPIENTS"].ToString().Split(';');
-                                if(fixedRecipients != null)
+                                if (fixedRecipients != null)
                                     hiddenRecipients.AddRange(fixedRecipients);
                             }
                             if (ds.Tables[0].Rows[0]["CHA_MAIL_STRUTTURA"] != DBNull.Value)
@@ -5857,12 +5697,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                 string[] mailStruttura = ds.Tables[0].Rows[0]["CHA_MAIL_STRUTTURA"].ToString().Split(';');
                                 if (mailStruttura != null)
                                     recipients.AddRange(mailStruttura);
-                            }
-                            if(ds.Tables[0].Rows[0]["CHA_MAIL_POLICY"] != DBNull.Value)
-                            {
-                                string[] mailPolicy = ds.Tables[0].Rows[0]["CHA_MAIL_POLICY"].ToString().Split(';');
-                                if (mailPolicy != null)
-                                    policyRecipients.AddRange(mailPolicy);
                             }
 
                             conf.Recipients = new string[recipients.Count];
@@ -5874,11 +5708,6 @@ namespace DocsPaDB.Query_DocsPAWS
                             for (int i = 0; i < hiddenRecipients.Count; i++)
                             {
                                 conf.FixedRecipients[i] = hiddenRecipients[i].ToString();
-                            }
-                            conf.PolicyRecipients = new string[policyRecipients.Count];
-                            for (int i = 0; i < policyRecipients.Count; i++)
-                            {
-                                conf.PolicyRecipients[i] = policyRecipients[i].ToString();
                             }
 
                             conf.MailBoxConfiguration = new Mailbox()
@@ -5895,8 +5724,6 @@ namespace DocsPaDB.Query_DocsPAWS
                             {
                                 conf.MailBoxConfiguration.Password = DocsPaUtils.Security.Crypter.Decode(conf.MailBoxConfiguration.Password, conf.MailBoxConfiguration.Username);
                             }
-
-
                         }
                     }
                     else
@@ -5943,14 +5770,12 @@ namespace DocsPaDB.Query_DocsPAWS
                         result.Port = ds.Tables[0].Rows[0]["VAR_PORT_SMTP"].ToString();
                         result.UseSSL = ds.Tables[0].Rows[0]["CHA_SSL"] != null && ds.Tables[0].Rows[0]["CHA_SSL"].ToString() == "1";
                         result.MailStruttura = ds.Tables[0].Rows[0]["CHA_MAIL_STRUTTURA"].ToString();
-                        result.MailPolicy = ds.Tables[0].Rows[0]["CHA_MAIL_POLICY"].ToString();
 
                         if (!string.IsNullOrEmpty(result.Username) && !string.IsNullOrEmpty(result.Password))
                         {
                             result.Password = DocsPaUtils.Security.Crypter.Decode(result.Password, result.Username);
-                        } 
+                        }
                     }
-
                 }
             }
             catch (Exception ex)
@@ -5980,16 +5805,13 @@ namespace DocsPaDB.Query_DocsPAWS
                         query = "U_MAIL_STRUTTURA";
 
                     Query q = InitQuery.getInstance().getQuery(query);
-                    q.setParam("idAmm", idAmm);
-                    q.setParam("mailString", mailbox.MailStruttura);
+                    q.setParam("idAmm", idAmm); q.setParam("mailString", mailbox.MailStruttura);
                     q.setParam("smtp_server", mailbox.Server);
                     q.setParam("mail_from", mailbox.From);
                     q.setParam("username", mailbox.Username);
                     q.setParam("password", DocsPaUtils.Security.Crypter.Encode(mailbox.Password, mailbox.Username));
                     q.setParam("port", mailbox.Port);
                     q.setParam("ssl", mailbox.UseSSL ? "1" : "0");
-                    q.setParam("policy_mailString", mailbox.MailPolicy);
-                    
 
                     string command = q.getSQL();
                     logger.Debug(command);
@@ -6028,7 +5850,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 using (DBProvider dbProvider = new DBProvider())
                 {
                     DataSet ds = new DataSet();
-                    
+
                     Query query1 = InitQuery.getInstance().getQuery("S_CONS_REPORT_SINGOLA_AMM_1");
                     Query query2 = InitQuery.getInstance().getQuery("S_CONS_REPORT_SINGOLA_AMM_2");
 
@@ -6056,7 +5878,7 @@ namespace DocsPaDB.Query_DocsPAWS
                         throw new Exception(dbProvider.LastExceptionMessage);
                     }
 
-                    response.Dataset = ds;                
+                    response.Dataset = ds;
                 }
             }
             catch (Exception ex)
@@ -6068,9 +5890,6 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Debug("END");
             return response;
         }
-
-
-        #endregion
 
         public bool GetStatoAttivazione(string idAmm)
         {
@@ -6091,7 +5910,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     if (!dbProvider.ExecuteScalar(out val, command))
                         throw new Exception(dbProvider.LastExceptionMessage);
 
-                    if(!string.IsNullOrEmpty(val) && val == "0")
+                    if (!string.IsNullOrEmpty(val) && val == "0")
                     {
                         result = false;
                     }
@@ -6131,7 +5950,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(ex.Message);
                 result = false;
@@ -6140,8 +5959,9 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-        #endregion
 
+
+        #endregion
 
         #region LAVORAZIONE ISTANZE CONSERVAZIONE
         /// <summary>

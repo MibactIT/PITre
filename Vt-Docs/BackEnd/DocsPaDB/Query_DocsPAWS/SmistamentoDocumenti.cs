@@ -1,12 +1,10 @@
 using System;
 using System.Data;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using DocsPaDbManagement.Functions;
 using log4net;
 using DocsPaVO.Notification;
-using System.Linq;
 
 namespace DocsPaDB.Query_DocsPAWS
 {
@@ -625,6 +623,9 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Debug("Chiamata SP 'I_SMISTAMENTO_SMISTADOC_U. Esito: " + retValue.CodiceEsitoSmistamento.ToString());
                 if (retValue.CodiceEsitoSmistamento > 0)
                 {
+                    if (ruoloDestinatario.Utenti == null) 
+                        logger.Debug("ERRORE: ruoloDestinatario.Utenti = NULL");
+                    else if (ruoloDestinatario.Utenti.Count < 1) logger.Debug("ERRORE: ruoloDestinatario.Utenti.Count < 1");
 
                     foreach (DocsPaVO.Smistamento.UtenteSmistamento utente in ruoloDestinatario.Utenti)
                     {
@@ -837,10 +838,8 @@ namespace DocsPaDB.Query_DocsPAWS
             parameters.Add(this.CreateParameter("Rights", this.GetAccessRightSmistamento(ragioneSmistamento)));
 
             //RIGHTS ORIGINALI
-            //05/02/2018: commentata la riga seguente perchè impostava al ruolo che sta effettuando lo smistamento i diritti del destinatario
-            //parameters.Add(this.CreateParameter("OriginalRights", this.GetAccessRightSmistamentoOriginali(ragioneSmistamento)));
-            parameters.Add(this.CreateParameter("OriginalRights", this.GetDirittoRagioneByIdTrasmSingola(datiTrasmissioneDocumento.IDTrasmissioneSingola)));
-
+            parameters.Add(this.CreateParameter("OriginalRights", this.GetAccessRightSmistamentoOriginali(ragioneSmistamento)));
+            
             //ID RAGIONE TRASMISSIONE
             parameters.Add(this.CreateParameter("IDRagioneTrasm", ragioneSmistamento.systemId));
 
@@ -1786,90 +1785,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
             this.ExecuteQuery(out ds, "DOCUMENTI_TRASMESSI", queryString);
             return ds;
-        }
-
-        public int GetDirittoRagioneByIdTrasmSingola(string idTrasmSingola)
-        {
-            int retVal = 0;
-            logger.Debug("INIZIO GetTipoDirittoRagioneByIdTrasmSingola");
-            try
-            {
-                if (!string.IsNullOrEmpty(idTrasmSingola))
-                {
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_RAG_TRASM_BY_ID_TRASM_SINGOLA");
-                    q.setParam("idTrasmSingola", idTrasmSingola);
-
-                    string query = q.getSQL();
-                    logger.Debug("GetTipoDirittoRagioneByIdTrasmSingola: " + query);
-                    DataSet ds = new DataSet();
-                    this.ExecuteQuery(ds, query);
-                    if (ds.Tables[0].Rows.Count > 0)
-                    {
-                        string tipoDiritto =ds.Tables[0].Rows[0]["CHA_TIPO_RAGIONE"].ToString().ToUpper();
-
-                        if(!string.IsNullOrEmpty(tipoDiritto))
-                        {
-                            DocsPaVO.HMDiritti.HMdiritti HMD = new DocsPaVO.HMDiritti.HMdiritti();
-                            switch (tipoDiritto)
-                            {
-                                case "R":
-                                    retVal = HMD.HMdiritti_Read;
-                                    break;
-                                case "W":
-                                    retVal = HMD.HMdiritti_Write;
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in GetTipoDirittoRagioneByIdTrasmSingola " + e.Message);
-            }
-
-            return retVal;
-        }
-
-        /// <summary>
-        /// Restituisce la lista degli id_corr_globali all'interno della UO di Appartenenza, per cui il documento è stato già trasmesso
-        /// </summary>
-        /// <param name="idCorrGlobali"></param>
-        /// <param name="docnumber"></param>
-        /// <param name="registriAppartenenza"></param>
-        /// <returns></returns>
-        public string[] GetIdDestinatariTrasmDocInUo(string idUO, string docnumber)
-        {
-            string[] idDestinatairiTrasm = null;
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("GET_ID_DEST_TRASM_DOC_IN_UO_APP");
-                q.setParam("idUO", idUO);
-                q.setParam("docnumber", docnumber);
-
-                string queryString = q.getSQL();
-                logger.Debug(queryString);
-
-                if (!this.ExecuteQuery(ds, "DEST", queryString))
-                    throw new Exception("Errore nell'esecuzine della QUERY:" + queryString);
-                if (ds.Tables["DEST"].Rows.Count > 0)
-                {
-                    string res = string.Empty;
-                    if (ds.Tables[0].Rows.Count != 0)
-                    {
-                        res = ds.Tables[0].Rows[0]["ID_DESTINATARI_TRASM"].ToString();
-                    }
-
-                    idDestinatairiTrasm = System.Text.RegularExpressions.Regex.Split(res, ";").Where(s => s != String.Empty).ToArray<string>();
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in GetIdDestinatariTrasmDocInUoApp " + e.Message);
-                return null;
-            }
-            return idDestinatairiTrasm;
         }
 
     }

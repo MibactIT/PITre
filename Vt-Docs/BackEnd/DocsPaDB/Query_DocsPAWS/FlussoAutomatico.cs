@@ -36,10 +36,14 @@ namespace DocsPaDB.Query_DocsPAWS
 
                  query = q.getSQL();
                  logger.Debug("InsertFlussoProcedurale: " + query);
-                if (ExecuteNonQuery(query))
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    result = true;
+                    if (dbProvider.ExecuteNonQuery(query))
+                    {
+                        result = true;
+                    }
                 }
+
             }
             catch(Exception e)
             {
@@ -378,17 +382,22 @@ namespace DocsPaDB.Query_DocsPAWS
                 query = q.getSQL();
 
                 logger.Debug("GetIdDocumentoInizioRichiesta: " + query);
-                if (this.ExecuteQuery(out ds, "FLUSSO", query))
+
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    if (ds.Tables["FLUSSO"] != null && ds.Tables["FLUSSO"].Rows.Count > 0)
+                    if (dbProvider.ExecuteQuery(out ds, "FLUSSO", query))
                     {
-                        DataRow row = ds.Tables["FLUSSO"].Rows[0];
-                        flusso.INFO_DOCUMENTO = new DocsPaVO.FlussoAutomatico.InfoDocumentoFlusso()
+                        if (ds.Tables["FLUSSO"] != null && ds.Tables["FLUSSO"].Rows.Count > 0)
                         {
-                            ID_PROFILE = row["ID_PROFILE"].ToString()
-                        };
+                            DataRow row = ds.Tables["FLUSSO"].Rows[0];
+                            flusso.INFO_DOCUMENTO = new DocsPaVO.FlussoAutomatico.InfoDocumentoFlusso()
+                            {
+                                ID_PROFILE = row["ID_PROFILE"].ToString()
+                            };
+                        }
                     }
                 }
+                
             }
             catch (Exception e)
             {
@@ -410,13 +419,17 @@ namespace DocsPaDB.Query_DocsPAWS
                 query = q.getSQL();
 
                 logger.Debug("GetTipiContestoProcedurale: " + query);
-                if (this.ExecuteQuery(out ds, "CONTESTO_PROCEDURALE", query))
+
+                using (DBProvider dbProvider = new DBProvider())
                 {
-                    if (ds.Tables["CONTESTO_PROCEDURALE"] != null && ds.Tables["CONTESTO_PROCEDURALE"].Rows.Count > 0)
+                    if (dbProvider.ExecuteQuery(out ds, "CONTESTO_PROCEDURALE", query))
                     {
-                        foreach (DataRow row in ds.Tables["CONTESTO_PROCEDURALE"].Rows)
+                        if (ds.Tables["CONTESTO_PROCEDURALE"] != null && ds.Tables["CONTESTO_PROCEDURALE"].Rows.Count > 0)
                         {
-                            tipiContestoProcedurale.Add(row["TIPO_CONTESTO_PROCEDURALE"].ToString());
+                            foreach (DataRow row in ds.Tables["CONTESTO_PROCEDURALE"].Rows)
+                            {
+                                tipiContestoProcedurale.Add(row["TIPO_CONTESTO_PROCEDURALE"].ToString());
+                            }
                         }
                     }
                 }
@@ -528,7 +541,10 @@ namespace DocsPaDB.Query_DocsPAWS
                 logger.Debug(queryString);
 
                 System.Data.DataSet dataSet;
-                this.ExecuteQuery(out dataSet, "PROJECT", queryString);
+                using (DBProvider dbProvider = new DBProvider())
+                {
+                    dbProvider.ExecuteQuery(out dataSet, "PROJECT", queryString);
+                }
 
                 if (dataSet.Tables["PROJECT"].Rows != null && dataSet.Tables["PROJECT"].Rows.Count > 0)
                 {

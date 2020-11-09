@@ -460,7 +460,7 @@ namespace BusinessLogic.Import.RDE
             {
                 // Creazione oggetto temporaneo
                 temporaryData = new RDEDocumentRowData();
-
+                temporaryData.ProtoType = protoType;
                 // Creazione array codici modelli trasmissione
                 temporaryData.TransmissionModelCode = new string[0];
 
@@ -476,8 +476,14 @@ namespace BusinessLogic.Import.RDE
                 // Parsing dell'ora di protocollazione
                 if (!String.IsNullOrEmpty(dataReader["Ora protocollo emergenza"].ToString()))
                 {
-                    protoDate = ImportUtils.ReadDate(dataReader["Ora protocollo emergenza"].ToString());
-                    temporaryData.EmergencyProtocolTime = protoDate.ToString("HH.mm.ss");
+                    DateTime time;
+                    DateTime.TryParse(dataReader["Ora protocollo emergenza"].ToString(), out time);
+
+                    if (time != null)
+                        temporaryData.EmergencyProtocolTime = time.ToString("HH.mm.ss");
+
+                    //protoDate = ImportUtils.ReadDate(dataReader["Ora protocollo emergenza"].ToString());
+                    //temporaryData.EmergencyProtocolTime = protoDate.ToString("HH.mm.ss");
                 }
 
                 // Lettura del numero del protocollo di emergenza
@@ -503,15 +509,12 @@ namespace BusinessLogic.Import.RDE
                     // parserizzo l'orario prima di utilizzarlo per verificare la formattazione e sollevare un messaggio di cortesia
                     if (!String.IsNullOrEmpty(dataReader["Ora arrivo"].ToString()))
                     {
-
-                        //DateTime time;
-                        //DateTime.TryParse(dataReader["Ora arrivo"].ToString(), out time);
-
-                        TimeSpan time;
-                        TimeSpan.TryParse(dataReader["Ora arrivo"].ToString().Replace(".", ":"), out time);
+                        DateTime time;
+                        DateTime.TryParse(dataReader["Ora arrivo"].ToString(), out time);
 
                         if (time != null)
-                            temporaryData.ArrivalTime = time.ToString();
+                            temporaryData.ArrivalTime = time.ToString("hh.mm.ss");
+
                     }
                 }
 
@@ -669,10 +672,10 @@ namespace BusinessLogic.Import.RDE
             else
                 // Altrimenti aggiunta di un result negativo
                 result.InDocument.Add(new ImportResult()
-                    {
-                        Outcome = ImportResult.OutcomeEnumeration.KO,
-                        Message = "Ruolo non abilitato alla creazione di documenti in arrivo."
-                    });
+                {
+                    Outcome = ImportResult.OutcomeEnumeration.KO,
+                    Message = "Ruolo non abilitato alla creazione di documenti in arrivo."
+                });
 
             #endregion
 
@@ -742,18 +745,246 @@ namespace BusinessLogic.Import.RDE
             else
                 // Altrimenti aggiunta di un result negativo
                 result.OwnDocument.Add(new ImportResult()
-                    {
-                        Outcome = ImportResult.OutcomeEnumeration.KO,
-                        Message = "Utente non abilitato alla creazione di documenti interni."
-                    });
+                {
+                    Outcome = ImportResult.OutcomeEnumeration.KO,
+                    Message = "Utente non abilitato alla creazione di documenti interni."
+                });
 
             #endregion
 
             // Restituzione del risultato dell'importazione
             return result;
+        }
+
+        public static ResultsContainer ImportDocumentsRDE(DocumentRowDataContainer container, InfoUtente userInfo, Ruolo role, string serverPath, bool isProfilationRequired, bool isRapidClassificationRequired, bool isSmistamentoEnabled, string ftpAddress, String ftpUsername, String ftpPassword, bool isEnabledPregressi)
+        {
+            #region Dichiarazione variabili
+
+            // La stringa di connessione al foglio excel
+            string connectionString = String.Empty;
+
+            // Il risultato dell'elaborazione
+            ResultsContainer result = null;
+
+            // La lista di funzioni associate al ruolo
+            Funzione[] functions = null;
+
+            // Un booleano utilizzato per tesare se con il ruolo segnalato può creare
+            // creato un documento di un certo tipo
+            bool canCreateDocuments = false;
+
+            #endregion
+
+            // Creazione della lista dei risultati
+            result = new ResultsContainer();
+
+            // Recupero delle funzioni associate al ruolo
+            functions = (Funzione[])role.funzioni.ToArray(typeof(Funzione));
+
+            List<DocumentRowData> allDocs = new List<DocumentRowData>();
+                allDocs.AddRange(container.InDocument);
+                allDocs.AddRange(container.OutDocument);            
+                allDocs.AddRange(container.OwnDocument);
+
+            if (allDocs != null)
+            {
+                allDocs = allDocs.OrderBy(a => a.OrdinalNumber).Select(a => a).ToList();
+
+                //Procedi con l'importazione
+                ImportDocuments(
+                        allDocs,
+                        userInfo,
+                        role,
+                        serverPath,
+                        isProfilationRequired,
+                        isRapidClassificationRequired,
+                        ftpAddress,
+                        false,
+                        isSmistamentoEnabled,
+                        ftpUsername,
+                        ftpPassword,
+                        isEnabledPregressi, ref result);
+
+            }
+            
+            // Restituzione del risultato dell'importazione
+            return result;
 
         }
 
+        /// <summary>
+        /// Funzione per l'importazione di un insieme di documenti di una determinata tipologia
+        /// </summary>
+        /// <param name="documentRowDataList"></param>
+        /// <param name="userInfo"></param>
+        /// <param name="role"></param>
+        /// <param name="serverPath"></param>
+        /// <param name="isProfilationRequired"></param>
+        /// <param name="isRapidClassificationRequired"></param>
+        /// <param name="sharedDirectoryPath"></param>
+        /// <param name="isGray"></param>
+        /// <param name="isSmistamentoEnabled"></param>
+        /// <param name="protoType"></param>
+        /// <returns></returns>
+        public static void ImportDocuments(
+            List<DocumentRowData> documentRowDataList,
+            InfoUtente userInfo,
+            Ruolo role,
+            string serverPath,
+            bool isProfilationRequired,
+            bool isRapidClassificationRequired,
+            string ftpAddress,
+            bool isGray,
+            bool isSmistamentoEnabled,
+            string ftpUsername,
+            String ftpPassword,
+            bool isEnabledPregressi,
+            ref ResultsContainer result)
+        {
+            #region Dichiarazione variabili
+
+
+            // Risultato dell'ultima importazione
+            ImportResult importResult = null;
+            Dictionary<string, int> importedDocuments = new Dictionary<string, int>();
+            importedDocuments.Add("A", 0);
+            importedDocuments.Add("P", 0);
+            importedDocuments.Add("I", 0);
+            Dictionary<string, int> notImportedDocuments = new Dictionary<string, int>();
+            notImportedDocuments.Add("A", 0);
+            notImportedDocuments.Add("P", 0);
+            notImportedDocuments.Add("I", 0);
+
+            #endregion
+
+            // Se non ci sono documenti da importare, il risultato sarà costituito da un solo risultato
+            // positivo
+            if (documentRowDataList.Count == 0)
+            {
+                importResult = new ImportResult()
+                {
+                    Outcome = ImportResult.OutcomeEnumeration.OK,
+                    Message = "Non sono stati rilevati documenti da importare."
+                };
+
+                result.InDocument.Add(importResult);
+                result.OutDocument.Add(importResult);
+                result.OwnDocument.Add(importResult);
+
+                return;
+            }
+
+            // Importazione dei documenti
+            foreach (DocumentRowData documentData in documentRowDataList)
+            {
+                try
+                {
+                    importResult = ImportRDEDocument(
+                        documentData,
+                        userInfo,
+                        role,
+                        serverPath,
+                        isRapidClassificationRequired,
+                        isSmistamentoEnabled,
+                        ftpAddress,
+                        isProfilationRequired,
+                        (ImportDocumentsManager.ProtoType)Enum.Parse(typeof(ImportDocumentsManager.ProtoType), documentData.ProtoType),
+                        ftpUsername,
+                        ftpPassword,
+                        isEnabledPregressi);
+                }
+                catch (Exception e)
+                {
+                    // Inclusione di un risultato negativo
+                    importResult = new ImportResult()
+                    {
+                        Outcome = ImportResult.OutcomeEnumeration.KO,
+                        Message = e.Message,
+                        Ordinal = documentData.OrdinalNumber
+                    };
+                }
+                finally
+                {
+                    switch(documentData.ProtoType)
+                    {
+                        case "A":
+                            result.InDocument.Add(importResult);
+                            break;
+                        case "P":
+                            result.OutDocument.Add(importResult);
+                            break;
+                        case "I":
+                            result.OwnDocument.Add(importResult);
+                            break;
+                    }
+
+                    // Se il risultato restituito dalla funzione di creazione del documento
+                    // è positivo, aggiunta di un risultato positivo, altrimenti aggiunta di un
+                    // risultato negativo
+                    if (importResult.Outcome == ImportResult.OutcomeEnumeration.KO)
+                        notImportedDocuments[documentData.ProtoType] += 1;
+                    else
+                        importedDocuments[documentData.ProtoType] += 1; ;
+                }
+            }
+
+            // Aggiunta di un ultimo risultato con il numero di 
+            // documenti importati e non importati
+            // Aggiunta di un'ultima riga contenente il totale dei documenti
+            // importati e non importati
+            result.InDocument.Add(new ImportResult()
+            {
+                Outcome = ImportResult.OutcomeEnumeration.OK,
+                Message = String.Format("Documenti importati: {0}; Documenti non importati: {1}",
+                    importedDocuments["A"], notImportedDocuments["A"])
+            });
+
+            result.OutDocument.Add(new ImportResult()
+            {
+                Outcome = ImportResult.OutcomeEnumeration.OK,
+                Message = String.Format("Documenti importati: {0}; Documenti non importati: {1}",
+                    importedDocuments["P"], notImportedDocuments["P"])
+            });
+
+            result.OwnDocument.Add(new ImportResult()
+            {
+                Outcome = ImportResult.OutcomeEnumeration.OK,
+                Message = String.Format("Documenti importati: {0}; Documenti non importati: {1}",
+                    importedDocuments["I"], notImportedDocuments["I"])
+            });
+        }
+
+        /// <summary>
+        /// Funzione per la restituzione dell'oggetto preposto all'importazione dei
+        /// documenti di una determinata tipologia
+        /// </summary>
+        /// <param name="protoType">Il tipo di protocollo da importare</param>
+        /// <returns>L'oggetto adatto ad effettuare l'importazione dei documenti della tipologia specificata</returns>
+        private static Document GetDocumentManager(string protoType)
+        {
+            // L'oggetto da restituire
+            Document toReturn = null;
+
+            switch (protoType)
+            {
+                case "A":   // Arrivo
+                    toReturn = new InDocument();
+                    break;
+
+                case "P":   // Partenza
+                    toReturn = new OutDocument();
+                    break;
+
+                case "I":   // Interno
+                    toReturn = new OwnDocument();
+                    break;
+
+            }
+
+            // Restituzione del risultato
+            return toReturn;
+
+        }
         #endregion
 
     }

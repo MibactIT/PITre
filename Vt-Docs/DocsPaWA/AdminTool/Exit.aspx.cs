@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Web.Security;
+using log4net;
 
 namespace Amministrazione
 {
@@ -17,6 +18,7 @@ namespace Amministrazione
     /// </summary>
     public class Exit : System.Web.UI.Page
     {
+        private ILog logger = LogManager.GetLogger(typeof(Exit));
         private void Page_Load(object sender, System.EventArgs e)
         {
             this.Session.Abandon();
@@ -33,14 +35,35 @@ namespace Amministrazione
             switch (Request.QueryString["FROM"])
             {
                 case "ABORT":
-                    Response.Redirect("login.htm");
+                    //Response.Redirect("login.htm");
                     break;
 
                 case "EXPIRED":
                     FormsAuthentication.SignOut();
-                    Response.Redirect("login.htm");
+                    //Response.Redirect("login.htm");
                     break;
             }
+            string logoutRedirectUrl = "";
+           // non fuziona   logoutRedirectUrl = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "LOGOUT_REDIRECT_URL");
+            logoutRedirectUrl = System.Configuration.ConfigurationManager.AppSettings["LOGOUT_REDIRECT_URL"];
+
+            logger.Debug("exit url ldap redirect  " + logoutRedirectUrl);
+            if(!string.IsNullOrEmpty(logoutRedirectUrl))
+            {
+                logger.Debug("exit url ldap redirect  logoutRedirectUrl");
+                
+                Response.Redirect(logoutRedirectUrl);
+            }
+           else
+                {
+                logger.Debug("exit url ldap redirect  login.htm");
+                //Response.Redirect("login.htm");
+                string httpFullPath = DocsPAWA.Utils.getHttpFullPath();
+
+                //Response.Redirect(httpFullPath + "/AdminTool/Gestione_Login/login.aspx");
+                Response.Redirect("Gestione_Login/login.aspx");
+            }
+
         }
 
         #region Web Form Designer generated code

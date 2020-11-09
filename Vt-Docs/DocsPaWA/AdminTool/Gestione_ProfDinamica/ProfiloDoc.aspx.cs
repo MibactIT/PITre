@@ -59,6 +59,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
         protected System.Web.UI.WebControls.Button btn_ConfermaPersCampoDiTesto;
         protected System.Web.UI.WebControls.Button btn_ConfermaPersCasellaDiSelezione;
         protected System.Web.UI.WebControls.TextBox txt_etichettaCampoDiTesto;
+        protected System.Web.UI.WebControls.TextBox txt_default_campotesto;
         protected System.Web.UI.WebControls.TextBox txt_etichettaCasellaDiSelezione;
         protected System.Web.UI.WebControls.TextBox DataInizio;
         protected System.Web.UI.WebControls.TextBox DataFine;
@@ -185,6 +186,14 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
         protected System.Web.UI.WebControls.Button btn_confermaInvioCons;
         protected System.Web.UI.WebControls.ImageButton pulsante_chiudi_InvioCons;
         protected System.Web.UI.WebControls.CheckBox cb_ModInvioCons;
+        //Gestione procedimentale
+        protected System.Web.UI.WebControls.Label LblTipoDocProcedimentale;
+        protected System.Web.UI.WebControls.Panel Panel_Procedimentale;
+        protected System.Web.UI.WebControls.Button btn_confermaProcedimentale;
+        protected System.Web.UI.WebControls.ImageButton pulsante_chiudi_Procedimentale;
+        protected System.Web.UI.WebControls.CheckBox cb_ModProcedimentale;
+
+
         //Gestione consolidamento/conservazione
         protected System.Web.UI.WebControls.Panel Panel_ConsolidaOgg;
         protected System.Web.UI.WebControls.Label LblOggConsolidamento;
@@ -259,6 +268,12 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
         protected Label lbl_repertorio;
         protected Label LblColoreSelezioneEsclusiva;
         protected Label LblColoreMenu;
+
+        protected System.Web.UI.WebControls.Button btn_replica;
+
+
+        protected CheckBox cbx_segnatura_permanente;
+        protected CheckBox cbx_segnatura_opzione_omnicomprensiva;
 
         private void Page_Load(object sender, System.EventArgs e)
         {
@@ -371,6 +386,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
         private void InitializeComponent()
         {
             this.btn_inEsercizio.Click += new System.EventHandler(this.btn_inEsercizio_Click);
+            this.btn_replica.Click += new System.EventHandler(this.btn_replica_Click);
             this.btn_salvaTemplate.Click += new System.EventHandler(this.btn_salvaTemplate_Click);
             this.btn_modelli.Click += new System.EventHandler(this.btn_modelli_Click);
             this.btn_nuovoModello.Click += new System.EventHandler(this.btn_nuovoModello_Click);
@@ -433,6 +449,10 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
             // eventi dei button per la gestione dell'invio in conservazione
             this.pulsante_chiudi_InvioCons.Click += new System.Web.UI.ImageClickEventHandler(this.pulsante_chiudi_InvioCons_Click);
             this.btn_confermaInvioCons.Click += new System.EventHandler(this.btn_confermaInvioCons_Click);
+            // eventi dei button per la gestione dei tipi doc procedimentali
+            this.pulsante_chiudi_Procedimentale.Click += new System.Web.UI.ImageClickEventHandler(this.pulsante_chiudi_Procedimentale_Click);
+            this.btn_confermaProcedimentale.Click += new System.EventHandler(this.btn_confermaProcedimentale_Click);
+
             // eventi per consolidamento/conservazione 
             this.pulsante_chiudi_OggConsol.Click += new System.Web.UI.ImageClickEventHandler(this.pulsante_chiudi_OggConsol_Click);
             this.btn_confermaConsolidaOgg.Click += new System.EventHandler(this.btn_confermaConsolidaOgg_Click);
@@ -582,6 +602,8 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                         dg_listaComponenti.Items[i].Height = 24;
                         dg_listaComponenti.Items[i].Cells[5].Controls[0].Visible = false;
                         dg_listaComponenti.Items[i].Cells[6].Controls[0].Visible = false;
+                        //dg_listaComponenti.Items[i].Cells[9].Controls[0].Visible = false;
+                        //dg_listaComponenti.Items[i].Cells[9].Controls[3].Visible = false;
                         dg_listaComponenti.Items[i].BackColor = System.Drawing.Color.Gray;
                     }
                 }
@@ -1208,6 +1230,8 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
             Panel_ListaComponenti.Visible = true;
             Panel_Personalizzazione.Visible = false;
             Panel_Dg_ListaComponenti.Visible = false;
+            Panel_Procedimentale.Visible = false;
+            Panel_InvioCons.Visible = false;
             dt_listaComponenti.Rows.Clear();
             txt_MesiConservazione.Text = "0";
             cb_InvioConservazione.Checked = false;
@@ -1996,6 +2020,37 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
 
         #endregion
 
+        #region btn_confermaProcedimentale_Click - pulsante_chiudi_Procedimentale_Click
+
+        private void btn_confermaProcedimentale_Click(object sender, System.EventArgs e)
+        {
+            DocsPAWA.DocsPaWR.Templates template = (DocsPAWA.DocsPaWR.Templates)Session["templateSelPerProcedimentale"];
+            string procedimentale = cb_ModProcedimentale.Checked ? "1" : "0";
+
+            if (string.IsNullOrEmpty(template.PROCEDIMENTALE))
+                template.PROCEDIMENTALE = "0";
+
+            if(!template.PROCEDIMENTALE.Equals(procedimentale))
+            {
+                ProfilazioneDocManager.updateProcedimentaleTipoDoc(template.SYSTEM_ID, procedimentale, this);
+                Panel_Procedimentale.Visible = false;
+                popolaTemplateDG();
+            }
+            else
+            {
+                Panel_Procedimentale.Visible = false;
+                dg_listaTemplates.SelectedIndex = -1;
+            }
+        }
+
+        private void pulsante_chiudi_Procedimentale_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+        {
+            Panel_Procedimentale.Visible = false;
+            LblTipoDocProcedimentale.Text = "";
+        }
+
+        #endregion
+
         #region btn consolidamento / conservazione
 
         private void btn_confermaConsolidaOgg_Click(object sender, System.EventArgs e)
@@ -2295,6 +2350,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                         oggettoCustom.NUMERO_DI_LINEE = txt_NumeroLinee_CampoDiTesto.Text;
                         oggettoCustom.TIPO_RICERCA_CORR = "0";
                         oggettoCustom.ID_RUOLO_DEFAULT = "0";
+                        oggettoCustom.VALORE_DATABASE = txt_default_campotesto.Text;
                         //Di default i seguenti valori MULTILINEA, CAMPO DI RICERCA e CAMPO OBBLIGATORIO sono una stringa vuota
                         if (cb_Multilinea_CampoDiTesto.Checked)
                         {
@@ -2482,6 +2538,13 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
 
                         if (txt_formatoContatore.Text != "")
                             oggettoCustom.FORMATO_CONTATORE = txt_formatoContatore.Text;
+                        //*****
+                        // Alessandro Aiello 31/10/2018
+                        // Gestione segnatura permanente
+                        //***** Inizio
+                        oggettoCustom.IS_SEGNATURA_PERMANENTE = this.cbx_segnatura_permanente.Checked ? "1" : "0";
+                        oggettoCustom.IS_SEGNATURA_PERMANENTE_ONNICOMPRENSIVA = this.cbx_segnatura_opzione_omnicomprensiva.Checked ? "1" : "0";
+                        //***** Fine
 
                         if (cb_ContaDopo.Checked)
                             oggettoCustom.CONTA_DOPO = "1";
@@ -3059,6 +3122,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
             txt_NumeroLinee_CampoDiTesto.Text = "";
             //txt_NumeroLinee_CampoDiTesto.Enabled = false;
             //txt_NumeroLinee_CampoDiTesto.BackColor = System.Drawing.Color.AntiqueWhite;
+            txt_default_campotesto.Text = "";
         }
 
         public void compilaPersCampoDiTesto(DocsPAWA.DocsPaWR.OggettoCustom oggettoCustom)
@@ -3098,6 +3162,14 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                 //txt_NumeroCaratteri_CampoDiTesto.BackColor = System.Drawing.Color.White;
                 //txt_NumeroLinee_CampoDiTesto.Enabled = false;
                 //txt_NumeroLinee_CampoDiTesto.BackColor = System.Drawing.Color.AntiqueWhite;						
+            }
+            if (!string.IsNullOrEmpty(oggettoCustom.VALORE_DATABASE))
+            {
+                txt_default_campotesto.Text = oggettoCustom.VALORE_DATABASE;
+            }
+            else
+            {
+                txt_default_campotesto.Text = string.Empty;
             }
         }
         #endregion resetta-compila CampoDiTesto
@@ -3458,7 +3530,6 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
             ddl_campiContatore.Enabled = false;
             txt_formatoContatore.Text = "";
             rbl_tipoContatore.SelectedIndex = 0;
-            rbl_tipoContatore.SelectedIndex = 1;
             cb_Repertorio.Checked = false;
             cb_ContaDopo.Checked = false;
             cb_Repertorio.Enabled = true;
@@ -3511,6 +3582,12 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
 
             if (oggettoCustom.FORMATO_CONTATORE != "")
                 txt_formatoContatore.Text = oggettoCustom.FORMATO_CONTATORE;
+            //***** Alessandro Aiello 31/10/2018
+            // Gestione segnatura permanente
+            //***** Inizio
+            this.cbx_segnatura_permanente.Checked = "1".Equals(oggettoCustom.IS_SEGNATURA_PERMANENTE);
+            this.cbx_segnatura_opzione_omnicomprensiva.Checked = "1".Equals(oggettoCustom.IS_SEGNATURA_PERMANENTE_ONNICOMPRENSIVA);
+            //***** Fine
 
             if (oggettoCustom.TIPO_CONTATORE != null)
             {
@@ -3940,6 +4017,11 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                     lbl_invioCons.Text = "SI";
                 else
                     lbl_invioCons.Text = "NO";
+                Label lbl_procedimentale = ((Label)dg_listaTemplates.Items[i].Cells[8].Controls[3]);
+                if (!string.IsNullOrEmpty(template.PROCEDIMENTALE) && template.PROCEDIMENTALE == "1")
+                    lbl_procedimentale.Text = "SI";
+                else
+                    lbl_procedimentale.Text = "NO";
             }
 
             //Imposto il campo Diagramma di Stato
@@ -3999,7 +4081,8 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                     ((ImageButton)dg_listaTemplates.Items[0].Cells[4].Controls[1]).Visible = false;
                     dg_listaTemplates.Items[0].Cells[5].Enabled = false;
                     //dg_listaTemplates.Items[0].Cells[7].Controls[0].Visible = false;
-                    dg_listaTemplates.Items[0].Cells[8].Controls[0].Visible = false;
+                    //dg_listaTemplates.Items[0].Cells[8].Controls[0].Visible = false;
+                    dg_listaTemplates.Items[0].Cells[9].Controls[0].Visible = false;
                     dg_listaTemplates.Items[0].BackColor = System.Drawing.Color.Gray;
                 }
             }
@@ -4073,6 +4156,14 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
             popolaTemplateDG();
         }
 
+        private void btn_replica_Click(object sender, System.EventArgs e)
+        {
+            DocsPAWA.DocsPaWR.Templates template = (DocsPAWA.DocsPaWR.Templates)Session["template"];
+            Session.Add("templateSelPerReplicaDoc", template);
+
+            RegisterStartupScript("ReplicaInAOO", "<script>apriPopupReplicaInAoo();</script>");
+        }
+
         protected void btn_isInstance_OnClick(object sender, EventArgs e)
         {
             DocsPAWA.DocsPaWR.Templates template = (DocsPAWA.DocsPaWR.Templates)Session["template"];
@@ -4120,6 +4211,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                     btn_anteprima.Visible = false;
                     btn_salvaTemplate.Visible = false;
                     btn_inEsercizio.Visible = false;
+                    btn_replica.Visible = false;
                     this.btn_isInstance.Visible = false;
                     lbl_titolo.Visible = true;
                     lbl_nameTypeDoc.Text = "";
@@ -4170,6 +4262,14 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                         btn_anteprima.Visible = true;
                         btn_salvaTemplate.Visible = false;
                         lbl_avviso.Visible = false;
+
+                        // Il pulsante replica è attivo solo per i SYSTEM ADMINISTRATOR
+                        DocsPAWA.DocsPaWR.InfoUtenteAmministratore _datiAmministratore = new DocsPAWA.DocsPaWR.InfoUtenteAmministratore();
+                        DocsPAWA.AdminTool.Manager.SessionManager session = new DocsPAWA.AdminTool.Manager.SessionManager();
+                        _datiAmministratore = session.getUserAmmSession();
+                        if (_datiAmministratore.tipoAmministratore.Equals("1"))
+                            btn_replica.Visible = true;
+
                         //Session.Add("templateSelezionato",elSelezionato);
                         if (template.IN_ESERCIZIO.Equals("NO"))
                         {
@@ -4239,8 +4339,10 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                     btn_anteprima.Visible = false;
                     btn_salvaTemplate.Visible = false;
                     btn_inEsercizio.Visible = false;
+                    btn_replica.Visible = false;
                     Panel_MesiCons.Visible = false;
                     Panel_InvioCons.Visible = false;
+                    Panel_Procedimentale.Visible = false;
                     Panel_ConsolidaOgg.Visible = false;
                     Panel_ConservaOgg.Visible = false;
                     this.btn_isInstance.Visible = false;
@@ -4278,6 +4380,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                     Panel_Personalizzazione.Visible = false;
                     Panel_MesiCons.Visible = false;
                     Panel_InvioCons.Visible = false;
+                    Panel_Procedimentale.Visible = false;
                     Panel_ConsolidaOgg.Visible = false;
                     Panel_ConservaOgg.Visible = false;
                     break;
@@ -4316,6 +4419,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                     Panel_Personalizzazione.Visible = false;
                     Panel_MesiCons.Visible = false;
                     Panel_InvioCons.Visible = false;
+                    Panel_Procedimentale.Visible = false;
                     Panel_ConsolidaOgg.Visible = false;
                     Panel_ConservaOgg.Visible = false;
                     break;
@@ -4333,6 +4437,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                     Panel_Diagrammi_Trasmissioni.Visible = false;
                     Panel_Personalizzazione.Visible = false;
                     Panel_InvioCons.Visible = false;
+                    Panel_Procedimentale.Visible = false;
                     Panel_ConsolidaOgg.Visible = false;
                     Panel_ConservaOgg.Visible = false;
                     break;
@@ -4346,6 +4451,7 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                         cb_ModInvioCons.Checked = true;
                     else
                         cb_ModInvioCons.Checked = false;
+                    Panel_Procedimentale.Visible = false;
                     Panel_InvioCons.Visible = true;
                     Panel_MesiCons.Visible = false;
                     Panel_Privato.Visible = false;
@@ -4356,6 +4462,28 @@ namespace DocsPAWA.AdminTool.Gestione_ProfDinamica
                     Panel_ConsolidaOgg.Visible = false;
                     Panel_ConservaOgg.Visible = false;
                     break;
+                case "Procedimentale":
+                    DocsPAWA.DocsPaWR.Templates temp_6 = ProfilazioneDocManager.getTemplateById(((DocsPAWA.DocsPaWR.Templates)listaTemplates[elSelezionato]).SYSTEM_ID.ToString(), this);
+                    Session.Add("templateSelPerProcedimentale", temp_6);
+
+                    dg_listaTemplates.SelectedIndex = elSelezionato;
+                    LblTipoDocInvioCons.Text = temp_6.DESCRIZIONE;
+                    if (!string.IsNullOrEmpty(temp_6.PROCEDIMENTALE) && temp_6.PROCEDIMENTALE == "1") // QUI
+                        cb_ModProcedimentale.Checked = true;
+                    else
+                        cb_ModProcedimentale.Checked = false;
+                    Panel_Procedimentale.Visible = true;
+                    Panel_InvioCons.Visible = false;
+                    Panel_MesiCons.Visible = false;
+                    Panel_Privato.Visible = false;
+                    Panel_ListaComponenti.Visible = false;
+                    Panel_Dg_ListaComponenti.Visible = false;
+                    Panel_Diagrammi_Trasmissioni.Visible = false;
+                    Panel_Personalizzazione.Visible = false;
+                    Panel_ConsolidaOgg.Visible = false;
+                    Panel_ConservaOgg.Visible = false;
+                    break;
+
 
             }
         }

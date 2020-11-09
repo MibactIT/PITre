@@ -455,16 +455,16 @@ namespace BusinessLogic.Import.Template
                 if (schedaDocumento.protocollo != null)
                 {
                     // NUMERO PROTOCOLLO
-                    builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.NUM_PROTOCOLLO, this._handleNullString(schedaDocumento.protocollo.numero) );
+                    builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.NUM_PROTOCOLLO, schedaDocumento.protocollo.numero);
 
                     // SEGNATURA
-                    builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.SEGNATURA, this._handleNullString(schedaDocumento.protocollo.segnatura));
+                    builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.SEGNATURA, schedaDocumento.protocollo.segnatura);
 
                     // DATA PROTOCOLLO
-                    builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.DATA_PROTOCOLLO, this._handleNullString(schedaDocumento.protocollo.dataProtocollazione));
+                    builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.DATA_PROTOCOLLO, schedaDocumento.protocollo.dataProtocollazione);
 
                     // DATA ORA PROTOCOLLO
-                    builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.DATA_ORA_PROTOCOLLO, this._handleNullString(BusinessLogic.Documenti.ProtoManager.getDataOraProtocollo(schedaDocumento.docNumber)));
+                    builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.DATA_ORA_PROTOCOLLO, BusinessLogic.Documenti.ProtoManager.getDataOraProtocollo(schedaDocumento.docNumber));
 
                     // REGISTRO
                     builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.REGISTRO, schedaDocumento.registro.descrizione);
@@ -851,7 +851,6 @@ namespace BusinessLogic.Import.Template
                                 builder.AddTextPlaceholder(BusinessLogic.Modelli.BaseDocModelProcessor.DocumentCommonFields.UFF_REF_DESC, prot.ufficioReferente.descrizione);
                             }
                         }
-                        
                     }
                 }
                 else
@@ -892,11 +891,5 @@ namespace BusinessLogic.Import.Template
                 logger.Debug("Eccezione in HandleCampiComuni: "+e);
             }
         }
-
-        private string _handleNullString(string value)
-        {
-            return value == null ? String.Empty : value;
-        }
-
     }
 }

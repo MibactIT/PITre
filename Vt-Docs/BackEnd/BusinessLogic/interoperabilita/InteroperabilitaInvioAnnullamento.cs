@@ -129,8 +129,7 @@ namespace BusinessLogic.Interoperabilità
                 costruisciXml(idProfile, reg, ref numRegMitt, ref qco, separatore, pathFiles);
 
                 //invio mail
-                string mailMitt = Interoperabilità.InteroperabilitaUtils.getMailAddress(qco, idProfile);
-
+                string mailMitt = Interoperabilità.InteroperabilitaUtils.getMailAddress(qco);
                 logger.Debug("Invio mail all'indirizzo " + mailMitt);
                 string porta = null;
                 if (regRow["NUM_PORTA_SMTP"] != null)
@@ -276,10 +275,6 @@ namespace BusinessLogic.Interoperabilità
                 codiceAOO.InnerText = reg.codRegistro;
 
                 identificatore.AppendChild(codiceAOO);
-
-                XmlElement codiceRegistro = xdoc.CreateElement("CodiceRegistro");
-                codiceRegistro.InnerText = reg.codRegistro;
-                identificatore.AppendChild(codiceRegistro);
 
                 XmlElement numeroReg = xdoc.CreateElement("NumeroRegistrazione");
                 numeroReg.InnerText = numeroRegString;

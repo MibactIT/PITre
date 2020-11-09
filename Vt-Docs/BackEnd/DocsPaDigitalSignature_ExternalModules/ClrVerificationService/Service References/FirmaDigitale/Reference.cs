@@ -12,7 +12,7 @@ namespace ClrVerificationService.FirmaDigitale {
     
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -72,7 +72,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.regione.taa.it/FaultType/schemas")]
     public enum TipologiaFaultType {
@@ -85,53 +85,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitaleType/schemas")]
-    public partial class DocumentoType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private byte[] fileOriginaleField;
-        
-        private string mediaTypeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary", Order=0)]
-        public byte[] fileOriginale {
-            get {
-                return this.fileOriginaleField;
-            }
-            set {
-                this.fileOriginaleField = value;
-                this.RaisePropertyChanged("fileOriginale");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string mediaType {
-            get {
-                return this.mediaTypeField;
-            }
-            set {
-                this.mediaTypeField = value;
-                this.RaisePropertyChanged("mediaType");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -177,7 +131,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -237,7 +191,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -507,7 +461,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -665,7 +619,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -711,7 +665,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -841,7 +795,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -901,7 +855,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -989,7 +943,53 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitaleType/schemas")]
+    public partial class DocumentoType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private byte[] fileOriginaleField;
+        
+        private string mediaTypeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary", Order=0)]
+        public byte[] fileOriginale {
+            get {
+                return this.fileOriginaleField;
+            }
+            set {
+                this.fileOriginaleField = value;
+                this.RaisePropertyChanged("fileOriginale");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string mediaType {
+            get {
+                return this.mediaTypeField;
+            }
+            set {
+                this.mediaTypeField = value;
+                this.RaisePropertyChanged("mediaType");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1203,91 +1203,29 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale", ConfigurationName="FirmaDigitale.FirmaDigitalePortType")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://xmlns.example.com/1302014887254", ConfigurationName="FirmaDigitale.FirmaDigitalePortType")]
     public interface FirmaDigitalePortType {
         
-        // CODEGEN: Generating message contract since the wrapper namespace (http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions) of message VerificaFirmaCompletaRequest does not match the default value (http://www.firmadigitale.regione.taa.it/FirmaDigitale)
-        [System.ServiceModel.OperationContractAttribute(Action="/VerificaFirmaCompleta", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.FaultType), Action="/VerificaFirmaCompleta", Name="WSFault", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
-        [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.WarningResponseType), Action="/VerificaFirmaCompleta", Name="WarningResponse", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        ClrVerificationService.FirmaDigitale.VerificaFirmaCompletaResponse VerificaFirmaCompleta(ClrVerificationService.FirmaDigitale.VerificaFirmaCompletaRequest request);
-        
-        // CODEGEN: Generating message contract since the wrapper namespace (http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions) of message VerificaFirmaConOriginaleRequest does not match the default value (http://www.firmadigitale.regione.taa.it/FirmaDigitale)
+        // CODEGEN: Generating message contract since the wrapper namespace (http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions) of message VerificaFirmaConOriginaleRequest does not match the default value (http://xmlns.example.com/1302014887254)
         [System.ServiceModel.OperationContractAttribute(Action="/VerificaFirmaConOriginale", ReplyAction="*")]
         [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.FaultType), Action="/VerificaFirmaConOriginale", Name="WSFault", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
         [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.WarningResponseType), Action="/VerificaFirmaConOriginale", Name="WarningResponse", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         ClrVerificationService.FirmaDigitale.VerificaFirmaConOriginaleResponse VerificaFirmaConOriginale(ClrVerificationService.FirmaDigitale.VerificaFirmaConOriginaleRequest request);
         
-        // CODEGEN: Generating message contract since the wrapper namespace (http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions) of message VerificaCertificatoRequest does not match the default value (http://www.firmadigitale.regione.taa.it/FirmaDigitale)
+        // CODEGEN: Generating message contract since the wrapper namespace (http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions) of message VerificaCertificatoRequest does not match the default value (http://xmlns.example.com/1302014887254)
         [System.ServiceModel.OperationContractAttribute(Action="/VerificaCertificato", ReplyAction="*")]
         [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.FaultType), Action="/VerificaCertificato", Name="WSFault", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
         [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.WarningCertificatoType), Action="/VerificaCertificato", Name="WarningCertificatoResponse", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         ClrVerificationService.FirmaDigitale.VerificaCertificatoResponse VerificaCertificato(ClrVerificationService.FirmaDigitale.VerificaCertificatoRequest request);
         
-        // CODEGEN: Generating message contract since the wrapper namespace (http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions) of message VerificaFirmaRequest does not match the default value (http://www.firmadigitale.regione.taa.it/FirmaDigitale)
+        // CODEGEN: Generating message contract since the wrapper namespace (http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions) of message VerificaFirmaRequest does not match the default value (http://xmlns.example.com/1302014887254)
         [System.ServiceModel.OperationContractAttribute(Action="/VerificaFirma", ReplyAction="*")]
         [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.FaultType), Action="/VerificaFirma", Name="WSFault", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
         [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.WarningResponseType), Action="/VerificaFirma", Name="WarningResponse", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         ClrVerificationService.FirmaDigitale.VerificaFirmaResponse VerificaFirma(ClrVerificationService.FirmaDigitale.VerificaFirmaRequest request);
-        
-        // CODEGEN: Generating message contract since the wrapper namespace (http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions) of message RimuoviFirmePdfRequest does not match the default value (http://www.firmadigitale.regione.taa.it/FirmaDigitale)
-        [System.ServiceModel.OperationContractAttribute(Action="/RimuoviFirmePdf", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(ClrVerificationService.FirmaDigitale.FaultType), Action="/RimuoviFirmePdf", Name="WSFault", Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        ClrVerificationService.FirmaDigitale.RimuoviFirmePdfResponse RimuoviFirmePdf(ClrVerificationService.FirmaDigitale.RimuoviFirmePdfRequest request);
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="VerificaFirmaCompleta", WrapperNamespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions", IsWrapped=true)]
-    public partial class VerificaFirmaCompletaRequest {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitaleType/schemas", Order=0)]
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitaleType/schemas", DataType="base64Binary")]
-        public byte[] fileFirmato;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions", Order=1)]
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public string dataVerifica;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions", Order=2)]
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
-        public System.Nullable<sbyte> controlloFirmeAnnidate;
-        
-        public VerificaFirmaCompletaRequest() {
-        }
-        
-        public VerificaFirmaCompletaRequest(byte[] fileFirmato, string dataVerifica, System.Nullable<sbyte> controlloFirmeAnnidate) {
-            this.fileFirmato = fileFirmato;
-            this.dataVerifica = dataVerifica;
-            this.controlloFirmeAnnidate = controlloFirmeAnnidate;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="VerificaFirmaCompletaResponse", WrapperNamespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions", IsWrapped=true)]
-    public partial class VerificaFirmaCompletaResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions", Order=0)]
-        public ClrVerificationService.FirmaDigitale.DettaglioFirmaDigitaleType esito;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions", Order=1)]
-        public ClrVerificationService.FirmaDigitale.DocumentoType documento;
-        
-        public VerificaFirmaCompletaResponse() {
-        }
-        
-        public VerificaFirmaCompletaResponse(ClrVerificationService.FirmaDigitale.DettaglioFirmaDigitaleType esito, ClrVerificationService.FirmaDigitale.DocumentoType documento) {
-            this.esito = esito;
-            this.documento = documento;
-        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1351,7 +1289,7 @@ namespace ClrVerificationService.FirmaDigitale {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1593,42 +1531,6 @@ namespace ClrVerificationService.FirmaDigitale {
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="RimuoviFirmePdf", WrapperNamespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions", IsWrapped=true)]
-    public partial class RimuoviFirmePdfRequest {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitaleType/schemas", Order=0)]
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitaleType/schemas", DataType="base64Binary")]
-        public byte[] fileFirmato;
-        
-        public RimuoviFirmePdfRequest() {
-        }
-        
-        public RimuoviFirmePdfRequest(byte[] fileFirmato) {
-            this.fileFirmato = fileFirmato;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="RimuoviFirmePdfResponse", WrapperNamespace="http://www.firmadigitale.regione.taa.it/FirmaDigitale/definitions", IsWrapped=true)]
-    public partial class RimuoviFirmePdfResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitaleType/schemas", Order=0)]
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://www.firmadigitale.regione.taa.it/FirmaDigitaleType/schemas", DataType="base64Binary")]
-        public byte[] fileSenzaFirme;
-        
-        public RimuoviFirmePdfResponse() {
-        }
-        
-        public RimuoviFirmePdfResponse(byte[] fileSenzaFirme) {
-            this.fileSenzaFirme = fileSenzaFirme;
-        }
-    }
-    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface FirmaDigitalePortTypeChannel : ClrVerificationService.FirmaDigitale.FirmaDigitalePortType, System.ServiceModel.IClientChannel {
     }
@@ -1654,21 +1556,6 @@ namespace ClrVerificationService.FirmaDigitale {
         
         public FirmaDigitalePortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        ClrVerificationService.FirmaDigitale.VerificaFirmaCompletaResponse ClrVerificationService.FirmaDigitale.FirmaDigitalePortType.VerificaFirmaCompleta(ClrVerificationService.FirmaDigitale.VerificaFirmaCompletaRequest request) {
-            return base.Channel.VerificaFirmaCompleta(request);
-        }
-        
-        public ClrVerificationService.FirmaDigitale.DettaglioFirmaDigitaleType VerificaFirmaCompleta(byte[] fileFirmato, string dataVerifica, System.Nullable<sbyte> controlloFirmeAnnidate, out ClrVerificationService.FirmaDigitale.DocumentoType documento) {
-            ClrVerificationService.FirmaDigitale.VerificaFirmaCompletaRequest inValue = new ClrVerificationService.FirmaDigitale.VerificaFirmaCompletaRequest();
-            inValue.fileFirmato = fileFirmato;
-            inValue.dataVerifica = dataVerifica;
-            inValue.controlloFirmeAnnidate = controlloFirmeAnnidate;
-            ClrVerificationService.FirmaDigitale.VerificaFirmaCompletaResponse retVal = ((ClrVerificationService.FirmaDigitale.FirmaDigitalePortType)(this)).VerificaFirmaCompleta(inValue);
-            documento = retVal.documento;
-            return retVal.esito;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -1719,18 +1606,6 @@ namespace ClrVerificationService.FirmaDigitale {
             ClrVerificationService.FirmaDigitale.VerificaFirmaResponse retVal = ((ClrVerificationService.FirmaDigitale.FirmaDigitalePortType)(this)).VerificaFirma(inValue);
             documento = retVal.documento;
             return retVal.esito;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        ClrVerificationService.FirmaDigitale.RimuoviFirmePdfResponse ClrVerificationService.FirmaDigitale.FirmaDigitalePortType.RimuoviFirmePdf(ClrVerificationService.FirmaDigitale.RimuoviFirmePdfRequest request) {
-            return base.Channel.RimuoviFirmePdf(request);
-        }
-        
-        public byte[] RimuoviFirmePdf(byte[] fileFirmato) {
-            ClrVerificationService.FirmaDigitale.RimuoviFirmePdfRequest inValue = new ClrVerificationService.FirmaDigitale.RimuoviFirmePdfRequest();
-            inValue.fileFirmato = fileFirmato;
-            ClrVerificationService.FirmaDigitale.RimuoviFirmePdfResponse retVal = ((ClrVerificationService.FirmaDigitale.FirmaDigitalePortType)(this)).RimuoviFirmePdf(inValue);
-            return retVal.fileSenzaFirme;
         }
     }
 }

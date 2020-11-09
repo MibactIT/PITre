@@ -3999,23 +3999,6 @@ namespace DocsPAWA
             return new List<Corrispondente>(docsPaWS.GetPrefChannelAllDest(idProfile, typeDest));
         }
 
-        /// <summary>
-        /// Restituisce l'utente automatico per un'amministrazione
-        /// </summary>
-        public static DocsPAWA.DocsPaWR.Utente GetUtenteAutomatico(Page page, string idAmm, out string returnMsg)
-        {
-            returnMsg = string.Empty;
-            try
-            {
-                return docsPaWS.GetUtenteAutomatico(idAmm);
-            }
-            catch (System.Exception e)
-            {
-                ErrorManager.redirectToErrorPage(page, e);
-            }
-            return null;
-        }
-
         // MEV Utente Multi Amministrazione
         /// <summary>
         /// Lista Amministrazione pewr Utente

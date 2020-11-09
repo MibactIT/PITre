@@ -7,7 +7,6 @@ using DocsPaVO.LibroFirma;
 using System.Data;
 using log4net;
 using System.IO;
-using DocsPaUtils.Data;
 
 namespace DocsPaDB.Query_DocsPAWS
 {
@@ -110,39 +109,6 @@ namespace DocsPaDB.Query_DocsPAWS
             return retVal;
         }
 
-        public IstanzaPassoDiFirma GetIstanzaPassoFirmaInAttesaByDocnumber(string docnumber)
-        {
-            IstanzaPassoDiFirma istanza = null;
-
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_ISTANZA_PASSO_LIBRO_FIRMA_IN_ATTESA_BY_DOCNUMBER");
-                q.setParam("docnumber", docnumber);
-
-                string query = q.getSQL();
-                logger.Debug("GetIstanzaPassoFirmaInAttesa: " + query);
-
-                if (this.ExecuteQuery(out ds, "IstanzaPassoFirmaInAttesa", query))
-                {
-                    if (ds.Tables["IstanzaPassoFirmaInAttesa"] != null && ds.Tables["IstanzaPassoFirmaInAttesa"].Rows.Count > 0)
-                    {
-                        DataRow row = ds.Tables["IstanzaPassoFirmaInAttesa"].Rows[0];
-                        istanza = new IstanzaPassoDiFirma();
-                        istanza.RuoloCoinvolto = new DocsPaVO.utente.Ruolo() { idGruppo = row["ID_RUOLO_COINVOLTO"].ToString() } ;
-                        istanza.UtenteCoinvolto = new DocsPaVO.utente.Utente() { idPeople = row["Id_UTENTE_COINVOLTO"].ToString() };
-                        istanza.UtenteLocker = row["ID_UTENTE_LOCKER"].ToString();
-                        istanza.TipoFirma = row["TIPO_FIRMA"].ToString();
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in GetIstanzaPassoFirmaInAttesa: " + e.Message);
-            }
-
-            return istanza;
-        }
 
         public bool IsDocInLibroFirma(string docNumber)
         {
@@ -175,37 +141,6 @@ namespace DocsPaDB.Query_DocsPAWS
             return retVal;
         }
 
-        public bool IsModelloDiFirma(string idProcesso)
-        {
-            logger.Debug("Inizio Metodo IsModelloDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            bool retVal = false;
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_SCHEMA_PROCESSO_FIRMA_MODELLO");
-                q.setParam("idProcesso", idProcesso);
-
-                string query = q.getSQL();
-                logger.Debug("IsModelloDiFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "IsModelloDiFirma", query))
-                {
-                    if (ds.Tables["IsModelloDiFirma"] != null && ds.Tables["IsModelloDiFirma"].Rows.Count > 0)
-                    {
-                        retVal = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo IsModelloDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                retVal = false;
-            }
-
-            return retVal;
-        }
-
         //Verifica se un documento o uno dei suoi allegati è in libro firma
         public bool IsDocOrAllInLibroFirma(string docNumber)
         {
@@ -232,73 +167,6 @@ namespace DocsPaDB.Query_DocsPAWS
             catch (Exception e)
             {
                 logger.Error("Errore nel Metodo IsDocOrAllInLibroFirma in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                retVal = false;
-            }
-
-            return retVal;
-        }
-
-        /// <summary>
-        /// Verifica se il documento ha allegati in Libro Firma
-        /// </summary>
-        /// <param name="idDocumentoPrincipale"></param>
-        /// <returns></returns>
-        public bool CheckAllegatiInLibroFirma(string idDocumentoPrincipale)
-        {
-            logger.Debug("Inizio Metodo CheckAllegatiInLibroFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            bool retVal = false;
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_ALLEGATI_IN_LIBRO_FIRMA");
-                q.setParam("idDocumentoPrincipale", idDocumentoPrincipale);
-
-                string query = q.getSQL();
-                logger.Debug("CheckAllegatiInLibroFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "CheckAllegatiInLibroFirma", query))
-                {
-                    if (ds.Tables["CheckAllegatiInLibroFirma"] != null && ds.Tables["CheckAllegatiInLibroFirma"].Rows.Count > 0)
-                    {
-                        retVal = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo CheckAllegatiInLibroFirma in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                retVal = false;
-            }
-
-            return retVal;
-        }
-
-        public bool IsDocumentoPrincipaleInLF(string docNumber)
-        {
-            logger.Debug("Inizio Metodo IsDocumentoPrincipaleInLF in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            bool retVal = false;
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DOC_PRINCIPALE_IN_LIBRO_FIRMA");
-                q.setParam("docnumber", docNumber);
-
-                string query = q.getSQL();
-                logger.Debug("IsDocumentoPrincipaleInLF: " + query);
-
-                if (this.ExecuteQuery(out ds, "Documento_In_Libro_Firma", query))
-                {
-                    if (ds.Tables["Documento_In_Libro_Firma"] != null && ds.Tables["Documento_In_Libro_Firma"].Rows.Count > 0)
-                    {
-                        retVal = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo IsDocumentoPrincipaleInLF in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
                 retVal = false;
             }
 
@@ -379,10 +247,8 @@ namespace DocsPaDB.Query_DocsPAWS
                             {
                                 gruppo = !string.IsNullOrEmpty(row["GRUPPO"].ToString()) ? row["GRUPPO"].ToString() : string.Empty,
                                 descrizione = !string.IsNullOrEmpty(row["DESCRIZIONE"].ToString()) ? row["DESCRIZIONE"].ToString() : string.Empty,
-                                codiceAzione = !string.IsNullOrEmpty(row["VAR_COD_AZIONE"].ToString()) ? row["VAR_COD_AZIONE"].ToString() : string.Empty,
-                                automatico = string.IsNullOrEmpty(row["CHA_AUTOMATICO"].ToString()) || !row["CHA_AUTOMATICO"].ToString().Equals("1") ? false : true
-
-                        };
+                                codiceAzione = !string.IsNullOrEmpty(row["VAR_COD_AZIONE"].ToString()) ? row["VAR_COD_AZIONE"].ToString() : string.Empty
+                            };
                             eventTypes.Add(evento);
                         }
                     }
@@ -404,7 +270,7 @@ namespace DocsPaDB.Query_DocsPAWS
         /// </summary>
         /// <param name="infoUtente"></param>
         /// <returns></returns>
-        public List<ProcessoFirma> GetProcessesSignatureVisibleRole(bool asProponente, bool asMonitoratore, DocsPaVO.utente.InfoUtente infoUtente)
+        public List<ProcessoFirma> GetProcessesSignatureVisibleRole(DocsPaVO.utente.InfoUtente infoUtente)
         {
             logger.Info("Inizio Metodo GetProcessesSignatureVisibleRole in DocsPaDb.Query_DocsPAWS.LibroFirma");
             List<ProcessoFirma> listProcessiDiFirma = new List<ProcessoFirma>();
@@ -415,13 +281,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 DataSet ds = new DataSet();
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_SCHEMA_PROCESSO_FIRMA_VISIBLE_ROLE");
                 q.setParam("idGroup", infoUtente.idGruppo);
-                if(asMonitoratore && asProponente)
-                    q.setParam("visibilita", string.Empty);
-                if(asProponente)
-                    q.setParam("visibilita", "AND CHA_TIPO_VISIBILITA='P'");
-                if (asMonitoratore)
-                    q.setParam("visibilita", "AND CHA_TIPO_VISIBILITA='M'");
-
                 query = q.getSQL();
                 logger.Debug("GetProcessesSignatureVisibleRole: " + query);
 
@@ -489,7 +348,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                 nome = !string.IsNullOrEmpty(row["NOME"].ToString()) ? row["NOME"].ToString() : string.Empty,
                                 isInvalidated = !string.IsNullOrEmpty(row["TICK"].ToString()) && row["TICK"].ToString().Equals("1") ? true : false,
                                 IsProcessModel = !string.IsNullOrEmpty(row["CHA_MODELLO"].ToString()) && row["CHA_MODELLO"].ToString().Equals("1") ? true : false,
-                                DataCreazione = !string.IsNullOrEmpty(row["DTA_CREAZIONE"].ToString()) ? row["DTA_CREAZIONE"].ToString() : string.Empty,
                                 //idRuoloAutore = !string.IsNullOrEmpty(row["RUOLO_AUTORE"].ToString()) ? row["RUOLO_AUTORE"].ToString() : string.Empty,
                                 //idPeopleAutore = !string.IsNullOrEmpty(row["UTENTE_AUTORE"].ToString()) ? row["UTENTE_AUTORE"].ToString() : string.Empty,
                                 passi = GetPassiProcessoDiFirma(row["ID_PROCESSO"].ToString())
@@ -507,142 +365,6 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Info("Fine Metodo GetProcessiDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
 
             return listProcessiDiFirma;
-        }
-
-
-        /// <summary>
-        /// Metodo per l'estrazione degli schemi dei processi di firma impostando filtri di ricerca
-        /// </summary>
-        /// <param name="infoUtente"></param>
-        /// <returns></returns>
-        public List<ProcessoFirma> GetProcessiDiFirmaByFilter(List<DocsPaVO.LibroFirma.FiltroProcessoFirma> filtri, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Info("Inizio Metodo GetProcessiDiFirmaByFilter in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            List<ProcessoFirma> listProcessiDiFirma = new List<ProcessoFirma>();
-            ProcessoFirma processoDiFirma = null;
-            try
-            {
-                string query;
-
-                string condition = BindConditionFiltersProcess(filtri);
-                string order = BindOrderBysProcess(filtri);
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_SCHEMA_PROCESSO_FIRMA_BY_FILTER");
-                q.setParam("ruoloAutore", infoUtente.idGruppo);
-                q.setParam("utenteAutore", infoUtente.idPeople);
-                q.setParam("condition", condition);
-                q.setParam("order", order);
-                query = q.getSQL();
-                logger.Debug("getProcessiDiFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "processiDiFirma", query))
-                {
-                    if (ds.Tables["processiDiFirma"] != null && ds.Tables["processiDiFirma"].Rows.Count > 0)
-                    {
-                        foreach (DataRow row in ds.Tables["processiDiFirma"].Rows)
-                        {
-                            processoDiFirma = new ProcessoFirma()
-                            {
-                                idProcesso = !string.IsNullOrEmpty(row["ID_PROCESSO"].ToString()) ? row["ID_PROCESSO"].ToString() : string.Empty,
-                                nome = !string.IsNullOrEmpty(row["NOME"].ToString()) ? row["NOME"].ToString() : string.Empty,
-                                isInvalidated = !string.IsNullOrEmpty(row["TICK"].ToString()) && row["TICK"].ToString().Equals("1") ? true : false,
-                                IsProcessModel = !string.IsNullOrEmpty(row["CHA_MODELLO"].ToString()) && row["CHA_MODELLO"].ToString().Equals("1") ? true : false,
-                                passi = GetPassiProcessoDiFirma(row["ID_PROCESSO"].ToString())
-                            };
-                            listProcessiDiFirma.Add(processoDiFirma);
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetProcessiDiFirmaByFilter", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetProcessiDiFirmaByFilter in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return listProcessiDiFirma;
-        }
-
-        private string BindConditionFiltersProcess(List<DocsPaVO.LibroFirma.FiltroProcessoFirma> filtri)
-        {
-            string condition = string.Empty;
-            string conditionTipo = string.Empty;
-            string conditionStato = string.Empty;
-            string conditionUtenteRuolo = string.Empty;
-            foreach (FiltroProcessoFirma f in filtri)
-            {
-                switch (f.Argomento)
-                {
-                    case "RUOLO_COINVOLTO":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            if (string.IsNullOrEmpty(conditionUtenteRuolo))
-                            {
-                                conditionUtenteRuolo = string.Format(" P.ID_RUOLO_COINVOLTO = (SELECT ID_GRUPPO FROM DPA_CORR_GLOBALI WHERE SYSTEM_ID = {0})", f.Valore);
-                            }
-                            else
-                            {
-                                conditionUtenteRuolo += string.Format(" AND P.ID_RUOLO_COINVOLTO = (SELECT ID_GRUPPO FROM DPA_CORR_GLOBALI WHERE SYSTEM_ID = {0})", f.Valore);
-                            }
-                        }
-                        break;
-                    case "UTENTE_COINVOLTO":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            if (string.IsNullOrEmpty(conditionUtenteRuolo))
-                            {
-                                conditionUtenteRuolo = string.Format(" P.ID_UTENTE_COINVOLTO = (SELECT ID_PEOPLE FROM DPA_CORR_GLOBALI WHERE SYSTEM_ID = {0})", f.Valore);
-                            }
-                            else
-                            {
-                                conditionUtenteRuolo += string.Format(" AND P.ID_UTENTE_COINVOLTO = (SELECT ID_PEOPLE FROM DPA_CORR_GLOBALI WHERE SYSTEM_ID = {0})", f.Valore);
-                            }
-                        }
-                        break;
-                    case "TIPO_MODELLO":
-                        if(Convert.ToBoolean(f.Valore))
-                            conditionTipo += string.IsNullOrEmpty(conditionTipo) ? " CHA_MODELLO = '1' " : " OR CHA_MODELLO = '1' ";
-                        break;
-                    case "TIPO_PROCESSO":
-                        if (Convert.ToBoolean(f.Valore))
-                            conditionTipo += string.IsNullOrEmpty(conditionTipo) ? " CHA_MODELLO = '0' " : " OR CHA_MODELLO = '0' ";
-                        break;
-                    case "VALIDO":
-                        if (Convert.ToBoolean(f.Valore))
-                            conditionStato += string.IsNullOrEmpty(conditionStato) ? " NVL(TICK, '0') = '0' " : " OR NVL(TICK, '0') = '0' ";
-                        break;
-                    case "INVALIDO":
-                        if (Convert.ToBoolean(f.Valore))
-                            conditionStato += string.IsNullOrEmpty(conditionStato) ? " TICK = '1' " : " OR TICK = '1' ";
-                        break;
-                    case "NOME":
-                        condition += " AND UPPER(NOME) LIKE UPPER('%" + f.Valore.Replace("'", "''") + "%')";
-                        break;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(conditionTipo))
-                condition += " AND ( " + conditionTipo + ") ";
-            if (!string.IsNullOrEmpty(conditionStato))
-                condition += " AND ( " + conditionStato + ") ";
-            if (!string.IsNullOrEmpty(conditionUtenteRuolo))
-                condition += " AND EXISTS ( SELECT 'X' FROM DPA_PASSO_DI_FIRMA P WHERE P.ID_PROCESSO = S.ID_PROCESSO AND ( " + conditionUtenteRuolo + " ) )";
-
-            return condition;
-        }
-
-        private string BindOrderBysProcess(List<DocsPaVO.LibroFirma.FiltroProcessoFirma> filtri)
-        {
-            string order = " ORDER BY ";
-
-            DocsPaVO.LibroFirma.FiltroProcessoFirma filtro = filtri.Where(e => e.Argomento == "ORDER_FIELD").FirstOrDefault();
-            order += filtro.Valore.Equals(DocsPaVO.filtri.LibroFirma.OrderBy.NOME) ? "UPPER(" + filtro.Valore + ")" : filtro.Valore;
-
-            filtro = filtri.Where(e => e.Argomento == "ORDER_DIRECTION").FirstOrDefault();
-            order += " " + filtro.Valore;
-
-            return order;
         }
 
         public ProcessoFirma GetProcessoDiFirmaById(string idProcesso, DocsPaVO.utente.InfoUtente infoUtente)
@@ -711,8 +433,9 @@ namespace DocsPaDB.Query_DocsPAWS
                             {
                                 idProcesso = !string.IsNullOrEmpty(row["ID_PROCESSO"].ToString()) ? row["ID_PROCESSO"].ToString() : string.Empty,
                                 nome = !string.IsNullOrEmpty(row["NOME"].ToString()) ? row["NOME"].ToString() : string.Empty,
+
+                                //ATTENZIONE DESCRIZIONE DEL RUOLO AUTORE
                                 idRuoloAutore = !string.IsNullOrEmpty(row["RUOLO_AUTORE"].ToString()) ? row["RUOLO_AUTORE"].ToString() : string.Empty,
-                                idPeopleAutore = !string.IsNullOrEmpty(row["UTENTE_AUTORE"].ToString()) ? row["UTENTE_AUTORE"].ToString() : string.Empty,
                             };
 
                             processoDiFirma.passi = this.GetPassiProcessoDiFirmaSoggettoTitolare(processoDiFirma.idProcesso, idRuoloTitolare, "R");
@@ -865,8 +588,8 @@ namespace DocsPaDB.Query_DocsPAWS
                                 //Notifica_interrotto = !string.IsNullOrEmpty(row["NOTIFICA_INTERROTTO"].ToString()) ? (row["NOTIFICA_INTERROTTO"].ToString().Equals("1") ? true : false) : false,
                                 //MotivoRespingimento = !string.IsNullOrEmpty(row["MOTIVO_RESPINGIMENTO"].ToString()) ? row["MOTIVO_RESPINGIMENTO"].ToString() : string.Empty,
                                 docAll = !string.IsNullOrEmpty(row["DOC_ALL"].ToString()) ? row["DOC_ALL"].ToString() : string.Empty,
-                                RuoloProponente = GetRuolo(row, false),
-                                UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() },
+                                //RuoloProponente = GetRuolo(row, false),
+                                //UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() },
                                 //statoProcesso = (TipoStatoProcesso)Enum.Parse(typeof(TipoStatoProcesso), row["STATO"].ToString()),
                                 istanzePassoDiFirma = new List<IstanzaPassoDiFirma>() { GetIstanzaPassoDiFirmaInAttesa(row["ID_ISTANZA"].ToString()) }
                             };
@@ -1000,7 +723,7 @@ namespace DocsPaDB.Query_DocsPAWS
         /// </summary>
         /// <param name="idProcessoFirma"></param>
         /// <returns></returns>
-        public List<PassoFirma> GetPassiProcessoDiFirma(string idProcessoFirma)
+        private List<PassoFirma> GetPassiProcessoDiFirma(string idProcessoFirma)
         {
             logger.Info("Inizio Metodo GetPassiProcessoDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
             List<PassoFirma> listPassi = new List<PassoFirma>();
@@ -1031,23 +754,17 @@ namespace DocsPaDB.Query_DocsPAWS
                                 idEventiDaNotificare = GetOpzioniNotificaPasso(row["ID_PASSO"].ToString()),
                                 note = !string.IsNullOrEmpty(row["NOTE"].ToString()) ? row["NOTE"].ToString() : string.Empty,
                                 Invalidated = !string.IsNullOrEmpty(row["TICK"].ToString()) && !row["TICK"].ToString().Equals("0") ? Convert.ToChar(row["TICK"].ToString()) : '0',
-
                                 Evento = new Evento()
                                 {
                                     IdEvento = row["ID_EVENTO"].ToString(),
                                     CodiceAzione = row["VAR_COD_AZIONE"].ToString(),
                                     Descrizione = row["DESCRIZIONE"].ToString(),
                                     TipoEvento = row["CHA_TIPO_EVENTO"].ToString(),
-                                    Gruppo = row["GRUPPO"].ToString(),
-                                    Automatico = string.IsNullOrEmpty(row["CHA_AUTOMATICO_EVENTO"].ToString()) || !row["CHA_AUTOMATICO_EVENTO"].ToString().Equals("1") ? false : true
-                        }
+                                    Gruppo = row["GRUPPO"].ToString()
+                                }
+
                             };
-                            passo.IdAOO = row["ID_AOO"].ToString();
-                            passo.IdRF = row["ID_RF"].ToString();
-                            passo.IdMailRegistro = row["ID_MAIL_REGISTRO"].ToString();
-                            passo.IsAutomatico = string.IsNullOrEmpty(row["CHA_AUTOMATICO"].ToString()) || !row["CHA_AUTOMATICO"].ToString().Equals("1") ? false : true;
-                            //Il passo è un modello se non è definito il ruolo e il tipo ruolo o se di tipo automatico idAOO, idRF, idMailRegistro
-                            passo.IsModello = PassoIsModello(passo);
+
                             listPassi.Add(passo);
                         }
                     }
@@ -1061,34 +778,6 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Info("Fine Metodo GetPassiProcessoDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
 
             return listPassi;
-        }
-
-        private bool PassoIsModello(PassoFirma passo)
-        {
-            bool isModello = false;
-            try
-            {
-                if (!passo.Evento.TipoEvento.Equals("W") && string.IsNullOrEmpty(passo.ruoloCoinvolto.idGruppo))
-                {
-                    return true;
-                }
-                if (passo.IsAutomatico)
-                {
-                    if (string.IsNullOrEmpty(passo.IdAOO) || string.IsNullOrEmpty(passo.IdRF))
-                    {
-                        return true;
-                    }
-                    if (passo.Evento.CodiceAzione.Equals(Azione.DOCUMENTOSPEDISCI.ToString()) && string.IsNullOrEmpty(passo.IdMailRegistro))
-                    {
-                        return true;
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in PassoIsModello: " + e.Message);
-            }
-            return isModello;
         }
 
         /// <summary>
@@ -1134,13 +823,8 @@ namespace DocsPaDB.Query_DocsPAWS
                                     TipoEvento = row["CHA_TIPO_EVENTO"].ToString(),
                                     Gruppo = row["GRUPPO"].ToString()
                                 }
+
                             };
-                            passo.IdAOO = row["ID_AOO"].ToString();
-                            passo.IdRF = row["ID_RF"].ToString();
-                            passo.IdMailRegistro = row["ID_MAIL_REGISTRO"].ToString();
-                            passo.IsAutomatico = string.IsNullOrEmpty(row["CHA_AUTOMATICO"].ToString()) || !row["CHA_AUTOMATICO"].ToString().Equals("1") ? false : true;
-                            //Il passo è un modello se non è definito il ruolo e il tipo ruolo o se di tipo automatico idAOO, idRF, idMailRegistro
-                            passo.IsModello = PassoIsModello(passo);
 
                             listPassi.Add(passo);
                         }
@@ -1264,11 +948,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                 RuoloCoinvolto = GetRuolo(row, false),
                                 TipoFirma = row["TIPO_FIRMA"].ToString(),
                                 UtenteCoinvolto = GetUtente(row),
-                                IsAutomatico = string.IsNullOrEmpty(row["CHA_AUTOMATICO"].ToString()) || !row["CHA_AUTOMATICO"].ToString().Equals("1") ? false : true,
-                                IdAOO = row["ID_AOO"].ToString(),
-                                IdRF = row["ID_RF"].ToString(),
-                                IdMailRegistro = row["ID_MAIL_REGISTRO"].ToString(),
-                                Errore = row["VAR_ERRORE"].ToString(),
                                 Evento = new Evento()
                                 {
                                     IdEvento = row["Id_Tipo_Evento"].ToString(),
@@ -1454,25 +1133,17 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <param name="idProcesso"></param>
         /// <param name="infoUtente"></param>
         /// <returns></returns>
-        public List<DocsPaVO.LibroFirma.VisibilitaProcessoRuolo> GetVisibilitaProcesso(string idProcesso, List<DocsPaVO.LibroFirma.FiltroProcessoFirma> filtroRicerca, DocsPaVO.utente.InfoUtente infoUtente)
+        public List<DocsPaVO.utente.Corrispondente> GetVisibilitaProcesso(string idProcesso, DocsPaVO.utente.InfoUtente infoUtente)
         {
             logger.Debug("Inizio Metodo GetVisibilitaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            List<DocsPaVO.LibroFirma.VisibilitaProcessoRuolo> lista = new List<DocsPaVO.LibroFirma.VisibilitaProcessoRuolo>();
-            DocsPaVO.utente.Ruolo ruolo = null;
-            VisibilitaProcessoRuolo visibilita = null;
+            List<DocsPaVO.utente.Corrispondente> lista = new List<DocsPaVO.utente.Corrispondente>();
+            DocsPaVO.utente.Corrispondente corr = null;
             try
             {
                 string query;
-                string filter = string.Empty;
                 DataSet ds = new DataSet();
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_PROCESSO_FIRMA_VISIBILITA");
                 q.setParam("idProcesso", idProcesso);
-
-                if(filtroRicerca != null && filtroRicerca.Count > 0)
-                {
-                    filter = BindFilterRuoliVisibilita(filtroRicerca);
-                }
-                q.setParam("filter", filter);
                 query = q.getSQL();
                 logger.Debug("GetVisibilitaProcesso: " + query);
 
@@ -1482,16 +1153,11 @@ namespace DocsPaDB.Query_DocsPAWS
                     {
                         foreach (DataRow row in ds.Tables["visibilitaProcessoFirma"].Rows)
                         {
-                            visibilita = new VisibilitaProcessoRuolo();
-                            ruolo = new DocsPaVO.utente.Ruolo();
-                            ruolo.systemId = row["ID_CORR"].ToString();
-                            ruolo.descrizione = row["DESCRIZIONE"].ToString();
-                            ruolo.codiceRubrica = row["VAR_COD_RUBRICA"].ToString();
-                            ruolo.idGruppo = row["ID_GRUPPO"].ToString();
-                            visibilita.ruolo = ruolo;
-                            visibilita.idProcesso = idProcesso;
-                            visibilita.tipoVisibilita = (DocsPaVO.LibroFirma.TipoVisibilita)row["CHA_TIPO_VISIBILITA"].ToString()[0];
-                            lista.Add(visibilita);
+                            corr = new DocsPaVO.utente.Corrispondente();
+                            corr.systemId = row["ID_CORR"].ToString();
+                            corr.descrizione = row["DESCRIZIONE"].ToString();
+                            corr.codiceRubrica = row["VAR_COD_RUBRICA"].ToString();
+                            lista.Add(corr);
                         }
                     }
                 }
@@ -1503,26 +1169,6 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             logger.Debug("Fine Metodo GetVisibilitaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
             return lista;
-        }
-
-        private string BindFilterRuoliVisibilita(List<DocsPaVO.LibroFirma.FiltroProcessoFirma> filtroRicerca)
-        {
-            string condition = string.Empty;
-
-            foreach (FiltroProcessoFirma f in filtroRicerca)
-            {
-                switch (f.Argomento)
-                {
-                    case "ID_RUOLO_VISIBILITA":
-                        condition += " AND G.SYSTEM_ID = " + f.Valore;
-                        break;
-                    case "DESC_RUOLO_VISIBILITA":
-                        condition += " AND CONTAINS(G.VAR_DESC_CORR, '" + f.Valore + "') > 0";
-                        break;
-                }
-            }
-
-            return condition;           
         }
 
         /// <summary>
@@ -1580,10 +1226,9 @@ namespace DocsPaDB.Query_DocsPAWS
                                 InfoDocumento = BuildInfoDocumento(row),
                                 ErroreFirma = !string.IsNullOrEmpty(row["ERRORE_FIRMA"].ToString()) ? row["ERRORE_FIRMA"].ToString() : string.Empty,
                                 FileSize = !string.IsNullOrEmpty(row["File_Size"].ToString()) ? long.Parse(row["File_Size"].ToString()) : 0,
-                                FileOriginaleFirmato = !string.IsNullOrEmpty(row["CHA_FIRMATO"].ToString()) ? (row["CHA_FIRMATO"].ToString()) : "0"
+                                FileOriginaleFirmato = !string.IsNullOrEmpty(row["CHA_FIRMATO"].ToString()) ? (row["CHA_FIRMATO"].ToString()) : "0",
+                                TipoFirmaFile = !string.IsNullOrEmpty(row["CHA_TIPO_FIRMA"].ToString()) ? (row["CHA_TIPO_FIRMA"].ToString()) : DocsPaVO.documento.TipoFirma.NESSUNA_FIRMA
                             };
-                            DocsPaDB.Query_DocsPAWS.Documenti doc = new Documenti();
-                            elemento.TipoFirmaFile = doc.GetTipoFirmaDocumento(elemento.InfoDocumento.Docnumber);
                             elementiLibroFirma.Add(elemento);
                         }
                     }
@@ -1600,33 +1245,6 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             logger.Debug("Fine Metodo GetElementiInLibroFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
             return elementiLibroFirma;
-        }
-
-        public int CountElementiInLibroFirma(DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Debug("Inizio Metodo CountElementiInLibroFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            int count = 0;
-            try
-            {
-                String query;
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ELEMENTI_LIBRO_FIRMA_COUNT_2");
-                q.setParam("idRuoloTitolare", infoUtente.idGruppo);
-                q.setParam("idUtenteTitolare", infoUtente.idPeople);
-                query = q.getSQL();
-                logger.Debug("CountElementiInLibroFirma: " + query);
-                string field;
-                using (DocsPaDB.DBProvider dbProvider = new DocsPaDB.DBProvider())
-                {
-                    if (dbProvider.ExecuteScalar(out field, query))
-                        count = Convert.ToInt32(field);
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo CountElementiInLibroFirma", ex);
-                count = 0;
-            }
-            return count;
         }
 
         private int GetCountElementiInLibroFirma(DocsPaVO.utente.InfoUtente infoUtente, string filtroRicerca)
@@ -2001,8 +1619,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 VersionId = row["VERSION_ID"].ToString(),
                 Destinatario = !string.IsNullOrEmpty(row["DESC_RECIPIENT"].ToString()) ? row["DESC_RECIPIENT"].ToString() : string.Empty,
                 NumAllegato = !string.IsNullOrEmpty(row["NUM_ALL"].ToString()) ? Convert.ToInt32(row["NUM_ALL"]) : 0,
-                NumVersione = Convert.ToInt32(row["NUM_VERSIONE"]),
-                IdRegistro = !string.IsNullOrEmpty(row["ID_REGISTRO"].ToString()) ? row["ID_REGISTRO"].ToString() : string.Empty
+                NumVersione = Convert.ToInt32(row["NUM_VERSIONE"])
             };
 
             return infoDocumento;
@@ -2049,10 +1666,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                 numeroSequenza = Convert.ToInt32(row["Numero_Sequenza"].ToString()),
                                 Note = !string.IsNullOrEmpty(row["NOTE"].ToString()) ? row["NOTE"].ToString() : string.Empty,
                                 TipoFirma = row["TIPO_FIRMA"].ToString(),
-                                IdAOO = row["ID_AOO"].ToString(),
-                                IdRF = row["ID_RF"].ToString(),
-                                IdMailRegistro = row["ID_MAIL_REGISTRO"].ToString(),
-                                IsAutomatico = string.IsNullOrEmpty(row["CHA_AUTOMATICO"].ToString()) || !row["CHA_AUTOMATICO"].ToString().Equals("1") ? false : true,
                                 Evento = new Evento()
                                 {
                                     IdEvento = row["ID_EVENTO"].ToString(),
@@ -2106,9 +1719,7 @@ namespace DocsPaDB.Query_DocsPAWS
                 {
                     if (ds.Tables["istanzaProcessiDiFirma"] != null && ds.Tables["istanzaProcessiDiFirma"].Rows.Count > 0)
                     {
-                        OpzioniNotifica notifica;
                         IstanzaProcessoDiFirma istanzaProcessoDiFirma = new IstanzaProcessoDiFirma();
-
                         foreach (DataRow row in ds.Tables["istanzaProcessiDiFirma"].Rows)
                         {
                             istanzaProcessoDiFirma = new IstanzaProcessoDiFirma()
@@ -2120,6 +1731,8 @@ namespace DocsPaDB.Query_DocsPAWS
                                 docNumber = row["ID_DOCUMENTO"].ToString(),
                                 dataChiusura = !string.IsNullOrEmpty(row["CONCLUSO_IL"].ToString()) ? row["CONCLUSO_IL"].ToString() : string.Empty,
                                 NoteDiAvvio = !string.IsNullOrEmpty(row["NOTE"].ToString()) ? row["NOTE"].ToString() : string.Empty,
+                                Notifica_concluso = !string.IsNullOrEmpty(row["NOTIFICA_CONCLUSO"].ToString()) ? (row["NOTIFICA_CONCLUSO"].ToString().Equals("1") ? true : false) : false,
+                                Notifica_interrotto = !string.IsNullOrEmpty(row["NOTIFICA_INTERROTTO"].ToString()) ? (row["NOTIFICA_INTERROTTO"].ToString().Equals("1") ? true : false) : false,
                                 MotivoRespingimento = !string.IsNullOrEmpty(row["MOTIVO_RESPINGIMENTO"].ToString()) ? row["MOTIVO_RESPINGIMENTO"].ToString() : string.Empty,
                                 docAll = !string.IsNullOrEmpty(row["DOC_ALL"].ToString()) ? row["DOC_ALL"].ToString() : string.Empty,
                                 RuoloProponente = GetRuolo(row, false),
@@ -2127,16 +1740,8 @@ namespace DocsPaDB.Query_DocsPAWS
                                 DescUtenteDelegato = (!string.IsNullOrEmpty(row["ID_PEOPLE_DELEGATO"].ToString()) && !row["ID_PEOPLE_DELEGATO"].ToString().Equals("0")) ? GetDescrizioneUtente(row["ID_PEOPLE_DELEGATO"].ToString()) : string.Empty,
                                 statoProcesso = (TipoStatoProcesso)Enum.Parse(typeof(TipoStatoProcesso), row["STATO"].ToString()),
                                 istanzePassoDiFirma = GetIstanzePassoDiFirma(row["ID_ISTANZA"].ToString()),
-                                ChaInterroDa = !string.IsNullOrEmpty(row["CHA_INTERROTTO_DA"].ToString()) ? Convert.ToChar(row["CHA_INTERROTTO_DA"].ToString()) : '0',
-                                DescUtenteInterruzione = (!string.IsNullOrEmpty(row["ID_PEOPLE_INTERRUZIONE"].ToString()) && !row["ID_PEOPLE_INTERRUZIONE"].ToString().Equals("0")) ? GetDescrizioneUtente(row["ID_PEOPLE_INTERRUZIONE"].ToString()) : string.Empty,
-                                DescUtenteDelegatoInterruzione = (!string.IsNullOrEmpty(row["ID_PEOPLE_DELEGATO_INTER"].ToString()) && !row["ID_PEOPLE_DELEGATO_INTER"].ToString().Equals("0")) ? GetDescrizioneUtente(row["ID_PEOPLE_DELEGATO_INTER"].ToString()) : string.Empty
+                                ChaInterroDa = !string.IsNullOrEmpty(row["CHA_INTERROTTO_DA"].ToString()) ? Convert.ToChar(row["CHA_INTERROTTO_DA"].ToString()) : '0'
                             };
-                            notifica = new OpzioniNotifica();
-                            notifica.Notifica_concluso = !string.IsNullOrEmpty(row["NOTIFICA_CONCLUSO"].ToString()) ? (row["NOTIFICA_CONCLUSO"].ToString().Equals("1") ? true : false) : false;
-                            notifica.Notifica_interrotto = !string.IsNullOrEmpty(row["NOTIFICA_INTERROTTO"].ToString()) ? (row["NOTIFICA_INTERROTTO"].ToString().Equals("1") ? true : false) : false;
-                            notifica.NotificaErrore = !string.IsNullOrEmpty(row["NOTIFICA_ERRORE"].ToString()) ? (row["NOTIFICA_ERRORE"].ToString().Equals("1") ? true : false) : false;
-                            notifica.NotificaPresenzaDestNonInterop = !string.IsNullOrEmpty(row["NOTIFICA_DEST_NON_INTEROP"].ToString()) ? (row["NOTIFICA_DEST_NON_INTEROP"].ToString().Equals("1") ? true : false) : false;
-                            istanzaProcessoDiFirma.Notifiche = notifica;
                             istanzeProcessoDiFirmaList.Add(istanzaProcessoDiFirma);
                         }
                     }
@@ -2151,116 +1756,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
             return istanzeProcessoDiFirmaList;
         }
-
-        /// <summary>
-        /// Metodo per l'estrazione del dettaglio dell'istanza di processo di firma
-        /// </summary>
-        /// <param name="infoUtente"></param>
-        /// <returns></returns>
-        public IstanzaProcessoDiFirma GetIstanzaProcessoDiFirmaByIdIstanzaProcesso(string idIstanzaProcesso, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Info("Inizio Metodo GetIstanzaProcessoDiFirmaByIdIstanzaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            IstanzaProcessoDiFirma istanzaProcessoDiFirma = new IstanzaProcessoDiFirma();
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_FIRMA_BY_ID_ISTANZA_PROCESSO_2");
-                q.setParam("idIstanzaProcesso", idIstanzaProcesso);
-                query = q.getSQL();
-                logger.Debug("GetIstanzaProcessoDiFirmaByIdIstanzaProcesso: " + query);
-
-                if (this.ExecuteQuery(out ds, "istanzaProcessiDiFirma", query))
-                {
-                    if (ds.Tables["istanzaProcessiDiFirma"] != null && ds.Tables["istanzaProcessiDiFirma"].Rows.Count > 0)
-                    {
-                        OpzioniNotifica notifica;
-                        foreach (DataRow row in ds.Tables["istanzaProcessiDiFirma"].Rows)
-                        {
-                            istanzaProcessoDiFirma = new IstanzaProcessoDiFirma()
-                            {
-                                idIstanzaProcesso = row["ID_ISTANZA"].ToString(),
-                                idProcesso = row["ID_PROCESSO"].ToString(),
-                                Descrizione = row["DESCRIZIONE"].ToString(),
-                                dataAttivazione = row["ATTIVATO_IL"].ToString(),
-                                docNumber = row["ID_DOCUMENTO"].ToString(),
-                                dataChiusura = !string.IsNullOrEmpty(row["CONCLUSO_IL"].ToString()) ? row["CONCLUSO_IL"].ToString() : string.Empty,
-                                NoteDiAvvio = !string.IsNullOrEmpty(row["NOTE"].ToString()) ? row["NOTE"].ToString() : string.Empty,
-                                MotivoRespingimento = !string.IsNullOrEmpty(row["MOTIVO_RESPINGIMENTO"].ToString()) ? row["MOTIVO_RESPINGIMENTO"].ToString() : string.Empty,
-                                docAll = !string.IsNullOrEmpty(row["DOC_ALL"].ToString()) ? row["DOC_ALL"].ToString() : string.Empty,
-                                RuoloProponente = GetRuolo(row, false),
-                                UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() },
-                                DescUtenteDelegato = (!string.IsNullOrEmpty(row["ID_PEOPLE_DELEGATO"].ToString()) && !row["ID_PEOPLE_DELEGATO"].ToString().Equals("0")) ? GetDescrizioneUtente(row["ID_PEOPLE_DELEGATO"].ToString()) : string.Empty,
-                                statoProcesso = (TipoStatoProcesso)Enum.Parse(typeof(TipoStatoProcesso), row["STATO"].ToString()),
-                                istanzePassoDiFirma = GetIstanzePassoDiFirma(row["ID_ISTANZA"].ToString()),
-                                ChaInterroDa = !string.IsNullOrEmpty(row["CHA_INTERROTTO_DA"].ToString()) ? Convert.ToChar(row["CHA_INTERROTTO_DA"].ToString()) : '0'
-                            };
-
-                            notifica = new OpzioniNotifica();
-                            notifica.Notifica_concluso = !string.IsNullOrEmpty(row["NOTIFICA_CONCLUSO"].ToString()) ? (row["NOTIFICA_CONCLUSO"].ToString().Equals("1") ? true : false) : false;
-                            notifica.Notifica_interrotto = !string.IsNullOrEmpty(row["NOTIFICA_INTERROTTO"].ToString()) ? (row["NOTIFICA_INTERROTTO"].ToString().Equals("1") ? true : false) : false;
-                            notifica.NotificaErrore = !string.IsNullOrEmpty(row["NOTIFICA_ERRORE"].ToString()) ? (row["NOTIFICA_ERRORE"].ToString().Equals("1") ? true : false) : false;
-                            notifica.NotificaPresenzaDestNonInterop = !string.IsNullOrEmpty(row["NOTIFICA_DEST_NON_INTEROP"].ToString()) ? (row["NOTIFICA_DEST_NON_INTEROP"].ToString().Equals("1") ? true : false) : false;
-                            istanzaProcessoDiFirma.Notifiche = notifica;
-
-                            istanzaProcessoDiFirma.istanzePassoDiFirma = GetIstanzePassoDiFirma(idIstanzaProcesso);
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetIstanzaProcessoDiFirmaByIdIstanzaProcesso", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetIstanzaProcessoDiFirmaByIdIstanzaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return istanzaProcessoDiFirma;
-        }
-
-        public IstanzaProcessoDiFirma GetIstanzaProcessoDiFirmaByIdIstanzaProcessoLite(string idIstanzaProcesso, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Info("Inizio Metodo GetIstanzaProcessoDiFirmaByIdIstanzaProcessoLite in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            IstanzaProcessoDiFirma istanzaProcessoDiFirma = new IstanzaProcessoDiFirma();
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_FIRMA_BY_ID_ISTANZA_PROCESSO_3");
-                q.setParam("idIstanzaProcesso", idIstanzaProcesso);
-                query = q.getSQL();
-                logger.Debug("GetIstanzaProcessoDiFirmaByIdIstanzaProcessoLite: " + query);
-
-                if (this.ExecuteQuery(out ds, "istanzaProcessiDiFirma", query))
-                {
-                    if (ds.Tables["istanzaProcessiDiFirma"] != null && ds.Tables["istanzaProcessiDiFirma"].Rows.Count > 0)
-                    {
-                        foreach (DataRow row in ds.Tables["istanzaProcessiDiFirma"].Rows)
-                        {
-                            istanzaProcessoDiFirma = new IstanzaProcessoDiFirma()
-                            {
-                                idIstanzaProcesso = row["ID_ISTANZA"].ToString(),
-                                idProcesso = row["ID_PROCESSO"].ToString(),
-                                Descrizione = row["DESCRIZIONE"].ToString(),
-                                dataAttivazione = row["ATTIVATO_IL"].ToString(),
-                                docNumber = row["ID_DOCUMENTO"].ToString(),
-                                dataChiusura = !string.IsNullOrEmpty(row["CONCLUSO_IL"].ToString()) ? row["CONCLUSO_IL"].ToString() : string.Empty,                              
-                                statoProcesso = (TipoStatoProcesso)Enum.Parse(typeof(TipoStatoProcesso), row["STATO"].ToString())
-                            };
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetIstanzaProcessoDiFirmaByIdIstanzaProcessoLite", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetIstanzaProcessoDiFirmaByIdIstanzaProcessoLite in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return istanzaProcessoDiFirma;
-        }
-
 
         private string GetDescrizioneUtente(string idPeople)
         {
@@ -2450,11 +1945,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                 Note = !string.IsNullOrEmpty(row["NOTE"].ToString()) ? row["NOTE"].ToString() : string.Empty,
                                 UtenteCoinvolto = GetUtente(row),
                                 DescrizioneUtenteLocker = !string.IsNullOrEmpty(row["DESC_UTENTE_LOCKER"].ToString()) ? row["DESC_UTENTE_LOCKER"].ToString() : string.Empty,
-                                IdAOO = row["ID_AOO"].ToString(),
-                                IdRF = row["ID_RF"].ToString(),
-                                IdMailRegistro = row["ID_MAIL_REGISTRO"].ToString(),
-                                IsAutomatico = string.IsNullOrEmpty(row["CHA_AUTOMATICO"].ToString()) || !row["CHA_AUTOMATICO"].ToString().Equals("1") ? false : true,
-                                Errore = row["VAR_ERRORE"].ToString(),
                                 Evento = new Evento()
                                 {
                                     IdEvento = row["ID_EVENTO"].ToString(),
@@ -2572,24 +2062,20 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-        public List<IstanzaProcessoDiFirma> GetIstanzaProcessiDiFirmaByFilter(List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma> filtro, int numPage, int pageSize, out int numTotPage, out int nRec, DocsPaVO.utente.InfoUtente infoUtente, out DataSet istanzeProcessi)
+        public List<IstanzaProcessoDiFirma> GetIstanzaProcessiDiFirmaByFilter(List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma> filtro, int numPage, int pageSize, out int numTotPage, out int nRec, DocsPaVO.utente.InfoUtente infoUtente)
         {
             logger.Debug("Inizio Metodo GetIstanzaProcessiDiFirmaByFilter in DocsPaDb.Query_DocsPAWS.LibroFirma");
             List<IstanzaProcessoDiFirma> listaIstanze = new List<IstanzaProcessoDiFirma>();
             numTotPage = 0;
             nRec = 0;
-            istanzeProcessi = null;
             try
             {
                 string query;
                 string idTrasmSingola = string.Empty;
                 string dtaAccettata = string.Empty;
-                string table = string.Empty;
                 DataSet ds = new DataSet();
-                string filters = BindConditionFilters(filtro, infoUtente, out table);
-                nRec = IstanzaProcessiDiFirmaByFilterCount(filters, infoUtente, table, out istanzeProcessi);
-
-                int maxRowSearchable =  Cfg_MAX_ROW_SEARCHABLE(infoUtente.idAmministrazione);
+                string condition = BindConditionFilters(filtro);
+                nRec = IstanzaProcessiDiFirmaByFilterCount(condition);
                 if (nRec > 0)
                 {
                     numTotPage = (nRec / pageSize);
@@ -2610,8 +2096,7 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("peopleId", infoUtente.idPeople);
                     q.setParam("groupId", infoUtente.idGruppo);
                     q.setParam("idAmm", infoUtente.idAmministrazione);
-                    q.setParam("filters", filters);
-                    q.setParam("table", table);
+                    q.setParam("condition", condition);
                     q.setParam("paging", paging);
 
                     //modifica effettuata da EPanici
@@ -2652,18 +2137,14 @@ namespace DocsPaDB.Query_DocsPAWS
                                     DataProtocollazione = !string.IsNullOrEmpty(row["DTA_PROTO"].ToString()) ? row["DTA_PROTO"].ToString() : string.Empty,
                                     DataCreazione = !string.IsNullOrEmpty(row["CREATION_DATE"].ToString()) ? row["CREATION_DATE"].ToString() : string.Empty,
                                     SegnaturaRepertorio = !string.IsNullOrEmpty(row["SEGNATURA_REPERTORIO"].ToString()) ? row["SEGNATURA_REPERTORIO"].ToString() : string.Empty,
-
-                                    RuoloProponente = GetRuolo(row, false),
-                                    UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() }
                                 };
-                                if (istanzaProcessoDiFirma.statoProcesso == TipoStatoProcesso.IN_EXEC || istanzaProcessoDiFirma.statoProcesso == TipoStatoProcesso.IN_ERROR || istanzaProcessoDiFirma.statoProcesso == TipoStatoProcesso.REPLAY)
+                                if (istanzaProcessoDiFirma.statoProcesso == TipoStatoProcesso.IN_EXEC)
                                 {
                                     IstanzaPassoDiFirma istanzaInEsecuzione = GetIstanzaPassoDiFirmaInAttesa(istanzaProcessoDiFirma.idIstanzaProcesso);
                                     if (istanzaInEsecuzione != null)
                                         istanzaProcessoDiFirma.istanzePassoDiFirma = new List<IstanzaPassoDiFirma>() { istanzaInEsecuzione };
                                 }
-                                istanzaProcessoDiFirma.IsTroncato = IsPresentIstanzaPassoTroncato(istanzaProcessoDiFirma.idIstanzaProcesso);
-                                if (istanzaProcessoDiFirma.statoProcesso == TipoStatoProcesso.CLOSED && istanzaProcessoDiFirma.IsTroncato)
+                                if (istanzaProcessoDiFirma.statoProcesso == TipoStatoProcesso.CLOSED && IsPresentIstanzaPassoTroncato(istanzaProcessoDiFirma.idIstanzaProcesso))
                                 {
                                     istanzaProcessoDiFirma.statoProcesso = TipoStatoProcesso.CLOSED_WITH_CUT;
                                 }
@@ -2684,45 +2165,20 @@ namespace DocsPaDB.Query_DocsPAWS
 
         }
 
-        private int IstanzaProcessiDiFirmaByFilterCount(string filters, DocsPaVO.utente.InfoUtente infoUtente, string table, out DataSet istanzeProcessi)
+        private int IstanzaProcessiDiFirmaByFilterCount(string condition)
         {
             int nRec = 0;
-            istanzeProcessi = new DataSet();
             DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_FIRMA_FILTER_COUNT");
-            q.setParam("filters", filters);
-            q.setParam("idGruppo", infoUtente.idGruppo);
-            q.setParam("idPeople", infoUtente.idPeople);
-            q.setParam("table", table);
-
-            string idRuoloPubblico = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue(infoUtente.idAmministrazione, "ENABLE_FASCICOLO_PUBBLICO");
-            if (string.IsNullOrEmpty(idRuoloPubblico))
-                idRuoloPubblico = "0";
-            q.setParam("idRuoloPubblico", idRuoloPubblico);
+            q.setParam("condition", condition);
 
             string query = q.getSQL();
             logger.Debug("IstanzaProcessiDiFirmaByFilterPagingCustom: " + query);
 
-            ExecuteQuery(out istanzeProcessi, query);
-            if (istanzeProcessi != null)
-                nRec = istanzeProcessi.Tables[0].Rows.Count;       
+            string field;
+            if (ExecuteScalar(out field, query))
+                Int32.TryParse(field, out nRec);
 
             return nRec;
-        }
-
-        public int Cfg_MAX_ROW_SEARCHABLE(string idAmministrazione)
-        {
-            int result = 0;
-            string value = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue(idAmministrazione, "MAX_ROW_SEARCHABLE");
-
-            if (string.IsNullOrEmpty(value))
-            {
-                value = DocsPaUtils.Configuration.InitConfigurationKeys.GetValue("0", "MAX_ROW_SEARCHABLE");
-            }
-            if (!string.IsNullOrEmpty(value))
-            {
-                result = Convert.ToInt32(value);
-            }
-            return result;
         }
 
         public bool IsPresentIstanzaPassoTroncato(string idIstanzaProcesso)
@@ -2762,38 +2218,31 @@ namespace DocsPaDB.Query_DocsPAWS
             return result;
         }
 
-        private string BindConditionFilters(List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma> filtri, DocsPaVO.utente.InfoUtente infoUtente, out string table)
+        private string BindConditionFilters(List<DocsPaVO.LibroFirma.FiltroIstanzeProcessoFirma> filtri)
         {
             string condition = string.Empty;
             string stato = string.Empty;
-            table = string.Empty;
+            string idProcesso = (from filtro in filtri where filtro.Argomento.Equals("ID_PROCESSO") select filtro.Valore).FirstOrDefault();
+            condition = "WHERE ID_PROCESSO =" + idProcesso;
+
             foreach (FiltroIstanzeProcessoFirma f in filtri)
             {
                 switch (f.Argomento)
                 {
-                    case "ID_PROCESSO":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            condition += " AND  I.ID_PROCESSO =" + f.Valore;
-                        }
-                        break;
-                    case "NOME":
-                        condition += " AND UPPER(I.DESCRIZIONE) LIKE UPPER('%" + f.Valore.Replace("'", "''") + "%')";
-                        break;
                     case "DOCNUMBER":
-                         condition += " AND I.ID_DOCUMENTO=" + f.Valore;
+                        condition += " AND I.ID_DOCUMENTO=" + f.Valore;
                         break;
                     case "DOCNUMBER_DAL":
-                        condition +=  "  AND I.ID_DOCUMENTO>=" + f.Valore;
+                        condition += "AND I.ID_DOCUMENTO>=" + f.Valore;
                         break;
                     case "DOCNUMBER_AL":
-                        condition += " AND I.ID_DOCUMENTO<=" + f.Valore;
+                        condition += "AND I.ID_DOCUMENTO<=" + f.Valore;
                         break;
                     case "OGGETTO":
                         if (dbType.ToUpper().Equals("SQL"))
-                            condition += " AND  UPPER(" + getUserDB() + "getObjectMainDoc(I.ID_DOCUMENTO)) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
+                            condition += "AND UPPER(" + getUserDB() + "getObjectMainDoc(I.ID_DOCUMENTO)) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
                         else
-                            condition += " AND UPPER(getObjectMainDoc(I.ID_DOCUMENTO)) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
+                            condition += "AND UPPER(getObjectMainDoc(I.ID_DOCUMENTO)) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
                         break;
                     case "DATA_AVVIO_IL":
                         condition += " AND I.ATTIVATO_IL >=" +
@@ -2801,96 +2250,62 @@ namespace DocsPaDB.Query_DocsPAWS
                             " AND I.ATTIVATO_IL <=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, false);
                         break;
                     case "DATA_AVVIO_SUCCESSIVA_AL":
+                        // if (numAndStr > 0)
                         condition += " AND I.ATTIVATO_IL>=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, true);
                         break;
                     case "DATA_AVVIO_PRECEDENTE_IL":
-                        condition += " AND I.ATTIVATO_IL<=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, false);
+                        condition += "AND I.ATTIVATO_IL<=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, false);
                         break;
                     case "DATA_AVVIO_SC":
                         if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND  I.ATTIVATO_IL>=(select to_date(to_char(sysdate+ (1-to_char(sysdate,'D')))) startdayofweek from dual) AND I.ATTIVATO_IL<(select to_date(to_char(sysdate+ (8-to_char(sysdate,'D')))) enddayofweek from dual) ";
+                            condition += "AND I.ATTIVATO>=(select to_date(to_char(sysdate+ (1-to_char(sysdate,'D')))) startdayofweek from dual) AND I.ATTIVATO_IL<(select to_date(to_char(sysdate+ (8-to_char(sysdate,'D')))) enddayofweek from dual) ";
                         else
-                            condition += " AND  I.ATTIVATO_IL>=(select DATEADD(DAY,-DATEPART(WEEKDAY,(DATEADD(DAY,7-DATEPART(WEEKDAY,GETDATE()),GETDATE())))+(7-DATEPART(WEEKDAY,GETDATE()))+2 ,GETDATE())) AND I.ATTIVATO_IL<=(select DATEADD(DAY , 8-DATEPART(WEEKDAY,GETDATE()),GETDATE())) ";
+                            condition += "AND I.ATTIVATO>=(select DATEADD(DAY,-DATEPART(WEEKDAY,(DATEADD(DAY,7-DATEPART(WEEKDAY,GETDATE()),GETDATE())))+(7-DATEPART(WEEKDAY,GETDATE()))+2 ,GETDATE())) AND I.ATTIVATO_IL<=(select DATEADD(DAY , 8-DATEPART(WEEKDAY,GETDATE()),GETDATE())) ";
                         break;
                     case "DATA_AVVIO_MC":
                         if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND  I.ATTIVATO_IL>= Trunc(Sysdate,'MM') AND I.ATTIVATO_IL<(Sysdate+1 ) ";
+                            condition += "AND I.ATTIVATO_IL>= Trunc(Sysdate,'MM') AND I.ATTIVATO_IL<(Sysdate+1 ) ";
                         else
-                            condition += " AND  I.ATTIVATO_IL>=(SELECT DATEADD(dd,-(DAY(getdate())-1),getdate())) AND I.ATTIVATO_IL<=(SELECT DATEADD(dd,-(DAY(DATEADD(mm,1,getdate()))),DATEADD(mm,1,getdate()))) ";
+                            condition += "AND I.ATTIVATO_IL>=(SELECT DATEADD(dd,-(DAY(getdate())-1),getdate())) AND I.ATTIVATO_IL<=(SELECT DATEADD(dd,-(DAY(DATEADD(mm,1,getdate()))),DATEADD(mm,1,getdate()))) ";
                         break;
                     case "DATA_AVVIO_TODAY":
                         if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND  I.ATTIVATO_IL between trunc(sysdate ,'DD') and sysdate";
+                            condition += " AND I.ATTIVATO_IL between trunc(sysdate ,'DD') and sysdate";
                         else
-                            condition += " AND  DATEDIFF(DD, I.ATTIVATO_IL, GETDATE()) = 0 ";
-                        break;
-                    case "DATA_AVVIO_YESTERDAY":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND  to_date(to_char(I.ATTIVATO_IL,'dd/mm/yyyy'),'dd/mm/yyyy') = trunc(sysdate -1 ,'DD') ";
-                        else
-                            condition += " AND  DATEDIFF(DD, I.ATTIVATO_IL, GETDATE() -1) = 0 ";
-                        break;
-                    case "DATA_AVVIO_LAST_SEVEN_DAYS":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND  I.ATTIVATO_IL>=(select to_date(to_char(sysdate - 7)) from dual) ";
-                        else
-                            condition += " AND  I.ATTIVATO_IL>=(SELECT DATEADD(day, -7, GETDATE())) ";
-                        break;
-                    case "DATA_AVVIO_LAST_THIRTY_ONE_DAYS":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND  I.ATTIVATO_IL>=(select to_date(to_char(sysdate - 31)) from dual) ";
-                        else
-                            condition += " AND  I.ATTIVATO_IL>=(SELECT DATEADD(day, -31, GETDATE())) ";
+                            condition += " AND DATEDIFF(DD, I.ATTIVATO_IL, GETDATE()) = 0 ";
                         break;
                     case "NOTE_AVVIO":
-                        condition += " AND  UPPER(I.NOTE) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
+                        condition += "AND UPPER(I.NOTE) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
                         break;
                     case "DATA_CONCLUSIONE_IL":
-                        condition += " AND  I.CONCLUSO_IL >=" +
+                        condition += " AND I.CONCLUSO_IL >=" +
                             DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, true) +
                             " AND I.CONCLUSO_IL <=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, false);
                         break;
                     case "DATA_CONCLUSIONE_SUCCESSIVA_AL":
-                        condition += " AND  I.CONCLUSO_IL>=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, true);
+                        // if (numAndStr > 0)
+                        condition += " AND I.CONCLUSO_IL>=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, true);
                         break;
                     case "DATA_CONCLUSIONE_PRECEDENTE_IL":
-                        condition += " AND I.CONCLUSO_IL<=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, false);
+                        condition += "AND I.CONCLUSO_IL<=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, false);
                         break;
                     case "DATA_CONCLUSIONE_SC":
                         if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND I.CONCLUSO_IL>=(select to_date(to_char(sysdate+ (1-to_char(sysdate,'D')))) startdayofweek from dual) AND I.CONCLUSO_IL<(select to_date(to_char(sysdate+ (8-to_char(sysdate,'D')))) enddayofweek from dual) ";
+                            condition += "AND I.CONCLUSO_IL>=(select to_date(to_char(sysdate+ (1-to_char(sysdate,'D')))) startdayofweek from dual) AND I.CONCLUSO_IL<(select to_date(to_char(sysdate+ (8-to_char(sysdate,'D')))) enddayofweek from dual) ";
                         else
-                            condition += " AND I.CONCLUSO_IL>=(select DATEADD(DAY,-DATEPART(WEEKDAY,(DATEADD(DAY,7-DATEPART(WEEKDAY,GETDATE()),GETDATE())))+(7-DATEPART(WEEKDAY,GETDATE()))+2 ,GETDATE())) AND I.CONCLUSO_IL<=(select DATEADD(DAY , 8-DATEPART(WEEKDAY,GETDATE()),GETDATE())) ";
+                            condition += "AND I.CONCLUSO_IL>=(select DATEADD(DAY,-DATEPART(WEEKDAY,(DATEADD(DAY,7-DATEPART(WEEKDAY,GETDATE()),GETDATE())))+(7-DATEPART(WEEKDAY,GETDATE()))+2 ,GETDATE())) AND I.CONCLUSO_IL<=(select DATEADD(DAY , 8-DATEPART(WEEKDAY,GETDATE()),GETDATE())) ";
                         break;
                     case "DATA_CONCLUSIONE_MC":
                         if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND I.CONCLUSO_IL>= Trunc(Sysdate,'MM') AND I.CONCLUSO_IL<(Sysdate+1 ) ";
+                            condition += "AND I.CONCLUSO_IL>= Trunc(Sysdate,'MM') AND I.CONCLUSO_IL<(Sysdate+1 ) ";
                         else
-                            condition += " AND I.CONCLUSO_IL>=(SELECT DATEADD(dd,-(DAY(getdate())-1),getdate())) AND I.ATTIVATO<=(SELECT DATEADD(dd,-(DAY(DATEADD(mm,1,getdate()))),DATEADD(mm,1,getdate()))) ";
+                            condition += "AND I.CONCLUSO_IL>=(SELECT DATEADD(dd,-(DAY(getdate())-1),getdate())) AND I.ATTIVATO<=(SELECT DATEADD(dd,-(DAY(DATEADD(mm,1,getdate()))),DATEADD(mm,1,getdate()))) ";
                         break;
                     case "DATA_CONCLUSIONE_TODAY":
                         if (!dbType.ToUpper().Equals("SQL"))
                             condition += " AND I.CONCLUSO_IL between trunc(sysdate ,'DD') and sysdate";
                         else
                             condition += " AND DATEDIFF(DD, I.CONCLUSO_IL, GETDATE()) = 0 ";
-                        break;
-                    case "DATA_CONCLUSIONE_YESTERDAY":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND to_date(to_char(I.CONCLUSO_IL,'dd/mm/yyyy'),'dd/mm/yyyy') = trunc(sysdate -1 ,'DD') ";
-                        else
-                            condition += " AND DATEDIFF(DD, I.CONCLUSO_IL, GETDATE() -1) = 0 ";
-                        break;
-                    case "DATA_CONCLUSIONE_LAST_SEVEN_DAYS":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND I.CONCLUSO_IL>=(select to_date(to_char(sysdate - 7)) from dual) ";
-                        else
-                            condition += " AND I.CONCLUSO_IL>=(SELECT DATEADD(day, -7, GETDATE())) ";
-                        break;
-                    case "DATA_CONCLUSIONE_LAST_THIRTY_ONE_DAYS":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND I.CONCLUSO_IL>=(select to_date(to_char(sysdate - 31)) from dual) ";
-                        else
-                            condition += " AND I.CONCLUSO_IL>=(SELECT DATEADD(day, -31, GETDATE())) ";
                         break;
                     case "DATA_INTERRUZIONE_IL":
                         condition += " AND I.CONCLUSO_IL >=" +
@@ -2901,19 +2316,19 @@ namespace DocsPaDB.Query_DocsPAWS
                         condition += " AND I.CONCLUSO_IL>=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, true);
                         break;
                     case "DATA_INTERRUZIONE_PRECEDENTE_IL":
-                        condition += " AND I.CONCLUSO_IL<=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, false) + " AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
+                        condition += "AND I.CONCLUSO_IL<=" + DocsPaDbManagement.Functions.Functions.ToDateBetween(f.Valore, false) + " AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
                         break;
                     case "DATA_INTERRUZIONE_SC":
                         if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND I.CONCLUSO_IL>=(select to_date(to_char(sysdate+ (1-to_char(sysdate,'D')))) startdayofweek from dual) AND I.CONCLUSO_IL<(select to_date(to_char(sysdate+ (8-to_char(sysdate,'D')))) enddayofweek from dual)  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
+                            condition += "AND I.CONCLUSO_IL>=(select to_date(to_char(sysdate+ (1-to_char(sysdate,'D')))) startdayofweek from dual) AND I.CONCLUSO_IL<(select to_date(to_char(sysdate+ (8-to_char(sysdate,'D')))) enddayofweek from dual)  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
                         else
-                            condition += " AND I.CONCLUSO_IL>=(select DATEADD(DAY,-DATEPART(WEEKDAY,(DATEADD(DAY,7-DATEPART(WEEKDAY,GETDATE()),GETDATE())))+(7-DATEPART(WEEKDAY,GETDATE()))+2 ,GETDATE())) AND I.CONCLUSO_IL<=(select DATEADD(DAY , 8-DATEPART(WEEKDAY,GETDATE()),GETDATE()))  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
+                            condition += "AND I.CONCLUSO_IL>=(select DATEADD(DAY,-DATEPART(WEEKDAY,(DATEADD(DAY,7-DATEPART(WEEKDAY,GETDATE()),GETDATE())))+(7-DATEPART(WEEKDAY,GETDATE()))+2 ,GETDATE())) AND I.CONCLUSO_IL<=(select DATEADD(DAY , 8-DATEPART(WEEKDAY,GETDATE()),GETDATE()))  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
                         break;
                     case "DATA_INTERRUZIONE_MC":
                         if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND I.CONCLUSO_IL>= Trunc(Sysdate,'MM') AND I.CONCLUSO_IL<(Sysdate+1 )  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
+                            condition += "AND I.CONCLUSO_IL>= Trunc(Sysdate,'MM') AND I.CONCLUSO_IL<(Sysdate+1 )  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
                         else
-                            condition += " AND I.CONCLUSO_IL>=(SELECT DATEADD(dd,-(DAY(getdate())-1),getdate())) AND I.ATTIVATO<=(SELECT DATEADD(dd,-(DAY(DATEADD(mm,1,getdate()))),DATEADD(mm,1,getdate())))  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
+                            condition += "AND I.CONCLUSO_IL>=(SELECT DATEADD(dd,-(DAY(getdate())-1),getdate())) AND I.ATTIVATO<=(SELECT DATEADD(dd,-(DAY(DATEADD(mm,1,getdate()))),DATEADD(mm,1,getdate())))  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
                         break;
                     case "DATA_INTERRUZIONE_TODAY":
                         if (!dbType.ToUpper().Equals("SQL"))
@@ -2921,97 +2336,20 @@ namespace DocsPaDB.Query_DocsPAWS
                         else
                             condition += " AND DATEDIFF(DD, I.CONCLUSO_IL, GETDATE()) = 0 AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
                         break;
-                    case "DATA_INTERRUZIONE_YESTERDAY":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND to_date(to_char(I.CONCLUSO_IL,'dd/mm/yyyy'),'dd/mm/yyyy') = trunc(sysdate -1 ,'DD')  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
-                        else
-                            condition += " AND DATEDIFF(DD, I.CONCLUSO_IL, GETDATE() -1) = 0  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
-                        break;
-                    case "DATA_INTERRUZIONE_LAST_SEVEN_DAYS":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND I.CONCLUSO_IL>=(select to_date(to_char(sysdate - 7)) from dual)  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
-                        else
-                            condition += " AND I.CONCLUSO_IL>=(SELECT DATEADD(day, -7, GETDATE()))  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
-                        break;
-                    case "DATA_INTERRUZIONE_LAST_THIRTY_ONE_DAYS":
-                        if (!dbType.ToUpper().Equals("SQL"))
-                            condition += " AND I.CONCLUSO_IL>=(select to_date(to_char(sysdate - 31)) from dual)  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
-                        else
-                            condition +=  " AND I.CONCLUSO_IL>=(SELECT DATEADD(day, -31, GETDATE()))  AND I.STATO='" + DocsPaVO.LibroFirma.StatoProcesso.STOPPED + "'";
-                        break;
-                    case "RUOLO_COINVOLTO":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            if(string.IsNullOrEmpty(table) || !table.ToUpper().Contains("DPA_ISTANZA_PASSO_FIRMA"))
-                            {
-                                table += ", DPA_ISTANZA_PASSO_FIRMA IP";
-                            }
-                            condition += string.Format(" AND IP.ID_RUOLO_COINVOLTO = (SELECT ID_GRUPPO FROM DPA_CORR_GLOBALI WHERE SYSTEM_ID = {0})", f.Valore);
-                        }
-                        break;
-                    case "UTENTE_COINVOLTO":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            if (string.IsNullOrEmpty(table) || !table.ToUpper().Contains("DPA_ISTANZA_PASSO_FIRMA"))
-                            {
-                                table += ", DPA_ISTANZA_PASSO_FIRMA IP";
-                            }
-                            condition += string.Format(" AND IP.ID_UTENTE_COINVOLTO = (SELECT ID_PEOPLE FROM DPA_CORR_GLOBALI WHERE SYSTEM_ID = {0})", f.Valore);
-                        }
-                        break;
-                    case "ID_RUOLO_PROPONENTE":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            condition += " AND I.ID_RUOLO_PROPONENTE = " + f.Valore;
-                        }
-                        break;
-                    case "ID_UTENTE_PROPONENTE":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            condition += " AND I.ID_UTENTE_PROPONENTE = " + f.Valore;
-                        }
-                        break;
-                    case "TIPO_VISIBILITA":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            if (string.IsNullOrEmpty(table) || !table.ToUpper().Contains("DPA_ISTANZA_PASSO_FIRMA"))
-                            {
-                                table += ", DPA_PROCESSO_FIRMA_VISIBILITA V";
-                            }
-                            condition += " AND V.CHA_TIPO_VISIBILITA='" + f.Valore + "' AND I.ID_PROCESSO = V.ID_PROCESSO AND V.ID_GROUPS = " + infoUtente.idGruppo;
-                        }
-                        break;
-                    case "TIPO_PASSO_AUTOMATICO":
-                        if (!string.IsNullOrEmpty(f.Valore))
-                        {
-                            if (string.IsNullOrEmpty(table) || !table.ToUpper().Contains("DPA_ISTANZA_PASSO_FIRMA"))
-                            {
-                                table += ", DPA_ISTANZA_PASSO_FIRMA IP";
-                            }
-                            condition += " AND IP.ID_ISTANZA_PROCESSO = I.ID_ISTANZA AND IP.CHA_AUTOMATICO='1' AND IP.TIPO_FIRMA ='"+ f.Valore +"'";
-                        }
-                        break;
                     case "NOTE_RESPINGIMENTO":
-                        condition += " AND UPPER(I.MOTIVO_RESPINGIMENTO) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
+                        condition += "AND UPPER(I.MOTIVO_RESPINGIMENTO) LIKE '%" + f.Valore.ToUpper().Replace("'", "''") + "%'";
                         break;
                     case "STATO_IN_ESECUZIONE":
                         if (Convert.ToBoolean(f.Valore))
-                            stato += " I.STATO IN ('" + DocsPaVO.LibroFirma.TipoStatoProcesso.IN_EXEC + "'";
-                        break;
-                    case "STATO_IN_ERRORE":
-                        if (Convert.ToBoolean(f.Valore))
-                        {
-                            stato += string.IsNullOrEmpty(stato) ? " I.STATO IN ('" + DocsPaVO.LibroFirma.TipoStatoProcesso.IN_ERROR + "'" : ", '" + DocsPaVO.LibroFirma.TipoStatoProcesso.IN_ERROR + "'";
-                            stato += ", '" + DocsPaVO.LibroFirma.TipoStatoProcesso.REPLAY + "'";
-                        }
+                            stato += " AND I.STATO IN ('" + DocsPaVO.LibroFirma.TipoStatoProcesso.IN_EXEC + "'";
                         break;
                     case "STATO_INTERROTTO":
                         if (Convert.ToBoolean(f.Valore))
-                            stato += string.IsNullOrEmpty(stato) ? " I.STATO IN ('" + DocsPaVO.LibroFirma.TipoStatoProcesso.STOPPED + "'" : ", '" + DocsPaVO.LibroFirma.TipoStatoProcesso.STOPPED + "'";
+                            stato += string.IsNullOrEmpty(stato) ? " AND I.STATO IN ('" + DocsPaVO.LibroFirma.TipoStatoProcesso.STOPPED + "'" : ", '" + DocsPaVO.LibroFirma.TipoStatoProcesso.STOPPED + "'";
                         break;
                     case "STATO_CONCLUSO":
                         if (Convert.ToBoolean(f.Valore))
-                            stato += string.IsNullOrEmpty(stato) ? " I.STATO IN ('" + DocsPaVO.LibroFirma.TipoStatoProcesso.CLOSED + "'" : ", '" + DocsPaVO.LibroFirma.TipoStatoProcesso.CLOSED + "'";
+                            stato += string.IsNullOrEmpty(stato) ? " AND I.STATO IN ('" + DocsPaVO.LibroFirma.TipoStatoProcesso.CLOSED + "'" : ", '" + DocsPaVO.LibroFirma.TipoStatoProcesso.CLOSED + "'";
                         break;
                     case "TRONCATO": //LA CONDIZIONE TRONCATO VA IN OR CON LA CONDIZIONE STATO
                         if (Convert.ToBoolean(f.Valore))
@@ -3025,8 +2363,9 @@ namespace DocsPaDB.Query_DocsPAWS
             if (!string.IsNullOrEmpty(stato))
             {
                 stato += ")";
-                condition +=  " AND " + stato;
+                condition += stato;
             }
+
             return condition;
         }
 
@@ -3080,36 +2419,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
             logger.Debug("FINE Metodo GetInfoProcessesStartedForDocument in DocsPaDb.Query_DocsPAWS.LibroFirma");
             return list;
-        }
-
-        public DocsPaVO.utente.Ruolo GetRuoloTitolarePasso(string idIstanzaProcesso, int numeroSequenza)
-        {
-            DocsPaVO.utente.Ruolo ruolo = new DocsPaVO.utente.Ruolo();
-            logger.Debug("INIZIO Metodo GetRuoloPassoPrecedente in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            try
-            {
-                DataSet dsMitt = new DataSet();
-                DocsPaUtils.Query query = DocsPaUtils.InitQuery.getInstance().getQuery("S_TITOLARE_PASSO");
-                query.setParam("numeroSequenza", (numeroSequenza).ToString());
-                query.setParam("idIstanzaProcesso", idIstanzaProcesso);
-
-                logger.Debug("QUERY: " + query.getSQL());
-
-                if (this.ExecuteQuery(out dsMitt, "titolarePasso", query.getSQL()))
-                {
-                    if (dsMitt.Tables["titolarePasso"] != null && dsMitt.Tables["titolarePasso"].Rows.Count > 0)
-                    {
-                        DataRow rowMitt = dsMitt.Tables["titolarePasso"].Rows[0];
-                        ruolo.idGruppo = rowMitt["ID_RUOLO_COINVOLTO"].ToString();
-                        ruolo.codiceRubrica = rowMitt["GROUP_ID"].ToString();
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in Metodo GetRuoloPassoPrecedente in DocsPaDb.Query_DocsPAWS.LibroFirma " + e.Message);
-            }
-            return ruolo;
         }
 
         public DocsPaVO.LibroFirma.WaitResponse GetFreeWaitStep(string idIstanzaPasso)
@@ -3224,10 +2533,6 @@ namespace DocsPaDB.Query_DocsPAWS
                                                 retVal.gruppoAzione = gruppoAzione;
                                                 retVal.idElementoInLF = null; //Da valorizzare se inseriamo in LF
                                             }
-                                        }
-                                        else //Se dopo il wait non c'è il passo devo chiudere il processo
-                                        {
-                                            SetProcesComplete(idProcesso, DocsPaVO.LibroFirma.TipoStatoProcesso.CLOSED, idDocPrincipale);
                                         }
                                     }
                                 }
@@ -3373,673 +2678,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
             return listTypeRole;
         }
-
-        #region AMMINISTRAZIONE
-
-        public List<ProcessoFirma> GetProcessiDiFirmaByTitolarePaging(string idRuoloTitolare, string idUtenteTitolare, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            logger.Info("Inizio Metodo GetProcessiDiFirmaByTitolare in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            List<ProcessoFirma> listProcessiDiFirma = new List<ProcessoFirma>();
-            ProcessoFirma processoDiFirma = null;
-            numTotPage = 0;
-            nRec = 0;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                nRec = GetCountProcessiDiFirmaByTitolare(idRuoloTitolare, idUtenteTitolare);
-                if (nRec > 0)
-                {
-                    numTotPage = (nRec / pageSize);
-                    int startRow = ((numPage * pageSize) - pageSize) + 1;
-                    int endRow = (startRow - 1) + pageSize;
-                    string paging = string.Empty;
-
-                    if (dbType == "SQL")
-                    {
-                        paging = "WHERE Row <= " + endRow.ToString() + " AND Row >=" + startRow.ToString();
-                    }
-                    else
-                    {
-                        paging = "WHERE ROWNUM <= " + endRow.ToString() + " ) a WHERE rnum >=" + startRow.ToString();
-                    }
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_SCHEMA_PROCESSO_FIRMA_BY_TITOLARE");
-                    if (string.IsNullOrEmpty(idRuoloTitolare))
-                    {
-                        string idRuoli = string.Empty;
-                        List<string> listIdRuoli = GetIdRuoliProcessiUltimoUtente(idUtenteTitolare);
-                        foreach (string id in listIdRuoli)
-                            idRuoli += string.IsNullOrEmpty(idRuoli) ? id : ", " + id;
-
-                        q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idUtenteTitolare + ")");
-                        q.setParam("idRuoloTitolare", string.Empty);
-                    }
-                    else
-                    {
-                        q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuoloTitolare) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuoloTitolare);
-                        q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idUtenteTitolare);
-                    }
-                    q.setParam("paging", paging);
-                    query = q.getSQL();
-                    logger.Debug("GetProcessiDiFirmaByTitolare: " + query);
-
-                    if (this.ExecuteQuery(out ds, "GetProcessiDiFirmaByTitolare", query))
-                    {
-                        if (ds.Tables["GetProcessiDiFirmaByTitolare"] != null && ds.Tables["GetProcessiDiFirmaByTitolare"].Rows.Count > 0)
-                        {
-                            foreach (DataRow row in ds.Tables["GetProcessiDiFirmaByTitolare"].Rows)
-                            {
-                                processoDiFirma = new ProcessoFirma()
-                                {
-                                    idProcesso = !string.IsNullOrEmpty(row["ID_PROCESSO"].ToString()) ? row["ID_PROCESSO"].ToString() : string.Empty,
-                                    nome = !string.IsNullOrEmpty(row["NOME"].ToString()) ? row["NOME"].ToString() : string.Empty,
-                                    idRuoloAutore = !string.IsNullOrEmpty(row["RUOLO_AUTORE"].ToString()) ? row["RUOLO_AUTORE"].ToString() : string.Empty,
-                                    idPeopleAutore = !string.IsNullOrEmpty(row["UTENTE_AUTORE"].ToString()) ? row["UTENTE_AUTORE"].ToString() : string.Empty,
-                                };
-                                listProcessiDiFirma.Add(processoDiFirma);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetProcessiDiFirmaByTitolare", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetProcessiDiFirmaByTitolare in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return listProcessiDiFirma;
-        }
-
-
-        public int GetCountProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare)
-        {
-            logger.Info("Inizio Metodo GetCountProcessiDiFirmaByTitolare in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            int countProcessi = 0;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_COUNT_DPA_SCHEMA_PROCESSO_FIRMA_BY_TITOLARE");
-                if (string.IsNullOrEmpty(idRuoloTitolare))
-                {
-                    string idRuoli = string.Empty;
-                    List<string> listIdRuoli = GetIdRuoliProcessiUltimoUtente(idUtenteTitolare);
-                    foreach (string id in listIdRuoli)
-                        idRuoli += string.IsNullOrEmpty(idRuoli) ? id : ", " + id;
-
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idUtenteTitolare + ")");
-                    q.setParam("idRuoloTitolare", string.Empty);
-                }
-                else
-                {
-                    q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuoloTitolare) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuoloTitolare);
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idUtenteTitolare);
-                }
-                query = q.getSQL();
-                logger.Debug("GetCountProcessiDiFirmaByTitolare: " + query);
-                string field;
-                if (this.ExecuteScalar(out field, query))
-                    countProcessi = Convert.ToInt32(field);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetCountProcessiDiFirmaByTitolare", exc);
-                return 0;
-            }
-            logger.Info("Fine Metodo GetCountProcessiDiFirmaByTitolare in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return countProcessi;
-        }
-
-        public List<IstanzaProcessoDiFirma> GetIstanzaProcessiDiFirmaByTitolarePaging(string idRuoloTitolare, string idUtenteTitolare, int numPage, int pageSize, out int numTotPage, out int nRec)
-        {
-            logger.Info("Inizio Metodo GetIstanzaProcessoDiFirmaByDocnumber in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            List<IstanzaProcessoDiFirma> istanzeProcessoDiFirmaList = new List<IstanzaProcessoDiFirma>();
-            numTotPage = 0;
-            nRec = 0;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                nRec = GetCountIstanzaProcessiDiFirmaByTitolare(idRuoloTitolare, idUtenteTitolare);
-                if (nRec > 0)
-                {
-                    numTotPage = (nRec / pageSize);
-                    int startRow = ((numPage * pageSize) - pageSize) + 1;
-                    int endRow = (startRow - 1) + pageSize;
-                    string paging = string.Empty;
-
-                    if (dbType == "SQL")
-                    {
-                        paging = "WHERE Row <= " + endRow.ToString() + " AND Row >=" + startRow.ToString();
-                    }
-                    else
-                    {
-                        paging = "WHERE ROWNUM <= " + endRow.ToString() + " ) a WHERE rnum >=" + startRow.ToString();
-                    }
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_FIRMA_BY_TITOLARE");
-                    if (string.IsNullOrEmpty(idRuoloTitolare))
-                    {
-                        string idRuoli = string.Empty;
-                        List<string> listIdRuoli = GetIdRuoliProcessiUltimoUtente(idUtenteTitolare);
-                        foreach (string id in listIdRuoli)
-                            idRuoli += string.IsNullOrEmpty(idRuoli) ? id : ", " + id;
-
-                        q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idUtenteTitolare + ")");
-                        q.setParam("idRuoloTitolare", string.Empty);
-                    }
-                    else
-                    {
-                        q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuoloTitolare) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuoloTitolare);
-                        q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idUtenteTitolare);
-                    }
-                    q.setParam("paging", paging);
-                    query = q.getSQL();
-                    logger.Debug("getIstanzaProcessiDiFirma: " + query);
-
-                    if (this.ExecuteQuery(out ds, "istanzaProcessiDiFirma", query))
-                    {
-                        if (ds.Tables["istanzaProcessiDiFirma"] != null && ds.Tables["istanzaProcessiDiFirma"].Rows.Count > 0)
-                        {
-                            IstanzaProcessoDiFirma istanzaProcessoDiFirma = new IstanzaProcessoDiFirma();
-                            foreach (DataRow row in ds.Tables["istanzaProcessiDiFirma"].Rows)
-                            {
-                                istanzaProcessoDiFirma = new IstanzaProcessoDiFirma()
-                                {
-                                    idIstanzaProcesso = row["ID_ISTANZA"].ToString(),
-                                    idProcesso = row["ID_PROCESSO"].ToString(),
-                                    Descrizione = row["DESCRIZIONE"].ToString(),
-                                    dataAttivazione = row["ATTIVATO_IL"].ToString(),
-                                    docNumber = row["ID_DOCUMENTO"].ToString(),
-                                    RuoloProponente = GetRuolo(row, false),
-                                    docAll = row["DOC_ALL"].ToString(),
-                                    UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() },
-                                };
-                                istanzeProcessoDiFirmaList.Add(istanzaProcessoDiFirma);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetIstanzaProcessiDiFirmaByRuoloTitolare", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetIstanzaProcessoDiFirmaByDocnumber in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return istanzeProcessoDiFirmaList;
-        }
-
-        public int GetCountIstanzaProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare)
-        {
-            logger.Info("Inizio Metodo GetCountIstanzaProcessiDiFirmaByTitolare in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            int countIstanzaProcessi = 0;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_COUNT_DPA_ISTANZA_PROCESSO_FIRMA_BY_TITOLARE");
-                if (string.IsNullOrEmpty(idRuoloTitolare))
-                {
-                    string idRuoli = string.Empty;
-                    List<string> listIdRuoli = GetIdRuoliProcessiUltimoUtente(idUtenteTitolare);
-                    foreach (string id in listIdRuoli)
-                        idRuoli += string.IsNullOrEmpty(idRuoli) ? id : ", " + id;
-
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idUtenteTitolare + ")");
-                    q.setParam("idRuoloTitolare", string.Empty);
-                }
-                else
-                {
-                    q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuoloTitolare) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuoloTitolare);
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idUtenteTitolare);
-                }
-                query = q.getSQL();
-                logger.Debug("getIstanzaProcessiDiFirma: " + query);
-
-                string field;
-                if (this.ExecuteScalar(out field, query))
-                    countIstanzaProcessi = Convert.ToInt32(field);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetCountIstanzaProcessiDiFirmaByTitolare", exc);
-                return 0;
-            }
-            logger.Info("Fine Metodo GetCountIstanzaProcessiDiFirmaByTitolare in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return countIstanzaProcessi;
-        }
-
-        public List<IstanzaProcessoDiFirma> GetIstanzaProcessiDiFirmaByTitolare(string idRuoloTitolare, string idUtenteTitolare)
-        {
-            logger.Info("Inizio Metodo GetIstanzaProcessoDiFirmaByDocnumber in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            List<IstanzaProcessoDiFirma> istanzeProcessoDiFirmaList = new List<IstanzaProcessoDiFirma>();
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_FIRMA_BY_TITOLARE_1");
-                if (string.IsNullOrEmpty(idRuoloTitolare))
-                {
-                    string idRuoli = string.Empty;
-                    List<string> listIdRuoli = GetIdRuoliProcessiUltimoUtente(idUtenteTitolare);
-                    foreach (string id in listIdRuoli)
-                        idRuoli += string.IsNullOrEmpty(idRuoli) ? id : ", " + id;
-
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idUtenteTitolare + ")");
-                    q.setParam("idRuoloTitolare", string.Empty);
-                }
-                else
-                {
-                    q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuoloTitolare) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuoloTitolare);
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteTitolare) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idUtenteTitolare);
-                }
-                query = q.getSQL();
-                logger.Debug("getIstanzaProcessiDiFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "istanzaProcessiDiFirma", query))
-                {
-                    if (ds.Tables["istanzaProcessiDiFirma"] != null && ds.Tables["istanzaProcessiDiFirma"].Rows.Count > 0)
-                    {
-                        IstanzaProcessoDiFirma istanzaProcessoDiFirma = new IstanzaProcessoDiFirma();
-                        foreach (DataRow row in ds.Tables["istanzaProcessiDiFirma"].Rows)
-                        {
-                            istanzaProcessoDiFirma = new IstanzaProcessoDiFirma()
-                            {
-                                idIstanzaProcesso = row["ID_ISTANZA"].ToString(),
-                                idProcesso = row["ID_PROCESSO"].ToString(),
-                                Descrizione = row["DESCRIZIONE"].ToString(),
-                                dataAttivazione = row["ATTIVATO_IL"].ToString(),
-                                docNumber = row["ID_DOCUMENTO"].ToString(),
-                                AttivatoPerPassaggioStato = (!string.IsNullOrEmpty(row["CHA_CAMBIO_STATO_DIAG"].ToString()) && row["CHA_CAMBIO_STATO_DIAG"].ToString().Equals("1")) ? true : false,  
-                                docAll = !string.IsNullOrEmpty(row["DOC_ALL"].ToString()) ? row["DOC_ALL"].ToString() : string.Empty,
-                                RuoloProponente = GetRuolo(row, false),
-                                UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() },
-                                istanzePassoDiFirma = new List<IstanzaPassoDiFirma>() { GetIstanzaPassoDiFirmaInAttesa(row["ID_ISTANZA"].ToString()) }
-                            };
-                            istanzeProcessoDiFirmaList.Add(istanzaProcessoDiFirma);
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetIstanzaProcessiDiFirmaByRuoloTitolare", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetIstanzaProcessoDiFirmaByDocnumber in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return istanzeProcessoDiFirmaList;
-        }
-
-        public bool InvalidaProcessiFirmaTitolare(string idRuolo, string idPeople, string tipoTick)
-        {
-            bool result = true;
-            string query;
-            try
-            {
-                //TRAMITE S
-                /*
-                ArrayList sp_params = new ArrayList();
-                int idPeopleTitolare = string.IsNullOrEmpty(idPeople) ? 0 : Convert.ToInt32(idPeople);
-                sp_params.Add(new DocsPaUtils.Data.ParameterSP("idruolotitolare", Convert.ToInt32(idRuolo), 0, DirectionParameter.ParamInput, System.Data.DbType.Decimal));
-                sp_params.Add(new DocsPaUtils.Data.ParameterSP("idutentetitolare", idPeopleTitolare, 0, DirectionParameter.ParamInput, System.Data.DbType.Decimal));
-                sp_params.Add(new DocsPaUtils.Data.ParameterSP("tipotick", tipoTick, 1, DirectionParameter.ParamInput, System.Data.DbType.String));
-                sp_params.Add(new DocsPaUtils.Data.ParameterSP("returnvalue", 0, 0, DirectionParameter.ParamOutput, System.Data.DbType.Int32));
-                DataSet ds = null;
-
-                if(ExecuteStoredProcedure("sp_invalida_processi_firma", sp_params, ds) != 1)
-                    throw new Exception("Errore durante l'aggiornamento del TickPasso in libro firma");
-                */
-                string idRuoli = string.Empty;
-                if (string.IsNullOrEmpty(idRuolo))
-                {
-                    List<string> listIdRuoli = GetIdRuoliProcessiUltimoUtente(idPeople);
-                    foreach (string id in listIdRuoli)
-                        idRuoli += string.IsNullOrEmpty(idRuoli) ? id : ", " + id;
-                }
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_TICK_1");
-                if (string.IsNullOrEmpty(idRuolo))
-                {
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idPeople) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idPeople + ")");
-                    q.setParam("idRuoloTitolare", string.Empty);
-                }
-                else
-                {
-                    q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuolo) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuolo);
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idPeople) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idPeople);
-                }
-                q.setParam("tipoTick", tipoTick);
-
-                query = q.getSQL();
-                logger.Debug("InvalidaProcessiFirmaUtenteCoinvolto: " + query);
-                int rowsAffected = 0;
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante l'aggiornamento del TickPasso in libro firma: " + query);
-                }
-                 q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PROCESSO_TICK_1");
-                if (string.IsNullOrEmpty(idRuolo))
-                {
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idPeople) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idPeople + ")");
-                    q.setParam("idRuoloTitolare", string.Empty);
-                }
-                else
-                {
-                    q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuolo) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuolo);
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idPeople) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idPeople);
-                }
-                query = q.getSQL();
-                logger.Debug("InvalidaProcessiFirmaUtenteCoinvolto: " + query);
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante l'aggiornamento del TickProcesso in libro firma: " + query);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo InvalidaProcessiFirmaUtenteCoinvolto in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                result = false;
-            }
-
-            return result;
-        }
-
-        public string GetDescDiagrammiByIdProcesso(string idProcesso)
-        {
-            logger.Debug("INIZIO GetDescDiagrammiByIdProcesso");
-            string retValue = string.Empty;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_DIAGRAMMI_STATO_BY_IDPROCESSO");
-                q.setParam("idProcesso", idProcesso);
-
-                query = q.getSQL();
-                logger.Debug("GetDescDiagrammiByIdProcesso: " + query);
-
-                if (this.ExecuteQuery(out ds, "descDiagramma", query))
-                {
-                    if (ds.Tables["descDiagramma"] != null && ds.Tables["descDiagramma"].Rows.Count > 0)
-                    {
-                        retValue = ds.Tables["descDiagramma"].Rows[0]["DESC_DIAGRAMMA_STATO"].ToString();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in GetDescDiagrammiByIdProcesso :" + e.Message);
-            }
-            logger.Debug("FINE GetDescDiagrammiByIdProcesso");
-            return retValue;
-        }
-
-        public bool DisassociaProcessoDaDiagrammaStato(string idRuolo, string idPeople)
-        {
-            logger.Debug("INIZIO DisassociaProcessoDaDiagrammaStato");
-            bool retValue = true;
-            string query;
-            DocsPaUtils.Query q;
-            try
-            {
-                string idRuoli = string.Empty;
-                if (string.IsNullOrEmpty(idRuolo))
-                {
-                    List<string> listIdRuoli = GetIdRuoliProcessiUltimoUtente(idPeople);
-                    foreach (string id in listIdRuoli)
-                        idRuoli += string.IsNullOrEmpty(idRuoli) ? id : ", " + id;
-                }
-                //Rimuovo il passaggio automatico ad uno stato per conclusioneProcesso
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSI_DIAG_PROCESSO");
-                if (string.IsNullOrEmpty(idRuolo))
-                {
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idPeople) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idPeople + ")");
-                    q.setParam("idRuoloTitolare", string.Empty);
-                }
-                else
-                {
-                    q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuolo) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuolo);
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idPeople) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idPeople);
-                }
-                query = q.getSQL();
-                logger.Debug("DisassociaProcessoDaDiagrammaStato: " + query);
-                int rowsAffected = 0;
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dei Diagrammi di stato: " + query);
-                }
-
-                //Rimuovo l'associazione stato-idProcesso
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_STATI_DIAG_PROCESSO");
-                if (string.IsNullOrEmpty(idRuolo))
-                {
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idPeople) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idPeople + ")");
-                    q.setParam("idRuoloTitolare", string.Empty);
-                }
-                else
-                {
-                    q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuolo) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuolo);
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idPeople) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idPeople);
-                }
-
-                query = q.getSQL();
-                logger.Debug("DisassociaProcessoDaDiagrammaStato: " + query);
-                rowsAffected = 0;
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dei Diagrammi di stato: " + query);
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore nel metodo DisassociaProcessoDaDiagrammaStato " + e.Message);
-                retValue = false;
-            }
-            logger.Debug("FINE DisassociaProcessoDaDiagrammaStato");
-            return retValue;
-        }
-
-        public bool SostituisciUtentePassoProcesso(string idRuolo, string idOldPeople, string idNewPeople)
-        {
-            bool result = true;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_PROCESSO_UTENTE_COINVOLTO");
-                q.setParam("idRuoloTitolare", idRuolo);
-                q.setParam("idUtenteTitolareOld", idOldPeople);
-                q.setParam("idUtenteTitolareNew", idNewPeople);
-
-                query = q.getSQL();
-                logger.Debug("SostituisciUtentePassoProcesso: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dei passi del processo: " + query);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo SostituisciUtentePassoProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                result = false;
-            }
-            return result;
-        }
-
-        public bool SostituisciUtentePassoIstanza(string idRuolo, string idOldPeople, string idNewPeople)
-        {
-            bool result = true;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_ISTANZA_UTENTE_COINVOLTO");
-                q.setParam("idRuoloTitolare", idRuolo);
-                q.setParam("idUtenteTitolareOld", idOldPeople);
-                q.setParam("idUtenteTitolareNew", idNewPeople);
-
-                query = q.getSQL();
-                logger.Debug("SostituisciUtentePassoIstanza: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dei passi dell'istanza: " + query);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo SostituisciUtentePassoIstanza in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                result = false;
-            }
-            return result;
-        }
-
-        public bool SostituisciUtenteElementiInLibroFirma(string idRuolo, string idOldPeople, string idNewPeople)
-        {
-            bool result = true;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_ELEMENTI_LIBRO_FIRMA_UTENTE_COINVOLTO");
-                q.setParam("idRuoloTitolare", idRuolo);
-                q.setParam("idUtenteTitolareOld", idOldPeople);
-                q.setParam("idUtenteTitolareNew", idNewPeople);
-
-                query = q.getSQL();
-                logger.Debug("SostituisciUtenteElementiInLibroFirma: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento degli elementi in libro firma: " + query);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo SostituisciUtenteElementiInLibroFirma in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                result = false;
-            }
-            return result;
-        }
-
-        
-        public bool StoricizzaRuoloPassoProcesso(string idRuoloOld, string idRuoloNew)
-        {
-            bool result = true;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_PROCESSO_RUOLO_COINVOLTO");
-                q.setParam("idRuoloTitolareNew", idRuoloNew);
-                q.setParam("idRuoloTitolare", idRuoloOld);
-                query = q.getSQL();
-                logger.Debug("StoricizzaRuoloPassoProcesso: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dei passi del processo: " + query);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo StoricizzaRuoloPassoProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                result = false;
-            }
-            return result;
-        }
-
-        public bool StoricizzaRuoloPassoIstanza(string idRuoloOld, string idRuoloNew)
-        {
-            bool result = true;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_ISTANZA_RUOLO_COINVOLTO");
-                q.setParam("idRuoloTitolareNew", idRuoloNew);
-                q.setParam("idRuoloTitolare", idRuoloOld);
-
-                query = q.getSQL();
-                logger.Debug("StoricizzaRuoloPassoIstanza: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dei passi dell'istanza: " + query);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo StoricizzaRuoloPassoIstanza in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                result = false;
-            }
-            return result;
-        }
-
-        public bool StoricizzaRuoloElementiInLibroFirma(string idRuoloOld, string idRuoloNew)
-        {
-            bool result = true;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_ELEMENTI_LIBRO_FIRMA_RUOLO_COINVOLTO");
-                q.setParam("idRuoloTitolareNew", idRuoloNew);
-                q.setParam("idRuoloTitolare", idRuoloOld);
-
-                query = q.getSQL();
-                logger.Debug("StoricizzaRuoloElementiInLibroFirma: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento degli elementi in libro firma: " + query);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo StoricizzaRuoloElementiInLibroFirma in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                result = false;
-            }
-            return result;
-        }
-
-        public List<ProcessoFirma> GetProcessiFirmaByIdAmm(string idAmministrazione)
-        {
-            logger.Info("Inizio Metodo GetProcessiFirmaByIdAmm in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            List<ProcessoFirma> listProcessiDiFirma = new List<ProcessoFirma>();
-            ProcessoFirma processoDiFirma = null;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_SCHEMA_PROCESSO_FIRMA_BY_ID_AMM");
-                q.setParam("idAmministrazione", idAmministrazione);
-                query = q.getSQL();
-                logger.Debug("GetProcessiFirmaByIdAmm: " + query);
-
-                if (this.ExecuteQuery(out ds, "processiDiFirma", query))
-                {
-                    if (ds.Tables["processiDiFirma"] != null && ds.Tables["processiDiFirma"].Rows.Count > 0)
-                    {
-                        foreach (DataRow row in ds.Tables["processiDiFirma"].Rows)
-                        {
-                            processoDiFirma = new ProcessoFirma()
-                            {
-                                idProcesso = !string.IsNullOrEmpty(row["ID_PROCESSO"].ToString()) ? row["ID_PROCESSO"].ToString() : string.Empty,
-                                nome = !string.IsNullOrEmpty(row["NOME"].ToString()) ? row["NOME"].ToString() : string.Empty,
-                                isInvalidated = !string.IsNullOrEmpty(row["TICK"].ToString()) && row["TICK"].ToString().Equals("1") ? true : false,
-                                IsProcessModel = !string.IsNullOrEmpty(row["CHA_MODELLO"].ToString()) && row["CHA_MODELLO"].ToString().Equals("1") ? true : false,
-                                DataCreazione = !string.IsNullOrEmpty(row["DTA_CREAZIONE"].ToString()) ? row["DTA_CREAZIONE"].ToString() : string.Empty
-                            };
-                            listProcessiDiFirma.Add(processoDiFirma);
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetProcessiFirmaByIdAmm", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetProcessiFirmaByIdAmm in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return listProcessiDiFirma;
-        }
-        #endregion
         #endregion
 
         #region insert
@@ -4067,7 +2705,6 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("nome", processoDiFirma.nome.Replace("'", "''"));
                     q.setParam("ruolo", infoUtente.idGruppo);
                     q.setParam("utente", infoUtente.idPeople);
-                    q.setParam("idAmm", infoUtente.idAmministrazione);
                     q.setParam("modello", processoDiFirma.IsProcessModel ? "1" : "0");
 
                     string query = q.getSQL();
@@ -4146,10 +2783,6 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("idTipoRuolo", passo.TpoRuoloCoinvolto == null || string.IsNullOrEmpty(passo.TpoRuoloCoinvolto.systemId) ? "null" : passo.TpoRuoloCoinvolto.systemId);
                     q.setParam("ruolo", passo.ruoloCoinvolto == null || string.IsNullOrEmpty(passo.ruoloCoinvolto.idGruppo) ? "null" : passo.ruoloCoinvolto.idGruppo);
                     q.setParam("utente", passo.utenteCoinvolto == null || string.IsNullOrEmpty(passo.utenteCoinvolto.idPeople) ? "null" : passo.utenteCoinvolto.idPeople);
-                    q.setParam("idAoo", string.IsNullOrEmpty(passo.IdAOO) ? "null" : passo.IdAOO);
-                    q.setParam("idRF", string.IsNullOrEmpty(passo.IdRF) ? "null" : passo.IdRF);
-                    q.setParam("idMailRegistro", string.IsNullOrEmpty(passo.IdMailRegistro) ? "null" : passo.IdMailRegistro);
-                    q.setParam("automatico", passo.IsAutomatico ? "1" : "0");
 
                     string query = q.getSQL();
                     logger.Debug("InsertPassoDiFirma: " + query);
@@ -4204,67 +2837,6 @@ namespace DocsPaDB.Query_DocsPAWS
             return passo;
         }
 
-        public bool DuplicaPassiDiFirmaByIdProcesso(string idProcessoNew, string idProcessoOld, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = false;
-
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_PASSO_DI_FIRMA_BY_ID_PROCESSO");
-                string idPasso = string.Empty;
-                if (DBType.ToUpper().Equals("ORACLE"))
-                    q.setParam("idPasso", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_PASSO_DI_FIRMA"));
-                q.setParam("idProcessoNew", idProcessoNew);
-                q.setParam("idProcessoOld", idProcessoOld);
-
-                string query = q.getSQL();
-                logger.Debug("DuplicaPassiDiFirmaByIdProcesso: " + query);
-                if (ExecuteNonQuery(query))
-                {
-                    result = true;
-                }
-                else
-                {
-                    throw new Exception("Errore " + query);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo DuplicaPassiDiFirmaByIdProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                return false;
-            }
-            return result;
-        }
-
-        public bool CopiaVisibilitaByIdProcesso(string idProcessoNew, string idProcessoOld, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            bool result = false;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_PROCESSO_FIRMA_VISIBILITA_BY_ID_PROCESSO");
-                q.setParam("idProcessoNew", idProcessoNew);
-                q.setParam("idProcessoOld", idProcessoOld);
-
-                string query = q.getSQL();
-                logger.Debug("CopiaVisibilitaByIdProcesso: " + query);
-                if (ExecuteNonQuery(query))
-                {
-                    result = true;
-                }
-                else
-                {
-                    throw new Exception("Errore " + query);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo CopiaVisibilitaByIdProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                return false;
-            }
-            return result;
-        }
-
-
         private bool InserisciOpzioniNotifica(PassoFirma passo)
         {
             logger.Debug("Inizio Metodo InserisciOpzioniNotifica in DocsPaDb.Query_DocsPAWS.LibroFirma");
@@ -4300,22 +2872,21 @@ namespace DocsPaDB.Query_DocsPAWS
             return retValue;
         }
 
-        public bool InsertVisibilitaProcesso(List<VisibilitaProcessoRuolo> visibilita, DocsPaVO.utente.InfoUtente infoUtente)
+        public bool InsertVisibilitaProcesso(List<DocsPaVO.utente.Corrispondente> listaCorr, string idProcesso, DocsPaVO.utente.InfoUtente infoUtente)
         {
             logger.Debug("Inizio Metodo InsertVisibilitaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
             bool retValue = true;
             try
             {
-                if (visibilita != null && visibilita.Count > 0)
+                if (listaCorr != null && listaCorr.Count > 0)
                 {
                     BeginTransaction();
                     DocsPaUtils.Query q;
-                    foreach (VisibilitaProcessoRuolo vis in visibilita)
+                    foreach (DocsPaVO.utente.Corrispondente corr in listaCorr)
                     {
                         q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_PROCESSO_FIRMA_VISIBILITA");
-                        q.setParam("idProcesso", vis.idProcesso);
-                        q.setParam("idGruppo", vis.ruolo.idGruppo);
-                        q.setParam("tipoVisibilita", ((char)vis.tipoVisibilita).ToString());
+                        q.setParam("idProcesso", idProcesso);
+                        q.setParam("idCorr", corr.systemId);
 
                         string query = q.getSQL();
                         logger.Debug("InsertVisibilitaProcesso: " + query);
@@ -4432,7 +3003,7 @@ namespace DocsPaDB.Query_DocsPAWS
         /// /// <param name="FileRequest"></param>
         /// <param name="infoUtente"></param>
         /// <returns>IstanzaProcessoDiFirma</returns>
-        public IstanzaProcessoDiFirma CreateIstanzaFromProcesso(ProcessoFirma processoDiFirma, DocsPaVO.documento.FileRequest file, DocsPaVO.utente.InfoUtente infoUtente, string note, OpzioniNotifica opzioniNotifiche, bool daCambioStato)
+        public IstanzaProcessoDiFirma CreateIstanzaFromProcesso(ProcessoFirma processoDiFirma, DocsPaVO.documento.FileRequest file, DocsPaVO.utente.InfoUtente infoUtente, string note, bool notificaInterruzione, bool notificaConclusione)
         {
             IstanzaProcessoDiFirma IstanzaProcesso = null;
 
@@ -4467,12 +3038,8 @@ namespace DocsPaDB.Query_DocsPAWS
                     }
                     q.setParam("docNumber", file.docNumber);
                     q.setParam("versionId", file.versionId);
-                    q.setParam("noticaInterruzione", opzioniNotifiche.Notifica_interrotto ? "1" : "0");
-                    q.setParam("noticaConclusione", opzioniNotifiche.Notifica_concluso ? "1" : "0");
-
-                    q.setParam("notificaErrore", opzioniNotifiche.NotificaErrore ? "1" : "0");
-                    q.setParam("notificaDestNonInterop", opzioniNotifiche.NotificaPresenzaDestNonInterop ? "1" : "0");
-
+                    q.setParam("noticaInterruzione", notificaInterruzione ? "1" : "0");
+                    q.setParam("noticaConclusione", notificaConclusione ? "1" : "0");
                     q.setParam("note", note.Replace("'", "''"));
                     string strDocAll = "D";
                     if (file.GetType().Equals(typeof(DocsPaVO.documento.Allegato)))
@@ -4482,8 +3049,8 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("numAll", file.versionLabel.Replace("A", ""));
                     q.setParam("numVersion", file.version);
 
-                    q.setParam("descrizione", processoDiFirma.nome.Replace("'", "''"));
-                    q.setParam("chaCambioStato", daCambioStato ? "1" : "0");
+                    q.setParam("descrizione", processoDiFirma.nome);
+
                     string query = q.getSQL();
                     logger.Debug("CreateIstanzaFromProcesso: " + query);
                     if (ExecuteNonQuery(query))
@@ -4509,29 +3076,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
                             if (ExecuteNonQuery(query))
                             {
-                                //Aggiorno le informazioni che potrebbero cambiare lato utente
-                                List<PassoFirma> listPassiFirmaToUpdate = (from p in processoDiFirma.passi where p.DaAggiornare select p).ToList();
-                                foreach (PassoFirma passo in listPassiFirmaToUpdate)
-                                {
-                                    q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_ISTANZA_PASSI_PROCESSO_MODEL");
-                                    q.setParam("IdRuoloCoinvolto", passo.ruoloCoinvolto.idGruppo);
-                                    q.setParam("idUtenteCoinvolto", passo.utenteCoinvolto == null || string.IsNullOrEmpty(passo.utenteCoinvolto.idPeople) ? "null" : passo.utenteCoinvolto.idPeople);
-                                    q.setParam("numeroSequenza", passo.numeroSequenza.ToString());
-                                    q.setParam("idIstanzaProcesso", idIstanza);
-                                    q.setParam("tipoFirma", passo.Evento.CodiceAzione);
-                                    q.setParam("idAoo", string.IsNullOrEmpty(passo.IdAOO) ? "null" : passo.IdAOO);
-                                    q.setParam("idRF", string.IsNullOrEmpty(passo.IdRF) ? "null" : passo.IdRF);
-                                    q.setParam("idMailRegistro", string.IsNullOrEmpty(passo.IdMailRegistro) ? "null" : passo.IdMailRegistro);
-
-                                    query = q.getSQL();
-                                    logger.Debug("Popolo il modello di passo passo: " + query);
-
-                                    if (!ExecuteNonQuery(query))
-                                    {
-                                        throw new Exception("Errore nell'associazione del ruolo al passo di modello");
-                                    }
-                                }
-
                                 q = DocsPaUtils.InitQuery.getInstance().getQuery("U_STATE_ISTANZA_PASSO_NUM");
                                 q.setParam("IdProcesso", idIstanza);
                                 q.setParam("stato", TipoStatoPasso.LOOK.ToString());
@@ -5397,7 +3941,7 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <param name="dataEvento"></param>
         /// <param name="interrottoDa">Utente che ha interrotto. T=Titolare, P=Proponente, A=Amministratore</param>
         /// <returns></returns>
-        public bool InterruptionSignatureProcess(string idIstanzaProcesso, TipoStatoProcesso stato, string docNumber, string noteInterruption, string dataEvento, string interrottoDa, DocsPaVO.utente.InfoUtente infoUtente)
+        public bool InterruptionSignatureProcess(string idIstanzaProcesso, TipoStatoProcesso stato, string docNumber, string noteInterruption, string dataEvento, string interrottoDa)
         {
             bool retVal = false;
 
@@ -5410,11 +3954,6 @@ namespace DocsPaDB.Query_DocsPAWS
                 q.setParam("idIstanza", idIstanzaProcesso);
                 q.setParam("stato", stato.ToString());
                 q.setParam("interrottoDa", interrottoDa);
-                q.setParam("idPeopleInterruzione", infoUtente.idPeople);
-
-                string idPeopleDelegato = (infoUtente.delegato != null && !string.IsNullOrEmpty(infoUtente.delegato.idPeople)) ? infoUtente.delegato.idPeople : "null";
-                q.setParam("idPeopleDelegatoInterruzione", idPeopleDelegato);
-
                 if (string.IsNullOrEmpty(dataEvento))
                     q.setParam("dataConclusione", DocsPaDbManagement.Functions.Functions.GetDate());
                 else
@@ -5439,7 +3978,6 @@ namespace DocsPaDB.Query_DocsPAWS
                         throw new Exception("Errore durante l'aggiornamento della PROFILE: " + query);
                     }
                 }
-
                 retVal = true;
             }
             catch (Exception e)
@@ -5453,7 +3991,8 @@ namespace DocsPaDB.Query_DocsPAWS
 
             return retVal;
         }
-        
+
+
         public ProcessoFirma AggiornaProcessoDiFirma(ProcessoFirma processo, DocsPaVO.utente.InfoUtente infoUtente)
         {
             logger.Debug("Inizio Metodo AggiornaProcessoDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
@@ -5491,36 +4030,11 @@ namespace DocsPaDB.Query_DocsPAWS
         public bool AggiornaTipoProcessoFirma(string idProcesso, DocsPaVO.utente.InfoUtente infoUtente)
         {
             bool result = true;
-            bool isModello = false;
             logger.Debug("Inizio Metodo AggiornaProcessoDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
             try
             {
-                List<PassoFirma> passi = GetPassiProcessoDiFirma(idProcesso);
-                foreach(PassoFirma passo in passi)
-                {
-                    if (!passo.Evento.TipoEvento.Equals("W") && string.IsNullOrEmpty(passo.ruoloCoinvolto.idGruppo))
-                    {
-                        isModello = true;
-                        break;
-                    }
-                    if(passo.IsAutomatico)
-                    {
-                        if(string.IsNullOrEmpty(passo.IdAOO) || string.IsNullOrEmpty(passo.IdRF))
-                        {
-                            isModello = true;
-                            break;
-                        }
-                        if(passo.Evento.CodiceAzione.Equals(Azione.DOCUMENTOSPEDISCI.ToString()) && string.IsNullOrEmpty(passo.IdMailRegistro))
-                        {
-                            isModello = true;
-                            break;
-                        }
-                    }
-                }
-
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_SCHEMA_PROCESSO_FIRMA_CHA_MODELLO");
                 q.setParam("idProcesso", idProcesso);
-                q.setParam("isModello", isModello ? "1" : "0");
 
                 string query = q.getSQL();
                 logger.Debug("AggiornaTipoProcessoFirma: " + query);
@@ -5558,10 +4072,6 @@ namespace DocsPaDB.Query_DocsPAWS
                     q.setParam("ruolo", passo.ruoloCoinvolto == null || string.IsNullOrEmpty(passo.ruoloCoinvolto.idGruppo) ? "null" : passo.ruoloCoinvolto.idGruppo);
                     q.setParam("utente", passo.utenteCoinvolto == null || string.IsNullOrEmpty(passo.utenteCoinvolto.idPeople) ? "null" : passo.utenteCoinvolto.idPeople);
                     q.setParam("tick", "0");
-                    q.setParam("idAoo", string.IsNullOrEmpty(passo.IdAOO) ? "null" : passo.IdAOO);
-                    q.setParam("idRF", string.IsNullOrEmpty(passo.IdRF) ? "null" : passo.IdRF);
-                    q.setParam("idMailRegistro", string.IsNullOrEmpty(passo.IdMailRegistro) ? "null" : passo.IdMailRegistro);
-                    q.setParam("automatico", passo.IsAutomatico ? "1" : "0");
 
                     string query = q.getSQL();
                     logger.Debug("UpdatePassoDiFirma: " + query);
@@ -5621,69 +4131,6 @@ namespace DocsPaDB.Query_DocsPAWS
             logger.Debug("Fine Metodo AggiornaPassoDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma");
 
             return retValue;
-        }
-
-        public bool IsUniqueProcessName(string nomeProcesso, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Debug("Inizio Metodo IsUniqueProcessName in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            bool retVal = true;
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_SCHEMA_PROCESSO_FIRMA_BY_NAME");
-                q.setParam("nomeProcesso", nomeProcesso);
-                q.setParam("idRuoloCreatore", infoUtente.idGruppo);
-
-                string query = q.getSQL();
-                logger.Debug("IsDocInLibroFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "SCHEMA_PROCESSO_FIRMA", query))
-                {
-                    if (ds.Tables["SCHEMA_PROCESSO_FIRMA"] != null && ds.Tables["SCHEMA_PROCESSO_FIRMA"].Rows.Count > 0)
-                    {
-                        retVal = false;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo IsUniqueProcessName in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                retVal = false;
-            }
-
-            return retVal;
-        }
-
-        public bool NotificaPresenzaDestinatariInterop(string idIstanzaProcesso)
-        {
-            logger.Debug("Inizio Metodo NotificaPresenzaDestinatariInterop in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            bool retVal = false;
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_FIRMA_NOTIFICA_DEST_NO_INTEROP");
-                q.setParam("idIstanzaProcesso", idIstanzaProcesso);
-
-                string query = q.getSQL();
-                logger.Debug("NotificaPresenzaDestinatariInterop: " + query);
-
-                if (this.ExecuteQuery(out ds, "NotificaPresenzaDestinatariInterop", query))
-                {
-                    if (ds.Tables["NotificaPresenzaDestinatariInterop"] != null && ds.Tables["NotificaPresenzaDestinatariInterop"].Rows.Count > 0)
-                    {
-                        retVal = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo NotificaPresenzaDestinatariInterop in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                retVal = false;
-            }
-
-            return retVal;
         }
 
         private bool ValedatedProcess(string idProcesso)
@@ -5755,7 +4202,7 @@ namespace DocsPaDB.Query_DocsPAWS
                             user = utente.GetUtente(infoUtente.delegato.userId, infoUtente.delegato.idAmministrazione);
                             if (user != null)
                                 descDelegato = user.descrizione;
-                            descUserLocker = descDelegato + " SOSTITUTO DI " + descDelegante;
+                            descUserLocker = descDelegato + " DELEGATO DA " + descDelegante;
 
                         }
                         else
@@ -5845,11 +4292,8 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_ISTANZA_PROCESSO_FIRMA");
                 q.setParam("idIstanzaProcesso", istanzaProcesso.idIstanzaProcesso);
-                q.setParam("notificaConcluso", (istanzaProcesso.Notifiche.Notifica_concluso) ? "1" : "0");
-                q.setParam("notificaInterrotto", (istanzaProcesso.Notifiche.Notifica_interrotto) ? "1" : "0");
-                q.setParam("notificaErrore", (istanzaProcesso.Notifiche.NotificaErrore) ? "1" : "0");
-                q.setParam("notificaDestNonInterop", (istanzaProcesso.Notifiche.NotificaPresenzaDestNonInterop) ? "1" : "0");
-
+                q.setParam("notificaConcluso", (istanzaProcesso.Notifica_concluso) ? "1" : "0");
+                q.setParam("notificaInterrotto", (istanzaProcesso.Notifica_interrotto) ? "1" : "0");
                 string query = q.getSQL();
                 logger.Debug("UpdateIstanzaProcesso: " + query);
                 if (!ExecuteNonQuery(query))
@@ -6277,7 +4721,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_ELEMENTO_IN_LIBRO_ERRORE_FIRMA");
                 q.setParam("docnumber", docnumber);
-                q.setParam("msgError", msgError.Replace("'", "''"));
+                q.setParam("msgError", msgError);
                 query = q.getSQL();
                 logger.Debug("AggiornaErroreEsitoFirma: " + query);
                 int rowsAffected = 0;
@@ -6445,7 +4889,7 @@ namespace DocsPaDB.Query_DocsPAWS
         /// <param name="idProcesso"></param>
         /// <param name="idCorr"></param>
         /// <returns></returns>
-        public bool RimuoviVisibilitaProcesso(string idProcesso, string idGruppo, DocsPaVO.utente.InfoUtente infoUtente)
+        public bool RimuoviVisibilitaProcesso(string idProcesso, string idCorr, DocsPaVO.utente.InfoUtente infoUtente)
         {
             logger.Debug("Inizio Metodo RimuoviVisibilitaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
             bool retValue = true;
@@ -6453,7 +4897,7 @@ namespace DocsPaDB.Query_DocsPAWS
             {
                 DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_DPA_PROCESSO_FIRMA_VISIBILITA");
                 q.setParam("idProcesso", idProcesso);
-                q.setParam("idGruppo", idGruppo);
+                q.setParam("idCorr", idCorr);
                 string query = q.getSQL();
                 logger.Debug("RimuoviVisibilitaProcesso: " + query);
                 if (!ExecuteNonQuery(query))
@@ -6470,34 +4914,6 @@ namespace DocsPaDB.Query_DocsPAWS
 
             logger.Debug("Fine Metodo RimuoviVisibilitaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
             return retValue;
-        }
-
-        public bool UpdateTipoVisibilitaProcesso(string idProcesso, string idGruppo, TipoVisibilita tipoVisibilita, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Debug("INIZIO Metodo UpdateTipoVisibilitaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            bool result = true;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PROCESSO_FIRMA_VISIBILITA");
-                q.setParam("idProcesso", idProcesso);
-                q.setParam("idGruppo", idGruppo);
-                q.setParam("tipoVisibilita", ((char)tipoVisibilita).ToString());
-
-                string query = q.getSQL();
-                logger.Debug("UpdateTipoVisibilitaProcesso: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    logger.Error("Errore durante la rimozione in U_DPA_PROCESSO_FIRMA_VISIBILITA: " + query);
-                    result = false;
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in UpdateTipoVisibilitaProcesso " + e.Message);
-            }
-
-            logger.Debug("FINE Metodo UpdateTipoVisibilitaProcesso in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            return result;
         }
 
         /// <summary>
@@ -6797,942 +5213,6 @@ namespace DocsPaDB.Query_DocsPAWS
             }
             logger.Debug("Fine Metodo GetIdDocumentInLibroFirmabBySign in DocsPaDb.Query_DocsPAWS.LibroFirma");
             return idDocument;
-        }
-
-        public void SalvaStoricoIstanzaProcessoFirma(string idIstanza,string docnumber, string azione, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            DocsPaUtils.Query query;
-            string commandText;
-            DataSet ds = new DataSet();
-            try
-            {
-                query = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_ISTANZA_PROC_FIRMA_STO");
-                query.setParam("id", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_ISTANZA_PROC_FIRMA_STO"));
-                query.setParam("idUtente", infoUtente.userId);
-                query.setParam("docNumber", docnumber);
-                query.setParam("idIstanzaProcesso", idIstanza);
-                query.setParam("azione", azione.Replace("'", "''"));
-                query.setParam("idPeople", infoUtente.idPeople);
-
-                //Se idGruppo è vuoto è amministratore per cui non inserisco il ruolo
-                query.setParam("idRuolo", string.IsNullOrEmpty(infoUtente.idGruppo) ? "0" : infoUtente.idCorrGlobali);
-                string idPeopleDelegato = "0";
-                if (infoUtente.delegato != null)
-                    idPeopleDelegato = infoUtente.delegato.idPeople;
-                query.setParam("idPeopleDelegato", idPeopleDelegato);
-                
-                commandText = query.getSQL();
-                logger.Debug("SalvaStoricoIstanzaProcessoFirma: " + query);
-                if (!this.ExecuteNonQuery(commandText))
-                {
-                    logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo SalvaStoricoIstanzaProcessoFirma");
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo SalvaStoricoIstanzaProcessoFirma", ex);
-            }
-        }
-
-        public string GetIdIstanzaProcessoInExec(string docnumber)
-        {
-            string idIstanzaProcesso = string.Empty;
-            DocsPaUtils.Query query;
-            string commandText;
-            DataSet ds = new DataSet();
-            try
-            {
-                query = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_FIRMA_ID_BY_DOCNUMBER");
-                query.setParam("docnumber", docnumber);
-
-                commandText = query.getSQL();
-                logger.Debug("SalvaStoricoIstanzaProcessoFirma: " + query);
-                if (this.ExecuteQuery(out ds, "idIstanzaProcesso", commandText))
-                {
-                    if (ds.Tables["idIstanzaProcesso"] != null && ds.Tables["idIstanzaProcesso"].Rows.Count > 0)
-                    {
-                        idIstanzaProcesso = ds.Tables["idIstanzaProcesso"].Rows[0]["ID_ISTANZA"].ToString();
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                logger.Error("Errore nel reperimento dell'id del'istanza di processo");
-            }
-
-            return idIstanzaProcesso;
-        }
-
-        public bool UpdateIstanzaProcessoFirmaDaCambioStato(string docnumber, bool cambioStato)
-        {
-            logger.Debug("Inizio Metodo UpdateIstanzaProcessoFirmaDaCambioStato in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            bool retValue = true;
-            string idIstanzaProcesso = string.Empty;
-            try
-            {
-                idIstanzaProcesso = GetIdIstanzaProcessoInExec(docnumber);
-                if (!string.IsNullOrEmpty(idIstanzaProcesso))
-                {
-                    DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_ISTANZA_PROCESSO_FIRMA_CAMBIO_STATO");
-                    q.setParam("idIstanzaProcesso", idIstanzaProcesso);
-                    q.setParam("chaCambioStato", (cambioStato) ? "1" : "0");
-                    string query = q.getSQL();
-                    logger.Debug("UpdateIstanzaProcesso: " + query);
-                    if (!ExecuteNonQuery(query))
-                    {
-                        throw new Exception("Errore durante l'aggiornamento dell'istanza di processo: " + query);
-                    }
-                }
-                else
-                {
-                    retValue = false;
-                }
-            }
-            catch (Exception e)
-            {
-                RollbackTransaction();
-                logger.Error("Errore nel Metodo UpdateIstanzaProcessoFirmaDaCambioStato in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                return false;
-            }
-
-            logger.Debug("Fine Metodo UpdateIstanzaProcessoFirmaDaCambioStato in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return retValue;
-        }
-
-        /// <summary>
-        /// Restituisce true, se l'istanza di processo è stata avviata da passaggio di stato e quindi occorre selezionare lo stato successivo.
-        /// </summary>
-        /// <param name="idIstanzaProcesso"></param>
-        /// <returns></returns>
-        public bool CheckCambioStatoDocDaLF(string idIstanzaProcesso)
-        {
-            bool retVal = false;
-            logger.Debug("Inizio Metodo CheckCambioStatoDocDaLF in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_FIRMA_STATO_CAMBIO_DIAG");
-                q.setParam("idIstanzaProcesso", idIstanzaProcesso);
-
-                DataSet ds = new DataSet();
-                string query = q.getSQL();
-                logger.Debug("CheckCambioStatoDocDaLF: " + query);
-
-                if (this.ExecuteQuery(out ds, "CheckCambioStatoDocDaLF", query))
-                {
-                    if (ds.Tables["CheckCambioStatoDocDaLF"] != null && ds.Tables["CheckCambioStatoDocDaLF"].Rows.Count > 0)
-                    {
-                        retVal = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in CheckCambioStatoDocDaLF " + e.Message);
-            }
-            logger.Debug("Fine Metodo CheckCambioStatoDocDaLF in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            return retVal;
-        }
-
-        public string InsertReportProcessiTick(string idUtenteCoinvolto, string idRuoloCoinvolto)
-        {
-            logger.Debug("INIZIO InsertIntoReportProcessiTick");
-            string idReport = string.Empty;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_SEQ_DPA_REPORT_PROCESSI_TICK");
-                query = q.getSQL();
-                logger.Debug("InsertIntoReportProcessiTick: " + query);
-                if(!ExecuteScalar(out idReport, query) || string.IsNullOrEmpty(idReport))
-                {
-                    throw new Exception("Errore durante la creazione del report: " + query);
-                }
-                
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_REPORT_PROCESSI_TICK");
-                q.setParam("systemId", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_REPORT_PROCESSI_TICK"));
-                q.setParam("idReport", idReport);
-                if (string.IsNullOrEmpty(idRuoloCoinvolto))
-                {
-                    string idRuoli = string.Empty;
-                    List<string> listIdRuoli = GetIdRuoliProcessiUltimoUtente(idUtenteCoinvolto);
-                    foreach (string id in listIdRuoli)
-                        idRuoli += string.IsNullOrEmpty(idRuoli) ? id : ", " + id;
-
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteCoinvolto) ? string.Empty : " AND ((ID_RUOLO_COINVOLTO IN (" + idRuoli + ") AND ID_UTENTE_COINVOLTO IS NULL) OR ID_UTENTE_COINVOLTO =" + idUtenteCoinvolto + ")");
-                    q.setParam("idRuoloTitolare", string.Empty);
-                }
-                else
-                {
-                    q.setParam("idRuoloTitolare", string.IsNullOrEmpty(idRuoloCoinvolto) ? string.Empty : " AND ID_RUOLO_COINVOLTO = " + idRuoloCoinvolto);
-                    q.setParam("idUtenteTitolare", string.IsNullOrEmpty(idUtenteCoinvolto) ? string.Empty : " AND ID_UTENTE_COINVOLTO = " + idUtenteCoinvolto);
-                }
-                query = q.getSQL();
-                logger.Debug("InsertIntoReportProcessiTick: " + query);
-                int rowsAffected = 0;
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante la creazione del report: " + query);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo InsertIntoReportProcessiTick in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                idReport = string.Empty;
-            }
-            logger.Debug("FINE InsertIntoReportProcessiTick");
-            return idReport;
-        }
-
-        public bool DeleteReportProcessiTick(string idReport)
-        {
-            bool retValue = true;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("D_DPA_REPORT_PROCESSI_TICK");
-                q.setParam("idReport", idReport);
-                string query = q.getSQL();
-                logger.Debug("DeleteReportProcessiTick: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante la creazione del report: " + query);
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in DeleteReportProcessiTick " + e.Message);
-                retValue = false;
-            }
-            return retValue;
-        }
-
-        public List<string> GetListaIdCreatoriProcessiInvalidati(string idReport)
-        {
-            List<string> listIdCreatoriProcessi = new List<string>();
-            try
-            {
-                String query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_REPORT_PROCESSI_TICK_CREATORE");
-                q.setParam("idReport", idReport);
-                query = q.getSQL();
-                logger.Debug("GetListaIdCreatoriProcessiInvalidati: " + query);
-
-                if (this.ExecuteQuery(out ds, "listIdCreatoriProcessi", query))
-                {
-                    if (ds.Tables["listIdCreatoriProcessi"] != null && ds.Tables["listIdCreatoriProcessi"].Rows.Count > 0)
-                    {
-                        foreach (DataRow row in ds.Tables["listIdCreatoriProcessi"].Rows)
-                        {
-                            listIdCreatoriProcessi.Add(row["ID_RUOLO_CREATORE"].ToString());
-                        }
-                    }
-                }
-                else
-                {
-                    throw new Exception("Errore durante l'estrazione: " + query);
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in GetListaIdCreatoriProcessiInvalidati " + e.Message);
-            }
-            return listIdCreatoriProcessi;
-        }
-
-        /// <summary>
-        /// Seleziona la lista degli ID GRUPPO dei ruoli per cui l'utente in input è l'ultimo del ruolo, ed il ruolo è coinvolto in processi
-        /// </summary>
-        /// <param name="idPople"></param>
-        /// <returns></returns>
-        public List<string> GetIdRuoliProcessiUltimoUtente(string idPeople)
-        {
-            List<string> listIdRuoli = new List<string>();
-            try
-            {
-                String query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_PEOPLE_GROUPS_RUOLI_ULTIMO_UTENTE");
-                q.setParam("idPeople", idPeople);
-                query = q.getSQL();
-                logger.Debug("idRuoli: " + query);
-                string idRuolo;
-                if (this.ExecuteQuery(out ds, "idRuoli", query))
-                {
-                    if (ds.Tables["idRuoli"] != null && ds.Tables["idRuoli"].Rows.Count > 0)
-                    {
-                        foreach (DataRow row in ds.Tables["idRuoli"].Rows)
-                        {
-                            idRuolo = row["GROUPS_SYSTEM_ID"].ToString();
-                            if (GetCountProcessiDiFirmaByTitolare(idRuolo, "") > 0 || GetCountIstanzaProcessiDiFirmaByTitolare(idRuolo, "") > 0)
-                                listIdRuoli.Add(idRuolo);
-                        }
-                    }
-                }
-                else
-                {
-                    throw new Exception("Errore durante l'estrazione: " + query);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in GetIdRuoliProcessiUltimoUtente " + e.Message);
-            }
-            return listIdRuoli;
-        }
-
-        public bool IsEventoAutomatico(string codiceEvento)
-        {
-            logger.Debug("Inizio Metodo IsEventoAutomatico in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            bool retVal = false;
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ANAGRAFICA_EVENTI_AUTOMATICO");
-                q.setParam("codiceEvento", codiceEvento);
-
-                string query = q.getSQL();
-                logger.Debug("IsEventoAutomatico: " + query);
-
-                if (this.ExecuteQuery(out ds, "IsEventoAutomatico", query))
-                {
-                    if (ds.Tables["IsEventoAutomatico"] != null && ds.Tables["IsEventoAutomatico"].Rows.Count > 0)
-                    {
-                        retVal = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore nel Metodo IsModelloDiFirma in DocsPaDb.Query_DocsPAWS.LibroFirma: " + e.Message);
-                retVal = false;
-            }
-
-            return retVal;
-        }
-
-        public DocsPaVO.amministrazione.CasellaRegistro GetCasellaRegistroByIdMail(string idMail)
-        {
-            logger.Debug("Inizio Metodo GetCasellaRegistroByIdMail in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            DocsPaVO.amministrazione.CasellaRegistro casella = new DocsPaVO.amministrazione.CasellaRegistro();
-            try
-            {
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_MAIL_REGISTRI_BY_ID_MAIL");
-                q.setParam("idMail", idMail);
-
-                string query = q.getSQL();
-                logger.Debug("GetCasellaRegistroByIdMail: " + query);
-
-                if (!this.ExecuteQuery(out ds, "casellaRegistro", query))
-                    throw new Exception("Errore durante l'estrazione: " + query);
-
-                if (ds.Tables["casellaRegistro"] != null && ds.Tables["casellaRegistro"].Rows.Count > 0)
-                {
-                    DataRow row = ds.Tables["casellaRegistro"].Rows[0];
-                    casella.IdRegistro = row["ID_REGISTRO"].ToString();
-                    casella.EmailRegistro = row["VAR_EMAIL_REGISTRO"].ToString();
-                    casella.System_id = idMail;
-                }             
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in GetCasellaRegistroByIdMail: " + e.Message);
-                return null;
-            }
-            logger.Debug("Fine Metodo GetCasellaRegistroByIdMail in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            return casella;
-        }
-
-        public bool SetErroreIstanzaPassoFirma(string errore, string idIstanzaPasso, string idIstanzaProcesso, TipoStatoProcesso stato)
-        {
-            bool result = true;
-
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_ISTANZA_PASSO_FIRMA_ERRORE");
-                q.setParam("idIstanzaPasso", idIstanzaPasso);
-                q.setParam("errore", errore.Replace("'", "''"));
-                string query = q.getSQL();
-                logger.Debug("SetErroreIstanzaPassoFirma: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dell'istanza di passo: " + query);
-                }
-                if (!SetStatoistanzaProcessoFirma(idIstanzaProcesso, stato))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dell'istanza di processo: " + query);
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in SetErroreIstanzaPassoFirma " + e.Message);
-                result = false;
-            }
-
-            return result;
-        }
-
-        public bool SetStatoistanzaProcessoFirma(string idIstanzaProcesso, TipoStatoProcesso stato)
-        {
-            bool result = true;
-
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_ISTANZA_PROCESSO_FIRMA_STATO");          
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("U_ISTANZA_PROCESSO_FIRMA_STATO");
-                q.setParam("idIstanzaProcesso", idIstanzaProcesso);
-                q.setParam("stato", stato.ToString());
-                string query = q.getSQL();
-                logger.Debug("SetErroreIstanzaProcessoFirma: " + query);
-                if (!ExecuteNonQuery(query))
-                {
-                    throw new Exception("Errore durante l'aggiornamento dell'istanza di processo: " + query);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Error("Errore in SetStatoistanzaProcessoFirma " + e.Message);
-                result = false;
-            }
-
-            return result;
-        }
-
-        public bool IsIstanzaProcessoConPassiAutomatici(string idIstanzaProcesso)
-        {
-            bool result = false;
-
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSO_PASSI_AUTOMATICI");
-                q.setParam("idIstanzaProcesso", idIstanzaProcesso);
-
-                query = q.getSQL();
-                logger.Debug("IsIstanzaProcessoConPassiAutomatici: " + query);
-
-                if (this.ExecuteQuery(out ds, "IsIstanzaProcessoConPassiAutomatici", query))
-                {
-                    if (ds.Tables["IsIstanzaProcessoConPassiAutomatici"] != null && ds.Tables["IsIstanzaProcessoConPassiAutomatici"].Rows.Count > 0)
-                    {
-                        result = true;
-                    }
-                    else
-                    {
-                        result = false;
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                logger.Error("Errore in IsProcessoConPassiAutomatici: " + e.Message);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Verifica l'esistenza di passi di firma in cui sono coinvolti il ruolo ed i registri la cui visibilità verra rimossa dai ruoli
-        /// </summary>
-        /// <param name="listaRegistriSelezionati"></param>
-        /// <param name="idRuoloInUO"></param>
-        /// <param name="idGruppo"></param>
-        /// <returns></returns>
-        public bool ExistsPassiFirmaByRuoloTitolareAndRegistro(DocsPaVO.amministrazione.RightRuoloMailRegistro[] rightRuoloMailReg, string idRuoloInUO, string idGruppo)
-        {
-            bool result = false;
-            string idRegistriSelezionati = string.Empty;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_PASSO_DI_FIRMA_ID_RUOLO_TITOLARE_REGISTRO");
-                q.setParam("idRuoloInUO", idRuoloInUO);
-                q.setParam("idGruppo", idGruppo);
-                
-                foreach (DocsPaVO.amministrazione.RightRuoloMailRegistro registro in rightRuoloMailReg)
-                {
-                    idRegistriSelezionati += "," + registro.IdRegistro;
-                }
-                idRegistriSelezionati = "NOT IN (" + idRegistriSelezionati.Substring(1, idRegistriSelezionati.Length - 1) + ")";
-
-                q.setParam("idRegistriSelezionati", idRegistriSelezionati);
-
-                query = q.getSQL();
-                logger.Debug("PassoFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "PassoFirma", query))
-                {
-                    if (ds.Tables["PassoFirma"] != null && ds.Tables["PassoFirma"].Rows.Count > 0)
-                    {
-                        result = true;
-                    }
-                }
-                //Se la visibilita dei registri non è stata modificata controllo se è stato modificato il flag spedizione
-                if(!result)
-                {
-                    foreach (DocsPaVO.amministrazione.RightRuoloMailRegistro registro in rightRuoloMailReg)
-                    {
-                        if (!string.IsNullOrEmpty(registro.EmailRegistro) && !registro.cha_spedisci.ToLower().Equals("true"))
-                        {
-                            q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_PASSO_DI_FIRMA_ID_RUOLO_TITOLARE_REGISTRO_MAIL");
-                            q.setParam("idRuoloInUO", idRuoloInUO);
-                            q.setParam("idGruppo", idGruppo);
-                            q.setParam("idRegistro", registro.IdRegistro);
-                            q.setParam("emailRegistro", registro.EmailRegistro.Trim());
-
-                            query = q.getSQL();
-                            logger.Debug("PassoFirma: " + query);
-
-                            if (this.ExecuteQuery(out ds, "PassoFirma", query))
-                            {
-                                if (ds.Tables["PassoFirma"] != null && ds.Tables["PassoFirma"].Rows.Count > 0)
-                                {
-                                    result = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                result = false;
-                logger.Error("Errore in CheckProcessiFirmaRuoloRegistro: " + e.Message);
-            }
-
-            return result;
-        }
-
-        public bool ExistsPassiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro)
-        {
-            bool result = false;
-            string idRegistriSelezionati = string.Empty;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-
-                DocsPaUtils.Query q;
-                if(!string.IsNullOrEmpty(emailRegistro))
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_PASSO_DI_FIRMA_BY_REGISTRO_EMAIL");
-                else
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_PASSO_DI_FIRMA_BY_REGISTRO");
-                q.setParam("idRegistro", idRegistro);
-                q.setParam("emailRegistro", emailRegistro);
-              
-                query = q.getSQL();
-                logger.Debug("PassoFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "PassoFirma", query))
-                {
-                    if (ds.Tables["PassoFirma"] != null && ds.Tables["PassoFirma"].Rows.Count > 0)
-                    {
-                        result = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                result = false;
-                logger.Error("Errore in ExistsPassiFirmaByIdRegistroAndIdCasellaRegistro: " + e.Message);
-            }
-
-            return result;
-        }
-
-        public bool InvalidaProcessiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro)
-        {
-            bool result = false;
-            string idRegistriSelezionati = string.Empty;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-
-                DocsPaUtils.Query q;
-                if (!string.IsNullOrEmpty(emailRegistro))
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_DI_FIRMA_BY_REGISTRO_EMAIL");
-                else
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_DI_FIRMA_BY_REGISTRO");
-                q.setParam("idRegistro", idRegistro);
-                q.setParam("emailRegistro", emailRegistro);
-
-                query = q.getSQL();
-                logger.Debug("PassoFirma: " + query);
-
-                int rowsAffected = 0;
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante l'aggiornamento del TickPasso in libro firma: " + query);
-                }
-
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PROCESSO_TICK_2");
-                q.setParam("idRuoloTitolare", string.Empty);
-                q.setParam("idUtenteTitolare", string.Empty);
-                query = q.getSQL();
-                logger.Debug("InvalidaProcessiFirmaUtenteCoinvolto: " + query);
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante l'aggiornamento del TickProcesso in libro firma: " + query);
-                }
-                result = true;
-            }
-            catch (Exception e)
-            {
-                result = false;
-                logger.Error("Errore in InvalidaProcessiFirmaByIdRegistroAndEmailRegistro: " + e.Message);
-            }
-
-            return result;
-        }
-
-        public bool InvalidaProcessiRegistriCoinvolti(DocsPaVO.amministrazione.RightRuoloMailRegistro[] rightRuoloMailReg, string idRuoloInUO, string idGruppo)
-        {
-            bool result = false;
-            string idRegistriSelezionati = string.Empty;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_DI_FIRMA_ID_RUOLO_TITOLARE_REGISTRO_TICK");
-                q.setParam("idRuoloInUO", idRuoloInUO);
-                q.setParam("idGruppo", idGruppo);
-
-                foreach (DocsPaVO.amministrazione.RightRuoloMailRegistro registro in rightRuoloMailReg)
-                {
-                    idRegistriSelezionati += "," + registro.IdRegistro;
-                }
-                idRegistriSelezionati = "NOT IN (" + idRegistriSelezionati.Substring(1, idRegistriSelezionati.Length - 1) + ")";
-
-                q.setParam("idRegistriSelezionati", idRegistriSelezionati);
-
-                query = q.getSQL();
-                logger.Debug("PassoFirma: " + query);
-
-                int rowsAffected = 0;
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante l'aggiornamento del TickPasso in libro firma: " + query);
-                }
-                //Se la visibilita dei registri non è stata modificata controllo se è stato modificato il flag spedizione
-                foreach (DocsPaVO.amministrazione.RightRuoloMailRegistro registro in rightRuoloMailReg)
-                {
-                    if (!string.IsNullOrEmpty(registro.EmailRegistro) && !registro.cha_spedisci.Equals("1"))
-                    {
-                        q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PASSO_DI_FIRMA_ID_RUOLO_TITOLARE_REGISTRO_MAIL_TICK");
-                        q.setParam("idRuoloInUO", idRuoloInUO);
-                        q.setParam("idGruppo", idGruppo);
-                        q.setParam("idRegistro", registro.IdRegistro);
-                        q.setParam("emailRegistro", registro.EmailRegistro.Trim());
-
-                        query = q.getSQL();
-                        logger.Debug("PassoFirma: " + query);
-
-                        rowsAffected = 0;
-                        if (!ExecuteNonQuery(query, out rowsAffected))
-                        {
-                            throw new Exception("Errore durante l'aggiornamento del TickPasso in libro firma: " + query);
-                        }
-                    }
-                }
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("U_DPA_PROCESSO_TICK_2");
-                q.setParam("idRuoloTitolare", " AND ID_RUOLO_COINVOLTO = " + idGruppo);
-                q.setParam("idUtenteTitolare", string.Empty);
-                query = q.getSQL();
-                logger.Debug("InvalidaProcessiFirmaUtenteCoinvolto: " + query);
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante l'aggiornamento del TickProcesso in libro firma: " + query);
-                }
-                result = true;
-            }
-            catch (Exception e)
-            {
-                result = false;
-                logger.Error("Errore in InvalidaProcessiRegistriCoinvolti: " + e.Message);
-            }
-
-            return result;
-        }
-
-        public string InsertReportProcessiTickRegistroRuolo(DocsPaVO.amministrazione.RightRuoloMailRegistro[] rightRuoloMailReg, string idRuoloInUO, string idGruppo)
-        {
-            logger.Debug("INIZIO InsertReportProcessiTickRegistroRuolo");
-            string idReport = string.Empty;
-            string idRegistriSelezionati = string.Empty;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_SEQ_DPA_REPORT_PROCESSI_TICK");
-                query = q.getSQL();
-                logger.Debug("InsertIntoReportProcessiTick: " + query);
-                if (!ExecuteScalar(out idReport, query) || string.IsNullOrEmpty(idReport))
-                {
-                    throw new Exception("Errore durante la creazione del report: " + query);
-                }
-
-                q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_REPORT_PROCESSI_TICK_REGISTRO_RUOLO");
-                q.setParam("systemId", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_REPORT_PROCESSI_TICK"));
-                q.setParam("idReport", idReport);
-                q.setParam("idRuoloInUO", idRuoloInUO);
-                q.setParam("idGruppo", idGruppo);
-
-                foreach (DocsPaVO.amministrazione.RightRuoloMailRegistro registro in rightRuoloMailReg)
-                {
-                    idRegistriSelezionati += "," + registro.IdRegistro;
-                }
-                idRegistriSelezionati = "NOT IN (" + idRegistriSelezionati.Substring(1, idRegistriSelezionati.Length - 1) + ")";
-
-                q.setParam("idRegistriSelezionati", idRegistriSelezionati);
-
-                query = q.getSQL();
-                logger.Debug("InsertIntoReportProcessiTick: " + query);
-                int rowsAffected = 0;
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante la creazione del report: " + query);
-                }
-
-                //Se la visibilita dei registri non è stata modificata controllo se è stato modificato il flag spedizione
-                foreach (DocsPaVO.amministrazione.RightRuoloMailRegistro registro in rightRuoloMailReg)
-                {
-                    if (!string.IsNullOrEmpty(registro.EmailRegistro) && !registro.cha_spedisci.Equals("1"))
-                    {
-                        q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_REPORT_PROCESSI_TICK_REGISTRO_RUOLO_MAIL");
-                        q.setParam("systemId", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_REPORT_PROCESSI_TICK"));
-                        q.setParam("idReport", idReport);
-                        q.setParam("idRuoloInUO", idRuoloInUO);
-                        q.setParam("idGruppo", idGruppo);
-                        q.setParam("idRegistro", registro.IdRegistro);
-                        q.setParam("emailRegistro", registro.EmailRegistro.Trim());
-
-                        query = q.getSQL();
-                        logger.Debug("PassoFirma: " + query);
-
-                        rowsAffected = 0;
-                        if (!ExecuteNonQuery(query, out rowsAffected))
-                        {
-                            throw new Exception("Errore durante l'aggiornamento del TickPasso in libro firma: " + query);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo InsertReportProcessiTickRegistroRuolo in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                idReport = string.Empty;
-            }
-            logger.Debug("FINE InsertReportProcessiTickRegistroRuolo");
-            return idReport;
-        }
-
-        public string InsertReportProcessiTickByRegistroAndEmailRegistro(string idRegistro, string emailRegistro)
-        {
-            logger.Debug("INIZIO InsertReportProcessiTickByRegistroAndEmailRegistro");
-            string idReport = string.Empty;
-            string idRegistriSelezionati = string.Empty;
-            string query;
-            try
-            {
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_SEQ_DPA_REPORT_PROCESSI_TICK");
-                query = q.getSQL();
-                logger.Debug("InsertIntoReportProcessiTick: " + query);
-                if (!ExecuteScalar(out idReport, query) || string.IsNullOrEmpty(idReport))
-                {
-                    throw new Exception("Errore durante la creazione del report: " + query);
-                }
-
-                if (!string.IsNullOrEmpty(emailRegistro))
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_REPORT_PROCESSI_TICK_REGISTRO_MAIL");
-                else
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("I_DPA_REPORT_PROCESSI_TICK_REGISTRO");
-                
-                q.setParam("systemId", DocsPaDbManagement.Functions.Functions.GetSystemIdNextVal("DPA_REPORT_PROCESSI_TICK"));
-                q.setParam("idReport", idReport);
-                q.setParam("idRegistro", idRegistro);
-                q.setParam("emailRegistro", emailRegistro);
-                
-                query = q.getSQL();
-                logger.Debug("InsertIntoReportProcessiTick: " + query);
-                int rowsAffected = 0;
-                if (!ExecuteNonQuery(query, out rowsAffected))
-                {
-                    throw new Exception("Errore durante la creazione del report: " + query);
-                }               
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Errore nel Metodo InsertReportProcessiTickByRegistroAndEmailRegistro in DocsPaDb.Query_DocsPAWS.LibroFirma: " + ex.Message);
-                idReport = string.Empty;
-            }
-            logger.Debug("FINE InsertReportProcessiTickByRegistroAndEmailRegistro");
-            return idReport;
-        }
-
-        public List<IstanzaProcessoDiFirma> GetIstanzaProcessiDiFirmaRegistriCoinvolti(DocsPaVO.amministrazione.RightRuoloMailRegistro[] rightRuoloMailReg, string idRuoloInUO, string idGruppo, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Info("Inizio Metodo GetIstanzaProcessiDiFirmaRegistriCoinvolti in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            List<IstanzaProcessoDiFirma> istanzeProcessoDiFirmaList = new List<IstanzaProcessoDiFirma>();
-            string idRegistriSelezionati = string.Empty;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSI_DI_FIRMA_ID_RUOLO_TITOLARE_REGISTRO");
-                q.setParam("idRuoloInUO", idRuoloInUO);
-                q.setParam("idGruppo", idGruppo);
-
-                foreach (DocsPaVO.amministrazione.RightRuoloMailRegistro registro in rightRuoloMailReg)
-                {
-                    idRegistriSelezionati += "," + registro.IdRegistro;
-                }
-                idRegistriSelezionati = "NOT IN (" + idRegistriSelezionati.Substring(1, idRegistriSelezionati.Length - 1) + ")";
-
-                q.setParam("idRegistriSelezionati", idRegistriSelezionati);
-
-                query = q.getSQL();
-                logger.Debug("PassoFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "istanzaProcessiDiFirma", query))
-                {
-                    if (ds.Tables["istanzaProcessiDiFirma"] != null && ds.Tables["istanzaProcessiDiFirma"].Rows.Count > 0)
-                    {
-                        IstanzaProcessoDiFirma istanzaProcessoDiFirma = new IstanzaProcessoDiFirma();
-                        foreach (DataRow row in ds.Tables["istanzaProcessiDiFirma"].Rows)
-                        {
-                            istanzaProcessoDiFirma = new IstanzaProcessoDiFirma()
-                            {
-                                idIstanzaProcesso = row["ID_ISTANZA"].ToString(),
-                                idProcesso = row["ID_PROCESSO"].ToString(),
-                                Descrizione = row["DESCRIZIONE"].ToString(),
-                                dataAttivazione = row["ATTIVATO_IL"].ToString(),
-                                docNumber = row["ID_DOCUMENTO"].ToString(),
-                                AttivatoPerPassaggioStato = (!string.IsNullOrEmpty(row["CHA_CAMBIO_STATO_DIAG"].ToString()) && row["CHA_CAMBIO_STATO_DIAG"].ToString().Equals("1")) ? true : false,
-                                docAll = !string.IsNullOrEmpty(row["DOC_ALL"].ToString()) ? row["DOC_ALL"].ToString() : string.Empty,
-                                RuoloProponente = GetRuolo(row, false),
-                                UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() },
-                                istanzePassoDiFirma = new List<IstanzaPassoDiFirma>() { GetIstanzaPassoDiFirmaInAttesa(row["ID_ISTANZA"].ToString()) }
-                            };
-                            istanzeProcessoDiFirmaList.Add(istanzaProcessoDiFirma);
-                        }
-                    }
-                }
-
-                //Se la visibilita dei registri non è stata modificata controllo se è stato modificato il flag spedizione
-                foreach (DocsPaVO.amministrazione.RightRuoloMailRegistro registro in rightRuoloMailReg)
-                {
-                    if (!string.IsNullOrEmpty(registro.EmailRegistro) && !registro.cha_spedisci.Equals("1"))
-                    {
-                        q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSI_DI_FIRMA_ID_RUOLO_TITOLARE_REGISTRO_MAIL");
-                        q.setParam("idRuoloInUO", idRuoloInUO);
-                        q.setParam("idGruppo", idGruppo);
-                        q.setParam("idRegistro", registro.IdRegistro);
-                        q.setParam("emailRegistro", registro.EmailRegistro.Trim());
-
-                        query = q.getSQL();
-                        logger.Debug("PassoFirma: " + query);
-
-                        if (this.ExecuteQuery(out ds, "istanzaProcessiDiFirma", query))
-                        {
-                            if (ds.Tables["istanzaProcessiDiFirma"] != null && ds.Tables["istanzaProcessiDiFirma"].Rows.Count > 0)
-                            {
-                                IstanzaProcessoDiFirma istanzaProcessoDiFirma = new IstanzaProcessoDiFirma();
-                                foreach (DataRow row in ds.Tables["istanzaProcessiDiFirma"].Rows)
-                                {
-                                    istanzaProcessoDiFirma = new IstanzaProcessoDiFirma()
-                                    {
-                                        idIstanzaProcesso = row["ID_ISTANZA"].ToString(),
-                                        idProcesso = row["ID_PROCESSO"].ToString(),
-                                        Descrizione = row["DESCRIZIONE"].ToString(),
-                                        dataAttivazione = row["ATTIVATO_IL"].ToString(),
-                                        docNumber = row["ID_DOCUMENTO"].ToString(),
-                                        AttivatoPerPassaggioStato = (!string.IsNullOrEmpty(row["CHA_CAMBIO_STATO_DIAG"].ToString()) && row["CHA_CAMBIO_STATO_DIAG"].ToString().Equals("1")) ? true : false,
-                                        docAll = !string.IsNullOrEmpty(row["DOC_ALL"].ToString()) ? row["DOC_ALL"].ToString() : string.Empty,
-                                        RuoloProponente = GetRuolo(row, false),
-                                        UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() },
-                                        istanzePassoDiFirma = new List<IstanzaPassoDiFirma>() { GetIstanzaPassoDiFirmaInAttesa(row["ID_ISTANZA"].ToString()) }
-                                    };
-                                    if((from i in istanzeProcessoDiFirmaList where i.idIstanzaProcesso.Equals(istanzaProcessoDiFirma.idIstanzaProcesso) select i).FirstOrDefault() == null)
-                                        istanzeProcessoDiFirmaList.Add(istanzaProcessoDiFirma);
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetIstanzaProcessiDiFirmaRegistriCoinvolti", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetIstanzaProcessiDiFirmaRegistriCoinvolti in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return istanzeProcessoDiFirmaList;
-        }
-
-        public List<IstanzaProcessoDiFirma> GetIstanzaProcessiDiFirmaByIdRegistroAndEmailRegistro(string idRegistro, string emailRegistro, DocsPaVO.utente.InfoUtente infoUtente)
-        {
-            logger.Info("Inizio Metodo GetIstanzaProcessiDiFirmaRegistriCoinvolti in DocsPaDb.Query_DocsPAWS.LibroFirma");
-            List<IstanzaProcessoDiFirma> istanzeProcessoDiFirmaList = new List<IstanzaProcessoDiFirma>();
-            string idRegistriSelezionati = string.Empty;
-            try
-            {
-                string query;
-                DataSet ds = new DataSet();
-                DocsPaUtils.Query q;
-                if (!string.IsNullOrEmpty(emailRegistro))
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSI_DI_FIRMA_BY_REGISTRO_EMAIL");
-                else
-                    q = DocsPaUtils.InitQuery.getInstance().getQuery("S_DPA_ISTANZA_PROCESSI_DI_FIRMA_BY_REGISTRO");
-                q.setParam("idRegistro", idRegistro);
-                q.setParam("emailRegistro", emailRegistro);
-
-                query = q.getSQL();
-                logger.Debug("PassoFirma: " + query);
-
-                if (this.ExecuteQuery(out ds, "istanzaProcessiDiFirma", query))
-                {
-                    if (ds.Tables["istanzaProcessiDiFirma"] != null && ds.Tables["istanzaProcessiDiFirma"].Rows.Count > 0)
-                    {
-                        IstanzaProcessoDiFirma istanzaProcessoDiFirma = new IstanzaProcessoDiFirma();
-                        foreach (DataRow row in ds.Tables["istanzaProcessiDiFirma"].Rows)
-                        {
-                            istanzaProcessoDiFirma = new IstanzaProcessoDiFirma()
-                            {
-                                idIstanzaProcesso = row["ID_ISTANZA"].ToString(),
-                                idProcesso = row["ID_PROCESSO"].ToString(),
-                                Descrizione = row["DESCRIZIONE"].ToString(),
-                                dataAttivazione = row["ATTIVATO_IL"].ToString(),
-                                docNumber = row["ID_DOCUMENTO"].ToString(),
-                                AttivatoPerPassaggioStato = (!string.IsNullOrEmpty(row["CHA_CAMBIO_STATO_DIAG"].ToString()) && row["CHA_CAMBIO_STATO_DIAG"].ToString().Equals("1")) ? true : false,
-                                docAll = !string.IsNullOrEmpty(row["DOC_ALL"].ToString()) ? row["DOC_ALL"].ToString() : string.Empty,
-                                RuoloProponente = GetRuolo(row, false),
-                                UtenteProponente = new DocsPaVO.utente.Utente() { idPeople = row["ID_UTENTE"].ToString(), descrizione = row["USER_DESCRIPTION"].ToString(), userId = row["USER_CODE"].ToString(), systemId = row["USER_SYSTEM_ID"].ToString() },
-                                istanzePassoDiFirma = new List<IstanzaPassoDiFirma>() { GetIstanzaPassoDiFirmaInAttesa(row["ID_ISTANZA"].ToString()) }
-                            };
-                            istanzeProcessoDiFirmaList.Add(istanzaProcessoDiFirma);
-                        }
-                    }
-                }    
-
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Errore in DocsPaDb.Query_DocsPAWS.LibroFirma - Metodo GetIstanzaProcessiDiFirmaByIdRegistroAndEmailRegistro", exc);
-                return null;
-            }
-            logger.Info("Fine Metodo GetIstanzaProcessiDiFirmaByIdRegistroAndEmailRegistro in DocsPaDb.Query_DocsPAWS.LibroFirma");
-
-            return istanzeProcessoDiFirmaList;
         }
 
         private string getUserDB()

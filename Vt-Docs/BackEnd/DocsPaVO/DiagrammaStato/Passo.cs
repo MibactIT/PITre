@@ -9,7 +9,6 @@ namespace DocsPaVO.DiagrammaStato
 		public int ID_DIAGRAMMA;
 		public Stato STATO_PADRE;
 		public string ID_STATO_AUTOMATICO;
-        public string ID_STATO_AUTOMATICO_LF;
 		public string DESCRIZIONE_STATO_AUTOMATICO = "";
 
 		[XmlArray()]

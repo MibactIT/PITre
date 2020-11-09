@@ -73,6 +73,8 @@ namespace DocsPaVO.ProfilazioneDinamica
 
         public string RESETTA_CONTATORE_INIZIO_ANNO;
         public string FORMATO_CONTATORE;
+        public string IS_SEGNATURA_PERMANENTE;
+        public string IS_SEGNATURA_PERMANENTE_ONNICOMPRENSIVA;
         public string ANNO;
         public string CAMPO_COMUNE;
 

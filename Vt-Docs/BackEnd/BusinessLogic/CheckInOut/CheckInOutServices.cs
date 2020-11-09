@@ -559,6 +559,11 @@ namespace BusinessLogic.CheckInOut
                                 BusinessLogic.Modelli.AsposeModelProcessor.PptModelProcessor processor = new Modelli.AsposeModelProcessor.PptModelProcessor();
                                 content = processor.GetProcessedTemplate(user, sd);
                             }
+                            else if (sd != null && sd.template != null && sd.template.PATH_MODELLO_1 != null && (sd.template.PATH_MODELLO_1_EXT.ToUpper().Equals("ODT")))
+                            {
+                                BusinessLogic.Modelli.AsposeModelProcessor.DocModelProcessor processor = new Modelli.AsposeModelProcessor.DocModelProcessor();
+                                content = processor.GetProcessedTemplate(user, sd);
+                            }
                             else
                             {
                                 // Se non è presente alcun documento,

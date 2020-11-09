@@ -11,13 +11,13 @@ namespace BusinessLogic.Rubrica
 
 		public RF(){}
 
-        public static ArrayList getCorrispondentiByCodRF(string codiceRF) 
+        public static ArrayList getCorrispondentiByCodRF(string codiceRF, string idAmm = "") 
 		{
 			ArrayList corr = new ArrayList();
 			try 
 			{
 				DocsPaDB.Query_DocsPAWS.RF rf = new DocsPaDB.Query_DocsPAWS.RF();
-				corr = rf.getCorrispondentiByCodRF(codiceRF);
+				corr = rf.getCorrispondentiByCodRF(codiceRF, idAmm);
 			}
 			catch(Exception e) 
 			{

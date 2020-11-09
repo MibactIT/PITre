@@ -206,7 +206,6 @@ namespace BusinessLogic.interoperabilita.Semplificata
             {
                 foreach (ReceiverInfo receiver in receiversInfo)
                 {
-                    tempReceivers = new List<Corrispondente>();
                     // Il codice del corrispondente pubblicato in Rubrica Comune è composto da CodiceAmministrazione-CodiceCorrispondente
                     String corrCode = receiver.Code;
                     logger.Debug("RAFFREDDORE - receiver.Code " + corrCode);

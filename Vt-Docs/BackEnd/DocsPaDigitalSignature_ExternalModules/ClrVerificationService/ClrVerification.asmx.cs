@@ -58,12 +58,12 @@ namespace ClrVerificationService
             return false;
         }
 
-        
+
         [WebMethod]
         public string ProvaServizio()
         {
             string file =  Server.MapPath("~")+"\\test.p7m";
-            return VerificaCertificato(System.IO.File.ReadAllBytes(file), DateTime.Now, false, false);
+            return VerificaCertificato(System.IO.File.ReadAllBytes(file), DateTime.Now, false);
         }
 
         [WebMethod]
@@ -146,23 +146,21 @@ namespace ClrVerificationService
 
 
         [WebMethod]
-        public string VerificaCertificatoFileLocale(string file, DateTime? dataverificaDT, bool ancheFile, bool isCadesPades)
+        public string VerificaCertificatoFileLocale(string file, DateTime? dataverificaDT, bool ancheFile)
         {
-            return VerificaCertificato(System.IO.File.ReadAllBytes(file), dataverificaDT, ancheFile, isCadesPades);
+            return VerificaCertificato(System.IO.File.ReadAllBytes(file), dataverificaDT, ancheFile);
         }
 
         [WebMethod]
-        public string VerificaCertificato(byte[] content, DateTime? dataverificaDT,bool ancheFile, bool isCadesPades)
+        public string VerificaCertificato(byte[] content, DateTime? dataverificaDT,bool ancheFile)
         {
             OpenWcfChannel();
             Verifica clr = new Verifica();
             EsitoVerifica retval = null;
             try
             {
-                if(!isCadesPades)
-                    retval = clr.VerificaByteEV(content,null, dataverificaDT, client);
-                else
-                    retval = clr.VerificaByteEVCompleta(content, dataverificaDT, client);
+
+                retval = clr.VerificaByteEV(content,null, dataverificaDT, client);
                 logger.Debug("Verifica cerificato effettuato con successo.");
             }
             catch (Exception e)
